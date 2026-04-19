@@ -1,0 +1,35 @@
+{% extends 'builder/base.html' %}
+
+{% block content %}
+
+<main class="ml-64 pt-16 min-h-screen bg-gray-50">
+<div class="p-8 max-w-3xl mx-auto">
+
+<h2 class="text-2xl font-bold mb-6">Create Campaign</h2>
+
+<form method="POST" class="bg-white p-6 rounded-xl shadow space-y-4">
+    {% csrf_token %}
+
+    <input type="text" name="name" placeholder="Campaign Name"
+        class="w-full border px-4 py-2 rounded" required>
+
+    <input type="number" name="reach" placeholder="Total Reach"
+        class="w-full border px-4 py-2 rounded">
+
+    <input type="number" name="clicked" placeholder="Clicks"
+        class="w-full border px-4 py-2 rounded">
+
+    <input type="number" name="conversion" placeholder="Conversions"
+        class="w-full border px-4 py-2 rounded">
+  <!-- ✅ IMAGE FIELD -->
+    <input type="file" name="image" class="border p-2 w-full mb-3">
+    <button class="bg-blue-600 text-white px-6 py-2 rounded">
+        Create Campaign
+    </button>
+
+</form>
+
+</div>
+</main>
+
+{% endblock %}

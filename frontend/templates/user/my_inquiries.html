@@ -1,0 +1,24 @@
+{% for inquiry in inquiries %}
+
+
+  <p>{{ inquiry.name }}</p>
+  <p>{{ inquiry.email }}</p>
+  <p>{{ inquiry.message }}</p>
+  <hr>
+
+
+    {% if inquiry.agent %}
+        <p class="text-green-600 font-bold">
+            Assigned Agent: {{ inquiry.agent.username }}
+        </p>
+        <p>
+            Phone: {{ inquiry.agent.phone }}
+        </p>
+    {% else %}
+        <p class="text-yellow-500">
+            ⏳ Agent not assigned yet
+        </p>
+    {% endif %}
+</div>
+
+{% endfor %}

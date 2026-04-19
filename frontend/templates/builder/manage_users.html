@@ -1,0 +1,118 @@
+{% extends 'builder/base.html' %}
+{% block content %}
+
+<main class="ml-64 min-h-screen bg-gray-50">
+<div class="p-10">
+
+<!-- HEADER -->
+<div class="flex justify-between items-center mb-8">
+    <h2 class="text-3xl font-bold">Manage Users</h2>
+
+    <!-- ADD USER -->
+    <form method="POST" action="{% url 'create_agent' %}" class="flex gap-2">
+        {% csrf_token %}
+        <input name="name" placeholder="Name" class="border px-3 py-2 rounded">
+        <input name="email" placeholder="Email" class="border px-3 py-2 rounded">
+        <input name="phone" placeholder="Phone" class="border px-3 py-2 rounded">
+
+        <select name="role" class="border px-3 py-2 rounded">
+            <option value="Agent">Agent</option>
+            <option value="Admin">Admin</option>
+        </select>
+
+        <button class="bg-blue-600 text-white px-4 py-2 rounded">
+            + Add
+        </button>
+    </form>
+</div>
+
+<!-- SEARCH + FILTER -->
+<div class="flex justify-between mb-6">
+
+<form method="GET" class="flex gap-3">
+    <input type="text" name="q" placeholder="Search..."
+           class="border px-4 py-2 rounded w-64">
+
+    <select name="role" class="border px-3 py-2 rounded">
+        <option value="">All Roles</option>
+        <option value="Agent">Agent</option>
+        <option value="Admin">Admin</option>
+    </select>
+
+    <button class="bg-gray-800 text-white px-4 py-2 rounded">
+        Filter
+    </button>
+</form>
+
+</div>
+
+<!-- TABLE -->
+<div class="bg-white rounded-xl shadow overflow-hidden">
+
+<table class="w-full text-left">
+
+<thead class="bg-gray-100 text-gray-600 text-sm">
+<tr>
+    <th class="p-4">Name</th>
+    <th>Email</th>
+    <th>Phone</th>
+    <th>Role</th>
+    <th>Status</th>
+    <th>Actions</th>
+</tr>
+</thead>
+
+<tbody>
+
+{% for a in agents %}
+<tr class="border-t hover:bg-gray-50">
+
+<td class="p-4 font-semibold">{{ a.name }}</td>
+<td>{{ a.email }}</td>
+<td>{{ a.phone }}</td>
+<td>
+    <span class="px-2 py-1 text-xs rounded
+        {% if a.role == 'Admin' %}
+            bg-purple-100 text-purple-600
+        {% else %}
+            bg-blue-100 text-blue-600
+        {% endif %}
+    ">
+        {{ a.role }}
+    </span>
+</td>
+
+<td>
+    <a href="{% url 'toggle_agent' a.id %}">
+        {% if a.is_active %}
+            <span class="text-green-600 font-semibold">Active</span>
+        {% else %}
+            <span class="text-red-600 font-semibold">Inactive</span>
+        {% endif %}
+    </a>
+</td>
+
+<td class="flex gap-3 py-4">
+
+    <!-- DELETE -->
+    <a href="{% url 'delete_agent' a.id %}"
+       onclick="return confirm('Delete this user?')"
+       class="text-red-600 font-semibold">
+       Delete
+    </a>
+
+</td>
+
+</tr>
+{% endfor %}
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+</main>
+
+{% endblock %}

@@ -1,0 +1,123 @@
+{% extends "agent/base.html" %}
+{% block content %}
+
+<div class="p-6">
+
+    <!-- HEADER -->
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-bold">Interested Properties</h1>
+
+        <form method="GET">
+            <input type="text" name="q" value="{{ request.GET.q }}"
+                   placeholder="Search properties..."
+                   class="border px-3 py-2 rounded w-64">
+        </form>
+    </div>
+
+    <!-- STATS -->
+    <div class="grid grid-cols-3 gap-4 mb-6">
+        <div class="bg-blue-600 text-white p-4 rounded-xl shadow">
+            <p class="text-sm">Total Properties</p>
+            <h2 class="text-xl font-bold">{{ properties|length }}</h2>
+        </div>
+
+        <div class="bg-red-500 text-white p-4 rounded-xl shadow">
+            <p class="text-sm">High Demand</p>
+            <h2 class="text-xl font-bold">
+                {% for p in properties %}
+                    {% if p.demand > 3 %}1{% endif %}
+                {% endfor %}
+            </h2>
+        </div>
+
+        <div class="bg-green-600 text-white p-4 rounded-xl shadow">
+            <p class="text-sm">Total Leads</p>
+            <h2 class="text-xl font-bold">
+                {% for p in properties %}
+                    {{ p.demand }}
+                {% endfor %}
+            </h2>
+        </div>
+    </div>
+
+    <!-- PROPERTY GRID -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+        {% for property in properties %}
+        <div class="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition duration-300">
+
+            <!-- IMAGE -->
+            {% if property.image %}
+                <img src="{{ property.image.url }}" class="h-48 w-full object-cover">
+            {% else %}
+                <div class="h-48 bg-gray-200 flex items-center justify-center">
+                    No Image
+                </div>
+            {% endif %}
+
+            <div class="p-4">
+
+                <!-- TITLE -->
+                <h2 class="text-lg font-bold">{{ property.title }}</h2>
+
+                <!-- LOCATION -->
+                <p class="text-sm text-gray-500">{{ property.location }}</p>
+
+                <!-- PRICE -->
+                <p class="text-blue-600 font-semibold mt-2">
+                    ₹ {{ property.price }}
+                </p>
+
+                <!-- DEMAND -->
+                <div class="mt-2 flex justify-between items-center">
+
+                    <span class="text-xs text-gray-500">
+                        {{ property.demand }} Leads Interested
+                    </span>
+
+                    {% if property.demand > 3 %}
+                    <span class="bg-red-500 text-white text-xs px-2 py-1 rounded">
+                        HOT 🔥
+                    </span>
+                    {% endif %}
+
+                </div>
+
+                <!-- ACTIONS -->
+                <div class="mt-4 flex justify-between">
+
+                    <a href="#"
+                       class="bg-blue-600 text-white px-3 py-1 rounded text-sm">
+                        View
+                    </a>
+
+                    <a href="#"
+                       class="bg-green-600 text-white px-3 py-1 rounded text-sm">
+                        Visit
+                    </a>
+
+                </div>
+
+                <!-- 🔥 LEADS PREVIEW -->
+                <div class="mt-4 border-t pt-2">
+                    <p class="text-xs text-gray-400 mb-1">Interested Leads:</p>
+
+                    {% for lead in property.interested_leads.all|slice:":3" %}
+                        <p class="text-xs">• {{ lead.name }}</p>
+                    {% empty %}
+                        <p class="text-xs text-gray-400">No leads</p>
+                    {% endfor %}
+                </div>
+
+            </div>
+
+        </div>
+        {% empty %}
+        <p>No properties found</p>
+        {% endfor %}
+
+    </div>
+
+</div>
+
+{% endblock %}

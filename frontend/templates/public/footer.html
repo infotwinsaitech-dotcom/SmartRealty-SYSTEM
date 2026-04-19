@@ -1,0 +1,32 @@
+<footer class="bg-gray-900 text-white mt-10 px-6 py-10">
+    <div class="max-w-6xl mx-auto grid md:grid-cols-3 gap-6">
+
+        <div>
+            <h2 class="text-xl font-bold mb-3">
+                {{ site.site_name|default:"Uma Realty" }}
+            </h2>
+            <p class="text-gray-400">
+                {{ site.about_text|default:"Premium real estate company." }}
+            </p>
+        </div>
+
+        <div>
+            <h3 class="font-bold mb-2">Contact</h3>
+            <p>📞 {{ site.phone }}</p>
+            <p>✉ {{ site.email }}</p>
+            <p>📍 {{ site.address }}</p>
+        </div>
+
+        <div>
+            <h3 class="font-bold mb-2">Quick Links</h3>
+            <p><a href="/" class="hover:text-yellow-300">Home</a></p>
+            <p><a href="/about/" class="hover:text-yellow-300">About</a></p>
+            <p><a href="/contact/" class="hover:text-yellow-300">Contact</a></p>
+        </div>
+
+    </div>
+
+    <div class="text-center text-gray-500 mt-6">
+        © {{ site.site_name }} | All rights reserved
+    </div>
+</footer>

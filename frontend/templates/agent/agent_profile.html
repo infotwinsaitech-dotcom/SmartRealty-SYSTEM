@@ -1,0 +1,103 @@
+{% extends "agent/base.html" %}
+{% block content %}
+
+<div class="p-6 bg-gray-100 min-h-screen">
+
+    <!-- 🔝 PROFILE HEADER -->
+    <div class="bg-gradient-to-r from-blue-600 to-indigo-700 text-white p-6 rounded-xl shadow-lg flex justify-between items-center">
+        <div>
+            <h1 class="text-3xl font-bold">{{ request.user.username }}</h1>
+            <p class="text-sm opacity-80">Agent Dashboard Profile</p>
+        </div>
+        <div>
+            <img src="https://ui-avatars.com/api/?name={{ request.user.username }}" class="w-16 h-16 rounded-full border-2 border-white">
+        </div>
+    </div>
+
+    <!-- 📊 STATS -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mt-6">
+
+        <div class="bg-white p-5 rounded-xl shadow hover:shadow-xl transition">
+            <h2 class="text-gray-500 text-sm">Total Leads</h2>
+            <p class="text-2xl font-bold text-blue-600">{{ total_leads }}</p>
+        </div>
+
+        <div class="bg-white p-5 rounded-xl shadow hover:shadow-xl transition">
+            <h2 class="text-gray-500 text-sm">Hot Leads 🔥</h2>
+            <p class="text-2xl font-bold text-red-500">{{ hot_leads }}</p>
+        </div>
+
+        <div class="bg-white p-5 rounded-xl shadow hover:shadow-xl transition">
+            <h2 class="text-gray-500 text-sm">Site Visits</h2>
+            <p class="text-2xl font-bold text-green-600">{{ total_visits }}</p>
+        </div>
+
+        <div class="bg-white p-5 rounded-xl shadow hover:shadow-xl transition">
+            <h2 class="text-gray-500 text-sm">Conversion %</h2>
+            <p class="text-2xl font-bold text-purple-600">{{ conversion_rate }}%</p>
+        </div>
+
+    </div>
+
+    <!-- 👤 DETAILS -->
+    <div class="bg-white mt-6 p-6 rounded-xl shadow">
+
+        <h2 class="text-xl font-bold mb-4">Profile Details</h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+            <div>
+                <label class="text-gray-500 text-sm">Username</label>
+                <p class="font-semibold">{{ request.user.username }}</p>
+            </div>
+
+            <div>
+                <label class="text-gray-500 text-sm">Email</label>
+                <p class="font-semibold">{{ request.user.email }}</p>
+            </div>
+
+            <div>
+                <label class="text-gray-500 text-sm">Builder</label>
+                <p class="font-semibold">
+                    {{ agent.builder.username }}
+                </p>
+            </div>
+
+            <div>
+                <label class="text-gray-500 text-sm">Joined</label>
+                <p class="font-semibold">{{ request.user.date_joined|date:"d M Y" }}</p>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- 📈 PERFORMANCE BAR -->
+    <div class="bg-white mt-6 p-6 rounded-xl shadow">
+        <h2 class="text-xl font-bold mb-4">Performance</h2>
+
+        <div class="w-full bg-gray-200 rounded-full h-4">
+            <div class="bg-green-500 h-4 rounded-full"
+                 style="width: {{ conversion_rate }}%">
+            </div>
+        </div>
+
+        <p class="text-sm mt-2 text-gray-500">
+            Conversion based on completed visits
+        </p>
+    </div>
+
+    <!-- 🔐 ACTIONS -->
+    <div class="mt-6 flex gap-4">
+        <a href="/logout/" class="bg-red-500 text-white px-4 py-2 rounded shadow hover:bg-red-600">
+            Logout
+        </a>
+
+        <a href="/edit-profile/" class="bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700">
+            Edit Profile
+        </a>
+    </div>
+
+</div>
+
+{% endblock %}

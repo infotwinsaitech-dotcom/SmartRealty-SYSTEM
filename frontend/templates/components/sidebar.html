@@ -1,0 +1,129 @@
+{% load static %}
+
+<aside class="h-screen w-64 fixed left-0 top-0 overflow-y-auto bg-[#0F172A] flex flex-col gap-2 py-6 shadow-2xl shadow-blue-900/20 z-50">
+
+    <!-- Logo -->
+    <div class="px-7 mb-8">
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded bg-gradient-to-br from-[#1E3A8A] to-[#3B82F6] flex items-center justify-center">
+                <span class="material-symbols-outlined text-white text-sm">architecture</span>
+            </div>
+            <div>
+                <h1 class="text-xl font-bold text-white">EstateArchitect</h1>
+                <p class="text-[10px] text-slate-500 font-extrabold">CRM Premium</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="flex flex-col gap-1">
+
+        <a href="{% url 'builder_dashboard' %}"
+           class="mx-3 px-4 py-3 rounded-lg flex items-center gap-3 text-white hover:bg-blue-700
+           {% if request.resolver_match.url_name == 'builder_dashboard' %} bg-blue-700 {% endif %}">
+            <span class="material-symbols-outlined">dashboard</span>
+            Dashboard
+        </a>
+
+        <a href="{% url 'property_management' %}"
+           class="mx-3 px-4 py-3 rounded-lg flex items-center gap-3 text-white hover:bg-blue-700
+           {% if request.resolver_match.url_name == 'property_management' %} bg-blue-700 {% endif %}">
+            <span class="material-symbols-outlined">domain</span>
+            Properties
+        </a>
+
+        <a href="{% url 'ai_insights' %}"
+           class="mx-3 px-4 py-3 rounded-lg flex items-center gap-3 text-white hover:bg-blue-700
+           {% if request.resolver_match.url_name == 'ai_insights' %} bg-blue-700 {% endif %}">
+            <span class="material-symbols-outlined">psychology</span>
+            AI Insights
+        </a>
+
+        <a href="{% url 'lead_management' %}"
+           class="mx-3 px-4 py-3 rounded-lg flex items-center gap-3 text-white hover:bg-blue-700
+           {% if request.resolver_match.url_name == 'lead_management' %} bg-blue-700 {% endif %}">
+            <span class="material-symbols-outlined">person_search</span>
+            Leads
+        </a>
+
+        <a href="{% url 'assign_property' %}"
+           class="mx-3 px-4 py-3 rounded-lg flex items-center gap-3 text-white hover:bg-blue-700
+           {% if request.resolver_match.url_name == 'assign_property' %} bg-blue-700 {% endif %}">
+            <span class="material-symbols-outlined">real_estate_agent</span>
+            Assign Property
+        </a>
+
+        <a href="{% url 'create_agent' %}"
+           class="mx-3 px-4 py-3 rounded-lg flex items-center gap-3 text-white hover:bg-blue-700
+           {% if request.resolver_match.url_name == 'create_agent' %} bg-blue-700 {% endif %}">
+            <span class="material-symbols-outlined">group</span>
+            Agents
+        </a>
+
+        <a href="{% url 'pipeline' %}"
+           class="mx-3 px-4 py-3 rounded-lg flex items-center gap-3 text-white hover:bg-blue-700
+           {% if request.resolver_match.url_name == 'pipeline' %} bg-blue-700 {% endif %}">
+            <span class="material-symbols-outlined">account_tree</span>
+            Pipeline
+        </a>
+
+        <a href="{% url 'analytics' %}"
+           class="mx-3 px-4 py-3 rounded-lg flex items-center gap-3 text-white hover:bg-blue-700
+           {% if request.resolver_match.url_name == 'analytics' %} bg-blue-700 {% endif %}">
+            <span class="material-symbols-outlined">insights</span>
+            Analytics
+        </a>
+
+        <a href="{% url 'document_management' %}"
+           class="mx-3 px-4 py-3 rounded-lg flex items-center gap-3 text-white hover:bg-blue-700
+           {% if request.resolver_match.url_name == 'document_management' %} bg-blue-700 {% endif %}">
+            <span class="material-symbols-outlined">description</span>
+            Documents
+        </a>
+
+        <a href="{% url 'communication' %}"
+           class="mx-3 px-4 py-3 rounded-lg flex items-center gap-3 text-white hover:bg-blue-700
+           {% if request.resolver_match.url_name == 'communication' %} bg-blue-700 {% endif %}">
+            💬 Communication
+        </a>
+
+        <a href="{% url 'scheduler' %}"
+           class="mx-3 px-4 py-3 rounded-lg flex items-center gap-3 text-white hover:bg-blue-700
+           {% if request.resolver_match.url_name == 'scheduler' %} bg-blue-700 {% endif %}">
+            <span class="material-symbols-outlined">event</span>
+            Scheduler
+        </a>
+
+        <a href="{% url 'marketing_automation' %}"
+           class="mx-3 px-4 py-3 rounded-lg flex items-center gap-3 text-white hover:bg-blue-700
+           {% if request.resolver_match.url_name == 'marketing_automation' %} bg-blue-700 {% endif %}">
+            <span class="material-symbols-outlined">campaign</span>
+            Marketing Automation
+        </a>
+
+        <a href="{% url 'manage_users' %}"
+           class="mx-3 px-4 py-3 rounded-lg flex items-center gap-3 text-white hover:bg-blue-700
+           {% if request.resolver_match.url_name == 'manage_users' %} bg-blue-700 {% endif %}">
+            <span class="material-symbols-outlined">group</span>
+            Manage Users
+        </a>
+
+        <a href="{% url 'settings' %}"
+           class="mx-3 px-4 py-3 rounded-lg flex items-center gap-3 text-white hover:bg-blue-700
+           {% if request.resolver_match.url_name == 'settings' %} bg-blue-700 {% endif %}">
+            <span class="material-symbols-outlined">settings</span>
+            Settings
+        </a>
+
+    </nav>
+
+    <!-- Logout -->
+    <div class="mt-auto px-3">
+        <a href="{% url 'logout' %}"
+           class="flex items-center gap-3 text-slate-400 hover:text-white hover:bg-red-500/20 rounded-lg px-4 py-3">
+            <span class="material-symbols-outlined">logout</span>
+            Logout
+        </a>
+    </div>
+
+</aside>

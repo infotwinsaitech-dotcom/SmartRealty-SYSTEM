@@ -1,0 +1,134 @@
+{% extends "builder/base.html" %}
+{% block content %}
+
+<div class="flex h-screen ml-64">
+
+<!-- LEFT: CHAT LIST -->
+<div class="w-80 bg-gray-100 p-4 overflow-y-auto">
+
+    <h2 class="font-bold text-lg mb-4">Inbox</h2>
+
+{% for convo in conversations %}
+<div onclick="openChat({{ convo.id }}, '{{ convo.lead_phone }}')"
+     class="p-3 border-b cursor-pointer">
+
+    <b>{{ convo.lead_name }}</b>
+    <p class="text-xs text-gray-500">{{ convo.lead_phone }}</p>
+
+</div>
+{% endfor %}
+
+</div>
+
+<!-- RIGHT: CHAT WINDOW -->
+ 
+<div class="flex-1 flex flex-col">
+
+    <!-- HEADER -->
+    <div class="p-4 bg-white border-b font-bold">
+        {{ active_chat.lead_name }}
+    </div>
+
+    <!-- MESSAGES -->
+    <div id="chatBox" class="flex-1 p-4 overflow-y-auto space-y-2">
+
+        {% for msg in messages %}
+        <div class="{% if msg.is_agent %}text-right{% endif %}">
+            <span class="inline-block px-3 py-2 rounded 
+                {% if msg.is_agent %}
+                    bg-blue-600 text-white
+                {% else %}
+                    bg-gray-200
+                {% endif %}">
+                {{ msg.text }}
+            </span>
+        </div>
+        {% endfor %}
+
+    </div>
+
+    <!-- INPUT -->
+    <div class="p-4 bg-white border-t flex gap-2">
+
+        <input id="messageInput" type="text"
+               class="border p-2 w-full rounded">
+
+        <button onclick="sendMessage()"
+                class="bg-blue-600 text-white px-4 rounded">
+            Send
+        </button>
+<button onclick="sendMessage()"></button>
+    </div>
+
+</div>
+
+</div>
+
+<script>
+
+let currentConvoId = null;
+
+/* ✅ OPEN CHAT */
+function openChat(convoId){
+    currentConvoId = convoId;
+    loadMessages();
+}
+
+/* ✅ LOAD MESSAGES */
+function loadMessages(){
+
+    if(!currentConvoId) return;
+
+    fetch(`/get-messages/?conversation_id=${currentConvoId}`)
+    .then(res => res.json())
+    .then(data => {
+
+        let chatBox = document.getElementById("chatBox");
+        chatBox.innerHTML = "";
+
+        data.messages.forEach(msg => {
+
+            chatBox.innerHTML += `
+                <div class="${msg.is_agent ? 'text-right' : 'text-left'} mb-2">
+                    <span class="px-3 py-2 rounded inline-block
+                        ${msg.is_agent ? 'bg-blue-500 text-white' : 'bg-gray-300'}">
+                        ${msg.text}
+                    </span>
+                </div>
+            `;
+        });
+
+        chatBox.scrollTop = chatBox.scrollHeight;
+    });
+}
+
+/* ✅ SEND AGENT MESSAGE (FIXED 🔥) */
+function sendMessage(){
+
+    let text = document.getElementById("messageInput").value;
+
+    if(!currentConvoId || !text) return;
+
+    fetch("/agent/send-message/", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": "{{ csrf_token }}"
+        },
+        body: JSON.stringify({
+            conversation_id: currentConvoId,
+            message: text
+        })
+    }).then(() => {
+        document.getElementById("messageInput").value = "";
+        loadMessages();
+    });
+}
+
+/* ✅ AUTO REFRESH */
+setInterval(loadMessages, 2000);
+
+
+</script>
+
+{% endblock %}

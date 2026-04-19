@@ -1,0 +1,17 @@
+<header class="fixed top-0 left-64 right-0 h-16 bg-white shadow flex items-center justify-between px-6 z-40">
+
+    <!-- Left -->
+    <h2 class="font-semibold text-lg">Dashboard</h2>
+
+    <!-- Right -->
+    <div class="flex items-center gap-4">
+        <span class="text-sm text-gray-600">
+            {{ request.user.username }}
+        </span>
+
+        <a href="{% url 'logout' %}" class="text-red-500 text-sm">
+            Logout
+        </a>
+    </div>
+
+</header>

@@ -1,0 +1,83 @@
+{% extends "public/base.html" %}
+{% load static %}
+
+{% block content %}
+
+<!-- HERO -->
+<section class="relative h-screen flex items-center justify-center overflow-hidden">
+
+    <img src="{% static 'images/hero.jpg' %}" 
+         class="absolute w-full h-full object-cover">
+
+    <div class="absolute inset-0 bg-black/50"></div>
+
+    <div class="relative z-10 text-center text-white px-6">
+
+        <h1 class="text-5xl md:text-7xl font-bold mb-6">
+            Find Your Dream Property
+        </h1>
+
+        <!-- ✅ WORKING SEARCH -->
+        <form method="GET" action="{% url 'property_list' %}" 
+              class="bg-white p-4 rounded-xl flex flex-wrap gap-3 justify-center">
+
+            <input type="text" name="location" placeholder="Location"
+                   class="p-2 border rounded">
+
+            <select name="type" class="p-2 border rounded">
+                <option value="">Type</option>
+                <option value="villa">Villa</option>
+                <option value="apartment">Apartment</option>
+            </select>
+
+            <input type="number" name="min_price" placeholder="Min Price"
+                   class="p-2 border rounded">
+
+            <input type="number" name="max_price" placeholder="Max Price"
+                   class="p-2 border rounded">
+
+            <button class="bg-blue-600 text-white px-6 rounded">
+                Search
+            </button>
+
+        </form>
+
+    </div>
+</section>
+
+<!-- FEATURED PROPERTIES -->
+<section class="py-20 px-8">
+    <h2 class="text-3xl font-bold mb-10 text-center">
+        Featured Properties
+    </h2>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+        {% for property in properties %}
+        <div class="bg-white shadow rounded-xl p-4">
+
+            <img src="{{ property.thumbnail.url }}" 
+                 class="h-48 w-full object-cover rounded">
+
+            <h3 class="text-xl font-bold mt-3">
+                {{ property.title }}
+            </h3>
+
+            <p class="text-gray-500">{{ property.location }}</p>
+
+            <p class="text-blue-600 font-bold">
+                ₹{{ property.price }}
+            </p>
+
+            <a href="{% url 'property_detail' property.id %}"
+               class="block mt-3 text-center bg-black text-white py-2 rounded">
+               View Details
+            </a>
+
+        </div>
+        {% endfor %}
+
+    </div>
+</section>
+
+{% endblock %}

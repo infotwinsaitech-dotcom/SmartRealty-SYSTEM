@@ -1,0 +1,200 @@
+{% extends "builder/base.html" %}
+{% block content %}
+
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+
+<main class="ml-64 mt-16 p-8 min-h-screen bg-surface overflow-x-auto">
+
+<div class="flex gap-6 min-w-max">
+
+{% for status, leads in columns %}
+<div class="w-80 bg-white/70 backdrop-blur rounded-xl p-4 shadow-sm">
+
+    <!-- HEADER -->
+    <h3 class="font-bold mb-4 text-sm uppercase text-gray-700">
+        {{ status }}
+    </h3>
+
+    <!-- COLUMN -->
+    <div class="space-y-4 min-h-[200px] pipeline-column"
+         data-status="{{ status }}">
+
+        {% for lead in leads %}
+        <div class="bg-white p-4 rounded-xl shadow cursor-pointer hover:shadow-md transition"
+             data-id="{{ lead.id }}"
+             onclick="openModal({{ lead.id }})">
+
+            <h4 class="font-semibold">{{ lead.name }}</h4>
+
+            <p class="text-xs text-gray-500">{{ lead.phone }}</p>
+
+            <p class="text-xs text-gray-400">
+                {{ lead.agent|default:"No Agent" }}
+            </p>
+
+            <!-- PRIORITY -->
+            <span class="text-xs px-2 py-1 rounded
+            {% if lead.priority == 'HOT' %}bg-red-100 text-red-600
+            {% elif lead.priority == 'WARM' %}bg-yellow-100 text-yellow-600
+            {% else %}bg-blue-100 text-blue-600{% endif %}">
+                {{ lead.priority }}
+            </span>
+
+        </div>
+        {% endfor %}
+
+    </div>
+
+</div>
+{% endfor %}
+
+</div>
+
+</main>
+
+<!-- ================= MODAL ================= -->
+<div id="leadModal"
+     class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
+
+    <div class="bg-white w-[500px] p-6 rounded-xl shadow-lg">
+
+        <h2 class="text-xl font-bold mb-4">Lead Detail</h2>
+
+        <div id="modalContent" data-id=""></div>
+
+        <!-- NOTE -->
+        <textarea id="noteText" placeholder="Add note..."
+                  class="w-full border p-2 mt-3 rounded"></textarea>
+
+        <button onclick="addNote()"
+                class="bg-blue-600 text-white px-3 py-2 mt-2 rounded w-full">
+            Add Note
+        </button>
+
+        <button onclick="closeModal()"
+                class="mt-4 bg-red-500 text-white px-4 py-2 rounded w-full">
+            Close
+        </button>
+
+    </div>
+
+</div>
+
+<!-- ================= SCRIPT ================= -->
+<script>
+
+/* ===== DRAG & DROP ===== */
+document.querySelectorAll('.pipeline-column').forEach(column => {
+    new Sortable(column, {
+        group: 'pipeline',
+        animation: 150,
+
+        onEnd: function (evt) {
+
+            let leadId = evt.item.dataset.id;
+            let newStatus = evt.to.dataset.status;
+
+            fetch("{% url 'update_lead_status' %}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": "{{ csrf_token }}"
+                },
+                body: JSON.stringify({
+                    lead_id: leadId,
+                    status: newStatus
+                })
+            });
+
+        }
+    });
+});
+
+/* ===== OPEN MODAL ===== */
+function openModal(id) {
+
+    fetch(`/builder/lead/${id}/`)
+    .then(res => res.json())
+    .then(data => {
+
+        document.getElementById("leadModal").classList.remove("hidden");
+        document.getElementById("modalContent").dataset.id = data.id;
+
+        let colorClass = "";
+
+        if(data.priority === "HOT"){
+            colorClass = "bg-red-100 text-red-600";
+        }else if(data.priority === "WARM"){
+            colorClass = "bg-yellow-100 text-yellow-600";
+        }else{
+            colorClass = "bg-blue-100 text-blue-600";
+        }
+
+        document.getElementById("modalContent").innerHTML = `
+            <p><b>Name:</b> ${data.name}</p>
+            <p><b>Phone:</b> ${data.phone}</p>
+            <p><b>Source:</b> ${data.source}</p>
+            <p><b>Status:</b> ${data.status}</p>
+
+            <p class="mt-2"><b>Priority:</b>
+                <span class="px-2 py-1 rounded ${colorClass}">
+                    ${data.priority}
+                </span>
+            </p>
+
+            <select onchange="updatePriority(${data.id}, this.value)"
+                    class="border p-2 mt-3 w-full rounded">
+                <option value="HOT" ${data.priority === "HOT" ? "selected" : ""}>Hot</option>
+                <option value="WARM" ${data.priority === "WARM" ? "selected" : ""}>Warm</option>
+                <option value="COLD" ${data.priority === "COLD" ? "selected" : ""}>Cold</option>
+            </select>
+        `;
+    });
+}
+
+/* ===== CLOSE MODAL ===== */
+function closeModal(){
+    document.getElementById("leadModal").classList.add("hidden");
+}
+
+/* ===== ADD NOTE ===== */
+function addNote(){
+
+    let note = document.getElementById("noteText").value;
+    let leadId = document.getElementById("modalContent").dataset.id;
+
+    fetch("/add-note/", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": "{{ csrf_token }}"
+        },
+        body: JSON.stringify({
+            lead_id: leadId,
+            note: note
+        })
+    });
+
+    document.getElementById("noteText").value = "";
+}
+
+/* ===== UPDATE PRIORITY ===== */
+function updatePriority(id, value){
+
+    fetch("/update-priority/", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": "{{ csrf_token }}"
+        },
+        body: JSON.stringify({
+            lead_id: id,
+            priority: value
+        })
+    });
+
+}
+
+</script>
+
+{% endblock %}

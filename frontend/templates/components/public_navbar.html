@@ -1,0 +1,32 @@
+<nav class="bg-white shadow-md px-8 py-4 flex justify-between items-center sticky top-0 z-50">
+
+    <!-- LOGO -->
+    <div class="text-2xl font-extrabold text-primary">
+        {{ site.site_name|default:"Uma Realty" }}
+    </div>
+
+    <!-- MENU -->
+    <div class="hidden md:flex gap-8 font-medium text-gray-600">
+
+        <a href="/" class="hover:text-primary transition">Home</a>
+        <a href="/properties/" class="hover:text-primary transition">Properties</a>
+        <a href="/about/" class="hover:text-primary transition">About</a>
+        <a href="/contact/" class="hover:text-primary transition">Contact</a>
+
+    </div>
+
+    <!-- RIGHT SIDE -->
+    <div class="flex gap-4 items-center">
+
+        <a href="/login/" class="text-gray-600 hover:text-primary font-medium">
+            Login
+        </a>
+
+        <a href="/register/" 
+           class="bg-primary text-white px-5 py-2 rounded-lg font-semibold hover:bg-secondary transition">
+            Register
+        </a>
+<a href="{% url 'logout' %}" class="text-red-500">Logout</a>
+    </div>
+
+</nav>

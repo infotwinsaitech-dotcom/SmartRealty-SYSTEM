@@ -1,0 +1,168 @@
+{% extends "public/base.html" %}
+{% block title %}Properties{% endblock %}
+
+{% block content %}
+
+<!-- HEADER -->
+<section class="space-y-10 mb-10">
+
+  <div class="flex justify-between items-end">
+    <div>
+      <span class="text-secondary font-semibold text-xs uppercase tracking-widest">
+        Premium Properties
+      </span>
+
+      <h1 class="text-5xl font-extrabold tracking-tight mt-2">
+        Find Your Meridian.
+      </h1>
+    </div>
+
+    <!-- VIEW SWITCH -->
+    <div class="flex bg-surface-container-high rounded-full p-1 shadow-inner">
+      <button class="px-6 py-2 bg-primary text-white rounded-full text-sm font-bold">
+        Grid View
+      </button>
+      <button class="px-6 py-2 text-gray-500 text-sm font-medium">
+        Map View
+      </button>
+    </div>
+  </div>
+
+  <!-- SEARCH BAR -->
+ <form method="GET" class="grid grid-cols-2 md:grid-cols-6 gap-4 mb-8">
+
+    <!-- Location -->
+    <input type="text" name="location" placeholder="Location"
+           class="p-2 border rounded">
+
+    <!-- Property Type -->
+    <select name="type" class="p-2 border rounded">
+        <option value="">Type</option>
+        <option value="villa">Villa</option>
+        <option value="apartment">Apartment</option>
+        <option value="bungalow">Bungalow</option>
+        <option value="penthouse">Penthouse</option>
+        <option value="plot">Plot</option>
+    </select>
+
+    <!-- Min Price -->
+    <input type="number" name="min_price" placeholder="Min Price"
+           class="p-2 border rounded">
+
+    <!-- Max Price -->
+    <input type="number" name="max_price" placeholder="Max Price"
+           class="p-2 border rounded">
+
+    <!-- Bedrooms -->
+    <select name="beds" class="p-2 border rounded">
+        <option value="">Beds</option>
+        <option value="1">1+</option>
+        <option value="2">2+</option>
+        <option value="3">3+</option>
+        <option value="4">4+</option>
+    </select>
+
+    <!-- Bathrooms -->
+    <select name="baths" class="p-2 border rounded">
+        <option value="">Baths</option>
+        <option value="1">1+</option>
+        <option value="2">2+</option>
+        <option value="3">3+</option>
+    </select>
+
+    <!-- Submit -->
+    <button type="submit"
+        class="col-span-2 md:col-span-6 bg-blue-600 text-white py-2 rounded">
+        Search
+    </button>
+
+</form>
+
+</section>
+
+
+<!-- PROPERTY GRID -->
+<section>
+
+  <div class="flex justify-between items-center mb-6">
+    <h2 class="text-2xl font-bold">
+      Available Collections
+    </h2>
+
+    <span class="text-gray-400 text-sm">
+      {{ properties|length }} Properties
+    </span>
+  </div>
+
+  <div class="grid md:grid-cols-2 xl:grid-cols-3 gap-10">
+
+    {% for property in properties %}
+
+    <div class="group bg-white rounded-xl overflow-hidden shadow hover:-translate-y-2 hover:shadow-2xl transition duration-500">
+
+      <!-- MEDIA -->
+      <div class="relative h-72 overflow-hidden">
+
+        {% if property.video %}
+        <video class="w-full h-full object-cover" autoplay muted loop>
+          <source src="{{ property.video.url }}">
+        </video>
+        {% else %}
+         <img src="{{ property.thumbnail.url }}" class="rounded-xl h-60 w-full object-cover">
+        {% endif %}
+
+        <!-- GRADIENT OVERLAY -->
+        <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+
+        <!-- PRICE -->
+        <div class="absolute bottom-4 left-4 text-white text-2xl font-bold">
+          ₹{{ property.price }}
+        </div>
+
+      </div>
+
+      <!-- CONTENT -->
+      <div class="p-6 space-y-3">
+
+        <h3 class="text-xl font-bold">
+          {{ property.title }}
+        </h3>
+
+        <p class="text-gray-500 text-sm">
+          {{ property.location }}
+        </p>
+
+        <!-- DETAILS -->
+      <a href="{% url 'property_detail' property.id %}">
+  <button class="w-full mt-6 py-3 border border-primary text-primary font-bold rounded hover:bg-primary hover:text-white transition">
+    View Details
+  </button>
+</a>
+
+        
+
+      </div>
+
+    </div>
+
+    {% endfor %}
+
+  </div>
+
+</section>
+
+
+<!-- RECOMMENDATION SECTION -->
+<section class="bg-primary text-white p-12 rounded-2xl mt-16">
+
+  <h2 class="text-3xl font-bold mb-2">
+    Personalized Recommendations
+  </h2>
+
+  <p class="text-sm opacity-80">
+    Based on your activity
+  </p>
+
+</section>
+
+{% endblock %}

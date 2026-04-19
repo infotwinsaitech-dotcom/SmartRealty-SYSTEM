@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ArchitectVisits - Site Scheduler</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary-fixed-variant": "#004395",
+                        "inverse-on-surface": "#eef0ff",
+                        "on-primary-fixed-variant": "#264191",
+                        "outline": "#757682",
+                        "secondary-container": "#2170e4",
+                        "on-tertiary": "#ffffff",
+                        "surface": "#faf8ff",
+                        "on-tertiary-fixed-variant": "#3a485c",
+                        "surface-container-highest": "#dae2fd",
+                        "background": "#faf8ff",
+                        "primary-fixed": "#dce1ff",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary-container": "#9eadc5",
+                        "surface-variant": "#dae2fd",
+                        "inverse-surface": "#283044",
+                        "on-primary-fixed": "#00164e",
+                        "inverse-primary": "#b6c4ff",
+                        "secondary-fixed-dim": "#adc6ff",
+                        "on-error-container": "#93000a",
+                        "on-error": "#ffffff",
+                        "tertiary-container": "#334155",
+                        "error": "#ba1a1a",
+                        "on-tertiary-fixed": "#0d1c2f",
+                        "on-surface-variant": "#444651",
+                        "on-surface": "#131b2e",
+                        "primary-fixed-dim": "#b6c4ff",
+                        "on-secondary-fixed": "#001a42",
+                        "on-primary": "#ffffff",
+                        "surface-dim": "#d2d9f4",
+                        "outline-variant": "#c5c5d3",
+                        "surface-bright": "#faf8ff",
+                        "tertiary-fixed-dim": "#b9c7e0",
+                        "primary-container": "#1e3a8a",
+                        "tertiary": "#1d2b3e",
+                        "surface-tint": "#4059aa",
+                        "on-secondary-container": "#fefcff",
+                        "secondary-fixed": "#d8e2ff",
+                        "surface-container": "#eaedff",
+                        "secondary": "#0058be",
+                        "on-primary-container": "#90a8ff",
+                        "surface-container-low": "#f2f3ff",
+                        "primary": "#00236f",
+                        "on-secondary": "#ffffff",
+                        "on-background": "#131b2e",
+                        "surface-container-high": "#e2e7ff",
+                        "error-container": "#ffdad6",
+                        "tertiary-fixed": "#d5e3fd"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.5rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Manrope"],
+                        "body": ["Manrope"],
+                        "label": ["Manrope"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Manrope', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface flex h-screen overflow-hidden">
+<!-- SideNavBar (Authority Source: JSON) -->
+<aside class="hidden md:flex flex-col h-full py-6 bg-[#0f172a] w-64 h-screen left-0 top-0 shadow-2xl shadow-[#131b2e]/10 font-manrope font-medium text-sm">
+<div class="px-6 mb-8">
+<div class="flex items-center gap-3 mb-1">
+<div class="w-8 h-8 rounded-lg bg-primary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-lg">architecture</span>
+</div>
+<h1 class="text-lg font-black text-white">Site Scheduler</h1>
+</div>
+<p class="text-slate-400 text-xs uppercase tracking-widest">Field Operations</p>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="text-slate-400 hover:text-white mx-2 flex items-center gap-3 px-4 py-3 hover:bg-[#1d2b3e] transition-all active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span>Dashboard</span>
+</a>
+<!-- Active State Logic: Schedule is active -->
+<a class="bg-[#1e3a8a] text-white rounded-lg mx-2 flex items-center gap-3 px-4 py-3 transition-all active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined" data-icon="calendar_today">calendar_today</span>
+<span>Schedule</span>
+</a>
+<a class="text-slate-400 hover:text-white mx-2 flex items-center gap-3 px-4 py-3 hover:bg-[#1d2b3e] transition-all active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined" data-icon="domain">domain</span>
+<span>Properties</span>
+</a>
+<a class="text-slate-400 hover:text-white mx-2 flex items-center gap-3 px-4 py-3 hover:bg-[#1d2b3e] transition-all active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span>Visitors</span>
+</a>
+<a class="text-slate-400 hover:text-white mx-2 flex items-center gap-3 px-4 py-3 hover:bg-[#1d2b3e] transition-all active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span>Reports</span>
+</a>
+</nav>
+<div class="px-4 mt-4">
+<button class="w-full py-3 bg-gradient-to-br from-[#1E3A8A] to-[#3B82F6] text-white font-bold rounded-lg shadow-lg shadow-primary-container/20 flex items-center justify-center gap-2 transition-transform active:scale-95">
+<span class="material-symbols-outlined text-sm">add</span>
+                New Visit
+            </button>
+</div>
+<div class="mt-auto pt-6 border-t border-slate-800/50">
+<a class="text-slate-400 hover:text-white mx-2 flex items-center gap-3 px-4 py-3 hover:bg-[#1d2b3e] transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+<span>Help</span>
+</a>
+<a class="text-slate-400 hover:text-white mx-2 flex items-center gap-3 px-4 py-3 hover:bg-[#1d2b3e] transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+<span>Logout</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col min-w-0 bg-surface">
+<!-- TopNavBar (Authority Source: JSON) -->
+<header class="flex justify-between items-center px-6 py-3 w-full border-b border-opacity-15 border-[#131b2e] bg-[#faf8ff] z-40 font-manrope text-sm">
+<div class="flex items-center gap-4 flex-1">
+<div class="relative max-w-md w-full">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg">search</span>
+<input class="w-full bg-surface-container-low border-none rounded-full py-2 pl-10 pr-4 focus:ring-2 focus:ring-primary-container/20 text-sm placeholder:text-slate-400" placeholder="Search visits, agents, or properties..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2">
+<button class="p-2 text-[#334155] hover:bg-[#dae2fd] rounded-full transition-colors relative">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full border-2 border-surface"></span>
+</button>
+<button class="p-2 text-[#334155] hover:bg-[#dae2fd] rounded-full transition-colors">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+</div>
+<div class="flex items-center gap-3 pl-4 border-l border-outline-variant/30">
+<div class="text-right hidden sm:block">
+<p class="font-bold text-[#00236f]">Marcus Sterling</p>
+<p class="text-[10px] text-slate-500 uppercase tracking-tighter">Senior Architect</p>
+</div>
+<img alt="User profile" class="w-10 h-10 rounded-full object-cover ring-2 ring-primary-container/10" data-alt="Professional portrait of a middle-aged male architect with clean-cut appearance in a modern office setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBzDQ7Go027omSalmyWbm12rcQy95Rw-StNc7lnvzGJOFxYft0bTbr25kKc24OcKiqp1SFiJ6zoyG6BUaEqqstNfuFYm-WWlK9ZMgxBp0HWcabvkj6__hfz-sLldCV1dbHftD11ppOKP9lJ01_NH-KvRYs37V6r7mOhFrAUh4MiflGsWCfomwcs2Yt7UG0PdDQHaArg9Lx1zkovCyNaLZFS7hy9Cr0G1SWw-fQ9lV5N1GZFGVEpP5yWo2u4Hf8r0pat4CKFcuLTqU9t"/>
+</div>
+</div>
+</header>
+<!-- Calendar Dashboard Content -->
+<section class="flex-1 overflow-y-auto p-8 space-y-8">
+<!-- Hero Header Section (Editorial Authority) -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
+<div>
+<h2 class="text-5xl font-extrabold text-on-surface tracking-tight mb-2">October <span class="text-primary-container">2024</span></h2>
+<p class="text-slate-500 font-medium">You have <span class="text-secondary font-bold">14 site visits</span> scheduled for this month.</p>
+</div>
+<div class="flex items-center gap-3 bg-surface-container-low p-1 rounded-xl">
+<button class="px-6 py-2.5 bg-white text-primary-container font-bold rounded-lg shadow-sm">Month</button>
+<button class="px-6 py-2.5 text-slate-500 font-bold hover:text-primary-container transition-colors">Week</button>
+<button class="px-6 py-2.5 text-slate-500 font-bold hover:text-primary-container transition-colors">Day</button>
+</div>
+</div>
+<!-- Calendar Container -->
+<div class="bg-surface-container-lowest rounded-2xl overflow-hidden shadow-2xl shadow-[#131b2e]/5">
+<!-- Days Header -->
+<div class="calendar-grid border-b border-surface-container-low bg-surface-container-low/30">
+<div class="py-4 text-center text-xs font-black uppercase tracking-widest text-slate-400">Sun</div>
+<div class="py-4 text-center text-xs font-black uppercase tracking-widest text-slate-400">Mon</div>
+<div class="py-4 text-center text-xs font-black uppercase tracking-widest text-slate-400">Tue</div>
+<div class="py-4 text-center text-xs font-black uppercase tracking-widest text-slate-400">Wed</div>
+<div class="py-4 text-center text-xs font-black uppercase tracking-widest text-slate-400">Thu</div>
+<div class="py-4 text-center text-xs font-black uppercase tracking-widest text-slate-400">Fri</div>
+<div class="py-4 text-center text-xs font-black uppercase tracking-widest text-slate-400">Sat</div>
+</div>
+<!-- Calendar Days -->
+<div class="calendar-grid auto-rows-[minmax(120px,1fr)]">
+<!-- Week 1 - Leading Days -->
+<div class="p-3 border-r border-b border-surface-container-low bg-surface-container-low/10 opacity-30">
+<span class="text-sm font-bold">29</span>
+</div>
+<div class="p-3 border-r border-b border-surface-container-low bg-surface-container-low/10 opacity-30">
+<span class="text-sm font-bold">30</span>
+</div>
+<!-- October Days -->
+<div class="p-3 border-r border-b border-surface-container-low hover:bg-surface-container-low/20 transition-colors">
+<span class="text-sm font-bold">1</span>
+</div>
+<div class="p-3 border-r border-b border-surface-container-low hover:bg-surface-container-low/20 transition-colors">
+<span class="text-sm font-bold">2</span>
+<div class="mt-2 space-y-1">
+<div class="bg-primary-fixed-dim/40 text-[#00164e] text-[10px] font-bold p-1.5 rounded-md border-l-4 border-primary">
+                                10:00 AM - Villa X
+                            </div>
+</div>
+</div>
+<div class="p-3 border-r border-b border-surface-container-low hover:bg-surface-container-low/20 transition-colors">
+<span class="text-sm font-bold text-primary-container">3</span>
+</div>
+<div class="p-3 border-r border-b border-surface-container-low hover:bg-surface-container-low/20 transition-colors">
+<span class="text-sm font-bold">4</span>
+<div class="mt-2 space-y-1">
+<div class="bg-secondary-fixed/50 text-on-secondary-fixed-variant text-[10px] font-bold p-1.5 rounded-md border-l-4 border-secondary">
+                                02:30 PM - Sky Loft
+                            </div>
+</div>
+</div>
+<div class="p-3 border-b border-surface-container-low hover:bg-surface-container-low/20 transition-colors">
+<span class="text-sm font-bold">5</span>
+</div>
+<!-- Week 2 -->
+<div class="p-3 border-r border-b border-surface-container-low hover:bg-surface-container-low/20 transition-colors">
+<span class="text-sm font-bold">6</span>
+</div>
+<div class="p-3 border-r border-b border-surface-container-low hover:bg-surface-container-low/20 transition-colors">
+<span class="text-sm font-bold">7</span>
+<div class="mt-2 space-y-1">
+<div class="bg-tertiary-fixed-dim/40 text-on-tertiary-fixed text-[10px] font-bold p-1.5 rounded-md border-l-4 border-tertiary">
+                                11:15 AM - Horizon
+                            </div>
+</div>
+</div>
+<div class="p-3 border-r border-b border-surface-container-low hover:bg-surface-container-low/20 transition-colors">
+<span class="text-sm font-bold">8</span>
+</div>
+<!-- Today Highlight -->
+<div class="p-3 border-r border-b border-surface-container-low bg-primary-container/5 ring-inset ring-2 ring-primary-container/20">
+<div class="flex justify-between items-start">
+<span class="w-8 h-8 flex items-center justify-center bg-primary-container text-white text-sm font-black rounded-full">9</span>
+<span class="text-[10px] font-black text-primary-container uppercase">Today</span>
+</div>
+<div class="mt-2 space-y-1">
+<div class="bg-primary-container text-white text-[10px] font-bold p-1.5 rounded-md shadow-md">
+                                09:00 AM - Azure Park
+                            </div>
+<div class="bg-error-container text-on-error-container text-[10px] font-bold p-1.5 rounded-md border-l-4 border-error">
+                                04:00 PM - Penthouse
+                            </div>
+</div>
+</div>
+<div class="p-3 border-r border-b border-surface-container-low hover:bg-surface-container-low/20 transition-colors">
+<span class="text-sm font-bold">10</span>
+</div>
+<div class="p-3 border-r border-b border-surface-container-low hover:bg-surface-container-low/20 transition-colors">
+<span class="text-sm font-bold">11</span>
+</div>
+<div class="p-3 border-b border-surface-container-low hover:bg-surface-container-low/20 transition-colors">
+<span class="text-sm font-bold">12</span>
+</div>
+</div>
+</div>
+<!-- Detailed Activity / Side Panels (Asymmetric Layout) -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+<div class="lg:col-span-2 space-y-6">
+<h3 class="text-2xl font-bold text-on-surface">Upcoming Priority Visits</h3>
+<div class="space-y-4">
+<div class="flex items-center gap-6 p-5 bg-surface-container-lowest rounded-2xl hover:shadow-xl hover:shadow-primary-container/5 transition-all group">
+<div class="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0">
+<img alt="Property" class="w-full h-full object-cover transition-transform group-hover:scale-110" data-alt="Modern minimalist luxury villa with floor-to-ceiling windows and clean architectural lines at dusk" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCAvTWdluKjNM0vsTvFCAZjp6qP9f1Ochnvzzf-ckMZff3E70PW9Axm8H_tTAGcHRBsiVteynsI4aN2aERdZyOuRmzRcor_6X4ohzY4vzpu8Y0ACNdXajS3Bs_4nDlPUChlX-GQXrLzeml7CQJh-Ej9ULrw002H4HJ2HBJrfssmJ2uj08E8QS3lm6dcD3TuziLpgEMLai6c2gFobMp_F43IhYhM5E7RkXWv6pz0xt9tjylrdSU4MhruqVnSTUuCuwq93A562VDuKDCK"/>
+</div>
+<div class="flex-1">
+<div class="flex items-center gap-2 mb-1">
+<span class="px-2 py-0.5 rounded bg-error/10 text-error text-[10px] font-black uppercase">Hot Lead</span>
+<h4 class="font-bold text-on-surface">Villa X - Garden Inspection</h4>
+</div>
+<div class="flex items-center gap-4 text-slate-500 text-sm">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">schedule</span> 10:00 AM</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">person</span> Agent: Sarah Connor</span>
+</div>
+</div>
+<button class="w-10 h-10 rounded-full bg-surface-container-low text-primary-container flex items-center justify-center hover:bg-primary-container hover:text-white transition-all">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+<div class="flex items-center gap-6 p-5 bg-surface-container-lowest rounded-2xl hover:shadow-xl hover:shadow-primary-container/5 transition-all group">
+<div class="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0">
+<img alt="Property" class="w-full h-full object-cover transition-transform group-hover:scale-110" data-alt="Interior of a luxury sky loft apartment with sprawling urban views and high-end furniture" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCBqlQb9ZfhJMJH0rjNOgZ0Go4Hz_YOXOscLaS2dpXeXwOwPsl71YwePj9MXbJfWFmLmkpOwK-Fa5mrMZZwO3PiOI_KC25F6DxIA2uCjhgjqlL0Mir6_QBeTwmaP2No7BzDzOKAnrGDiyT8RifOEZFsOWhGV5yzo8Z-JChuurB35rbpV2kEkhREIUZtRrisJzUNyrqbHNpaxJzxB7TrsGEje_UNA0rw25uG-aTRJ7pQSS7pRwzJPZ-bJx9yy545qoc-z5IwJYK7r0OB"/>
+</div>
+<div class="flex-1">
+<div class="flex items-center gap-2 mb-1">
+<span class="px-2 py-0.5 rounded bg-secondary/10 text-secondary text-[10px] font-black uppercase">Warm</span>
+<h4 class="font-bold text-on-surface">Sky Loft - Final Walkthrough</h4>
+</div>
+<div class="flex items-center gap-4 text-slate-500 text-sm">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">schedule</span> 02:30 PM</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">person</span> Agent: David Miller</span>
+</div>
+</div>
+<button class="w-10 h-10 rounded-full bg-surface-container-low text-primary-container flex items-center justify-center hover:bg-primary-container hover:text-white transition-all">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+<div class="space-y-6">
+<h3 class="text-2xl font-bold text-on-surface">Top Agents</h3>
+<div class="bg-primary-container rounded-3xl p-6 text-white space-y-6">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<img alt="Agent" class="w-12 h-12 rounded-full border-2 border-primary-container-highest" data-alt="Confident female real estate agent in professional attire with a bright inviting smile" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCnpYFKnPWJfvNiLK0Z2uRu-BtHyjbaGsS7qRv-6qQbz89C1ysdlCJIlekYQdbWYEB5cv0MMdJ6bciDTzDYj_KepmEFeNL_BqvBVtQzMkcclDxqYRMG8-hBm_n_sS1woxc9s3TnKL_iPTqSOxT3pnU-WfdsIYiOAvOdrFIxl3jpHhiPCgMRLUloBkfhec_VW4qsXLYPD2V9N8O5EkrZde4V6S-0Yn-iA_RMKqqAR7MMlDvJYOIq_khHFlMJChkLSDu-uKskj8GhkmaQ"/>
+<div>
+<p class="font-bold">Sarah Connor</p>
+<p class="text-xs text-on-primary-container font-medium">8 Visits this week</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-secondary">trending_up</span>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<img alt="Agent" class="w-12 h-12 rounded-full border-2 border-primary-container-highest" data-alt="Successful male business professional in a tailored suit leaning against a modern wall" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBTQq0z2qqmP37K3BDGe8HPrei8YuX1cJGgFxeK2dkFDF4PWxocjzhueZfbSOakFUQJKwIG_-8Gs_Cf2tCKDVCDwlrdNKD2avmYt98Bo7hf9n34-0TGVg73-sXgSLUnw4D-jy8EHCwKdFQRemZNuY-nEFbnQIOdr_NOx3Ax1mGHD484RFm7lvf3Ppnw6XLHoBuwbiUXYvErxJdPMH9_rRe03R64YqlPE8mhWlBsTqwdk4OXdp-JlGOlR8p0Ggd3ughU9DPvGiMjVdA8"/>
+<div>
+<p class="font-bold">David Miller</p>
+<p class="text-xs text-on-primary-container font-medium">6 Visits this week</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-secondary">trending_up</span>
+</div>
+<button class="w-full py-3 bg-white/10 hover:bg-white/20 transition-colors rounded-xl font-bold text-sm">View Leaderboard</button>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Centered Modal Popup (Schedule New Visit) -->
+<!-- Displaying as flex for visual presentation of the task requirements -->
+<div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#131b2e]/60 backdrop-blur-sm">
+<div class="bg-white w-full max-w-xl rounded-3xl overflow-hidden shadow-2xl border border-white/20">
+<div class="p-8 border-b border-surface-container-low flex justify-between items-center">
+<div>
+<h2 class="text-2xl font-black text-on-surface">Schedule New Visit</h2>
+<p class="text-slate-500 text-sm">Coordinate agent and property availability</p>
+</div>
+<button class="p-2 hover:bg-surface-container-low rounded-full transition-colors">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<div class="p-8 space-y-6">
+<!-- Select Property -->
+<div class="space-y-2">
+<label class="text-xs font-black uppercase tracking-widest text-slate-400">Select Property</label>
+<div class="relative">
+<select class="w-full bg-surface-container-low border-none rounded-xl py-3 pl-4 pr-10 text-on-surface font-semibold appearance-none focus:ring-2 focus:ring-primary-container/20">
+<option>Villa X - 42 Garden View Ave</option>
+<option>Sky Loft - Penthouse B, Downtown</option>
+<option>Horizon Estates - Plot 22</option>
+</select>
+<span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">keyboard_arrow_down</span>
+</div>
+</div>
+<!-- Select Agent -->
+<div class="space-y-2">
+<label class="text-xs font-black uppercase tracking-widest text-slate-400">Assign Agent</label>
+<div class="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
+<div class="flex-shrink-0 flex flex-col items-center gap-2 cursor-pointer group">
+<div class="relative">
+<img alt="Agent" class="w-14 h-14 rounded-full ring-2 ring-primary-container ring-offset-2" data-alt="Headshot of professional female agent Sarah Connor" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD8od22SM-D2GRsQK_eybNZYON2TxzqRPdRYI2tyQ62u1jfUae8beyXNuxovVJHj2NLcnT8ijhUqg9UssveFEB7m3jjmsC5ax1YMUEHcyHEFYssTNlQ0YurKtiEu5fdehyAeHvmeJeJeYXSFaDbfmr-wZPInxDxRarep6SQf_J0jqXdbLG9xtta_Yf7M2WaiqvBckl_ujq_85n5WS71cJrQZbI-dKF4Yb3TzAKQVCyTpPqTjMIzBD60nRMPJRtrusmAKPCwkNQBS6F4"/>
+<div class="absolute -bottom-1 -right-1 bg-primary-container text-white rounded-full p-0.5">
+<span class="material-symbols-outlined text-[10px]">check</span>
+</div>
+</div>
+<span class="text-xs font-bold text-primary-container">Sarah C.</span>
+</div>
+<div class="flex-shrink-0 flex flex-col items-center gap-2 cursor-pointer opacity-40 hover:opacity-100 transition-opacity">
+<img alt="Agent" class="w-14 h-14 rounded-full border border-outline-variant/30" data-alt="Headshot of professional male agent David Miller" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCXMWHLx-VhhtxdMpByqahrHczXjIiCU9Si8VihCcDKj7EvDmNBGSZVQhb5I_xnU3xwENexhROotLgk97exZJ_VTeiuz4WZ0Rh4REcF8IRpjQoTGAis4LuN9jcZ6_LGfE_1niBj9uKavmXPwlYTXnC7zHa5__o8y5fO6ChOnw5oKaCU58-h8vvcqwWL7XIcUDG8HxpsS4-0sZ3upPp90pI34IpcDWjMvLl8adOLOAjjq3M6xeBFGwk8I_B_y8V-uR9UR7Id-knU55-8"/>
+<span class="text-xs font-bold text-slate-500">David M.</span>
+</div>
+<div class="flex-shrink-0 flex flex-col items-center gap-2 cursor-pointer opacity-40 hover:opacity-100 transition-opacity">
+<img alt="Agent" class="w-14 h-14 rounded-full border border-outline-variant/30" data-alt="Headshot of professional female agent Elena Vance" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCna8-hhOmP6F0SQtSG926VuKC4zPCb-3mGEWJJ7p2JlJl9ZEnfFD3NpYZ3qIexjTvZt55ZeV2uyBQ037xTewB3aESx8WMP0Bwr-QyzmfJoZWX72gn4oZ_yp3BX0ECmn-M-t7JVStaSnatPONuvzmGdt3Z9qHpu3Vu4BtI-_5Fi6zzMk13ymzK3vyqgKSMEzdYs0f0NdQkghHIVAWTVIJ3SHpmDZpqAjYUk3l7HVL6b8UNBVThFLU_p7_-NVtzo_JqcnJuntTz8c2Qn"/>
+<span class="text-xs font-bold text-slate-500">Elena V.</span>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-6">
+<!-- Date Picker -->
+<div class="space-y-2">
+<label class="text-xs font-black uppercase tracking-widest text-slate-400">Date</label>
+<input class="w-full bg-surface-container-low border-none rounded-xl py-3 px-4 text-on-surface font-semibold focus:ring-2 focus:ring-primary-container/20" type="date" value="2024-10-14"/>
+</div>
+<!-- Time (Quick Pick) -->
+<div class="space-y-2">
+<label class="text-xs font-black uppercase tracking-widest text-slate-400">Start Time</label>
+<input class="w-full bg-surface-container-low border-none rounded-xl py-3 px-4 text-on-surface font-semibold focus:ring-2 focus:ring-primary-container/20" type="time" value="10:00"/>
+</div>
+</div>
+<!-- Time Slot Selection -->
+<div class="space-y-2">
+<label class="text-xs font-black uppercase tracking-widest text-slate-400">Available Slots</label>
+<div class="grid grid-cols-4 gap-2">
+<button class="py-2 text-[10px] font-bold rounded-lg border border-primary-container bg-primary-container/5 text-primary-container">09:00 AM</button>
+<button class="py-2 text-[10px] font-bold rounded-lg border border-outline-variant/20 hover:bg-surface-container-low transition-colors">10:00 AM</button>
+<button class="py-2 text-[10px] font-bold rounded-lg border border-outline-variant/20 opacity-30 cursor-not-allowed line-through">11:00 AM</button>
+<button class="py-2 text-[10px] font-bold rounded-lg border border-outline-variant/20 hover:bg-surface-container-low transition-colors">12:00 PM</button>
+<button class="py-2 text-[10px] font-bold rounded-lg border border-outline-variant/20 hover:bg-surface-container-low transition-colors">01:00 PM</button>
+<button class="py-2 text-[10px] font-bold rounded-lg border border-outline-variant/20 hover:bg-surface-container-low transition-colors">02:00 PM</button>
+<button class="py-2 text-[10px] font-bold rounded-lg border border-outline-variant/20 hover:bg-surface-container-low transition-colors">03:00 PM</button>
+<button class="py-2 text-[10px] font-bold rounded-lg border border-outline-variant/20 hover:bg-surface-container-low transition-colors">04:00 PM</button>
+</div>
+</div>
+<div class="pt-4">
+<button class="w-full py-4 bg-gradient-to-r from-primary-container to-secondary text-white font-black text-lg rounded-2xl shadow-xl shadow-primary-container/30 transition-transform active:scale-95">
+                        Schedule Visit
+                    </button>
+</div>
+</div>
+</div>
+</div>
+</body></html>

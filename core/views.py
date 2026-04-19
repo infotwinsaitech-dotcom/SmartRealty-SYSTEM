@@ -1,0 +1,1598 @@
+from django.shortcuts import render,get_object_or_404 ,redirect
+from .models import Property,User,Profile,Lead, Deal, Task,Activity,Agent,Document,Conversation, Message,Notification,Campaign,SiteVisit
+import urllib.parse
+from django.contrib import messages
+from django.contrib.auth import authenticate, login,logout,get_user_model
+from django.contrib.auth.decorators import login_required
+import random
+from django.core.mail import send_mail
+from django.contrib.auth.hashers import make_password
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from django.conf import settings
+from django.db.models import Sum
+from datetime import date, timedelta
+from django.db.models.functions import ExtractMonth
+import calendar, json,csv
+from django.core.paginator import Paginator
+from django.views.decorators.http import require_POST
+from django.http import HttpResponse
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.db.models import Count
+from django.db.models import Q
+from django.contrib.auth import update_session_auth_hash
+
+def home(request):
+    properties = Property.objects.all()[:6]
+
+    return render(request, "public/index.html", {
+        "properties": properties
+    })
+
+def properties_view(request):
+    properties = Property.objects.all().order_by('-created_at')
+    return render(request, "public/properties.html", {
+        "properties": properties
+    })
+
+from .models import Inquiry
+
+
+def property_detail(request, id):
+    property = get_object_or_404(Property, id=id)
+
+    if request.method == "POST":
+        name = request.POST.get("name")
+        email = request.POST.get("email")
+        message = request.POST.get("message")
+
+        lead = Lead.objects.create(
+            name=name,
+            email=email,
+            phone='',
+            status='HOT',
+            source='Website',
+            interest=property.title,
+            builder=property.builder  # ✅ direct use करो
+)
+
+        lead.properties.add(property)  # ✅ M2M add
+
+        Inquiry.objects.create(
+            property=property,
+            name=name,
+            email=email,
+            message=message
+        )
+
+    return render(request, "public/property_detail.html", {
+        "property": property
+    })
+
+def property_list(request):
+    properties = Property.objects.all().order_by('-created_at')
+
+    location = request.GET.get('location')
+    property_type = request.GET.get('type')
+    min_price = request.GET.get('min_price')
+    max_price = request.GET.get('max_price')
+    beds = request.GET.get('beds')
+    baths = request.GET.get('baths')
+
+    if location:
+        properties = properties.filter(location__icontains=location)
+
+    if property_type:
+        properties = properties.filter(property_type__iexact=property_type)
+
+    if min_price:
+        properties = properties.filter(price__gte=min_price)
+
+    if max_price:
+        properties = properties.filter(price__lte=max_price)
+
+    if beds:
+        properties = properties.filter(beds__gte=beds)
+
+    if baths:
+        properties = properties.filter(baths__gte=baths)
+
+    
+        whatsapp_message = f"""
+        New Inquiry!
+        Name: {name}
+        Property: {property.title}
+        Message: {message}
+        """
+
+        encoded_msg = urllib.parse.quote(whatsapp_message)
+
+    return render(request, "public/property.html", {
+        "properties": properties
+    })
+def contact(request):
+    if request.method == "POST":
+        name = request.POST.get("name")
+        phone = request.POST.get("phone")
+        message = request.POST.get("message")
+        messages.success(request, "Redirecting to WhatsApp...")
+
+        text = f"New Inquiry:%0AName: {name}%0APhone: {phone}%0AMessage: {message}"
+
+        whatsapp_url = f"https://wa.me/919876543210?text={text}"
+
+        return redirect(whatsapp_url)
+    
+
+    return render(request, "public/contact_us.html")
+
+def about(request):
+    return render(request, "public/about.html")
+
+def login_view(request):
+    if request.method == "POST":
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+
+        user = authenticate(request, username=username, password=password)
+
+        if user:
+            login(request, user)
+
+            if user.role == "builder":
+                return redirect("builder_dashboard")
+            elif user.role == "agent":
+                return redirect("agent_dashboard")
+            else:
+                return redirect("home")
+
+        else:
+            return render(request, "public/login.html", {"error": "Invalid credentials"})
+
+    return render(request, "public/login.html")
+
+
+
+def register_view(request):
+    if request.method == "POST":
+        full_name = request.POST.get("full_name")
+        username = request.POST.get("username")
+        email = request.POST.get("email")
+        phone = request.POST.get("phone")
+        password = request.POST.get("password")
+
+        if not username or not password:
+            return render(request, "public/register.html", {
+                "error": "Username and Password required"
+            })
+
+        user = User.objects.create_user(
+            username=username,
+            email=email,
+            password=password,
+            phone=phone,
+            role="user"
+        )
+
+        profile, created = Profile.objects.get_or_create(user=user)
+        profile.full_name = full_name
+        profile.email = email
+        profile.phone = phone
+        profile.save()
+
+        # ✅ SUCCESS MESSAGE
+        messages.success(request, "🎉 Registration successful! Please login.")
+
+        return redirect("login")
+
+    return render(request, "public/register.html")
+
+def user_login(request):
+    if request.method == "POST":
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+
+        user = authenticate(request, username=username, password=password)
+
+        if user is not None:
+            login(request, user)
+
+            # 🔥 ROLE CHECK
+            if hasattr(user, 'agent'):
+                return redirect('agent_dashboard')
+
+            else:
+                return redirect('builder_dashboard')
+
+    return render(request, "login.html")
+    
+
+
+@login_required
+def builder_dashboard(request):
+    if request.user.role != "builder":
+        return redirect("login")
+
+    return render(request, "builder/dashboard.html")
+
+@login_required
+def agent_dashboard(request):
+    if request.user.role != "agent":
+        return redirect("login")
+
+    return render(request, "agent/agent_dashboard.html")
+
+def forgot_password(request):
+    if request.method == "POST":
+        email = request.POST.get("email")
+
+        try:
+            user = User.objects.get(email=email)
+
+            # OTP generate
+            otp = random.randint(100000, 999999)
+
+            # session में save
+            request.session['reset_email'] = email
+            request.session['otp'] = str(otp)
+
+            # email send
+            send_mail(
+                "OTP Verification",
+                f"Your OTP is {otp}",
+                settings.EMAIL_HOST_USER,
+                [email],
+                fail_silently=False,
+            )
+
+            # 🔥 IMPORTANT REDIRECT
+            return redirect("otp_verification")
+
+        except User.DoesNotExist:
+            return render(request, "public/forgot_password.html", {
+                "error": "Email not registered"
+            })
+
+    return render(request, "public/forgot_password.html")
+
+def otp_verification(request):
+    email = request.session.get("reset_email")
+    session_otp = request.session.get("otp")
+
+    # 🔒 direct access block
+    if not email or not session_otp:
+        return redirect("forgot_password")
+
+    if request.method == "POST":
+        user_otp = request.POST.get("otp")
+
+        if user_otp == session_otp:
+            return redirect("reset_password")
+        else:
+            return render(request, "public/otp_verification.html", {
+                "error": "Invalid OTP"
+            })
+
+    return render(request, "public/otp_verification.html")
+
+def reset_password(request):
+    email = request.session.get("reset_email")
+
+    if not email:
+        return redirect("forgot_password")  # direct access block
+
+    if request.method == "POST":
+        password = request.POST.get("password")
+        confirm_password = request.POST.get("confirm_password")
+
+        if password != confirm_password:
+            return render(request, "public/reset_password.html", {
+                "error": "Passwords do not match"
+            })
+
+        try:
+            user = User.objects.get(email=email)
+            user.password = make_password(password)
+            user.save()
+
+            # session clear
+            request.session.flush()
+
+            return redirect("login")
+
+        except User.DoesNotExist:
+            return redirect("forgot_password")
+
+    return render(request, "public/reset_password.html")
+
+
+@receiver(post_save, sender=User)
+def create_user_profile(sender, instance, created, **kwargs):
+    if created:
+        Profile.objects.create(
+            user=instance,
+            full_name=instance.username,  # fallback
+            email=instance.email,
+            phone=instance.phone
+        )
+
+@login_required
+def profile(request):
+    profile = Profile.objects.get(user=request.user)
+
+    return render(request, "user/profile.html", {
+        "profile": profile
+    })
+
+def logout_view(request):
+    logout(request)
+    return redirect("login")
+
+@login_required
+def edit_profile(request):
+    profile = Profile.objects.get(user=request.user)
+
+    if request.method == "POST":
+        profile.full_name = request.POST.get("full_name")
+        profile.email = request.POST.get("email")
+        profile.phone = request.POST.get("phone")
+        profile.save()
+
+        return redirect("profile")
+
+    return render(request, "user/edit_profile.html", {"profile": profile})
+
+
+@login_required
+def my_properties(request):
+    properties = Property.objects.filter(user=request.user) 
+    return render(request, "user/my_property.html", {
+        "properties": properties
+    })
+
+@login_required
+def my_inquiries(request):
+    inquiries = Inquiry.objects.filter(email=request.user.email)
+
+    return render(request, "user/my_inquiries.html", {
+        "inquiries": inquiries
+    })
+
+
+
+@login_required
+def add_property(request):
+    if request.method == "POST":
+        title = request.POST.get("title")
+        location = request.POST.get("location")
+        status=request.POST.get('status')
+        price = request.POST.get("price")
+        beds = request.POST.get("beds")
+        baths = request.POST.get("baths")
+        sqft = request.POST.get("sqft")
+        description = request.POST.get("description")
+        type = request.POST.get("type")
+        thumbnail = request.FILES.get("thumbnail")
+
+        # 🔥 यही जगह है जहाँ add करना है
+        Property.objects.create(
+            title=title,
+            location=location,
+            price=price,
+            beds=beds,
+            baths=baths,
+            sqft=sqft,
+            description=description,
+            property_type=type,
+            thumbnail=thumbnail,
+            user=request.user   # ✅ IMPORTANT
+        )
+
+        return redirect("my_property")
+
+    return render(request, "user/add_property.html")
+@login_required
+def property_management(request):
+    properties = Property.objects.all()
+    return render(request, "builder/property_management.html", {
+        "properties": properties
+    })
+
+
+
+@login_required
+def lead_management(request):
+
+    inquiries = Inquiry.objects.all()
+    leads = Lead.objects.filter(builder=request.user)
+
+    # 🔍 search
+    query = request.GET.get('q')
+    if query:
+        leads = leads.filter(
+            Q(name__icontains=query) |
+            Q(email__icontains=query)
+        )
+
+    # 🎯 status filter
+    status = request.GET.get('status')
+    if status:
+        leads = leads.filter(status=status)
+
+    # 🔄 sorting
+    sort = request.GET.get('sort')
+    if sort == "new":
+        leads = leads.order_by('-id')
+    elif sort == "old":
+        leads = leads.order_by('id')
+
+    # 👤 selected lead
+    selected_lead = None
+    lead_id = request.GET.get('lead')
+    if lead_id:
+        selected_lead = get_object_or_404(Lead, id=lead_id)
+
+    # 📊 stats
+    total_pipeline = Deal.objects.aggregate(total=Sum('amount'))['total'] or 0
+    hot_leads = Lead.objects.filter(status='HOT').count()
+
+    # 👥 agents (for dropdown)
+    agents = Agent.objects.filter(builder=request.user)
+
+    # 📄 pagination
+    paginator = Paginator(leads, 10)
+    page = request.GET.get('page')
+    leads = paginator.get_page(page)
+
+    return render(request, "builder/lead_management.html", {
+        "inquiries": inquiries,
+        "leads": leads,
+        "selected_lead": selected_lead,
+        "total_pipeline": total_pipeline,
+        "hot_leads": hot_leads,
+        "agents": agents,
+    })
+
+
+@login_required
+def builder_dashboard(request):
+    
+
+    #   # 👇 existing code...
+
+    monthly_data = (
+        Deal.objects.filter(status="closed")
+        .annotate(month=ExtractMonth('created_at'))
+        .values('month')
+        .annotate(total=Sum('amount'))
+        .order_by('month')
+    )
+
+    chart_labels = []
+    chart_data = []
+
+    for item in monthly_data:
+        chart_labels.append(calendar.month_abbr[item['month']])
+        chart_data.append(item['total']) 
+    
+    total_leads = Lead.objects.filter(builder=request.user).count()
+    active_deals = Deal.objects.filter(status="active").count()
+
+    total_revenue = Deal.objects.filter(status="closed").aggregate(
+        total=Sum('amount')
+    )['total'] or 0
+
+    closed_deals = Deal.objects.filter(status="closed").count()
+
+    conversion_rate = 0
+    if total_leads > 0:
+        conversion_rate = (closed_deals / total_leads) * 100
+
+    # ===== ACTIVITY + TASK =====
+    activities = Activity.objects.order_by('-created_at')[:5]
+    tasks = Task.objects.order_by('-date', '-time')[:5]
+    today = date.today()
+    start_of_month = today.replace(day=1)
+    last_month_end = start_of_month - timedelta(days=1)
+    last_month_start = last_month_end.replace(day=1)
+
+# Leads
+    current_leads = Lead.objects.filter(created_at__date__gte=start_of_month).count()
+    last_leads = Lead.objects.filter(created_at__date__range=[last_month_start, last_month_end]).count()
+
+    lead_growth = ((current_leads - last_leads) / last_leads * 100) if last_leads else 0
+
+# Deals
+    current_deals = Deal.objects.filter(created_at__date__gte=start_of_month).count()
+    last_deals = Deal.objects.filter(created_at__date__range=[last_month_start, last_month_end]).count()
+
+    deal_growth = ((current_deals - last_deals) / last_deals * 100) if last_deals else 0
+
+# Revenue
+    current_revenue = Deal.objects.filter(
+    status="closed",
+    created_at__date__gte=start_of_month
+    ).aggregate(total=Sum('amount'))['total'] or 0
+
+    last_revenue = Deal.objects.filter(
+        status="closed",
+        created_at__date__range=[last_month_start, last_month_end]
+    ).aggregate(total=Sum('amount'))['total'] or 0
+
+    revenue_growth = ((current_revenue - last_revenue) / last_revenue * 100) if last_revenue else 0    
+
+
+
+    # ===== LEAD SOURCES (dynamic) =====
+    total = Lead.objects.count()
+
+    search = Lead.objects.filter(source='search').count()
+    referral = Lead.objects.filter(source='referral').count()
+    social = Lead.objects.filter(source='social').count()
+    direct = Lead.objects.filter(source='direct').count()
+
+    lead_sources = {
+        "search": (search / total * 100) if total else 0,
+        "referrals": (referral / total * 100) if total else 0,
+        "social": (social / total * 100) if total else 0,
+        "direct": (direct / total * 100) if total else 0,
+    }
+
+    # ===== CONTEXT =====
+    context = {
+        "total_leads": total_leads,
+        "active_deals": active_deals,
+        "total_revenue": total_revenue,
+        "conversion_rate": conversion_rate,
+        "activities": activities,
+        "tasks": tasks,
+
+        "lead_growth": lead_growth,
+        "deal_growth": deal_growth,
+        "revenue_growth": revenue_growth,
+
+        "lead_sources": lead_sources,
+
+        "start_date": date.today().replace(day=1),
+        "end_date": date.today(),
+        "chart_labels": json.dumps(chart_labels),
+        "chart_data": json.dumps(chart_data),    
+    }
+
+    return render(request, "builder/dashboard.html", context)
+
+
+
+@require_POST
+def add_lead(request):
+    agent = None
+    agent_id = request.POST.get("assigned_to")
+
+    if agent_id:
+        agent = Agent.objects.get(id=agent_id)
+
+    Lead.objects.create(
+        name=request.POST.get("name"),
+        email=request.POST.get("email"),
+        phone=request.POST.get("phone"),
+        source=request.POST.get("source"),
+        status=request.POST.get("status"),
+        assigned_to=agent,
+        interest=request.POST.get("interest"),
+        builder=request.user
+
+      # 🔥 MUST ADD
+)
+
+    # 🔔 notification
+    Notification.objects.create(
+        title="New Lead Added",
+        message=f"{lead.name} added",
+        type="lead"
+    )
+
+    return redirect("lead_management")
+
+
+@require_POST
+def edit_lead(request, id):
+    lead = get_object_or_404(Lead, id=id)
+
+    lead.name = request.POST.get("name")
+    lead.email = request.POST.get("email")
+    lead.phone = request.POST.get("phone")
+    lead.source = request.POST.get("source")
+    lead.status = request.POST.get("status")
+    lead.assigned_to = request.POST.get("assigned_to")
+    lead.interest = request.POST.get("interest")
+
+    lead.save()
+
+    return redirect(f"/builder/leads/?lead={id}")
+
+
+
+def export_leads(request):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="leads.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow(['Name', 'Email', 'Phone', 'Source', 'Status'])
+
+    leads = Lead.objects.filter(builder=request.user)
+    for lead in leads:
+        writer.writerow([lead.name, lead.email, lead.phone, lead.source, lead.status])
+
+    return response
+@login_required
+def add_to_cart(request, id):
+    property = Property.objects.get(id=id)
+
+    SavedProperty.objects.create(
+        user=request.user,
+        property=property
+    )
+
+    return redirect('property_list')
+
+@login_required
+def builder_property_detail(request, id):
+    property = Property.objects.get(id=id)
+    leads = Lead.objects.filter(properties=property)
+
+    if request.method == "POST":
+        property.title = request.POST.get('title')
+        property.location = request.POST.get('location')
+        property.price = request.POST.get('price')
+        property.description = request.POST.get('description')
+        property.status = request.POST.get('status'),
+        
+
+        if request.FILES.get('thumbnail'):
+            property.thumbnail = request.FILES.get('thumbnail')
+
+        property.save()
+
+    return render(request, "builder/property_detail.html", {
+        "property": property,
+        "leads": leads
+    })
+@login_required
+def delete_property(request, id):
+    property = Property.objects.get(id=id)
+    property.delete()
+    return redirect('property_management')
+@login_required
+def assign_property(request):
+    leads = Lead.objects.filter(builder=request.user)
+    properties = Property.objects.all()
+    agents = Agent.objects.filter(builder=request.user)
+    print(agents)
+
+    selected_lead_id = request.GET.get('lead')
+    selected_lead = None
+
+    if selected_lead_id:
+        selected_lead = Lead.objects.get(id=selected_lead_id)
+
+    if request.method == "POST":
+        lead_id = request.POST.get("lead_id")
+        property_id = request.POST.get("property_id")
+        agent_id = request.POST.get("agent_id")
+
+        lead = Lead.objects.get(id=lead_id)
+        property_obj = Property.objects.get(id=property_id)
+        agent = Agent.objects.get(id=agent_id)
+
+        lead.properties.add(property_obj)
+        lead.assigned_to = agent
+        lead.save()
+
+        return redirect(f"/builder/assign-property/?lead={lead.id}")
+
+    return render(request, "builder/assign_property.html", {
+        "leads": leads,
+        "properties": properties,
+        "agents": agents,
+        "selected_lead": selected_lead
+    })
+@login_required
+def builder_root(request):
+    return redirect('builder_dashboard')
+
+User = get_user_model()
+
+
+@login_required
+def create_agent(request):
+    if request.method == "POST":
+        name = request.POST.get("name")
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+        email = request.POST.get("email")
+        phone = request.POST.get("phone")
+
+        # ✅ User create (login के लिए)
+        user = User.objects.create_user(
+            username=username,
+            password=password,
+            role="agent"
+        )
+
+        # ✅ Agent profile create
+        Agent.objects.create(
+            user=user,
+            name=name,
+            email=email,
+            phone=phone,
+            builder=request.user   # 🔥 VERY IMPORTANT
+        )
+
+        return redirect('create_agent')
+
+    agents = Agent.objects.filter(builder=request.user)
+
+    return render(request, "builder/create_agent.html", {
+        "agents": agents
+    })
+
+
+def pipeline(request):
+
+    # POST: update status
+    if request.method == "POST":
+        lead_id = request.POST.get("lead_id")
+        new_status = request.POST.get("status")
+
+        if lead_id and new_status:
+            lead = get_object_or_404(Lead, id=lead_id)
+            lead.status = new_status
+            lead.save()
+
+        return redirect("pipeline")
+
+    # GET: show pipeline
+    leads = Lead.objects.filter(builder=request.user).order_by('-created_at')
+
+    context = {
+        "columns": [
+            ("NEW", leads.filter(status="NEW")),
+            ("CONTACTED", leads.filter(status="CONTACTED")),
+            ("VISIT", leads.filter(status="VISIT")),
+            ("NEGOTIATION", leads.filter(status="NEGOTIATION")),
+            ("CLOSED", leads.filter(status="CLOSED")),
+        ]
+    }
+
+    return render(request, "builder/pipeline.html", context)
+
+@csrf_exempt
+def update_lead_status(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+
+        lead_id = data.get("lead_id")
+        status = data.get("status")
+
+        try:
+            lead = Lead.objects.get(id=lead_id)
+            lead.status = status
+            lead.save()
+            return JsonResponse({"success": True})
+        except Lead.DoesNotExist:
+            return JsonResponse({"success": False})
+
+    return JsonResponse({"error": "Invalid request"})
+
+def lead_detail_api(request, id):
+    lead = Lead.objects.get(id=id)
+
+    return JsonResponse({
+        "id": lead.id,
+        "name": lead.name,
+        "phone": lead.phone,
+        "source": lead.source,
+        "status": lead.status,
+        "priority": lead.priority,
+    })
+@csrf_exempt
+def add_note(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        LeadNote.objects.create(
+            lead_id=data['lead_id'],
+            note=data['note'],
+            created_at=timezone.now()
+)         
+
+
+        return JsonResponse({"success": True})
+
+
+@csrf_exempt
+def update_priority(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+
+        lead = Lead.objects.get(id=data['lead_id'])
+        lead.priority = data['priority']
+        lead.save()
+
+        return JsonResponse({"success": True})
+    
+def analytics(request):
+
+    leads = Lead.objects.filter(builder=request.user)
+
+    total_leads = leads.count()
+    closed_leads = leads.filter(status="CLOSED").count()
+    active_leads = leads.exclude(status="CLOSED").count()
+
+    # 🔥 IMPORTANT: price issue fix
+    total_revenue = 0  # अगर price नहीं है तो 0 रखो
+
+    # STATUS DATA
+    status_counts = {
+        "NEW": leads.filter(status="NEW").count(),
+        "CONTACTED": leads.filter(status="CONTACTED").count(),
+        "SITE VISIT": leads.filter(status="SITE VISIT").count(),
+        "NEGOTIATION": leads.filter(status="NEGOTIATION").count(),
+        "CLOSED": leads.filter(status="CLOSED").count(),
+    }
+
+    # SOURCE DATA
+    sources = leads.values('source').annotate(count=Count('id'))
+    source_labels = [s['source'] for s in sources]
+    source_data = [s['count'] for s in sources]
+
+    # AGENT PERFORMANCE
+    agents = []
+    for agent in Agent.objects.filter(builder=request.user):
+        total = leads.filter(assigned_to=agent).count()
+        closed = leads.filter(agent=agent, status="CLOSED").count()
+
+        agents.append({
+            "name": agent.name,
+            "total": total,
+            "closed": closed
+        })
+
+    context = {
+        "total_leads": total_leads,
+        "closed_leads": closed_leads,
+        "active_leads": active_leads,
+        "total_revenue": total_revenue,
+        "status_data": list(status_counts.values()),
+        "source_labels": source_labels,
+        "source_data": source_data,
+        "agents": agents
+    }
+
+    return render(request, "builder/analytics.html", context)
+
+
+
+@login_required
+def document_management(request):
+
+    if request.method == "POST":
+        file = request.FILES.get("file")
+        category = request.POST.get("category")
+
+        if file:
+            Document.objects.create(
+                name=file.name,
+                file=file,
+                category=category,
+                uploaded_by=request.user
+            )
+            doc = Document.objects.create(
+        Notification.objects.create(
+            title="Document Uploaded",
+            message=f"{doc.name} uploaded",
+            type="document"
+         )     
+            )   
+            # 🔥 notification
+          
+        return redirect('document_management')
+
+    documents = Document.objects.all().order_by('-created_at')
+
+    return render(request, "builder/document_management.html", {
+        "documents": documents
+    })
+
+@login_required
+def delete_document(request, doc_id):
+    doc = get_object_or_404(Document, id=doc_id)
+    doc.delete()
+    return redirect('document_management')
+
+@login_required
+def communication(request):
+
+    conversations = Conversation.objects.all().order_by('-created_at')
+    first_chat = conversations.first()
+
+    messages = []
+    if first_chat:
+        messages = first_chat.messages.all().order_by('created_at')
+
+    return render(request, "builder/communication.html", {
+        "conversations": conversations,
+        "messages": messages,
+        "active_chat": first_chat
+    })
+
+
+@csrf_exempt
+def send_message(request):
+
+    data = json.loads(request.body)
+
+    name = data.get("name")
+    phone = data.get("phone")
+    text = data.get("message")
+
+    # ✅ SAME CONVERSATION ALWAYS
+    convo, created = Conversation.objects.get_or_create(
+        lead_phone=phone,
+        defaults={"lead_name": name}
+    )
+
+    Message.objects.create(
+        conversation=convo,
+        text=text,
+        is_agent=False
+    )
+            # 🔥 ADD THIS
+    Notification.objects.create(
+        title="New Message",
+        message=f"Message from {name}",
+        type="message"
+        )
+
+    
+    return JsonResponse({
+        "status": "sent",
+        "conversation_id": convo.id   # 🔥 IMPORTANT
+    })
+@csrf_exempt
+def client_send_message(request):
+
+    if request.method == "POST":
+        data = json.loads(request.body)
+
+        name = data.get("name", "Guest")
+        phone = data.get("phone", "unknown")
+        text = data.get("message")
+
+        # conversation create / get
+        convo, created = Conversation.objects.get_or_create(
+            lead_phone=phone,
+            defaults={"lead_name": name}
+        )
+
+        # save message
+        Message.objects.create(
+            conversation=convo,
+            text=text,
+            is_agent=False
+        )
+
+        return JsonResponse({"status": "ok"})
+
+def get_messages(request):
+
+    convo_id = request.GET.get("conversation_id")
+
+    convo = Conversation.objects.filter(id=convo_id).first()
+
+    if not convo:
+        return JsonResponse({"messages": []})
+
+    messages = convo.messages.all().order_by('created_at')
+
+    data = []
+
+    for m in messages:
+        data.append({
+            "text": m.text,
+            "is_agent": m.is_agent
+        })
+
+    return JsonResponse({"messages": data})
+
+@csrf_exempt
+def agent_send_message(request):
+
+    data = json.loads(request.body)
+
+    convo_id = data.get("conversation_id")
+    text = data.get("message")
+
+    convo = Conversation.objects.get(id=convo_id)
+
+    Message.objects.create(
+        conversation=convo,
+        text=text,
+        is_agent=True
+    )
+
+    return JsonResponse({"status": "sent"})
+
+@csrf_exempt
+def create_task(request):
+
+    data = json.loads(request.body)
+
+    Task.objects.create(
+        title=data['title'],
+        lead_id=data['lead'],
+        date=data['date'],
+        time=data['time'],
+        priority=data['priority']
+    )
+        # 🔥 notification
+    Notification.objects.create(
+        title="Task Created",
+        message=f"{task.title} scheduled",
+        type="task"
+    )
+
+
+    return JsonResponse({"status": "ok"})
+
+
+def task_done(request, id):
+
+    task = Task.objects.get(id=id)
+    task.status = "DONE"
+    task.save()
+
+    return JsonResponse({"status": "done"})
+
+def scheduler_overview(request):
+
+    tasks = Task.objects.all()
+    leads = Lead.objects.filter(builder=request.user)
+
+    today = date.today()
+    cal = calendar.monthcalendar(today.year, today.month)
+
+    calendar_days = []
+
+    for week in cal:
+        for d in week:
+            if d == 0:
+                calendar_days.append({"date": "", "tasks": []})
+            else:
+                day_tasks = tasks.filter(date__day=d)
+                calendar_days.append({
+                    "date": d,
+                    "tasks": day_tasks
+                })
+
+    return render(request, "builder/scheduler_overview.html", {
+        "tasks": tasks,
+        "leads": leads,
+        "calendar_days": calendar_days,
+        "today": date.today()
+    })
+
+
+@csrf_exempt
+def reorder_task(request):
+
+    data = json.loads(request.body)
+    task = Task.objects.get(id=data['task_id'])
+    task.order = data['position']
+    task.save()
+    
+
+    return JsonResponse({"status": "ok"})
+
+
+def check_reminders(request):
+
+    today = date.today()   # ✅ ADD THIS
+    count = Task.objects.filter(date=today, status='PENDING').count()
+
+    return JsonResponse({"count": count})
+
+
+def notifications_page(request):
+
+    notifications = Notification.objects.all().order_by('-created_at')
+
+    return render(request, "builder/notifications.html", {
+        "notifications": notifications
+    })
+@csrf_exempt
+def mark_notification_read(request, id):
+    n = Notification.objects.get(id=id)
+    n.is_read = True
+    n.save()
+
+    return JsonResponse({"status": "ok"})
+@login_required
+def agent_performance(request):
+
+    agents = Agent.objects.filter(builder=request.user)
+
+    selected_agent = request.GET.get("agent")
+    start_date = request.GET.get("start")
+    end_date = request.GET.get("end")
+
+    data = []
+    chart_labels = []
+    chart_data = []
+
+    total_revenue = 0
+    total_deals = 0
+
+    for agent in agents:
+
+        leads = Lead.objects.filter(agent=agent)
+        deals = Deal.objects.filter(agent=agent, status="closed")
+
+        # ✅ FILTER APPLY
+        if start_date and end_date:
+            leads = leads.filter(created_at__range=[start_date, end_date])
+            deals = deals.filter(created_at__range=[start_date, end_date])
+
+        if selected_agent:
+            if str(agent.id) != selected_agent:
+                continue
+
+        revenue = deals.aggregate(total=Sum('amount'))['total'] or 0
+
+        total_revenue += revenue
+        total_deals += deals.count()
+
+        conversion = 0
+        if leads.count() > 0:
+            conversion = (deals.count() / leads.count()) * 100
+
+        data.append({
+            "id": agent.id,
+            "name": agent.name,
+            "total_leads": leads.count(),
+            "closed_deals": deals.count(),
+            "revenue": revenue,
+            "conversion": round(conversion, 1)
+        })
+
+        chart_labels.append(agent.name)
+        chart_data.append(revenue)
+
+    # ✅ SORT BY REVENUE (LEADERBOARD)
+    data = sorted(data, key=lambda x: x['revenue'], reverse=True)
+
+    return render(request, "builder/agent_performance.html", {
+        "agents": data,
+        "all_agents": agents,
+        "total_agents": agents.count(),
+        "total_deals": total_deals,
+        "total_revenue": total_revenue,
+        "chart_labels": json.dumps(chart_labels),
+        "chart_data": json.dumps(chart_data)
+    })
+@login_required
+def agent_detail(request, id):
+
+    agent = Agent.objects.get(id=id)
+
+    leads = Lead.objects.filter(agent=agent)
+    deals = Deal.objects.filter(agent=agent)
+
+    revenue = deals.aggregate(total=Sum('amount'))['total'] or 0
+
+    return render(request, "builder/agent_detail.html", {
+        "agent": agent,
+        "leads": leads.count(),
+        "deals": deals.count(),
+        "revenue": revenue
+    })
+def export_agents(request):
+
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="agents.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow(['Name', 'Leads', 'Deals', 'Revenue'])
+
+    for agent in Agent.objects.filter(builder=request.user):
+        leads = Lead.objects.filter(agent=agent).count()
+        deals = Deal.objects.filter(agent=agent).count()
+        revenue = Deal.objects.filter(agent=agent).aggregate(total=Sum('amount'))['total'] or 0
+
+        writer.writerow([agent.name, leads, deals, revenue])
+
+    return response
+
+def ai_insights(request):
+
+    leads = Lead.objects.filter(builder=request.user)
+
+    scored_leads = []
+    high_intent = 0
+    closing = 0
+    risk = 0
+
+    for lead in leads:
+        score = random.randint(40, 100)
+
+        if score > 80:
+            intent = "High"
+            high_intent += 1
+        elif score > 60:
+            intent = "Medium"
+            closing += 1
+        else:
+            intent = "Low"
+            risk += 1
+
+        scored_leads.append({
+            "lead": lead,
+            "score": score,
+            "intent": intent
+        })
+
+    total_revenue = Deal.objects.aggregate(total=Sum('amount'))['total'] or 0
+    forecast = int(total_revenue * 1.3)
+
+    insights = [
+        {"title": "Market Shift", "desc": "Luxury demand increased"},
+        {"title": "Best Time", "desc": "Call leads at 2PM"},
+    ]
+
+    recommendations = []
+
+    for item in scored_leads:
+        if item["score"] > 85:
+            recommendations.append(f"Follow up with {item['lead'].name}")
+
+    return render(request, "builder/ai_insights.html", {
+        "scored_leads": scored_leads[:5],
+        "total_revenue": total_revenue,
+        "forecast": forecast,
+        "insights": insights,
+        "recommendations": recommendations,
+        "high_intent": high_intent,
+        "closing": closing,
+        "risk": risk
+    })
+
+
+def marketing_automation(request):
+    campaigns = Campaign.objects.all()
+
+    total_campaigns = campaigns.count()
+    total_reach = sum(c.reach or 0 for c in campaigns)
+    total_conversions = sum(c.conversion or 0 for c in campaigns)
+
+    avg_ctr = 0
+    if total_reach > 0:
+        avg_ctr = round((sum(c.clicked or 0 for c in campaigns) / total_reach) * 100, 2)
+
+    # ✅ CHART DATA (यही तुम पूछ रहे थे)
+    chart_labels = [c.name for c in campaigns]
+    chart_data = [c.reach for c in campaigns]
+
+    return render(request, 'builder/marketing_automation.html', {
+        'campaigns': campaigns,
+        'total_campaigns': total_campaigns,
+        'total_reach': total_reach,
+        'total_conversions': total_conversions,
+        'avg_ctr': avg_ctr,
+        'chart_labels': chart_labels,
+        'chart_data': chart_data,
+    })
+
+
+
+def create_campaign(request):
+    if request.method == "POST":
+        Campaign.objects.create(
+            name=request.POST.get('name'),
+            type=request.POST.get('type', ''),  # ✅ FIX
+            reach=request.POST.get('reach'),
+            clicked=request.POST.get('clicked'),
+            conversion=request.POST.get('conversion'),
+            image=request.FILES.get('image')
+        )
+        return redirect('/builder/marketing/')
+
+    return render(request, 'builder/create_campaign.html')
+
+
+def run_campaign(request, id):
+    campaign = Campaign.objects.get(id=id)
+
+    # dummy automation logic
+    campaign.sent += 100
+    campaign.opened += 60
+    campaign.clicked += 20
+    campaign.save()
+
+    return redirect('marketing_automation')
+
+
+def delete_campaign(request, id):
+    campaign = get_object_or_404(Campaign, id=id)
+    campaign.delete()
+    return redirect('/builder/marketing/')
+
+@login_required
+def manage_users(request):
+    query = request.GET.get('q')
+    role_filter = request.GET.get('role')
+
+    # 🔒 SAFE FILTER
+    agents = Agent.objects.filter(builder=request.user).order_by('-id')
+
+    # 🔍 SEARCH
+    if query:
+        agents = agents.filter(
+            Q(name__icontains=query) |
+            Q(email__icontains=query) |
+            Q(phone__icontains=query)
+        )
+
+    # 🎯 FILTER
+    if role_filter:
+        agents = agents.filter(role=role_filter)
+
+    return render(request, 'builder/manage_users.html', {
+        'agents': agents
+    })
+
+
+# ❌ DELETE
+@login_required
+def delete_agent(request, id):
+    agent = get_object_or_404(Agent, id=id, builder=request.user)
+    agent.delete()
+    return redirect('manage_users')
+
+
+# 🔄 TOGGLE STATUS
+@login_required
+def toggle_agent(request, id):
+    agent = get_object_or_404(Agent, id=id, builder=request.user)
+    agent.is_active = not agent.is_active
+    agent.save()
+    return redirect('manage_users')
+
+def register_user(request):
+    if request.method == "POST":
+        user = User.objects.create_user(
+            username=request.POST['username'],
+            password=request.POST['password']
+        )
+
+        Agent.objects.create(
+            user=user,
+            name=request.POST['username'],
+            email="",
+            phone="",
+            role="Agent"
+        )
+
+        return redirect('/login/')
+    
+
+def delete_lead(request, id):
+    lead = get_object_or_404(Lead, id=id)
+
+    # 🔒 security (builder only delete his leads)
+    if lead.builder == request.user:
+        lead.delete()
+
+    return redirect('lead_management')
+
+@login_required
+def agent_dashboard(request):
+
+    agent = request.user.agent_profile
+
+    leads = leads = Lead.objects.filter(
+    assigned_to=agent,
+    builder=agent.builder
+)
+
+    # lead stats
+    total_leads = leads.count()
+    hot = leads.filter(status="HOT").count()
+    warm = leads.filter(status="WARM").count()
+    cold = leads.filter(status="COLD").count()
+
+    # visits
+    from datetime import date
+    visits = SiteVisit.objects.filter(agent=agent)
+    today_visits = visits.filter(date=date.today()).count()
+
+    # tasks
+    tasks = Task.objects.filter(
+        lead__assigned_to=agent,
+        status="PENDING"
+    )
+
+    # deals
+    deals = Deal.objects.filter(agent=agent)
+    total_deals = deals.count()
+
+    return render(request, "agent/agent_dashboard.html", {
+        "leads": leads[:5],
+        "total_leads": total_leads,
+        "hot": hot,
+        "warm": warm,
+        "cold": cold,
+        "visits": visits[:5],
+        "today_visits": today_visits,
+        "tasks": tasks[:5],
+        "total_deals": total_deals,
+    })
+
+
+@login_required
+def agent_leads(request):
+    agent = request.user.agent_profile
+
+    leads = Lead.objects.filter(assigned_to=agent).order_by('-created_at')
+
+    # 🔍 Smart search (name, email, phone)
+    q = request.GET.get('q')
+    if q:
+        leads = leads.filter(
+            Q(name__icontains=q) |
+            Q(email__icontains=q) |
+            Q(phone__icontains=q)
+        )
+
+    # 🎯 Status filter
+    status = request.GET.get('status')
+    if status:
+        leads = leads.filter(status=status)
+
+    # 📊 Sorting
+    sort = request.GET.get('sort')
+    if sort == "old":
+        leads = leads.order_by('created_at')
+    elif sort == "new":
+        leads = leads.order_by('-created_at')
+
+    return render(request, "agent/agent_leads.html", {
+        "leads": leads
+    })
+
+
+@login_required
+def agent_properties(request):
+    agent = request.user.agent_profile
+
+    # 🔥 Step 1: agent ki leads
+    leads = Lead.objects.filter(assigned_to=agent)
+
+    # 🔥 Step 2: un leads ki properties ONLY
+    properties = Property.objects.filter(
+        interested_leads__in=leads
+    ).annotate(
+        demand=Count('interested_leads')
+    ).order_by('-demand').distinct()
+
+    properties = Property.objects.filter(
+    interested_leads__assigned_to=agent,
+    interested_leads__builder=request.user
+    ).distinct()
+
+    return render(request, "agent/agent_properties.html", {
+        "properties": properties
+    })
+
+@login_required
+def agent_profile(request):
+    agent = request.user.agent_profile  # OneToOne relation assumed
+
+    # 📊 stats
+    total_leads = Lead.objects.filter(assigned_to=agent).count()
+    hot_leads = Lead.objects.filter(assigned_to=agent, status='HOT').count()
+
+    visits = SiteVisit.objects.filter(agent=agent)
+    total_visits = visits.count()
+    completed_visits = visits.filter(status='DONE').count()
+
+    # 💰 conversion rate
+    conversion_rate = 0
+    if total_leads > 0:
+        conversion_rate = round((completed_visits / total_leads) * 100, 2)
+
+    context = {
+        "agent": agent,
+        "total_leads": total_leads,
+        "hot_leads": hot_leads,
+        "total_visits": total_visits,
+        "completed_visits": completed_visits,
+        "conversion_rate": conversion_rate,
+    }
+
+    return render(request, "agent/agent_profile.html", context)
+
+
+@login_required
+def scheduler(request):
+    agent = request.user.agent_profile
+
+    leads = Lead.objects.filter(assigned_to=agent)
+
+    visits = SiteVisit.objects.filter(agent=agent).order_by('-date')
+
+    if request.method == "POST":
+        lead_id = request.POST.get("lead")
+        date = request.POST.get("date")
+        time = request.POST.get("time")
+
+        SiteVisit.objects.create(
+            lead_id=lead_id,
+            agent=agent,
+            date=date,
+            time=time
+        )
+
+        return redirect("scheduler")
+
+    return render(request, "agent/scheduler.html", {
+        "leads": leads,
+        "visits": visits
+    })
+
+def property_leads(request, property_id):
+    leads = Lead.objects.filter(property_id=property_id)
+
+    return render(request, "agent/property_leads.html", {
+        "leads": leads
+    })
+@login_required
+def site_visits(request):
+    return render(request, "agent/scheduler.html")
+
+@login_required
+def settings_view(request):
+    user = request.user
+
+    if request.method == "POST":
+
+        # PROFILE UPDATE
+        user.username = request.POST.get("username")
+        user.email = request.POST.get("email")
+        user.phone = request.POST.get("phone")
+
+        # IMAGE
+        if request.FILES.get("profile_image"):
+            user.profile_image = request.FILES.get("profile_image")
+
+        user.save()
+
+        # PASSWORD CHANGE
+        password = request.POST.get("password")
+        confirm = request.POST.get("confirm_password")
+
+        if password:
+            if password == confirm:
+                user.set_password(password)
+                user.save()
+                update_session_auth_hash(request, user)
+                messages.success(request, "Password updated successfully")
+            else:
+                messages.error(request, "Passwords do not match")
+
+        messages.success(request, "Profile updated successfully")
+        return redirect("settings")
+
+    return render(request, "settings.html")
+
+def privacy(request):
+    return render(request, "public/privacy.html")

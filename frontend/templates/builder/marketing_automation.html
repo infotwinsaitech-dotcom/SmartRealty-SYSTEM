@@ -1,0 +1,166 @@
+{% extends 'builder/base.html' %}
+{% block content %}
+
+<main class="ml-64 min-h-screen bg-gray-50">
+<div class="p-10">
+
+<!-- HEADER -->
+<div class="flex justify-between items-center mb-8">
+    <h2 class="text-3xl font-bold">Marketing Automation</h2>
+
+    <a href="{% url 'create_campaign' %}"
+       class="bg-blue-600 text-white px-4 py-2 rounded-lg shadow">
+       + New Campaign
+    </a>
+</div>
+
+<!-- KPI -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
+
+<div class="bg-white p-6 rounded-xl shadow">
+    <p class="text-sm text-gray-500">Active Campaigns</p>
+    <h2 class="text-3xl font-bold">{{ total_campaigns }}</h2>
+</div>
+
+<div class="bg-white p-6 rounded-xl shadow">
+    <p class="text-sm text-gray-500">Total Reach</p>
+    <h2 class="text-3xl font-bold">{{ total_reach }}</h2>
+</div>
+
+<div class="bg-white p-6 rounded-xl shadow">
+    <p class="text-sm text-gray-500">CTR</p>
+    <h2 class="text-3xl font-bold">{{ avg_ctr }}%</h2>
+</div>
+
+<div class="bg-white p-6 rounded-xl shadow">
+    <p class="text-sm text-gray-500">Conversions</p>
+    <h2 class="text-3xl font-bold">{{ total_conversions }}</h2>
+</div>
+
+</div>
+
+<!-- MAIN GRID -->
+<div class="grid grid-cols-12 gap-8">
+
+<!-- LEFT SIDE (CAMPAIGNS) -->
+<div class="col-span-12 lg:col-span-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+    {% for c in campaigns %}
+    <div class="bg-white rounded-xl shadow overflow-hidden">
+
+        <!-- IMAGE -->
+        <div class="h-48 bg-gray-200">
+            
+{% if c.image %}
+    <img src="{{ c.image.url }}" class="w-full h-full object-cover">
+{% else %}
+    <img src="/static/default.jpg" class="w-full h-full object-cover">
+{% endif %}
+        </div>
+
+        <div class="p-6">
+            <h3 class="text-lg font-bold mb-2">{{ c.name }}</h3>
+
+            <div class="grid grid-cols-3 text-center border-t pt-4">
+                <div>
+                    <p class="text-xs text-gray-400">Reach</p>
+                    <p class="font-bold">{{ c.reach }}</p>
+                </div>
+                <div>
+                    <p class="text-xs text-gray-400">Clicked</p>
+                    <p class="font-bold">{{ c.clicked }}</p>
+                </div>
+                <div>
+                    <p class="text-xs text-gray-400">Conversion</p>
+                    <p class="font-bold">{{ c.conversion }}</p>
+                </div>
+            </div>
+
+            <div class="mt-4 flex justify-between">
+                <span class="text-green-600 text-sm font-semibold">
+                    {{ c.status }}
+                </span>
+
+                <a href="{% url 'run_campaign' c.id %}"
+                   class="text-blue-600 text-sm">
+                   Run
+                </a>
+                 <!-- ✅ DELETE BUTTON -->
+        <a href="{% url 'delete_campaign' c.id %}"
+           class="text-red-600 text-sm font-semibold"
+           onclick="return confirm('Are you sure you want to delete this campaign?')">
+           Delete
+        </a>
+            </div>
+        </div>
+
+    </div>
+    {% endfor %}
+
+    </div>
+</div>
+
+<!-- RIGHT SIDE (ANALYTICS) -->
+<div class="col-span-12 lg:col-span-4 space-y-6">
+
+    <!-- BAR CHART -->
+    <div class="bg-white p-6 rounded-xl shadow">
+        <h3 class="font-bold mb-4">Monthly Performance</h3>
+        <canvas id="marketingChart" height="120"></canvas>
+    </div>
+
+    <!-- DONUT CHART -->
+    <div class="bg-white p-6 rounded-xl shadow">
+        <h3 class="font-bold mb-4">Channel Distribution</h3>
+        <canvas id="donutChart"></canvas>
+    </div>
+
+</div>
+
+</div>
+
+</div>
+</main>
+
+<!-- CHART JS -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+// BAR CHART
+const ctx = document.getElementById('marketingChart');
+
+new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: {{ chart_labels|safe }},
+        datasets: [{
+            label: 'Reach',
+            data: {{ chart_data|safe }},
+            backgroundColor: '#3B82F6'
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: { display: false }
+        }
+    }
+});
+
+// DONUT CHART
+const ctx2 = document.getElementById('donutChart');
+
+new Chart(ctx2, {
+    type: 'doughnut',
+    data: {
+        labels: ['Email', 'Social', 'SMS'],
+        datasets: [{
+            data: [45, 39, 16],
+            backgroundColor: ['#3B82F6', '#1E40AF', '#CBD5F5']
+        }]
+    }
+});
+</script>
+
+{% endblock %}

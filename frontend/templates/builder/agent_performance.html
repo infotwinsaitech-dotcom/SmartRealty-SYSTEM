@@ -1,0 +1,133 @@
+{% extends 'builder/base.html' %}
+{% block content %}
+
+<main class="ml-64 pt-16 min-h-screen bg-gray-50">
+<div class="p-8 max-w-[1600px] mx-auto">
+
+<!-- HEADER -->
+<div class="flex justify-between items-center mb-8">
+    <div>
+        <h2 class="text-3xl font-bold">Agent Performance</h2>
+        <p class="text-gray-500">Track top agents & conversions</p>
+    </div>
+</div>
+<form method="GET" class="flex gap-3 mb-6">
+
+<select name="agent" class="border px-3 py-2 rounded">
+    <option value="">All Agents</option>
+    {% for a in all_agents %}
+    <option value="{{ a.id }}">{{ a.name }}</option>
+    {% endfor %}
+</select>
+
+<input type="date" name="start" class="border px-3 py-2 rounded">
+<input type="date" name="end" class="border px-3 py-2 rounded">
+
+<button class="bg-blue-600 text-white px-4 py-2 rounded">
+    Apply
+</button>
+
+</form>
+<a href="/builder/export-agents/" 
+   class="bg-green-600 text-white px-4 py-2 rounded">
+   Export CSV
+</a>
+<!-- TOP STATS -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+
+<div class="bg-white p-6 rounded-xl shadow">
+    <p class="text-gray-500 text-sm">Total Agents</p>
+    <h2 class="text-2xl font-bold">{{ total_agents }}</h2>
+</div>
+
+<div class="bg-white p-6 rounded-xl shadow">
+    <p class="text-gray-500 text-sm">Total Deals</p>
+    <h2 class="text-2xl font-bold">{{ total_deals }}</h2>
+</div>
+
+<div class="bg-white p-6 rounded-xl shadow">
+    <p class="text-gray-500 text-sm">Total Revenue</p>
+    <h2 class="text-2xl font-bold">₹{{ total_revenue }}</h2>
+</div>
+
+</div>
+
+<!-- LEADERBOARD -->
+<div class="bg-white rounded-xl shadow p-6 mb-8">
+    <h3 class="text-xl font-bold mb-4">🏆 Top Agents</h3>
+
+    <table class="w-full text-left">
+        <thead>
+            <tr class="text-gray-500 text-sm border-b">
+                <th>Name</th>
+                <th>Leads</th>
+                <th>Deals</th>
+                <th>Revenue</th>
+                <th>Conversion</th>
+            </tr>
+        </thead>
+
+        <tbody>
+        {% for agent in agents %}
+            <tr onclick="window.location='/builder/agent/{{ agent.id }}/'" 
+                class="cursor-pointer border-b hover:bg-gray-50">
+
+                <td class="py-3 font-semibold">
+                    {{ agent.name }}
+
+                    {% if forloop.counter == 1 %}
+                        🥇
+                    {% elif forloop.counter == 2 %}
+                        🥈
+                    {% elif forloop.counter == 3 %}
+                        🥉
+                    {% endif %}
+                </td>
+
+                <td>{{ agent.total_leads }}</td>
+                <td>{{ agent.closed_deals }}</td>
+                <td>₹{{ agent.revenue }}</td>
+
+                <td>
+                    <div class="w-full bg-gray-200 h-2 rounded">
+                        <div class="bg-green-500 h-2 rounded"
+                             style="width: {{ agent.conversion }}%">
+                        </div>
+                    </div>
+                    <span class="text-xs">{{ agent.conversion }}%</span>
+                </td>
+
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- CHART -->
+<div class="bg-white p-6 rounded-xl shadow">
+    <h3 class="text-lg font-bold mb-4">Revenue by Agent</h3>
+    <canvas id="agentChart"></canvas>
+</div>
+
+</div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+const ctx = document.getElementById('agentChart');
+
+new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: {{ chart_labels|safe }},
+        datasets: [{
+            label: 'Revenue',
+            data: {{ chart_data|safe }},
+            backgroundColor: '#6366F1'
+        }]
+    }
+});
+</script>
+
+{% endblock %}

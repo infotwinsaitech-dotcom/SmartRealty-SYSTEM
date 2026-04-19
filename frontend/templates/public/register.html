@@ -1,0 +1,85 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Register | EstateArchitect</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+body { font-family: 'Manrope', sans-serif; }
+
+.glass {
+    background: rgba(255,255,255,0.06);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+.input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: white;
+}
+
+.input::placeholder {
+    color: #cbd5e1;
+}
+
+</style>
+
+</head>
+
+<body class="bg-gradient-to-br from-[#0F172A] via-[#1E293B] to-black min-h-screen flex items-center justify-center">
+
+<div class="w-full max-w-md glass p-8 rounded-2xl shadow-2xl text-white">
+
+    <h2 class="text-3xl font-bold mb-2 text-center">
+        Create Account
+    </h2>
+
+    <p class="text-center text-gray-400 mb-6 text-sm">
+        Only for users (Agents & Builders are managed by Admin)
+    </p>
+
+    <form method="POST" class="space-y-4">
+        {% csrf_token %}
+
+        <input name="full_name" type="text" placeholder="Full Name" class="input">
+
+        <input name="email" type="email" placeholder="Email" class="input">
+
+        <input name="phone" type="text" placeholder="Phone Number" class="input">
+
+        <input name="company" type="text" placeholder="Company (Optional)" class="input">
+
+        <input name="username" type="text" placeholder="Username" class="input">
+
+        <input name="password" type="password" placeholder="Password" class="input">
+
+        <button type="submit"
+            class="w-full py-3 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl font-bold hover:scale-105 transition">
+            Create Account
+        </button>
+
+        {% if error %}
+        <p class="text-red-400 text-sm">{{ error }}</p>
+        {% endif %}
+    </form>
+
+    <p class="text-center text-gray-400 text-sm mt-6">
+        Already have an account?
+        <a href="{% url 'login' %}" class="text-blue-400 hover:underline">
+            Login
+        </a>
+    </p>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,80 @@
+{% extends "builder/base.html" %}
+{% block content %}
+
+<main class="ml-64 mt-16 p-8 min-h-screen bg-surface">
+
+<!-- HEADER -->
+<div class="flex justify-between items-center mb-10">
+    <div>
+        <h2 class="text-3xl font-extrabold">Create Agent</h2>
+        <p class="text-gray-500">Add and manage your sales team</p>
+    </div>
+</div>
+
+<div class="grid grid-cols-12 gap-8">
+
+    <!-- FORM -->
+    <div class="col-span-12 lg:col-span-5 bg-white p-8 rounded-2xl shadow-xl">
+
+        <h3 class="text-xl font-bold mb-6">Add New Agent</h3>
+
+        <form method="POST" class="space-y-4">
+            {% csrf_token %}
+
+            <input name="name" placeholder="Full Name"
+                class="w-full p-3 border rounded-xl">
+
+            <input name="email" placeholder="Email"
+                class="w-full p-3 border rounded-xl">
+
+            <input name="phone" placeholder="Phone"
+                class="w-full p-3 border rounded-xl">
+
+            <input name="username" placeholder="Username"
+                class="w-full p-3 border rounded-xl">
+
+            <input name="password" type="password" placeholder="Password"
+                class="w-full p-3 border rounded-xl">
+
+            <button
+                class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 rounded-xl font-bold">
+                🚀 Create Agent
+            </button>
+
+        </form>
+    </div>
+
+    <!-- AGENT LIST -->
+    <div class="col-span-12 lg:col-span-7 bg-white p-8 rounded-2xl shadow-xl">
+
+        <h3 class="text-xl font-bold mb-6">Agent List</h3>
+
+        <div class="space-y-4">
+
+            {% for agent in agents %}
+            <div class="p-4 border rounded-xl flex justify-between items-center">
+
+                <div>
+                    <p class="font-bold">{{ agent.name }}</p>
+                    <p class="text-sm text-gray-500">{{ agent.email }}</p>
+                    <p class="text-xs text-gray-400">{{ agent.phone }}</p>
+                </div>
+
+                <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs">
+                    Active
+                </span>
+
+            </div>
+            {% empty %}
+            <p class="text-gray-400">No agents yet</p>
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+</div>
+
+</main>
+
+{% endblock %}

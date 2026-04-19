@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Architect CRM - Admin Settings</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-variant": "#dae2fd",
+                    "surface-container-low": "#f2f3ff",
+                    "primary-fixed-dim": "#b6c4ff",
+                    "inverse-surface": "#283044",
+                    "error": "#ba1a1a",
+                    "surface-tint": "#4059aa",
+                    "tertiary-fixed-dim": "#b9c7e0",
+                    "on-primary-fixed": "#00164e",
+                    "on-background": "#131b2e",
+                    "on-tertiary": "#ffffff",
+                    "on-surface-variant": "#444651",
+                    "on-secondary": "#ffffff",
+                    "on-tertiary-fixed-variant": "#3a485c",
+                    "on-secondary-fixed-variant": "#004395",
+                    "primary-container": "#1e3a8a",
+                    "tertiary": "#1d2b3e",
+                    "surface-dim": "#d2d9f4",
+                    "secondary-fixed": "#d8e2ff",
+                    "outline-variant": "#c5c5d3",
+                    "inverse-on-surface": "#eef0ff",
+                    "surface-container-lowest": "#ffffff",
+                    "tertiary-fixed": "#d5e3fd",
+                    "secondary": "#0058be",
+                    "on-secondary-container": "#fefcff",
+                    "on-tertiary-fixed": "#0d1c2f",
+                    "on-primary-container": "#90a8ff",
+                    "inverse-primary": "#b6c4ff",
+                    "secondary-fixed-dim": "#adc6ff",
+                    "primary": "#00236f",
+                    "secondary-container": "#2170e4",
+                    "on-secondary-fixed": "#001a42",
+                    "on-primary": "#ffffff",
+                    "background": "#faf8ff",
+                    "on-error": "#ffffff",
+                    "on-primary-fixed-variant": "#264191",
+                    "error-container": "#ffdad6",
+                    "tertiary-container": "#334155",
+                    "surface-container-highest": "#dae2fd",
+                    "surface-container": "#eaedff",
+                    "surface-bright": "#faf8ff",
+                    "primary-fixed": "#dce1ff",
+                    "on-tertiary-container": "#9eadc5",
+                    "surface-container-high": "#e2e7ff",
+                    "outline": "#757682",
+                    "on-surface": "#131b2e",
+                    "surface": "#faf8ff",
+                    "on-error-container": "#93000a"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Manrope"],
+                    "body": ["Manrope"],
+                    "label": ["Manrope"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Manrope', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .active-pill { font-variation-settings: 'FILL' 1 !important; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface">
+<!-- SideNavBar Shell -->
+<aside class="h-screen w-72 flex flex-col fixed left-0 top-0 bg-[#0F172A] font-['Manrope'] text-sm font-medium tracking-tight py-6 z-50">
+<div class="px-6 mb-10">
+<span class="text-lg font-bold text-white tracking-widest uppercase">Architect CRM</span>
+</div>
+<nav class="flex-1 flex flex-col gap-1 overflow-y-auto no-scrollbar">
+<!-- Dashboard -->
+<a class="flex items-center gap-3 text-slate-400 hover:text-white px-4 py-3 mx-2 transition-colors hover:bg-slate-800 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span>Dashboard</span>
+</a>
+<!-- Properties -->
+<a class="flex items-center gap-3 text-slate-400 hover:text-white px-4 py-3 mx-2 transition-colors hover:bg-slate-800 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="domain">domain</span>
+<span>Properties</span>
+</a>
+<!-- Leads -->
+<a class="flex items-center gap-3 text-slate-400 hover:text-white px-4 py-3 mx-2 transition-colors hover:bg-slate-800 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="person_search">person_search</span>
+<span>Leads</span>
+</a>
+<!-- Pipeline -->
+<a class="flex items-center gap-3 text-slate-400 hover:text-white px-4 py-3 mx-2 transition-colors hover:bg-slate-800 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="account_tree">account_tree</span>
+<span>Pipeline</span>
+</a>
+<!-- Scheduler -->
+<a class="flex items-center gap-3 text-slate-400 hover:text-white px-4 py-3 mx-2 transition-colors hover:bg-slate-800 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="calendar_month">calendar_month</span>
+<span>Scheduler</span>
+</a>
+<!-- Communication -->
+<a class="flex items-center gap-3 text-slate-400 hover:text-white px-4 py-3 mx-2 transition-colors hover:bg-slate-800 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="chat">chat</span>
+<span>Communication</span>
+</a>
+<!-- Marketing -->
+<a class="flex items-center gap-3 text-slate-400 hover:text-white px-4 py-3 mx-2 transition-colors hover:bg-slate-800 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="campaign">campaign</span>
+<span>Marketing</span>
+</a>
+<!-- AI Insights -->
+<a class="flex items-center gap-3 text-slate-400 hover:text-white px-4 py-3 mx-2 transition-colors hover:bg-slate-800 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="psychology">psychology</span>
+<span>AI Insights</span>
+</a>
+<!-- Analytics -->
+<a class="flex items-center gap-3 text-slate-400 hover:text-white px-4 py-3 mx-2 transition-colors hover:bg-slate-800 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span>Analytics</span>
+</a>
+<!-- Admin - ACTIVE -->
+<a class="flex items-center gap-3 bg-[#1E3A8A] text-white rounded-lg px-4 py-3 mx-2 transition-all active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined active-pill" data-icon="settings" style="font-variation-settings: 'FILL' 1;">settings</span>
+<span>Admin</span>
+</a>
+</nav>
+<div class="px-6 mt-auto pt-6 border-t border-slate-800">
+<div class="flex items-center gap-3">
+<img alt="CRM User Avatar" class="w-10 h-10 rounded-lg object-cover" data-alt="Professional headshot of a senior CRM administrator in a business suit with a friendly yet authoritative expression" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAifd9Vc-knvOXShkCd3-snDISlKphjRTlCmkqI2qq_1vz-YPwwhwQN5478BhO1BMH5aaIePRDDGEKqu1obimSada7Uoq5XrbM0Grt0Ct_aDdTQv1fa3orqtDSfAWRhWnrjgw8HhCg7Mzb6Gooki9J1HapHE4v0j3_qS4OR7DEF2GamzN4A4dFDsijaBcOxVproJsT-SrofyTzNU5n-Xg1br39AvnClOKtynIFkmZ6p_gumYNEfF82nFFShHaCmSxnQUW0WegcjuqFx"/>
+<div class="flex flex-col">
+<span class="text-white text-xs font-bold">CRM Admin</span>
+<span class="text-slate-400 text-[10px]">The Digital Architect</span>
+</div>
+</div>
+</div>
+</aside>
+<!-- TopNavBar Shell -->
+<header class="h-16 w-[calc(100%-18rem)] fixed top-0 right-0 z-40 bg-[#faf8ff]/80 backdrop-blur-xl flex justify-between items-center px-8 transition-all">
+<div class="flex items-center gap-6">
+<h1 class="text-xl font-extrabold text-[#131b2e] tracking-tight">Settings</h1>
+<div class="relative flex items-center group">
+<span class="material-symbols-outlined absolute left-3 text-slate-400 text-sm">search</span>
+<input class="bg-surface-container-high border-none rounded-full pl-10 pr-4 py-1.5 text-sm w-64 focus:ring-1 ring-[#3B82F6] transition-all" placeholder="Search system settings..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="hover:bg-slate-100 rounded-full p-2 text-slate-600 transition-all">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="hover:bg-slate-100 rounded-full p-2 text-slate-600 transition-all">
+<span class="material-symbols-outlined" data-icon="help_outline">help_outline</span>
+</button>
+<div class="h-8 w-px bg-slate-200 mx-2"></div>
+<img alt="Admin User Profile" class="w-8 h-8 rounded-full border border-slate-200" data-alt="Modern high-resolution profile picture of an executive administrative user" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBgnttYcPlwK9x1CSDixk7HDNo7NzjkMSxOS5Shk4vLGpO9mcTNGzJGp0J1i0LwpUyrYCBiLixR9rc33SW8NB2YmQEoHrwYpXQw0OduakGL77pG1qd2ehH9LGyfYTpzt1ergzLB5cceJVIgRQMOi4VmHIvKiyf7bM72nztOnhTfTspXIkyki6VaqeFuKVRyj5an1dgVZFv9dP7Q2TSB1JjQJdJ1bV11H6p06psk15fddk9p72UPGXW21HQkECzUCsm0Z4xAmx0sTlYy"/>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="ml-72 pt-24 pb-12 px-8 min-h-screen bg-surface">
+<!-- Header Section -->
+<section class="mb-12">
+<div class="flex flex-col gap-2">
+<h2 class="text-4xl font-extrabold text-on-surface tracking-tighter">System Administration</h2>
+<p class="text-slate-500 max-w-2xl font-medium">Configure team hierarchy, manage granular access permissions, and audit user activity across the Architect ecosystem.</p>
+</div>
+</section>
+<!-- Bento Layout: Team & Roles -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-8">
+<!-- Team Management - Wide Bento -->
+<section class="lg:col-span-8 bg-surface-container-lowest rounded-xl p-8 transition-all hover:shadow-[0_24px_48px_-12px_rgba(19,27,46,0.06)]">
+<div class="flex justify-between items-center mb-8">
+<div>
+<h3 class="text-xl font-bold text-on-surface">Team Management</h3>
+<p class="text-xs text-slate-400 font-medium mt-1">24 active members in your organization</p>
+</div>
+<button class="flex items-center gap-2 bg-primary-container text-white px-5 py-2.5 rounded-lg text-sm font-bold hover:bg-secondary transition-all active:scale-95">
+<span class="material-symbols-outlined text-sm">add</span>
+                        Add Member
+                    </button>
+</div>
+<div class="space-y-4">
+<!-- Team Member Item 1 -->
+<div class="flex items-center justify-between p-4 bg-surface-container-low rounded-lg transition-all hover:bg-surface-container">
+<div class="flex items-center gap-4">
+<img alt="Alex Rivers" class="w-12 h-12 rounded-lg object-cover" data-alt="Professional headshot of a middle-aged male team lead in business casual attire" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCbwiZqQ4mjodZvxQ2EMo-MJFbCjINSKBwpoZRtiiNY0E1AMUCBI6taCd0AXbRU_1khQRBBosuTMrTZ80Y0VoOlTaqVMQ9-SRiSSumi2oTBlfy2utNJH5IORi_gxFVfsGuOst7BE7IBjLW5c14yXMmiB5EOhbzbJEXTHhQ7hX5I-pAa1R_efq6UAoDVYpGVIKxzIY5o8gMR8w-xgg1-cx0MWlxgsnzBkHycUf6zbonGrZ3mwiK2uSnZG7QqshjmHbrujsxzmzJKtHyQ"/>
+<div>
+<h4 class="font-bold text-on-surface">Alex Rivers</h4>
+<span class="text-xs text-slate-500">arivers@architect.crm</span>
+</div>
+</div>
+<div class="flex items-center gap-12">
+<span class="px-3 py-1 bg-primary/10 text-primary text-[10px] font-extrabold uppercase tracking-widest rounded-full">Admin</span>
+<div class="flex items-center gap-2 w-24">
+<span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+<span class="text-xs font-semibold">Active</span>
+</div>
+<button class="text-slate-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+</div>
+<!-- Team Member Item 2 -->
+<div class="flex items-center justify-between p-4 bg-surface-container-low rounded-lg transition-all hover:bg-surface-container">
+<div class="flex items-center gap-4">
+<img alt="Sarah Chen" class="w-12 h-12 rounded-lg object-cover" data-alt="Professional corporate headshot of a woman in a blazer with a confident smile" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDTzKDnTDr-pB4PYuBIsecbVnxi5sIy_FlpHyYVr8mGzGkc6ah6XzlGxF23rl0zKd7KL1D5oA4rNt8O1sYuDL8qMhi33kOmmAJBH6L8-sTwk6rfSQpIb-dZvlZzvx9RoH6R_SxbpEe0lr2UUpu2zJuuB7PBJ5j5WclvsZixixAXcDvQ5yeAINWv25gHiG3mtBg403iVDwMr7SR3KN1lFXHgHYT-rxTm6Hr2Rd7-2E2RnSHWGYclu4f-rULEqZ2Y2FJg7ECN5PRaMmAL"/>
+<div>
+<h4 class="font-bold text-on-surface">Sarah Chen</h4>
+<span class="text-xs text-slate-500">schen@architect.crm</span>
+</div>
+</div>
+<div class="flex items-center gap-12">
+<span class="px-3 py-1 bg-secondary/10 text-secondary text-[10px] font-extrabold uppercase tracking-widest rounded-full">Manager</span>
+<div class="flex items-center gap-2 w-24">
+<span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+<span class="text-xs font-semibold">Active</span>
+</div>
+<button class="text-slate-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+</div>
+<!-- Team Member Item 3 -->
+<div class="flex items-center justify-between p-4 bg-surface-container-low rounded-lg transition-all hover:bg-surface-container opacity-70">
+<div class="flex items-center gap-4">
+<img alt="Jordan Smith" class="w-12 h-12 rounded-lg object-cover grayscale" data-alt="Clean minimalist headshot of a male real estate agent" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAAJq-fpH8ffItB_cdL78jjoWQ12QUNFXGpPk66plkijnCpGbeGgrdlq0r7t8Vz3EM9lr2MeV0dKVSHpY9FWGpa5FIiBbrHP1dZPGCcauvwNVdnEobU6dNV5kzJCWyO09fFC18Rtx8sjC05_hqWTVFFQXnvj6wOtb4e4RAodRVe2g2AaJl55yiv25p92R9wONKF4k3hFkaY_ab4HFSy-IV0j5erMl6MsP5chjH0kx2P4SBqIyxsS_PxQe6NVyCHA_LetF2YgVBOqpa9"/>
+<div>
+<h4 class="font-bold text-on-surface">Jordan Smith</h4>
+<span class="text-xs text-slate-500">jsmith@architect.crm</span>
+</div>
+</div>
+<div class="flex items-center gap-12">
+<span class="px-3 py-1 bg-slate-200 text-slate-600 text-[10px] font-extrabold uppercase tracking-widest rounded-full">Agent</span>
+<div class="flex items-center gap-2 w-24">
+<span class="w-2 h-2 rounded-full bg-slate-300"></span>
+<span class="text-xs font-semibold text-slate-400">Inactive</span>
+</div>
+<button class="text-slate-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+<!-- User Roles - Tall Bento -->
+<section class="lg:col-span-4 bg-[#131b2e] rounded-xl p-8 flex flex-col text-white">
+<h3 class="text-xl font-bold mb-6">User Roles</h3>
+<div class="space-y-4 flex-1">
+<!-- Super Admin Card -->
+<div class="p-5 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 transition-all cursor-pointer">
+<div class="flex items-center gap-3 mb-2">
+<span class="material-symbols-outlined text-amber-400" style="font-variation-settings: 'FILL' 1;">workspace_premium</span>
+<h4 class="font-bold tracking-tight">Super Admin</h4>
+</div>
+<p class="text-xs text-slate-400 leading-relaxed">Full system access, billing management, and security protocols.</p>
+</div>
+<!-- Senior Agent Card -->
+<div class="p-5 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 transition-all cursor-pointer">
+<div class="flex items-center gap-3 mb-2">
+<span class="material-symbols-outlined text-blue-400" style="font-variation-settings: 'FILL' 1;">stars</span>
+<h4 class="font-bold tracking-tight">Senior Agent</h4>
+</div>
+<p class="text-xs text-slate-400 leading-relaxed">Lead distribution control, high-value property management, and analytics viewing.</p>
+</div>
+<!-- Junior Agent Card -->
+<div class="p-5 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 transition-all cursor-pointer">
+<div class="flex items-center gap-3 mb-2">
+<span class="material-symbols-outlined text-slate-400" style="font-variation-settings: 'FILL' 0;">person</span>
+<h4 class="font-bold tracking-tight">Junior Agent</h4>
+</div>
+<p class="text-xs text-slate-400 leading-relaxed">Basic lead management and communication tools for new associates.</p>
+</div>
+</div>
+<div class="mt-8 pt-6 border-t border-white/10">
+<button class="w-full py-3 bg-white/10 rounded-lg text-xs font-bold hover:bg-white/20 transition-all">
+                        Configure Hierarchy
+                    </button>
+</div>
+</section>
+</div>
+<!-- Permissions Matrix - Asymmetric Layout -->
+<section class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+<div class="lg:col-span-12">
+<div class="bg-surface-container-lowest rounded-xl overflow-hidden">
+<div class="p-8 border-b border-surface-container flex justify-between items-center">
+<div>
+<h3 class="text-xl font-bold text-on-surface">Permissions Matrix</h3>
+<p class="text-xs text-slate-500 font-medium mt-1">Define functional boundaries for organizational roles</p>
+</div>
+<div class="flex bg-surface-container-low p-1 rounded-lg">
+<button class="px-4 py-1.5 text-xs font-bold bg-white text-primary rounded-md shadow-sm">Super Admin</button>
+<button class="px-4 py-1.5 text-xs font-bold text-slate-500 hover:text-primary transition-all">Senior Agent</button>
+<button class="px-4 py-1.5 text-xs font-bold text-slate-500 hover:text-primary transition-all">Junior Agent</button>
+</div>
+</div>
+<div class="p-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-12 gap-y-8">
+<!-- Column 1: Leads -->
+<div class="space-y-6">
+<h4 class="text-[10px] font-extrabold uppercase tracking-[0.2em] text-slate-400">Leads &amp; Clients</h4>
+<div class="space-y-4">
+<label class="flex items-center justify-between cursor-pointer group">
+<span class="text-sm font-semibold text-slate-700 group-hover:text-primary transition-colors">View All Leads</span>
+<input checked="" class="w-5 h-5 rounded border-slate-300 text-primary-container focus:ring-primary-container" type="checkbox"/>
+</label>
+<label class="flex items-center justify-between cursor-pointer group">
+<span class="text-sm font-semibold text-slate-700 group-hover:text-primary transition-colors">Export Lead Data</span>
+<input checked="" class="w-5 h-5 rounded border-slate-300 text-primary-container focus:ring-primary-container" type="checkbox"/>
+</label>
+<label class="flex items-center justify-between cursor-pointer group">
+<span class="text-sm font-semibold text-slate-700 group-hover:text-primary transition-colors">Bulk Delete Leads</span>
+<input class="w-5 h-5 rounded border-slate-300 text-primary-container focus:ring-primary-container" type="checkbox"/>
+</label>
+</div>
+</div>
+<!-- Column 2: Properties -->
+<div class="space-y-6">
+<h4 class="text-[10px] font-extrabold uppercase tracking-[0.2em] text-slate-400">Property Assets</h4>
+<div class="space-y-4">
+<label class="flex items-center justify-between cursor-pointer group">
+<span class="text-sm font-semibold text-slate-700 group-hover:text-primary transition-colors">Create Listings</span>
+<input checked="" class="w-5 h-5 rounded border-slate-300 text-primary-container focus:ring-primary-container" type="checkbox"/>
+</label>
+<label class="flex items-center justify-between cursor-pointer group">
+<span class="text-sm font-semibold text-slate-700 group-hover:text-primary transition-colors">Delete Properties</span>
+<input checked="" class="w-5 h-5 rounded border-slate-300 text-primary-container focus:ring-primary-container" type="checkbox"/>
+</label>
+<label class="flex items-center justify-between cursor-pointer group">
+<span class="text-sm font-semibold text-slate-700 group-hover:text-primary transition-colors">Modify Global Pricing</span>
+<input checked="" class="w-5 h-5 rounded border-slate-300 text-primary-container focus:ring-primary-container" type="checkbox"/>
+</label>
+</div>
+</div>
+<!-- Column 3: Analytics -->
+<div class="space-y-6">
+<h4 class="text-[10px] font-extrabold uppercase tracking-[0.2em] text-slate-400">Data &amp; BI</h4>
+<div class="space-y-4">
+<label class="flex items-center justify-between cursor-pointer group">
+<span class="text-sm font-semibold text-slate-700 group-hover:text-primary transition-colors">Export Analytics</span>
+<input checked="" class="w-5 h-5 rounded border-slate-300 text-primary-container focus:ring-primary-container" type="checkbox"/>
+</label>
+<label class="flex items-center justify-between cursor-pointer group">
+<span class="text-sm font-semibold text-slate-700 group-hover:text-primary transition-colors">Revenue Dashboards</span>
+<input checked="" class="w-5 h-5 rounded border-slate-300 text-primary-container focus:ring-primary-container" type="checkbox"/>
+</label>
+<label class="flex items-center justify-between cursor-pointer group">
+<span class="text-sm font-semibold text-slate-700 group-hover:text-primary transition-colors">Audit Agent Activity</span>
+<input checked="" class="w-5 h-5 rounded border-slate-300 text-primary-container focus:ring-primary-container" type="checkbox"/>
+</label>
+</div>
+</div>
+<!-- Column 4: System -->
+<div class="space-y-6">
+<h4 class="text-[10px] font-extrabold uppercase tracking-[0.2em] text-slate-400">System Control</h4>
+<div class="space-y-4">
+<label class="flex items-center justify-between cursor-pointer group">
+<span class="text-sm font-semibold text-slate-700 group-hover:text-primary transition-colors">Manage Billing</span>
+<input checked="" class="w-5 h-5 rounded border-slate-300 text-primary-container focus:ring-primary-container" type="checkbox"/>
+</label>
+<label class="flex items-center justify-between cursor-pointer group">
+<span class="text-sm font-semibold text-slate-700 group-hover:text-primary transition-colors">API Configuration</span>
+<input checked="" class="w-5 h-5 rounded border-slate-300 text-primary-container focus:ring-primary-container" type="checkbox"/>
+</label>
+<label class="flex items-center justify-between cursor-pointer group">
+<span class="text-sm font-semibold text-slate-700 group-hover:text-primary transition-colors">Security Webhooks</span>
+<input checked="" class="w-5 h-5 rounded border-slate-300 text-primary-container focus:ring-primary-container" type="checkbox"/>
+</label>
+</div>
+</div>
+</div>
+<div class="bg-surface-container-low p-6 flex justify-end gap-4">
+<button class="px-6 py-2.5 text-xs font-bold text-slate-500 hover:text-on-surface transition-all">Discard Changes</button>
+<button class="px-8 py-2.5 bg-[#1E3A8A] text-white text-xs font-bold rounded-lg shadow-lg shadow-primary/20 hover:bg-secondary transition-all active:scale-95">Save Permission Matrix</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Aesthetic Footer Layer -->
+<footer class="mt-16 pt-8 flex items-center justify-between border-t border-surface-container">
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-emerald-500"></div>
+<span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Architect System v2.4.1 — All Services Operational</span>
+</div>
+<span class="text-[10px] font-medium text-slate-400 uppercase tracking-widest">Proprietary CRM Framework © 2024</span>
+</footer>
+</main>
+</body></html>

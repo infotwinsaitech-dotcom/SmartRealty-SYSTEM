@@ -1,0 +1,57 @@
+{% load static %}
+<!DOCTYPE html>
+<html class="light" lang="en">
+
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+
+    <!-- Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+
+    <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            primary: "#00236f",
+            secondary: "#0058be",
+            surface: "#faf8ff",
+            "on-surface": "#131b2e"
+          },
+          fontFamily: {
+            body: ["Manrope"]
+          }
+        }
+      }
+    }
+    </script>
+
+    <style>
+        body { font-family: 'Manrope', sans-serif; }
+    </style>
+
+    <title>{% block title %}{% endblock %}</title>
+</head>
+
+<body class="bg-surface text-on-surface">
+
+    {% include "public/navbar.html" %}
+
+    <main class="max-w-[1920px] mx-auto px-12 py-8">
+        {% block content %}{% endblock %}
+    </main>
+
+    {% include "public/footer.html" %}
+
+    <script src="{% static 'js/app.js' %}"></script>
+
+</body>
+</html>

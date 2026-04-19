@@ -1,0 +1,46 @@
+<footer class="bg-gray-900 text-white mt-16">
+
+    <div class="max-w-7xl mx-auto px-8 py-12 grid md:grid-cols-3 gap-8">
+
+        <!-- COMPANY -->
+        <div>
+            <h2 class="text-2xl font-bold mb-4">
+                {{ site.site_name|default:"Uma Realty" }}
+            </h2>
+            <p class="text-gray-400 text-sm">
+                Premium real estate solutions for modern living.
+            </p>
+        </div>
+
+        <!-- LINKS -->
+        <div>
+            <h3 class="font-bold mb-4">Quick Links</h3>
+            <ul class="space-y-2 text-gray-400 text-sm">
+                <li><a href="/" class="hover:text-white">Home</a></li>
+                <li><a href="/properties/" class="hover:text-white">Properties</a></li>
+                <li><a href="/about/" class="hover:text-white">About</a></li>
+                <li><a href="/contact/" class="hover:text-white">Contact</a></li>
+                <li>
+    <a href="/privacy/" class="hover:text-white">
+        Privacy Policy
+    </a>
+</li>
+            </ul>
+        </div>
+
+        <!-- CONTACT -->
+        <div>
+            <h3 class="font-bold mb-4">Contact</h3>
+            <p class="text-gray-400 text-sm">📞 {{ site.phone }}</p>
+            <p class="text-gray-400 text-sm">✉ {{ site.email }}</p>
+            <p class="text-gray-400 text-sm mt-2">{{ site.address }}</p>
+        </div>
+
+    </div>
+
+    <!-- BOTTOM -->
+    <div class="border-t border-gray-800 text-center py-4 text-gray-500 text-sm">
+        © {{ site.site_name|default:"Uma Realty" }} | All Rights Reserved
+    </div>
+
+</footer>

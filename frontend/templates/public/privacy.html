@@ -1,0 +1,99 @@
+{% extends "public/base.html" %}
+{% load static %}
+
+{% block content %}
+
+<!-- HERO -->
+<section class="relative h-[400px] flex items-center justify-center bg-gradient-to-r from-[#0F172A] to-[#1E3A8A] text-white">
+
+    <div class="text-center">
+        <h1 class="text-5xl font-extrabold mb-2">
+            Privacy Policy
+        </h1>
+        <p class="text-gray-300">
+            Your data, our responsibility.
+        </p>
+    </div>
+
+</section>
+
+<!-- CONTENT -->
+<section class="py-20 px-6 bg-gray-50">
+
+    <div class="max-w-5xl mx-auto bg-white p-10 rounded-2xl shadow-xl space-y-10">
+
+        <!-- Intro -->
+        <div>
+            <h2 class="text-2xl font-bold mb-3">Introduction</h2>
+            <p class="text-gray-600 leading-relaxed">
+                At {{ site.site_name|default:"EstateArchitect" }}, we value your privacy and are committed to protecting your personal information. 
+                This Privacy Policy explains how we collect, use, and safeguard your data when you use our platform.
+            </p>
+        </div>
+
+        <!-- Data Collection -->
+        <div>
+            <h2 class="text-2xl font-bold mb-3">Information We Collect</h2>
+            <ul class="list-disc pl-6 text-gray-600 space-y-2">
+                <li>Personal details such as name, email, and phone number</li>
+                <li>Property preferences and browsing activity</li>
+                <li>Account and login information</li>
+                <li>Communication data between users and agents</li>
+            </ul>
+        </div>
+
+        <!-- Usage -->
+        <div>
+            <h2 class="text-2xl font-bold mb-3">How We Use Your Information</h2>
+            <ul class="list-disc pl-6 text-gray-600 space-y-2">
+                <li>To provide and improve our services</li>
+                <li>To connect buyers with agents and builders</li>
+                <li>To personalize your experience</li>
+                <li>To send important updates and notifications</li>
+            </ul>
+        </div>
+
+        <!-- Security -->
+        <div>
+            <h2 class="text-2xl font-bold mb-3">Data Security</h2>
+            <p class="text-gray-600 leading-relaxed">
+                We implement industry-standard security measures to protect your data. However, no system is completely secure, 
+                and we encourage users to maintain strong passwords and account safety.
+            </p>
+        </div>
+
+        <!-- Sharing -->
+        <div>
+            <h2 class="text-2xl font-bold mb-3">Data Sharing</h2>
+            <p class="text-gray-600 leading-relaxed">
+                We do not sell your personal data. Information may be shared only with trusted partners such as agents or builders 
+                to fulfill your requests within the platform.
+            </p>
+        </div>
+
+        <!-- Rights -->
+        <div>
+            <h2 class="text-2xl font-bold mb-3">Your Rights</h2>
+            <ul class="list-disc pl-6 text-gray-600 space-y-2">
+                <li>Access your personal data</li>
+                <li>Request correction or deletion</li>
+                <li>Opt-out of communications</li>
+            </ul>
+        </div>
+
+        <!-- Contact -->
+        <div class="bg-gray-100 p-6 rounded-xl">
+            <h2 class="text-xl font-bold mb-2">Contact Us</h2>
+            <p class="text-gray-600">
+                If you have any questions, contact us at:
+            </p>
+            <p class="mt-2 text-gray-700 font-semibold">
+                {{ site.email|default:"support@estate.com" }}
+            </p>
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}

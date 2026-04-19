@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chat</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 flex items-center justify-center h-screen">
+
+<div class="w-96 bg-white rounded-xl shadow flex flex-col">
+
+    <!-- HEADER -->
+    <div class="bg-green-600 text-white p-4 font-bold">
+        WhatsApp Chat
+    </div>
+
+    <!-- USER INFO -->
+    <div class="p-3 border-b space-y-2">
+        <input id="name" placeholder="Your Name"
+               class="w-full border p-2 rounded">
+        <input id="phone" placeholder="Mobile Number"
+               class="w-full border p-2 rounded">
+    </div>
+
+    <!-- CHAT -->
+    <div id="chatBox" class="flex-1 p-3 overflow-y-auto space-y-2 h-80 bg-gray-50"></div>
+
+    <!-- INPUT -->
+    <div class="p-3 flex gap-2 border-t">
+        <input id="msg" class="border p-2 w-full rounded" placeholder="Type message...">
+        <button onclick="sendMsg()" class="bg-green-600 text-white px-4 rounded">
+            Send
+        </button>
+    </div>
+
+</div>
+
+<script>
+
+/* ✅ SEND MESSAGE (DB SAVE) */
+function sendMsg(){
+
+    let name = document.getElementById("name").value.trim();
+    let phone = document.getElementById("phone").value.trim();
+    let text = document.getElementById("msg").value.trim();
+
+    if(!name || !phone){
+        alert("Name & Phone required");
+        return;
+    }
+
+    if(!text) return;
+
+    fetch("/client/send-message/", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            name: name,
+            phone: phone,
+            message: text
+        })
+    }).then(() => {
+        loadMessages(); // तुरंत refresh
+    });
+
+    document.getElementById("msg").value = "";
+}
+
+
+/* ✅ LOAD MESSAGES (FROM DB) */
+function loadMessages(){
+
+    let phone = document.getElementById("phone").value;
+    if(!phone) return;
+
+    fetch(`/get-messages/?phone=${phone}`)
+    .then(res => res.json())
+    .then(data => {
+
+        let chatBox = document.getElementById("chatBox");
+        chatBox.innerHTML = "";
+
+        data.messages.forEach(msg => {
+
+            chatBox.innerHTML += `
+                <div class="${msg.is_agent ? 'text-left' : 'text-right'}">
+                    <span class="px-3 py-2 rounded inline-block max-w-[70%]
+                        ${msg.is_agent ? 'bg-gray-300 text-black' : 'bg-green-500 text-white'}">
+                        ${msg.text}
+                    </span>
+                </div>
+            `;
+        });
+
+        // ✅ AUTO SCROLL
+        chatBox.scrollTop = chatBox.scrollHeight;
+    });
+}
+
+
+/* ✅ AUTO REFRESH (LIVE FEEL) */
+setInterval(loadMessages, 2000);
+
+</script>
+
+</body>
+</html>

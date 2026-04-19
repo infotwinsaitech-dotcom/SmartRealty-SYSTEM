@@ -1,0 +1,125 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}CRM{% endblock %}</title>
+<span class="bg-red-500 text-white text-xs px-2 rounded-full">
+    {{ notifications|length }}
+</span>
+<a href="{% url 'notifications' %}" class="relative">
+    🔔
+
+    {% if notifications_unread_count > 0 %}
+    <span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs px-2 rounded-full">
+        {{ notifications_unread_count }}
+    </span>
+    {% endif %}
+</a>
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Tailwind Config -->
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "primary-fixed": "#dce1ff",
+                      "on-surface": "#131b2e",
+                      "on-secondary-container": "#fefcff",
+                      "surface-tint": "#4059aa",
+                      "primary": "#00236f",
+                      "tertiary-fixed-dim": "#b9c7e0",
+                      "secondary-container": "#2170e4",
+                      "on-tertiary-fixed": "#0d1c2f",
+                      "surface-container-high": "#e2e7ff",
+                      "on-secondary-fixed-variant": "#004395",
+                      "on-surface-variant": "#444651",
+                      "surface-bright": "#faf8ff",
+                      "on-tertiary-fixed-variant": "#3a485c",
+                      "on-error-container": "#93000a",
+                      "tertiary-container": "#334155",
+                      "primary-fixed-dim": "#b6c4ff",
+                      "outline-variant": "#c5c5d3",
+                      "surface-dim": "#d2d9f4",
+                      "surface-container-highest": "#dae2fd",
+                      "surface-container": "#eaedff",
+                      "primary-container": "#1e3a8a",
+                      "on-primary": "#ffffff",
+                      "surface": "#faf8ff",
+                      "on-primary-fixed-variant": "#264191",
+                      "background": "#faf8ff",
+                      "on-tertiary": "#ffffff",
+                      "on-primary-fixed": "#00164e",
+                      "error": "#ba1a1a",
+                      "surface-container-low": "#f2f3ff",
+                      "on-secondary-fixed": "#001a42",
+                      "error-container": "#ffdad6",
+                      "secondary-fixed": "#d8e2ff",
+                      "on-tertiary-container": "#9eadc5",
+                      "inverse-on-surface": "#eef0ff",
+                      "inverse-surface": "#283044",
+                      "inverse-primary": "#b6c4ff",
+                      "on-secondary": "#ffffff",
+                      "tertiary-fixed": "#d5e3fd",
+                      "surface-variant": "#dae2fd",
+                      "secondary-fixed-dim": "#adc6ff",
+                      "tertiary": "#1d2b3e",
+                      "surface-container-lowest": "#ffffff",
+                      "outline": "#757682",
+                      "secondary": "#0058be",
+                      "on-error": "#ffffff",
+                      "on-background": "#131b2e",
+                      "on-primary-container": "#90a8ff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.5rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "fontFamily": {
+                      "headline": ["Manrope"],
+                      "body": ["Manrope"],
+                      "label": ["Manrope"]
+              }
+            },
+          },
+        }
+    </script>
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+
+    <!-- Custom Style -->
+     <style>
+        body { font-family: 'Manrope', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .active-icon { font-variation-settings: 'FILL' 1; }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface m-0">
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Sidebar -->
+    {% include 'components/sidebar.html' %}
+
+    <!-- Navbar -->
+    {% include 'components/builder_navbar.html' %}
+
+    <!-- Main Content -->
+    {% block content %}
+    {% endblock %}
+
+</body>
+
+</html>
