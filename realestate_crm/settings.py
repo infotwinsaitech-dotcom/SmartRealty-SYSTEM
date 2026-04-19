@@ -9,9 +9,13 @@ https://docs.djangoproject.com/en/5.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
+from dotenv import load_dotenv
+load_dotenv()
 import dj_database_url
 from pathlib import Path
 import os
+
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -131,10 +135,7 @@ STATICFILES_DIRS = [
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 DATABASES = {
-    'default': dj_database_url.config(
-        # Isse Django Render ke DATABASE_URL variable ko apne aap utha lega
-        default=os.environ.get('DATABASE_URL')
-    )
+    'default': dj_database_url.config(default=os.getenv('DATABASE_URL'))
 }
 
 
