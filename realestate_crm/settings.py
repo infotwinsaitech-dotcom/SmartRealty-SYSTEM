@@ -149,6 +149,6 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'pckavathiya1@gmail.com'
 EMAIL_HOST_PASSWORD = 'unbk ptee szdt oaco'
-
+EMAIL_HOST = 'smtp.gmail.com'
 LOGIN_URL = '/login/'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
