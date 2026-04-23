@@ -1639,3 +1639,16 @@ def privacy(request):
 def auto_assign_agent(builder):
     agents = Agent.objects.filter(builder=builder)
     return agents.first() if agents.exists() else None
+
+@receiver(post_save, sender=User)
+def create_agent_for_user(sender, instance, created, **kwargs):
+    if created and instance.role == "agent":
+        Agent.objects.get_or_create(
+            user=instance,
+            defaults={
+                "name": instance.username,
+                "email": instance.email,
+                "phone": instance.phone or "",
+                "builder": None  # ya default builder
+            }
+        )
