@@ -569,42 +569,34 @@ def builder_dashboard(request):
 
 @require_POST
 def add_lead(request):
-   
+
+    # ✅ AUTO ASSIGN (simple round-robin ya first agent)
+    agents = Agent.objects.filter(builder=request.user)
 
     agent = None
-    agent_id = request.POST.get("assigned_to")
+    if agents.exists():
+        agent = agents.first()   # 🔥 simplest auto assign
 
-    # ✅ 1. Agar manually select kiya hai
-    if agent_id:
-        agent = Agent.objects.get(id=agent_id)
-
-    # ✅ 2. AUTO ASSIGN (agar agent select nahi hai)
-    else:
-        agents = Agent.objects.filter(builder=request.user)
-
-        if agents.exists():
-            agent = random.choice(agents)   # 🔥 random assign
-
-    # ✅ Lead create
     lead = Lead.objects.create(
         name=request.POST.get("name"),
         email=request.POST.get("email"),
         phone=request.POST.get("phone"),
         source=request.POST.get("source"),
         status=request.POST.get("status"),
-        assigned_to=agent,
+        assigned_to=agent,   # ✅ AUTO ASSIGNED
         interest=request.POST.get("interest"),
         builder=request.user,
         notes=request.POST.get("message")
     )
 
-    # ✅ Property attach
+    # property attach
     property_id = request.POST.get("property_id")
     if property_id:
         property = Property.objects.get(id=property_id)
         lead.properties.add(property)
 
-    # ✅ Notification
+    # ✅ SUCCESS MESSAGE
+    from django.contrib import messages
     messages.success(
         request,
         f"Lead '{lead.name}' assigned to {agent.name if agent else 'No Agent'}"
