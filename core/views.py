@@ -713,21 +713,34 @@ def create_agent(request):
         email = request.POST.get("email")
         phone = request.POST.get("phone")
 
-        # ✅ User create (login के लिए)
-        user = User.objects.create_user(
-            username=username,
-            password=password,
-            role="agent"
+        # ✅ Check user already exists
+        if User.objects.filter(username=username).exists():
+            user = User.objects.get(username=username)
+        else:
+            user = User.objects.create_user(
+                username=username,
+                password=password,
+                role="agent"
+            )
+
+        # ✅ Prevent duplicate agent (IMPORTANT)
+        agent, created = Agent.objects.get_or_create(
+            user=user,
+            defaults={
+                "name": name,
+                "email": email,
+                "phone": phone,
+                "builder": request.user
+            }
         )
 
-        # ✅ Agent profile create
-        Agent.objects.create(
-            user=user,
-            name=name,
-            email=email,
-            phone=phone,
-            builder=request.user   # 🔥 VERY IMPORTANT
-        )
+        # optional: update if already exists
+        if not created:
+            agent.name = name
+            agent.email = email
+            agent.phone = phone
+            agent.builder = request.user
+            agent.save()
 
         return redirect('create_agent')
 
@@ -736,7 +749,6 @@ def create_agent(request):
     return render(request, "builder/create_agent.html", {
         "agents": agents
     })
-
 
 def pipeline(request):
 
@@ -1397,7 +1409,14 @@ def delete_lead(request, id):
 @login_required
 def agent_dashboard(request):
 
-    agent = request.user.agent_profile
+    agent, created = Agent.objects.get_or_create(
+    user=request.user,
+    defaults={
+        "name": request.user.username,
+        "email": request.user.email,
+        "phone": request.user.phone or ""
+    }
+)
 
     leads = leads = Lead.objects.filter(
     assigned_to=agent,
