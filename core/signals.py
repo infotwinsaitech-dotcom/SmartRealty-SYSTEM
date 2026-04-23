@@ -1,16 +1,16 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.contrib.auth import get_user_model
-from .models import Agent
-
-User = get_user_model()
+from .models import User, Agent
 
 @receiver(post_save, sender=User)
-def create_agent_profile(sender, instance, created, **kwargs):
+def auto_create_agent(sender, instance, created, **kwargs):
     if created and instance.role == "agent":
+        builder = User.objects.filter(role="builder").first()
+
         Agent.objects.create(
             user=instance,
             name=instance.username,
             email=instance.email,
-            phone=instance.phone or ""
+            phone=instance.phone,
+            builder=builder
         )
