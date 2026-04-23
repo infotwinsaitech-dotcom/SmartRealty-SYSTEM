@@ -45,21 +45,30 @@ def property_detail(request, id):
     if request.method == "POST":
         name = request.POST.get("name")
         email = request.POST.get("email")
+        phone = request.POST.get("phone")   # ✅ FIX
         message = request.POST.get("message")
 
+        # ✅ AUTO ASSIGN
+        agents = Agent.objects.filter(builder=property.builder)
+        agent = agents.first() if agents.exists() else None
+
+        # ✅ CREATE LEAD
         lead = Lead.objects.create(
             name=name,
             email=email,
-            phone='',
+            phone=phone,   # ✅ NOW SAVED
             status='HOT',
             source='Website',
             interest=property.title,
             builder=property.builder,
-            notes=message   # 👈 yaha save karo
-)
-        
-        lead.properties.add(property)  # ✅ M2M add
+            assigned_to=agent,
+            notes=message
+        )
 
+        # ✅ PROPERTY LINK
+        lead.properties.add(property)
+
+        # ✅ SAVE INQUIRY
         Inquiry.objects.create(
             property=property,
             name=name,
@@ -70,6 +79,7 @@ def property_detail(request, id):
     return render(request, "public/property_detail.html", {
         "property": property
     })
+
 
 def property_list(request):
     properties = Property.objects.all().order_by('-created_at')
@@ -570,12 +580,7 @@ def builder_dashboard(request):
 @require_POST
 def add_lead(request):
 
-    # ✅ AUTO ASSIGN (simple round-robin ya first agent)
-    agents = Agent.objects.filter(builder=request.user)
-
-    agent = None
-    if agents.exists():
-        agent = agents.first()   # 🔥 simplest auto assign
+    agent = auto_assign_agent(request.user)
 
     lead = Lead.objects.create(
         name=request.POST.get("name"),
@@ -583,20 +588,17 @@ def add_lead(request):
         phone=request.POST.get("phone"),
         source=request.POST.get("source"),
         status=request.POST.get("status"),
-        assigned_to=agent,   # ✅ AUTO ASSIGNED
+        assigned_to=agent,
         interest=request.POST.get("interest"),
         builder=request.user,
         notes=request.POST.get("message")
     )
 
-    # property attach
     property_id = request.POST.get("property_id")
     if property_id:
         property = Property.objects.get(id=property_id)
         lead.properties.add(property)
 
-    # ✅ SUCCESS MESSAGE
-    from django.contrib import messages
     messages.success(
         request,
         f"Lead '{lead.name}' assigned to {agent.name if agent else 'No Agent'}"
@@ -1633,3 +1635,7 @@ def settings_view(request):
 
 def privacy(request):
     return render(request, "public/privacy.html")
+
+def auto_assign_agent(builder):
+    agents = Agent.objects.filter(builder=builder)
+    return agents.first() if agents.exists() else None
