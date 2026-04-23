@@ -569,12 +569,22 @@ def builder_dashboard(request):
 
 @require_POST
 def add_lead(request):
+
     agent = None
     agent_id = request.POST.get("assigned_to")
 
+    # ✅ 1. Agar manually select kiya hai
     if agent_id:
         agent = Agent.objects.get(id=agent_id)
 
+    # ✅ 2. AUTO ASSIGN (agar agent select nahi hai)
+    else:
+        agents = Agent.objects.filter(builder=request.user)
+
+        if agents.exists():
+            agent = random.choice(agents)   # 🔥 random assign
+
+    # ✅ Lead create
     lead = Lead.objects.create(
         name=request.POST.get("name"),
         email=request.POST.get("email"),
@@ -584,24 +594,23 @@ def add_lead(request):
         assigned_to=agent,
         interest=request.POST.get("interest"),
         builder=request.user,
-        notes=request.POST.get("message")  # optional
+        notes=request.POST.get("message")
     )
 
-    # property attach
+    # ✅ Property attach
     property_id = request.POST.get("property_id")
     if property_id:
         property = Property.objects.get(id=property_id)
         lead.properties.add(property)
 
-    # notification
+    # ✅ Notification
     Notification.objects.create(
         title="New Lead Added",
-        message=f"{lead.name} added",
+        message=f"{lead.name} assigned to {agent.name if agent else 'No Agent'}",
         type="lead"
     )
 
     return redirect("lead_management")
-
 
 @require_POST
 def edit_lead(request, id):
