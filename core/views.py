@@ -870,7 +870,7 @@ def analytics(request):
     agents = []
     for agent in Agent.objects.filter(builder=request.user):
         total = leads.filter(assigned_to=agent).count()
-        closed = leads.filter(agent=agent, status="CLOSED").count()
+        closed = leads.filter(assigned_to=agent, status="CLOSED").count()
 
         agents.append({
             "name": agent.name,
