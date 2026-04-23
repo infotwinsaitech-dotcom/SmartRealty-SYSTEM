@@ -1,5 +1,4 @@
 {% extends "builder/base.html" %}
-
 {% block content %}
 
 <main class="ml-64 mr-[400px] mt-16 min-h-screen bg-gradient-to-br from-slate-50 to-white p-8">
@@ -7,153 +6,72 @@
 <!-- HEADER -->
 <header class="flex justify-between items-center mb-10">
     <div>
-        <h2 class="text-4xl font-extrabold text-gray-800 tracking-tight">
-            Lead Management
-        </h2>
-        <p class="text-gray-500 text-sm mt-1">
-            Smart pipeline control with premium insights
-        </p>
+        <h2 class="text-4xl font-extrabold text-gray-800">Lead Management</h2>
+        <p class="text-gray-500 text-sm mt-1">Smart pipeline control</p>
     </div>
 
-    <div class="flex items-center gap-4">
-
-        <form method="GET">
-            <div class="relative">
-                <input name="q" value="{{ request.GET.q }}"
-                class="pl-10 pr-4 py-2 w-72 rounded-xl bg-white border shadow-sm focus:ring-2 focus:ring-blue-500 outline-none"
-                placeholder="Search leads...">
-
-                <span class="absolute left-3 top-2.5 text-gray-400">
-                    <span class="material-symbols-outlined">search</span>
-                </span>
-            </div>
-        </form>
-
-        <button class="p-2 rounded-full hover:bg-gray-100">
-            <span class="material-symbols-outlined">notifications</span>
-        </button>
-
-    </div>
+    <form method="GET">
+        <input name="q" value="{{ request.GET.q }}"
+        class="px-4 py-2 w-72 rounded-xl border shadow-sm"
+        placeholder="Search leads...">
+    </form>
 </header>
-
-<!-- STATS -->
-<section class="grid grid-cols-3 gap-6 mb-10">
-
-<div class="p-6 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 text-white shadow-xl">
-    <p class="text-sm opacity-80">Active Pipeline</p>
-    <h2 class="text-3xl font-bold mt-2">₹{{ total_pipeline }}</h2>
-</div>
-
-<div class="p-6 rounded-2xl bg-gradient-to-br from-red-500 to-pink-500 text-white shadow-xl">
-    <p class="text-sm opacity-80">Hot Leads</p>
-    <h2 class="text-3xl font-bold mt-2">{{ hot_leads }}</h2>
-</div>
-
-<div class="p-6 rounded-2xl bg-gradient-to-br from-green-500 to-emerald-500 text-white shadow-xl">
-    <p class="text-sm opacity-80">Avg Response</p>
-    <h2 class="text-3xl font-bold mt-2">4m 20s</h2>
-</div>
-
-</section>
 
 <!-- TABLE -->
 <div class="bg-white rounded-2xl shadow-lg border">
 
-<!-- TOP BAR -->
-<div class="p-6 flex justify-between items-center border-b">
-    <h3 class="text-xl font-bold text-gray-800">Lead Inventory</h3>
+<div class="p-6 flex justify-between">
+    <h3 class="text-xl font-bold">Lead Inventory</h3>
 
-    <div class="flex gap-2">
-
-        <button onclick="openModal()"
-        class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-4 py-2 rounded-lg shadow hover:scale-105 transition">
-            + Add Lead
-        </button>
-
-        <button class="px-3 py-2 bg-gray-100 rounded-lg hover:bg-gray-200">
-            Filter
-        </button>
-
-        <a href="{% url 'export_leads' %}"
-        class="px-3 py-2 bg-gray-100 rounded-lg hover:bg-gray-200">
-            Export
-        </a>
-
-    </div>
+    <button onclick="openModal()"
+    class="bg-blue-600 text-white px-4 py-2 rounded-lg">
+        + Add Lead
+    </button>
 </div>
-
-<div class="overflow-x-auto">
 
 <table class="w-full">
 
-<thead class="bg-gray-50 text-gray-500 text-xs uppercase">
+<thead class="bg-gray-50 text-xs uppercase">
 <tr>
 <th class="px-6 py-4">Lead</th>
-<th class="px-6 py-4">Source</th>
-<th class="px-6 py-4">Status</th>
-<th class="px-6 py-4">Agent</th>
-<th class="px-6 py-4 text-right">Action</th>
+<th>Property</th>
+<th>Source</th>
+<th>Status</th>
+<th>Agent</th>
 </tr>
 </thead>
 
-<tbody class="divide-y">
+<tbody>
 
 {% for lead in leads %}
 <tr onclick="window.location='?lead={{ lead.id }}'"
-class="hover:bg-blue-50 cursor-pointer transition">
+class="hover:bg-blue-50 cursor-pointer">
 
-<!-- NAME -->
-<td class="px-6 py-5">
-<div class="flex items-center gap-3">
-    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center font-bold">
-        {{ lead.name|slice:":1" }}
-    </div>
-    <div>
-        <div class="font-semibold">{{ lead.name }}</div>
-        <div class="text-xs text-gray-500">{{ lead.email }}</div>
-    </div>
-</div>
+<td class="px-6 py-4">
+<b>{{ lead.name }}</b><br>
+<span class="text-sm text-gray-500">{{ lead.email }}</span>
 </td>
 
-<!-- SOURCE -->
-<td class="px-6 py-5 text-sm text-gray-600">
-{{ lead.source }}
+<td>
+{% for p in lead.properties.all %}
+{{ p.title }}<br>
+{% empty %}
+-
+{% endfor %}
 </td>
 
-<!-- STATUS + DELETE -->
-<td class="px-6 py-5">
-<div class="flex items-center gap-3">
+<td>{{ lead.source }}</td>
 
-<span class="px-3 py-1 text-xs rounded-full text-white
-{% if lead.status == 'HOT' %} bg-red-500
-{% elif lead.status == 'WARM' %} bg-yellow-500
-{% else %} bg-blue-500
-{% endif %}">
+<td>
+<span class="px-2 py-1 text-white text-xs rounded
+{% if lead.status == 'HOT' %}bg-red-500
+{% elif lead.status == 'WARM' %}bg-yellow-500
+{% else %}bg-blue-500{% endif %}">
 {{ lead.status }}
 </span>
-
-<a href="{% url 'delete_lead' lead.id %}"
-onclick="event.stopPropagation(); return confirm('Delete this lead?')"
-class="text-red-500 hover:text-red-700 flex items-center gap-1 text-sm">
-
-<span class="material-symbols-outlined text-[18px]">delete</span>
-Delete
-</a>
-
-</div>
 </td>
 
-<!-- AGENT -->
-<td class="px-6 py-5 text-sm font-medium">
-{{ lead.assigned_to }}
-</td>
-
-<!-- VIEW -->
-<td class="px-6 py-5 text-right">
-<span class="material-symbols-outlined text-gray-400 hover:text-blue-600">
-visibility
-</span>
-</td>
+<td>{{ lead.assigned_to }}</td>
 
 </tr>
 
@@ -166,67 +84,48 @@ No Leads Found
 {% endfor %}
 
 </tbody>
-
 </table>
-</div>
-
-<!-- PAGINATION -->
-<div class="p-6 flex justify-between">
-
-<span class="text-sm text-gray-500">
-Page {{ leads.number }} of {{ leads.paginator.num_pages }}
-</span>
-
-<div class="flex gap-2">
-
-{% if leads.has_previous %}
-<a href="?q={{ request.GET.q }}&page={{ leads.previous_page_number }}"
-class="px-3 py-1 bg-gray-200 rounded">Prev</a>
-{% endif %}
-
-{% if leads.has_next %}
-<a href="?q={{ request.GET.q }}&page={{ leads.next_page_number }}"
-class="px-3 py-1 bg-gray-200 rounded">Next</a>
-{% endif %}
 
 </div>
-</div>
-
-</div>
-
 </main>
 
 <!-- SIDE PANEL -->
-<aside class="fixed right-0 top-16 h-full w-[400px] bg-white shadow-2xl p-6">
+<aside class="fixed right-0 top-16 h-full w-[400px] bg-white shadow-xl p-6">
 
 {% if selected_lead %}
-<h2 class="text-xl font-bold mb-4">{{ selected_lead.name }}</h2>
 
-<p class="text-sm text-gray-500 mb-2">{{ selected_lead.email }}</p>
+<h2 class="text-xl font-bold">{{ selected_lead.name }}</h2>
+<p class="text-gray-500">{{ selected_lead.email }}</p>
 
-<div class="space-y-2 text-sm">
+<div class="mt-4 space-y-2 text-sm">
 <p><b>Phone:</b> {{ selected_lead.phone }}</p>
-<p><b>Interest:</b> {{ selected_lead.interest }}</p>
 <p><b>Status:</b> {{ selected_lead.status }}</p>
 </div>
 
-<div class="grid grid-cols-2 gap-4 mt-6">
+<!-- PROPERTY -->
+<div class="mt-4">
+<b>Property:</b><br>
+{% for p in selected_lead.properties.all %}
+{{ p.title }}<br>
+{% endfor %}
+</div>
 
-<button class="bg-blue-600 text-white py-2 rounded-lg">
-Call
-</button>
+<!-- MESSAGE -->
+<div class="mt-4">
+<b>Message:</b><br>
+{{ selected_lead.notes }}
+</div>
+
+<div class="flex gap-3 mt-6">
+<a href="tel:{{ selected_lead.phone }}"
+class="bg-blue-600 text-white px-4 py-2 rounded">Call</a>
 
 <a href="https://wa.me/{{ selected_lead.phone }}"
-class="bg-green-500 text-white py-2 rounded-lg text-center">
-WhatsApp
-</a>
-
+class="bg-green-500 text-white px-4 py-2 rounded">WhatsApp</a>
 </div>
 
 {% else %}
-<p class="text-gray-400 text-center mt-20">
-Select a lead
-</p>
+<p class="text-gray-400 text-center mt-20">Select a lead</p>
 {% endif %}
 
 </aside>
@@ -244,6 +143,7 @@ Select a lead
 <input name="name" placeholder="Name" class="w-full mb-2 border p-2 rounded">
 <input name="email" placeholder="Email" class="w-full mb-2 border p-2 rounded">
 <input name="phone" placeholder="Phone" class="w-full mb-2 border p-2 rounded">
+
 <input name="source" placeholder="Source" class="w-full mb-2 border p-2 rounded">
 
 <select name="status" class="w-full mb-2 border p-2 rounded">
@@ -258,10 +158,18 @@ Select a lead
 {% endfor %}
 </select>
 
-<input name="interest" placeholder="Interest" class="w-full mb-2 border p-2 rounded">
+<!-- PROPERTY SELECT -->
+<select name="property_id" class="w-full mb-2 border p-2 rounded">
+{% for property in properties %}
+<option value="{{ property.id }}">{{ property.title }}</option>
+{% endfor %}
+</select>
+
+<textarea name="message" placeholder="Message"
+class="w-full mb-2 border p-2 rounded"></textarea>
 
 <button class="bg-blue-600 text-white px-4 py-2 rounded w-full">
-Save
+Save Lead
 </button>
 
 </form>

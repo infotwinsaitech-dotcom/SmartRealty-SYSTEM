@@ -54,9 +54,10 @@ def property_detail(request, id):
             status='HOT',
             source='Website',
             interest=property.title,
-            builder=property.builder  # ✅ direct use करो
+            builder=property.builder,
+            notes=message   # 👈 yaha save karo
 )
-
+        
         lead.properties.add(property)  # ✅ M2M add
 
         Inquiry.objects.create(
@@ -405,7 +406,8 @@ def property_management(request):
 def lead_management(request):
 
     inquiries = Inquiry.objects.all()
-    leads = Lead.objects.filter(builder=request.user)
+    leads = Lead.objects.all()
+    properties = Property.objects.filter(builder=request.user)
 
     # 🔍 search
     query = request.GET.get('q')
@@ -452,6 +454,7 @@ def lead_management(request):
         "total_pipeline": total_pipeline,
         "hot_leads": hot_leads,
         "agents": agents,
+        "properties": properties,
     })
 
 
@@ -572,7 +575,7 @@ def add_lead(request):
     if agent_id:
         agent = Agent.objects.get(id=agent_id)
 
-    Lead.objects.create(
+    lead = Lead.objects.create(
         name=request.POST.get("name"),
         email=request.POST.get("email"),
         phone=request.POST.get("phone"),
@@ -580,12 +583,17 @@ def add_lead(request):
         status=request.POST.get("status"),
         assigned_to=agent,
         interest=request.POST.get("interest"),
-        builder=request.user
+        builder=request.user,
+        notes=request.POST.get("message")  # optional
+    )
 
-      # 🔥 MUST ADD
-)
+    # property attach
+    property_id = request.POST.get("property_id")
+    if property_id:
+        property = Property.objects.get(id=property_id)
+        lead.properties.add(property)
 
-    # 🔔 notification
+    # notification
     Notification.objects.create(
         title="New Lead Added",
         message=f"{lead.name} added",
