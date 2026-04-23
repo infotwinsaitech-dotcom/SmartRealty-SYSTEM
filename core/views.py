@@ -569,6 +569,7 @@ def builder_dashboard(request):
 
 @require_POST
 def add_lead(request):
+   
 
     agent = None
     agent_id = request.POST.get("assigned_to")
@@ -604,10 +605,9 @@ def add_lead(request):
         lead.properties.add(property)
 
     # ✅ Notification
-    Notification.objects.create(
-        title="New Lead Added",
-        message=f"{lead.name} assigned to {agent.name if agent else 'No Agent'}",
-        type="lead"
+    messages.success(
+        request,
+        f"Lead '{lead.name}' assigned to {agent.name if agent else 'No Agent'}"
     )
 
     return redirect("lead_management")
@@ -1137,6 +1137,11 @@ def check_reminders(request):
 
 
 def notifications_page(request):
+    Notification.objects.create(
+    title="New Lead Assigned",
+    message=f"{lead.name} assigned to {agent.name}",
+    type="lead"
+)
 
     notifications = Notification.objects.all().order_by('-created_at')
 
