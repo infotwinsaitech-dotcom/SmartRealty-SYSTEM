@@ -868,14 +868,18 @@ def analytics(request):
 
     # AGENT PERFORMANCE
     agents = []
-    for agent in Agent.objects.filter(builder=request.user):
+    for agent in Agent:
         total = leads.filter(assigned_to=agent).count()
+
         closed = leads.filter(assigned_to=agent, status="CLOSED").count()
+
+        active = leads.filter(assigned_to=agent).exclude(status="CLOSED").count()
 
         agents.append({
             "name": agent.name,
             "total": total,
-            "closed": closed
+            "closed": closed,
+            "active":active
         })
 
     context = {
