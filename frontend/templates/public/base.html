@@ -1,57 +1,49 @@
 {% load static %}
 <!DOCTYPE html>
-<html class="light" lang="en">
+<html lang="en" class="scroll-smooth">
 
 <head>
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-    <!-- Tailwind -->
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind -->
+<script src="https://cdn.tailwindcss.com"></script>
 
-    <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<!-- AOS Animation -->
+<link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
 
-    <!-- Icons -->
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;600;800&display=swap" rel="stylesheet">
 
-    <script>
-    tailwind.config = {
-      darkMode: "class",
-      theme: {
-        extend: {
-          colors: {
-            primary: "#00236f",
-            secondary: "#0058be",
-            surface: "#faf8ff",
-            "on-surface": "#131b2e"
-          },
-          fontFamily: {
-            body: ["Manrope"]
-          }
-        }
-      }
-    }
-    </script>
+<style>
+body {
+    font-family: 'Manrope', sans-serif;
+}
+.hero-overlay {
+    background: linear-gradient(to bottom, rgba(0,0,0,0.4), rgba(0,0,0,0.8));
+}
+</style>
 
-    <style>
-        body { font-family: 'Manrope', sans-serif; }
-    </style>
-
-    <title>{% block title %}{% endblock %}</title>
+<title>{% block title %}{% endblock %}</title>
 </head>
 
-<body class="bg-surface text-on-surface">
+<body class="bg-white text-gray-900">
 
-    {% include "public/navbar.html" %}
+{% include "public/navbar.html" %}
 
-    <main class="max-w-[1920px] mx-auto px-12 py-8">
-        {% block content %}{% endblock %}
-    </main>
+<main>
+{% block content %}{% endblock %}
+</main>
 
-    {% include "public/footer.html" %}
+{% include "public/footer.html" %}
 
-    <script src="{% static 'js/app.js' %}"></script>
+<script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+<script>
+AOS.init({
+    duration: 1000,
+    once: true
+});
+</script>
 
 </body>
 </html>
