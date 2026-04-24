@@ -1,34 +1,35 @@
 {% extends "public/base.html" %}
+{% load cloudinary %}
 {% block title %}Luxury Properties{% endblock %}
 
 {% block content %}
 
-<!-- HERO HEADER -->
-<section class="relative py-24 text-center overflow-hidden">
+<!-- HERO -->
+<section class="relative py-28 text-center overflow-hidden">
 
-  <div class="absolute inset-0 bg-gradient-to-r from-black via-gray-900 to-black opacity-90"></div>
+  <div class="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-black"></div>
 
   <div class="relative z-10">
-    <h1 class="text-6xl font-extrabold gold mb-4">
+    <h1 class="text-6xl md:text-7xl font-extrabold tracking-tight bg-gradient-to-r from-yellow-400 to-yellow-200 bg-clip-text text-transparent mb-6">
       Exclusive Residences
     </h1>
-    <p class="text-gray-400 max-w-xl mx-auto">
-      Discover ultra-luxury homes crafted with precision, elegance and timeless architecture.
+    <p class="text-gray-400 max-w-2xl mx-auto text-lg">
+      Curated ultra-luxury homes crafted with precision, elegance, and timeless architecture.
     </p>
   </div>
 
 </section>
 
-<!-- FILTER BAR (GLASS UI) -->
-<section class="max-w-7xl mx-auto px-6 -mt-16 mb-16">
+<!-- FILTER -->
+<section class="max-w-7xl mx-auto px-6 -mt-20 mb-20">
 
 <form method="GET"
-class="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-6 shadow-2xl grid md:grid-cols-6 gap-4">
+class="backdrop-blur-2xl bg-white/5 border border-white/10 rounded-3xl p-6 shadow-2xl grid md:grid-cols-6 gap-4">
 
   <input type="text" name="location" placeholder="Location"
-    class="bg-white/20 text-white placeholder-gray-300 p-3 rounded-lg">
+    class="bg-white/10 text-white placeholder-gray-400 p-3 rounded-xl focus:ring-2 focus:ring-yellow-400 outline-none">
 
-  <select name="type" class="bg-white/20 text-white p-3 rounded-lg">
+  <select name="type" class="bg-white/10 text-white p-3 rounded-xl">
     <option value="">Type</option>
     <option>Villa</option>
     <option>Penthouse</option>
@@ -36,31 +37,30 @@ class="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-6 shado
   </select>
 
   <input type="number" name="min_price" placeholder="Min Price"
-    class="bg-white/20 text-white p-3 rounded-lg">
+    class="bg-white/10 text-white p-3 rounded-xl">
 
   <input type="number" name="max_price" placeholder="Max Price"
-    class="bg-white/20 text-white p-3 rounded-lg">
+    class="bg-white/10 text-white p-3 rounded-xl">
 
-  <select name="beds" class="bg-white/20 text-white p-3 rounded-lg">
+  <select name="beds" class="bg-white/10 text-white p-3 rounded-xl">
     <option>Beds</option>
     <option>2+</option>
     <option>3+</option>
     <option>4+</option>
   </select>
 
-  <button class="bg-gradient-to-r from-yellow-500 to-yellow-300 text-black font-bold rounded-lg">
+  <button class="bg-gradient-to-r from-yellow-400 to-yellow-300 text-black font-bold rounded-xl hover:scale-105 transition">
     Search
   </button>
 
 </form>
-
 </section>
 
 <!-- PROPERTY GRID -->
-<section class="max-w-7xl mx-auto px-6 pb-24">
+<section class="max-w-7xl mx-auto px-6 pb-28">
 
-<div class="flex justify-between items-center mb-10">
-  <h2 class="text-3xl font-bold gold">
+<div class="flex justify-between items-center mb-12">
+  <h2 class="text-4xl font-bold text-white tracking-tight">
     Signature Collection
   </h2>
   <span class="text-gray-400 text-sm">
@@ -68,34 +68,37 @@ class="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-6 shado
   </span>
 </div>
 
-<div class="grid md:grid-cols-2 xl:grid-cols-3 gap-12">
+<div class="grid md:grid-cols-2 xl:grid-cols-3 gap-10">
 
 {% for property in properties %}
-<div class="group relative rounded-3xl overflow-hidden shadow-xl">
+<div class="group relative rounded-3xl overflow-hidden shadow-2xl hover:shadow-yellow-500/10 transition duration-500">
 
   <!-- IMAGE -->
   <div class="relative h-[420px] overflow-hidden">
 
     {% if property.video %}
-    <video class="w-full h-full object-cover group-hover:scale-110 transition duration-700" autoplay muted loop>
-      <source src="{{ property.video.url }}">
-    </video>
+      <video class="w-full h-full object-cover group-hover:scale-110 transition duration-700" autoplay muted loop>
+        <source src="{{ property.video.url }}">
+      </video>
+
+    {% elif property.thumbnail %}
+      {% cloudinary property.thumbnail width=1000 height=700 crop="fill" class="w-full h-full object-cover group-hover:scale-110 transition duration-700" %}
+
     {% else %}
-   
-<img src="{{ property.thumbnail.url }}"
-     class="w-full h-48 object-cover rounded-lg">
+      <img src="https://via.placeholder.com/800x500"
+           class="w-full h-full object-cover">
     {% endif %}
 
-    <!-- DARK GRADIENT -->
+    <!-- GRADIENT -->
     <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent"></div>
 
-    <!-- FLOATING BADGE -->
-    <div class="absolute top-4 left-4 bg-white/20 backdrop-blur px-4 py-1 rounded-full text-xs">
-      Luxury
+    <!-- TAG -->
+    <div class="absolute top-5 left-5 bg-white/10 backdrop-blur-lg px-4 py-1 rounded-full text-xs text-white border border-white/10">
+      Premium
     </div>
 
     <!-- PRICE -->
-    <div class="absolute bottom-6 left-6 text-2xl font-bold gold">
+    <div class="absolute bottom-6 left-6 text-3xl font-bold text-yellow-400 tracking-wide">
       ₹{{ property.price }}
     </div>
 
@@ -104,20 +107,20 @@ class="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-6 shado
   <!-- CONTENT -->
   <div class="absolute bottom-0 p-6 w-full">
 
-    <h3 class="text-2xl font-bold text-white">
+    <h3 class="text-2xl font-bold text-white mb-1">
       {{ property.title }}
     </h3>
 
-    <p class="text-gray-300 text-sm mb-3">
+    <p class="text-gray-300 text-sm mb-4">
       {{ property.location }}
     </p>
 
-    <!-- HIDDEN DETAILS (HOVER ANIMATION) -->
-    <div class="opacity-0 group-hover:opacity-100 transition duration-500">
+    <!-- HOVER BUTTON -->
+    <div class="opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition duration-500">
 
       <a href="{% url 'property_detail' property.id %}"
-         class="inline-block mt-3 px-5 py-2 bg-white text-black rounded-full hover:scale-110 transition">
-         Explore Property
+         class="inline-block px-6 py-2 bg-white text-black rounded-full font-semibold hover:scale-110 transition">
+         Explore →
       </a>
 
     </div>
@@ -131,19 +134,19 @@ class="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-6 shado
 
 </section>
 
-<!-- LUXURY CTA -->
-<section class="py-32 text-center bg-gradient-to-r from-black via-gray-900 to-black">
+<!-- CTA -->
+<section class="py-32 text-center bg-gradient-to-br from-black via-gray-900 to-black">
 
-<h2 class="text-5xl font-bold gold mb-6">
+<h2 class="text-5xl font-extrabold text-white mb-6">
   Find Your Signature Home
 </h2>
 
 <p class="text-gray-400 mb-10 max-w-xl mx-auto">
-  Experience a new level of comfort, design, and prestige with our curated luxury properties.
+  Experience next-level luxury living with curated premium listings.
 </p>
 
 <a href="/contact"
-   class="px-10 py-4 bg-gradient-to-r from-yellow-500 to-yellow-300 text-black font-bold rounded-full hover:scale-110 transition">
+   class="px-12 py-4 bg-gradient-to-r from-yellow-400 to-yellow-300 text-black font-bold rounded-full hover:scale-110 transition shadow-xl">
    Schedule Visit
 </a>
 

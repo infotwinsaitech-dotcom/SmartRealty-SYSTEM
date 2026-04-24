@@ -1,29 +1,32 @@
 {% extends "public/base.html" %}
 {% load static %}
+{% load cloudinary %}
+
 {% block content %}
 
-<div class="max-w-7xl mx-auto px-6 py-16">
+<div class="max-w-7xl mx-auto px-6 py-20">
 
 <!-- HERO GRID -->
-<div class="grid lg:grid-cols-12 gap-6 mb-16">
+<div class="grid lg:grid-cols-12 gap-8 mb-16">
 
   <!-- MAIN IMAGE -->
   <div class="lg:col-span-8 relative group overflow-hidden rounded-3xl">
 
     {% if property.thumbnail %}
-   
-<img src="{{ property.thumbnail.url }}"
-     class="w-full h-48 object-cover rounded-lg">
+
+      {% cloudinary property.thumbnail width=1200 height=700 crop="fill"
+      class="w-full h-[520px] object-cover group-hover:scale-110 transition duration-700" %}
+
     {% else %}
-    <img src="https://via.placeholder.com/600"
-         class="w-full h-[520px] object-cover">
+      <img src="https://via.placeholder.com/1200x700"
+           class="w-full h-[520px] object-cover">
     {% endif %}
 
     <!-- OVERLAY -->
-    <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+    <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent"></div>
 
-    <!-- PRICE FLOAT -->
-    <div class="absolute bottom-6 left-6 text-3xl font-bold gold">
+    <!-- PRICE -->
+    <div class="absolute bottom-6 left-6 text-4xl font-bold text-yellow-400">
       ₹{{ property.price }}
     </div>
 
@@ -33,18 +36,21 @@
   <div class="lg:col-span-4 grid grid-cols-2 gap-4">
 
     {% for img in property.images.all %}
-    <div class="overflow-hidden rounded-xl">
-      <img src="{{ img.image.url }}"
-           class="h-40 w-full object-cover hover:scale-110 transition duration-500">
+    <div class="overflow-hidden rounded-xl group">
+      {% cloudinary img.image width=400 height=300 crop="fill"
+      class="h-40 w-full object-cover group-hover:scale-110 transition duration-500" %}
     </div>
+    {% empty %}
+      <img src="https://via.placeholder.com/300" class="rounded-xl">
     {% endfor %}
 
   </div>
 
 </div>
 
+<!-- VIDEO -->
 {% if property.video %}
-<div class="mb-16 reveal">
+<div class="mb-16">
   <video controls class="w-full rounded-3xl shadow-2xl">
     <source src="{{ property.video.url }}">
   </video>
@@ -54,59 +60,62 @@
 <!-- MAIN GRID -->
 <div class="grid lg:grid-cols-12 gap-12">
 
-<!-- LEFT CONTENT -->
+<!-- LEFT -->
 <div class="lg:col-span-8 space-y-12">
 
   <!-- TITLE -->
-  <div class="reveal">
-    <p class="text-gray-400">{{ property.location }}</p>
-    <h1 class="text-5xl font-extrabold gold">
+  <div>
+    <p class="text-gray-400 text-sm">{{ property.location }}</p>
+    <h1 class="text-5xl font-extrabold text-white leading-tight">
       {{ property.title }}
     </h1>
   </div>
 
   <!-- STATS -->
-  <div class="grid grid-cols-3 gap-6 reveal">
+  <div class="grid grid-cols-3 gap-6">
 
-    <div class="backdrop-blur-xl bg-white/5 p-6 rounded-2xl text-center border border-white/10">
-      <p class="text-3xl font-bold">{{ property.beds }}</p>
+    <div class="bg-white/5 backdrop-blur-xl p-6 rounded-2xl text-center border border-white/10">
+      <p class="text-3xl font-bold text-white">{{ property.beds }}</p>
       <p class="text-xs text-gray-400">Bedrooms</p>
     </div>
 
-    <div class="backdrop-blur-xl bg-white/5 p-6 rounded-2xl text-center border border-white/10">
-      <p class="text-3xl font-bold">{{ property.baths }}</p>
+    <div class="bg-white/5 backdrop-blur-xl p-6 rounded-2xl text-center border border-white/10">
+      <p class="text-3xl font-bold text-white">{{ property.baths }}</p>
       <p class="text-xs text-gray-400">Bathrooms</p>
     </div>
 
-    <div class="backdrop-blur-xl bg-white/5 p-6 rounded-2xl text-center border border-white/10">
-      <p class="text-3xl font-bold">{{ property.sqft }}</p>
+    <div class="bg-white/5 backdrop-blur-xl p-6 rounded-2xl text-center border border-white/10">
+      <p class="text-3xl font-bold text-white">{{ property.sqft }}</p>
       <p class="text-xs text-gray-400">Sq Ft</p>
     </div>
 
   </div>
 
   <!-- DESCRIPTION -->
-  <div class="reveal">
-    <h3 class="text-3xl font-bold mb-4 gold">Description</h3>
+  <div>
+    <h3 class="text-3xl font-bold mb-4 text-yellow-400">Description</h3>
     <p class="text-gray-300 leading-relaxed">
       {{ property.description }}
     </p>
   </div>
 
   <!-- AMENITIES -->
-  <div class="reveal">
-    <h3 class="text-3xl font-bold mb-6 gold">Amenities</h3>
+  <div>
+    <h3 class="text-3xl font-bold mb-6 text-yellow-400">Amenities</h3>
 
     <div class="grid md:grid-cols-3 gap-6">
 
       {% for item in property.amenities.all %}
-      <div class="flex items-center gap-4 backdrop-blur-xl bg-white/5 p-4 rounded-xl border border-white/10 hover:scale-105 transition">
+      <div class="flex items-center gap-4 bg-white/5 backdrop-blur-xl p-4 rounded-xl border border-white/10 hover:scale-105 transition">
+
         <span class="material-symbols-outlined text-yellow-400">
           {{ item.amenity.icon }}
         </span>
-        <span class="font-semibold">
+
+        <span class="text-white font-semibold">
           {{ item.amenity.name }}
         </span>
+
       </div>
       {% endfor %}
 
@@ -115,7 +124,7 @@
 
   <!-- CTA -->
   <a href="{% url 'add_to_cart' property.id %}"
-     class="inline-block bg-gradient-to-r from-yellow-500 to-yellow-300 text-black px-8 py-4 rounded-full font-bold hover:scale-110 transition reveal">
+     class="inline-block bg-gradient-to-r from-yellow-400 to-yellow-300 text-black px-10 py-4 rounded-full font-bold hover:scale-110 transition shadow-xl">
      ❤️ Save Property
   </a>
 
@@ -126,29 +135,28 @@
 
 <div class="sticky top-24 space-y-8">
 
-<!-- AGENT CARD -->
-<div class="backdrop-blur-xl bg-white/5 border border-white/10 p-6 rounded-3xl shadow-xl reveal">
+<!-- AGENT -->
+<div class="bg-white/5 backdrop-blur-xl border border-white/10 p-6 rounded-3xl shadow-xl">
 
   <div class="flex items-center gap-4 mb-6">
 
     {% if property.agent_image %}
-    <img src="{{ property.agent_image.url }}"
-         class="w-16 h-16 rounded-full border border-white">
+      {% cloudinary property.agent_image width=100 height=100 crop="fill"
+      class="w-16 h-16 rounded-full" %}
     {% else %}
-    <img src="{% static 'images/default-agent.jpg' %}"
-         class="w-16 h-16 rounded-full border border-white">
+      <img src="{% static 'images/default-agent.jpg' %}"
+           class="w-16 h-16 rounded-full">
     {% endif %}
 
     <div>
-      <h4 class="font-bold text-lg">{{ property.agent_name }}</h4>
+      <h4 class="font-bold text-lg text-white">{{ property.agent_name }}</h4>
       <p class="text-sm text-gray-400">{{ property.agent_role }}</p>
     </div>
 
   </div>
 
-  <h3 class="text-xl font-bold mb-4 gold">Request Inquiry</h3>
+  <h3 class="text-xl font-bold mb-4 text-yellow-400">Request Inquiry</h3>
 
-  <!-- FORM -->
   <form method="POST" class="space-y-4">
     {% csrf_token %}
 
@@ -164,10 +172,9 @@
     <textarea name="message" placeholder="Message"
       class="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white"></textarea>
 
-    <button class="w-full bg-gradient-to-r from-yellow-500 to-yellow-300 text-black font-bold py-3 rounded-lg hover:scale-105 transition">
+    <button class="w-full bg-gradient-to-r from-yellow-400 to-yellow-300 text-black font-bold py-3 rounded-lg hover:scale-105 transition">
       Send Inquiry
     </button>
-
   </form>
 
   <div class="flex justify-between mt-6 text-sm text-gray-400">
@@ -176,8 +183,8 @@
 
 </div>
 
-<!-- MARKET CARD -->
-<div class="backdrop-blur-xl bg-white/5 border border-white/10 p-6 rounded-2xl reveal">
+<!-- MARKET -->
+<div class="bg-white/5 backdrop-blur-xl border border-white/10 p-6 rounded-2xl">
   <p class="text-xs font-bold text-yellow-400 mb-2">Market Insight</p>
   <p class="text-sm text-gray-400">
     High demand zone with strong ROI potential and luxury buyer interest 📈

@@ -24,7 +24,7 @@ class Property(models.Model):
 )
 
     property_type = models.CharField(max_length=50)
-    thumbnail = models.ImageField(upload_to='properties/')
+    thumbnail = CloudinaryField('image')
     video = models.FileField(upload_to='videos/', blank=True, null=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
