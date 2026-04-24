@@ -4,68 +4,56 @@
 
 {% block content %}
 
-<div class="min-h-screen flex bg-gradient-to-br from-slate-50 to-white">
+<section class="min-h-screen flex items-center justify-center luxury-bg px-6">
 
-    <!-- LEFT SIDE -->
-    <div class="hidden lg:flex w-1/2 relative overflow-hidden">
+    <div class="grid lg:grid-cols-2 gap-10 max-w-6xl w-full items-center">
 
-        <img src="{% static 'images/about.jpg' %}"
-             class="absolute w-full h-full object-cover scale-110">
+        <!-- LEFT CONTENT -->
+        <div class="hidden lg:block text-white space-y-6 reveal">
 
-        <div class="absolute inset-0 bg-black/60"></div>
+            <h1 class="text-6xl font-extrabold leading-tight gold">
+                Welcome Back
+            </h1>
 
-        <div class="relative z-10 p-16 flex flex-col justify-between text-white">
+            <p class="text-gray-300 text-lg max-w-md">
+                Step into a premium real estate ecosystem powered by AI, automation,
+                and ultra-modern design.
+            </p>
 
-            <h2 class="text-2xl font-bold tracking-wide">
-                EstateCRM
-            </h2>
-
-            <div>
-                <h1 class="text-5xl font-extrabold leading-tight mb-6">
-                    Luxury Real Estate <br> Intelligence Platform
-                </h1>
-                <p class="text-gray-300 text-lg">
-                    Manage leads, agents, deals & properties — all in one intelligent system.
-                </p>
-            </div>
-
-            <div class="flex gap-10 text-sm">
+            <div class="flex gap-10 pt-6">
                 <div>
-                    <p class="text-3xl font-bold">10K+</p>
-                    <p class="text-gray-300">Leads Managed</p>
+                    <h3 class="text-3xl font-bold">500+</h3>
+                    <p class="text-gray-400 text-sm">Luxury Properties</p>
                 </div>
                 <div>
-                    <p class="text-3xl font-bold">500+</p>
-                    <p class="text-gray-300">Properties</p>
+                    <h3 class="text-3xl font-bold">10K+</h3>
+                    <p class="text-gray-400 text-sm">Leads Managed</p>
                 </div>
             </div>
 
         </div>
-    </div>
 
-    <!-- RIGHT SIDE -->
-    <div class="w-full lg:w-1/2 flex items-center justify-center px-6 py-12">
+        <!-- FORM -->
+        <div class="backdrop-blur-xl bg-white/5 border border-white/10 p-10 rounded-3xl shadow-2xl reveal">
 
-        <div class="w-full max-w-md bg-white p-8 rounded-2xl shadow-xl border">
-
-            <h2 class="text-3xl font-bold mb-2">
-                Welcome Back 👋
+            <h2 class="text-3xl font-bold mb-2 gold">
+                Login to Dashboard
             </h2>
 
-            <p class="text-gray-500 mb-6">
-                Access your dashboard & manage your real estate business
+            <p class="text-gray-400 mb-6">
+                Access your intelligent real estate workspace
             </p>
 
             {% if messages %}
                 {% for message in messages %}
-                    <div class="mb-4 p-3 rounded bg-green-100 text-green-700">
+                    <div class="mb-4 p-3 rounded bg-green-500/20 text-green-300">
                         {{ message }}
                     </div>
                 {% endfor %}
             {% endif %}
 
             {% if error %}
-                <div class="mb-4 p-3 rounded bg-red-100 text-red-600">
+                <div class="mb-4 p-3 rounded bg-red-500/20 text-red-300">
                     {{ error }}
                 </div>
             {% endif %}
@@ -73,51 +61,34 @@
             <form method="POST" class="space-y-5">
                 {% csrf_token %}
 
-                <!-- USERNAME -->
-                <div>
-                    <label class="text-sm font-semibold">Username</label>
-                    <input type="text" name="username" required
-                        class="w-full mt-1 p-3 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none">
+                <input type="text" name="username" placeholder="Username" required
+                    class="w-full p-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:ring-2 focus:ring-yellow-400 outline-none">
+
+                <div class="relative">
+                    <input id="password" type="password" name="password" placeholder="Password" required
+                        class="w-full p-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:ring-2 focus:ring-yellow-400 outline-none">
+
+                    <button type="button" onclick="togglePassword()"
+                        class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
+                        👁
+                    </button>
                 </div>
 
-                <!-- PASSWORD -->
-                <div>
-                    <div class="flex justify-between">
-                        <label class="text-sm font-semibold">Password</label>
-                        <a href="{% url 'forgot_password' %}" class="text-sm text-blue-600 hover:underline">
-                            Forgot?
-                        </a>
-                    </div>
-
-                    <div class="relative">
-                        <input id="password" type="password" name="password" required
-                            class="w-full mt-1 p-3 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none">
-
-                        <button type="button"
-                            onclick="togglePassword()"
-                            class="absolute right-3 top-1/2 -translate-y-1/2">
-                            👁
-                        </button>
-                    </div>
-                </div>
-
-                <!-- BUTTON -->
                 <button type="submit"
-                    class="w-full py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold rounded-xl hover:scale-[1.02] transition">
+                    class="w-full py-3 bg-gradient-to-r from-yellow-500 to-yellow-300 text-black font-bold rounded-xl hover:scale-105 transition">
                     Login
                 </button>
 
-                <!-- OTP -->
                 <a href="{% url 'otp_verification' %}"
-                   class="block text-center py-3 border rounded-xl hover:bg-gray-50 transition">
+                   class="block text-center py-3 border border-white/20 rounded-xl hover:bg-white/10 transition">
                    Login with OTP
                 </a>
 
             </form>
 
-            <p class="text-center text-sm mt-6 text-gray-500">
+            <p class="text-center text-sm mt-6 text-gray-400">
                 Don’t have an account?
-                <a href="{% url 'register' %}" class="text-blue-600 font-semibold hover:underline">
+                <a href="{% url 'register' %}" class="text-yellow-400 hover:underline">
                     Register
                 </a>
             </p>
@@ -126,7 +97,7 @@
 
     </div>
 
-</div>
+</section>
 
 <script>
 function togglePassword() {
