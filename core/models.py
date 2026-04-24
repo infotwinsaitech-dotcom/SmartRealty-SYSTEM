@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.contrib import admin
-
+from cloudinary.models import CloudinaryField
 
 class Property(models.Model):
     title = models.CharField(max_length=255)
