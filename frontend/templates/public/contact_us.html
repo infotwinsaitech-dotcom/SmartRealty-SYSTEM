@@ -1,176 +1,135 @@
-
 {% extends "public/base.html" %}
+{% load static %}
 {% block title %}Contact Us{% endblock %}
 
 {% block content %}
-<!DOCTYPE html>
 
+<div class="bg-gradient-to-br from-[#020617] via-[#0f172a] to-[#020617] text-white">
 
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Contact Us | ArchitectCRM</title>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<script id="tailwind-config">
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    "colors": {
-                        "on-tertiary-fixed": "#0d1c2f",
-                        "on-primary-container": "#90a8ff",
-                        "inverse-primary": "#b6c4ff",
-                        "secondary-fixed-dim": "#adc6ff",
-                        "primary": "#00236f",
-                        "secondary-container": "#2170e4",
-                        "on-secondary-fixed": "#001a42",
-                        "on-primary": "#ffffff",
-                        "background": "#faf8ff",
-                        "on-error": "#ffffff",
-                        "on-primary-fixed-variant": "#264191",
-                        "error-container": "#ffdad6",
-                        "tertiary-container": "#334155",
-                        "surface-container-highest": "#dae2fd",
-                        "surface-container": "#eaedff",
-                        "surface-bright": "#faf8ff",
-                        "primary-fixed": "#dce1ff",
-                        "on-tertiary-container": "#9eadc5",
-                        "surface-container-high": "#e2e7ff",
-                        "outline": "#757682",
-                        "on-surface": "#131b2e",
-                        "surface": "#faf8ff",
-                        "on-error-container": "#93000a",
-                        "surface-variant": "#dae2fd",
-                        "surface-container-low": "#f2f3ff",
-                        "primary-fixed-dim": "#b6c4ff",
-                        "inverse-surface": "#283044",
-                        "error": "#ba1a1a",
-                        "surface-tint": "#4059aa",
-                        "tertiary-fixed-dim": "#b9c7e0",
-                        "on-primary-fixed": "#00164e",
-                        "on-background": "#131b2e",
-                        "on-tertiary": "#ffffff",
-                        "on-surface-variant": "#444651",
-                        "on-secondary": "#ffffff",
-                        "on-tertiary-fixed-variant": "#3a485c",
-                        "on-secondary-fixed-variant": "#004395",
-                        "primary-container": "#1e3a8a",
-                        "tertiary": "#1d2b3e",
-                        "surface-dim": "#d2d9f4",
-                        "secondary-fixed": "#d8e2ff",
-                        "outline-variant": "#c5c5d3",
-                        "inverse-on-surface": "#eef0ff",
-                        "surface-container-lowest": "#ffffff",
-                        "tertiary-fixed": "#d5e3fd",
-                        "secondary": "#0058be",
-                        "on-secondary-container": "#fefcff"
-                    },
-                    "borderRadius": {
-                        "DEFAULT": "0.5rem",
-                        "lg": "0.5rem",
-                        "xl": "0.75rem",
-                        "full": "9999px"
-                    },
-                    "fontFamily": {
-                        "headline": ["Manrope"],
-                        "body": ["Manrope"],
-                        "label": ["Manrope"]
-                    }
-                }
-            }
-        }
-    </script>
-<style>
-        body { font-family: 'Manrope', sans-serif; }
-        .glass-panel {
-            background: rgba(250, 248, 255, 0.7);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-        }
-        .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
-        }
-    </style>
-
-<body class="bg-surface text-on-surface selection:bg-primary-container selection:text-white">
-<!-- TopNavBar -->
-
-<main>
-<!-- Hero Section -->
 <!-- HERO -->
-<section class="bg-tertiary text-white py-20 px-8">
-  <div class="max-w-5xl mx-auto">
-    <h1 class="text-5xl font-extrabold mb-4">
-      Get in Touch
+<section class="py-24 px-6 text-center">
+    <h1 class="text-5xl md:text-6xl font-extrabold mb-4">
+        Get in Touch
     </h1>
-    <p class="text-lg opacity-80">
-      Uma Reality — Premium Real Estate Services
+    <p class="text-gray-400 text-lg">
+        Premium Real Estate Assistance — We're Here to Help
     </p>
-  </div>
 </section>
-<!-- Main Content Split Layout -->
-<section class="py-16 px-8 bg-surface">
-  <div class="max-w-7xl mx-auto grid md:grid-cols-2 gap-12">
-<!-- Left Side: Contact Form -->
-    <div>
-      <h2 class="text-2xl font-bold mb-6">Send Inquiry</h2>
-      <form method="POST" class="space-y-4">
-        {% csrf_token %}
-<form class="space-y-6">
-<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-<div class="space-y-2">
-<label class="text-xs font-bold uppercase tracking-widest text-outline">Full Name</label>
-<input name="name" placeholder="Full Name"
-          class="w-full p-3 border rounded-lg" required>
-</div>
-<div class="space-y-2">
-<label class="text-xs font-bold uppercase tracking-widest text-outline">Contect Number</label>
- <input name="phone" placeholder="Phone Number"
-          class="w-full p-3 border rounded-lg" required>
-</div>
-<div class="space-y-2">
-<label class="text-xs font-bold uppercase tracking-widest text-outline">Email Address</label>
-<input name ="w-full bg-surface-container-high border-none rounded-lg p-4 focus:ring-1 focus:ring-secondary transition-all outline-none text-on-surface" placeholder="john@architect.com" type="email"/>
-</div>
-</div>
-<div class="space-y-2">
-<label class="text-xs font-bold uppercase tracking-widest text-outline">Subject</label>
-<input class="w-full bg-surface-container-high border-none rounded-lg p-4 focus:ring-1 focus:ring-secondary transition-all outline-none text-on-surface" placeholder="Project Consultation" type="text"/>
-</div>
-<div class="space-y-2">
-<label class="text-xs font-bold uppercase tracking-widest text-outline">Your Message</label>
-<textarea message ="w-full bg-surface-container-high border-none rounded-lg p-4 focus:ring-1 focus:ring-secondary transition-all outline-none text-on-surface resize-none" placeholder="Describe your vision..." rows="6"></textarea>
-</div>
-  <button type="submit"
-          class="bg-primary text-white px-6 py-3 rounded-lg font-bold">
-          Send Message
-        </button>
-</form>
-</div>
-    <!-- RIGHT: CONTACT INFO -->
-    <div class="bg-surface-container-low p-8 rounded-xl shadow">
-      <h2 class="text-2xl font-bold mb-6">Contact Info</h2>
 
-      <div class="space-y-4 text-gray-600">
+<!-- MAIN -->
+<section class="max-w-7xl mx-auto grid md:grid-cols-2 gap-12 px-6 pb-20">
 
-        <p><strong>Company:</strong> {{ site.company_name }}</p>
+    <!-- LEFT: FORM -->
+    <div class="backdrop-blur-xl bg-white/5 border border-white/10 p-10 rounded-3xl shadow-2xl">
 
-        <p><strong>Phone:</strong>
-  <a href="tel:{{ site.phone }}">{{ site.phone }}</a>
-</p>
+        <h2 class="text-3xl font-bold mb-8">
+            Send Inquiry
+        </h2>
 
-        <p><strong>Email:</strong>
-  <a href="mailto:{{ site.email }}">{{ site.email }}</a>
-</p>
+        <form method="POST" class="space-y-6">
+            {% csrf_token %}
 
-        <p><strong>Location:</strong> {{ site.location }}</p>
+            <div class="grid md:grid-cols-2 gap-6">
 
-      </div>
+                <!-- NAME -->
+                <div>
+                    <label class="text-sm text-gray-400">Full Name</label>
+                    <input name="name" required
+                        class="w-full mt-2 px-4 py-3 rounded-lg bg-white/10 border border-white/20 focus:outline-none focus:ring-2 focus:ring-yellow-400">
+                </div>
+
+                <!-- PHONE -->
+                <div>
+                    <label class="text-sm text-gray-400">Phone</label>
+                    <input name="phone" required
+                        class="w-full mt-2 px-4 py-3 rounded-lg bg-white/10 border border-white/20 focus:outline-none focus:ring-2 focus:ring-yellow-400">
+                </div>
+
+            </div>
+
+            <!-- EMAIL -->
+            <div>
+                <label class="text-sm text-gray-400">Email</label>
+                <input type="email" name="email" required
+                    class="w-full mt-2 px-4 py-3 rounded-lg bg-white/10 border border-white/20 focus:outline-none focus:ring-2 focus:ring-yellow-400">
+            </div>
+
+            <!-- MESSAGE -->
+            <div>
+                <label class="text-sm text-gray-400">Message</label>
+                <textarea name="message" rows="5" required
+                    class="w-full mt-2 px-4 py-3 rounded-lg bg-white/10 border border-white/20 focus:outline-none focus:ring-2 focus:ring-yellow-400"></textarea>
+            </div>
+
+            <!-- BUTTON -->
+            <button type="submit"
+                class="w-full bg-gradient-to-r from-yellow-500 to-yellow-300 text-black font-bold py-3 rounded-lg hover:scale-105 transition duration-300">
+                Send Message
+            </button>
+
+        </form>
+
     </div>
 
-  </div>
+    <!-- RIGHT: CONTACT INFO -->
+    <div class="space-y-8">
+
+        <!-- CARD -->
+        <div class="backdrop-blur-xl bg-white/5 border border-white/10 p-8 rounded-3xl shadow-xl">
+
+            <h2 class="text-2xl font-bold mb-6">
+                Contact Information
+            </h2>
+
+            <div class="space-y-4 text-gray-300">
+
+                <p>
+                    <span class="text-yellow-400 font-semibold">Company:</span><br>
+                    {{ site.company_name }}
+                </p>
+
+                <p>
+                    <span class="text-yellow-400 font-semibold">Phone:</span><br>
+                    <a href="tel:{{ site.phone }}" class="hover:text-yellow-400 transition">
+                        {{ site.phone }}
+                    </a>
+                </p>
+
+                <p>
+                    <span class="text-yellow-400 font-semibold">Email:</span><br>
+                    <a href="mailto:{{ site.email }}" class="hover:text-yellow-400 transition">
+                        {{ site.email }}
+                    </a>
+                </p>
+
+                <p>
+                    <span class="text-yellow-400 font-semibold">Location:</span><br>
+                    {{ site.location }}
+                </p>
+
+            </div>
+
+        </div>
+
+        <!-- EXTRA CARD -->
+        <div class="bg-gradient-to-r from-yellow-500 to-yellow-300 text-black p-8 rounded-3xl shadow-xl">
+            <h3 class="text-xl font-bold mb-2">
+                Need Immediate Help?
+            </h3>
+            <p class="text-sm mb-4">
+                Connect with our expert agents for instant consultation.
+            </p>
+
+            <a href="https://wa.me/919876543210"
+               class="inline-block bg-black text-white px-6 py-2 rounded-lg font-bold hover:scale-105 transition">
+               WhatsApp Now
+            </a>
+        </div>
+
+    </div>
+
 </section>
+
+</div>
 
 {% endblock %}
