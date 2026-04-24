@@ -3,151 +3,226 @@
 
 {% block content %}
 
-<!-- HERO -->
-<section class="relative h-[650px] flex items-center">
+<!-- HERO (CINEMATIC) -->
+<section class="relative h-screen flex items-center justify-center overflow-hidden">
 
+  <img src="{% static 'images/about.jpg' %}"
+       class="absolute w-full h-full object-cover scale-110 animate-[zoom_25s_linear_infinite]">
+
+  <div class="absolute inset-0 bg-gradient-to-b from-black/40 via-black/70 to-black"></div>
+
+  <div class="relative z-10 text-center text-white px-6 max-w-4xl">
+
+    <h1 class="text-6xl md:text-7xl font-extrabold leading-tight mb-6">
+      Crafting Luxury <br> Real Estate Experiences
+    </h1>
+
+    <p class="text-lg text-gray-300">
+      Where innovation meets architecture — redefining how properties are discovered, experienced, and managed.
+    </p>
+
+  </div>
+
+</section>
+
+<!-- STORY SECTION -->
+<section class="py-32 bg-white">
+
+<div class="max-w-7xl mx-auto grid md:grid-cols-2 gap-20 px-6 items-center">
+
+  <div class="space-y-6">
+    <h2 class="text-5xl font-bold">
+      Our Vision
+    </h2>
+
+    <p class="text-gray-600 text-lg leading-relaxed">
+      We are not just a real estate platform — we are a digital ecosystem built for the future of property experience.
+      Our mission is to simplify complexity and elevate the way buyers, builders, and agents interact.
+    </p>
+
+    <p class="text-gray-500">
+      From luxury villas to high-rise investments, we bring everything under one intelligent platform powered by data,
+      automation, and seamless design.
+    </p>
+
+  </div>
+
+  <div class="relative">
     <img src="{% static 'images/about.jpg' %}"
-         class="absolute inset-0 w-full h-full object-cover">
+         class="rounded-3xl shadow-2xl">
 
-    <div class="absolute inset-0 bg-black/70"></div>
-
-    <div class="relative z-10 max-w-6xl mx-auto px-8 text-white">
-        <h1 class="text-6xl font-extrabold">
-            About Our Platform
-        </h1>
-
-        <p class="mt-4 text-lg text-gray-300 max-w-xl">
-            A premium real estate ecosystem designed to connect buyers, agents, and builders in one powerful platform.
-        </p>
+    <!-- FLOAT CARD -->
+    <div class="absolute -bottom-10 -left-10 bg-white p-6 rounded-2xl shadow-xl w-60">
+      <h4 class="font-bold text-lg">10+ Years</h4>
+      <p class="text-gray-500 text-sm">Industry Experience</p>
     </div>
+  </div>
+
+</div>
+
 </section>
 
-<!-- ABOUT -->
-<section class="py-24 px-6 bg-white">
+<!-- PREMIUM FEATURES (GLASS CARDS) -->
+<section class="py-32 bg-gradient-to-br from-gray-900 to-black text-white">
 
-    <div class="max-w-6xl mx-auto grid md:grid-cols-2 gap-16 items-center">
+<div class="max-w-7xl mx-auto px-6 text-center">
 
-        <!-- LEFT -->
-        <div>
-            <h2 class="text-4xl font-bold mb-6">
-                What We Do
-            </h2>
+<h2 class="text-5xl font-bold mb-20">
+  Platform Excellence
+</h2>
 
-            <p class="text-gray-600 text-lg leading-relaxed">
-                Our platform simplifies the entire real estate journey — from discovering premium properties 
-                to managing leads, agents, and transactions. Whether you're a buyer searching for your dream home 
-                or a builder managing multiple listings, our system provides everything in one place.
-            </p>
+<div class="grid md:grid-cols-3 gap-10">
 
-            <p class="text-gray-600 mt-4 leading-relaxed">
-                We combine modern design with powerful backend tools to create a seamless experience. 
-                Users can explore properties, connect with agents, and track their journey effortlessly.
-            </p>
-        </div>
+  <div class="backdrop-blur-xl bg-white/10 p-8 rounded-2xl border border-white/10 hover:scale-105 transition">
+    <h3 class="text-xl font-bold mb-3">Luxury Listings</h3>
+    <p class="text-gray-300">
+      Curated premium properties with immersive visuals and detailed insights.
+    </p>
+  </div>
 
-        <!-- RIGHT CARD -->
-        <div class="bg-gradient-to-br from-blue-600 to-indigo-700 text-white p-8 rounded-2xl shadow-2xl">
+  <div class="backdrop-blur-xl bg-white/10 p-8 rounded-2xl border border-white/10 hover:scale-105 transition">
+    <h3 class="text-xl font-bold mb-3">Smart CRM</h3>
+    <p class="text-gray-300">
+      Manage leads, agents, deals, and communication seamlessly in one system.
+    </p>
+  </div>
 
-            <h3 class="text-2xl font-bold mb-6">
-                Platform Highlights
-            </h3>
+  <div class="backdrop-blur-xl bg-white/10 p-8 rounded-2xl border border-white/10 hover:scale-105 transition">
+    <h3 class="text-xl font-bold mb-3">AI Insights</h3>
+    <p class="text-gray-300">
+      Data-driven decisions with intelligent recommendations and analytics.
+    </p>
+  </div>
 
-            <ul class="space-y-4 text-sm">
+</div>
 
-                <li>✔ Advanced Property Listings</li>
-                <li>✔ Builder & Agent Management</li>
-                <li>✔ Lead Tracking System</li>
-                <li>✔ AI Insights & Analytics</li>
-                <li>✔ Real-time Communication</li>
-                <li>✔ Document & Deal Management</li>
+</div>
 
-            </ul>
-
-        </div>
-
-    </div>
 </section>
 
-<!-- WHY CHOOSE US -->
-<section class="py-24 bg-gray-100">
+<!-- TIMELINE -->
+<section class="py-32 bg-white">
 
-    <div class="max-w-6xl mx-auto text-center">
+<div class="max-w-5xl mx-auto px-6">
 
-        <h2 class="text-4xl font-bold mb-12">
-            Why Choose Us
-        </h2>
+<h2 class="text-4xl font-bold text-center mb-16">
+  Our Journey
+</h2>
 
-        <div class="grid md:grid-cols-3 gap-10">
+<div class="space-y-12">
 
-            <div class="bg-white p-8 rounded-xl shadow hover:shadow-xl transition">
-                <h3 class="text-xl font-bold mb-3">Premium Experience</h3>
-                <p class="text-gray-500">
-                    Designed with luxury UI and smooth user experience for modern users.
-                </p>
-            </div>
-
-            <div class="bg-white p-8 rounded-xl shadow hover:shadow-xl transition">
-                <h3 class="text-xl font-bold mb-3">All-in-One Platform</h3>
-                <p class="text-gray-500">
-                    Manage properties, leads, agents, and deals from a single dashboard.
-                </p>
-            </div>
-
-            <div class="bg-white p-8 rounded-xl shadow hover:shadow-xl transition">
-                <h3 class="text-xl font-bold mb-3">Smart Automation</h3>
-                <p class="text-gray-500">
-                    AI-powered insights and automation to boost your real estate business.
-                </p>
-            </div>
-
-        </div>
-
+  <div class="flex gap-6 items-start">
+    <div class="w-4 h-4 bg-black rounded-full mt-2"></div>
+    <div>
+      <h3 class="font-bold text-xl">2022 - Foundation</h3>
+      <p class="text-gray-500">Started with a vision to digitize real estate operations.</p>
     </div>
+  </div>
+
+  <div class="flex gap-6 items-start">
+    <div class="w-4 h-4 bg-black rounded-full mt-2"></div>
+    <div>
+      <h3 class="font-bold text-xl">2023 - Expansion</h3>
+      <p class="text-gray-500">Integrated CRM, lead tracking, and automation tools.</p>
+    </div>
+  </div>
+
+  <div class="flex gap-6 items-start">
+    <div class="w-4 h-4 bg-black rounded-full mt-2"></div>
+    <div>
+      <h3 class="font-bold text-xl">2025 - AI Powered</h3>
+      <p class="text-gray-500">Launched AI insights and predictive analytics.</p>
+    </div>
+  </div>
+
+</div>
+
+</div>
+
 </section>
 
-<!-- STATS -->
-<section class="py-24 bg-gradient-to-r from-[#0F172A] to-[#1E3A8A] text-white">
+<!-- STATS (ANIMATED FEEL) -->
+<section class="py-32 bg-black text-white">
 
-    <div class="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-10 text-center">
+<div class="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-10 text-center">
 
-        <div>
-            <h3 class="text-4xl font-bold">100+</h3>
-            <p class="text-gray-300">Properties</p>
-        </div>
+  <div>
+    <h3 class="text-5xl font-bold">500+</h3>
+    <p class="text-gray-400">Luxury Properties</p>
+  </div>
 
-        <div>
-            <h3 class="text-4xl font-bold">50+</h3>
-            <p class="text-gray-300">Agents</p>
-        </div>
+  <div>
+    <h3 class="text-5xl font-bold">120+</h3>
+    <p class="text-gray-400">Elite Agents</p>
+  </div>
 
-        <div>
-            <h3 class="text-4xl font-bold">1000+</h3>
-            <p class="text-gray-300">Leads</p>
-        </div>
+  <div>
+    <h3 class="text-5xl font-bold">10K+</h3>
+    <p class="text-gray-400">Leads Generated</p>
+  </div>
 
-        <div>
-            <h3 class="text-4xl font-bold">24/7</h3>
-            <p class="text-gray-300">Support</p>
-        </div>
+  <div>
+    <h3 class="text-5xl font-bold">24/7</h3>
+    <p class="text-gray-400">Premium Support</p>
+  </div>
 
-    </div>
+</div>
+
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="py-32 bg-gray-50">
+
+<div class="max-w-6xl mx-auto text-center px-6">
+
+<h2 class="text-4xl font-bold mb-16">
+  What Our Clients Say
+</h2>
+
+<div class="grid md:grid-cols-3 gap-10">
+
+  <div class="bg-white p-8 rounded-2xl shadow">
+    <p class="text-gray-600">
+      “This platform completely transformed how we manage our real estate business.”
+    </p>
+    <h4 class="mt-4 font-bold">Builder Client</h4>
+  </div>
+
+  <div class="bg-white p-8 rounded-2xl shadow">
+    <p class="text-gray-600">
+      “Smooth, modern and powerful — exactly what we needed.”
+    </p>
+    <h4 class="mt-4 font-bold">Agent</h4>
+  </div>
+
+  <div class="bg-white p-8 rounded-2xl shadow">
+    <p class="text-gray-600">
+      “Finding my dream home was never this easy.”
+    </p>
+    <h4 class="mt-4 font-bold">Buyer</h4>
+  </div>
+
+</div>
+
+</div>
+
 </section>
 
 <!-- CTA -->
-<section class="py-20 text-center bg-white">
+<section class="py-32 text-center bg-gradient-to-r from-black via-gray-900 to-black text-white">
 
-    <h2 class="text-4xl font-bold mb-4">
-        Start Your Real Estate Journey Today
-    </h2>
+<h2 class="text-5xl font-bold mb-6">
+  Experience Luxury Living Today
+</h2>
 
-    <p class="text-gray-500 mb-8">
-        Discover premium properties and manage everything in one place.
-    </p>
+<p class="text-gray-400 mb-10 max-w-xl mx-auto">
+  Step into a world of premium properties and intelligent real estate management.
+</p>
 
-    <a href="/properties/"
-       class="px-8 py-4 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition">
-        Explore Properties
-    </a>
+<a href="/properties/"
+   class="px-10 py-4 bg-white text-black font-bold rounded-full hover:scale-110 transition">
+   Explore Properties
+</a>
 
 </section>
 
