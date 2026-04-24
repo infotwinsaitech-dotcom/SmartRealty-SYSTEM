@@ -45,6 +45,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'core',
     'channels',
+    'cloudinary',
+    'cloudinary_storage',
 ]
 
 ASGI_APPLICATION = 'realestate_crm.asgi.application'
@@ -138,7 +140,7 @@ DATABASES = {
     'default': dj_database_url.config(default=os.getenv('DATABASE_URL'))
 }
 
-
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
@@ -152,3 +154,10 @@ EMAIL_HOST_PASSWORD = 'unbk ptee szdt oaco'
 EMAIL_HOST = 'smtp.gmail.com'
 LOGIN_URL = '/login/'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+import cloudinary
+
+cloudinary.config(
+    cloud_name="dzclbh7ru",
+    api_key="177977239851829",
+    api_secret="Dbmyb7hfE9787oUh-7J79aX6ZUo"
+)
