@@ -22,7 +22,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Count
 from django.db.models import Q
 from django.contrib.auth import update_session_auth_hash
-
+from .models import Property, PropertyImage
 def home(request):
     properties = Property.objects.all()[:6]
 

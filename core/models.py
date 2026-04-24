@@ -37,7 +37,7 @@ class Property(models.Model):
 
 class PropertyImage(models.Model):
     property = models.ForeignKey(Property, on_delete=models.CASCADE, related_name="images")
-    image = models.ImageField(upload_to='property_gallery/')
+    image = CloudinaryField('image')
     def __str__(self):
         return self.property.title
     
