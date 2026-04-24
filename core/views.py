@@ -357,7 +357,7 @@ def edit_profile(request):
 
 @login_required
 def my_properties(request):
-    properties = Property.objects.filter(user=request.user) 
+    properties = Property.objects.filter(builder=request.user) 
     return render(request, "user/my_property.html", {
         "properties": properties
     })
@@ -396,9 +396,10 @@ def add_property(request):
             sqft=sqft,
             description=description,
             property_type=type,
+            status=status,
             thumbnail=thumbnail,
-            user=request.user   # ✅ IMPORTANT
-        )
+            builder=request.user   # ✅ FIX
+      )          
 
         return redirect("my_property")
 
