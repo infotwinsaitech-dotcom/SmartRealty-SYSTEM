@@ -375,6 +375,8 @@ def my_inquiries(request):
 @login_required
 def add_property(request):
     if request.method == "POST":
+        print("POST DATA:", request.POST)
+        print("FILES:", request.FILES)
         title = request.POST.get("title")
         location = request.POST.get("location")
         status=request.POST.get('status')
@@ -401,12 +403,12 @@ def add_property(request):
             builder=request.user   # ✅ FIX
       )          
 
-        return redirect("my_property")
+        return redirect("property_management")
 
     return render(request, "user/add_property.html")
 @login_required
 def property_management(request):
-    properties = Property.objects.all()
+    properties = Property.objects.filter(builder=request.user)
     return render(request, "builder/property_management.html", {
         "properties": properties
     })

@@ -26,7 +26,6 @@ urlpatterns = [
     path("my-inquiries/", views.my_inquiries, name="my_inquiries"),
     path('add-property/', views.add_property, name='add_property'),
     path('builder-dashboard/', views.builder_dashboard, name='builder_dashboard'),
-    path('agent-dashboard/', views.agent_dashboard, name='agent_dashboard'),
     path('builder/properties/', views.property_management, name='property_management'),
     path('builder/leads/', views.lead_management, name='lead_management'),
     
@@ -57,7 +56,6 @@ urlpatterns = [
     path('agent/send-message/', views.agent_send_message),
     path('builder/create-task/', views.create_task),
     path('builder/task-done/<int:id>/', views.task_done),
-    path('builder/scheduler/', views.scheduler_overview),
     path('builder/scheduler/', views.scheduler_overview, name='scheduler'),
     path('builder/reorder-task/', views.reorder_task),
     path('builder/check-reminders/', views.check_reminders),
@@ -75,7 +73,6 @@ urlpatterns = [
     path('builder/users/delete/<int:id>/', views.delete_agent, name='delete_agent'),
     path('builder/users/toggle/<int:id>/', views.toggle_agent, name='toggle_agent'),
     path('agent-leads/', views.agent_leads, name='agent_leads'), 
-    path('agent-dashboard/', views.agent_dashboard, name='agent_dashboard'),
     path('agent-properties/', views.agent_properties, name='agent_properties'),
     path('agent-profile/', views.agent_profile, name='agent_profile'),
     path('scheduler/', views.scheduler, name='scheduler'),   

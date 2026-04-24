@@ -80,7 +80,7 @@
         .no-scrollbar::-webkit-scrollbar { display: none; }
     </style>
 
-<body class="bg-surface text-on-surface">
+
 <!-- SideNavBar Anchor -->
 
 <!-- Main Content Wrapper -->
@@ -148,49 +148,26 @@ class="flex items-center gap-2 px-6 py-3 bg-gradient-to-br from-primary-containe
 <div class="grid grid-cols-3 gap-6">
     
 {% if properties %}
-{% for property in properties %}
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
 
-<a href="{% url 'builder_property_detail' property.id %}">
-    <div class="bg-white rounded-xl shadow p-4">
+    {% for property in properties %}
+    <a href="{% url 'builder_property_detail' property.id %}">
+        <div class="bg-white rounded-xl shadow p-4">
 
-        {% if property.thumbnail %}
-            <img src="{{ property.thumbnail.url }}" class="w-full h-48 object-cover rounded">
-        {% else %}
-            <img src="https://via.placeholder.com/300" class="w-full h-48 object-cover rounded">
-        {% endif %}
+            {% if property.thumbnail %}
+                <img src="{{ property.thumbnail.url }}" class="w-full h-48 object-cover rounded">
+            {% else %}
+                <img src="https://via.placeholder.com/300" class="w-full h-48 object-cover rounded">
+            {% endif %}
 
-        <h3 class="text-xl font-bold mt-2">
-            {{ property.title }}
-        </h3>
-
-        <p class="text-gray-500">
-            {{ property.location }}
-        </p>
-
-        <p class="text-blue-600 font-bold">
-            ₹{{ property.price }}
-        </p>
-   <span class="text-sm px-2 py-1 rounded
-{% if property.status == 'Available' %}
-    bg-green-500
-{% elif property.status == 'Sold' %}
-    bg-red-500
-{% else %}
-    bg-gray-500
-{% endif %}
-text-white">
-    {{ property.status }}
-</span>
-    </div>
-</a>
-
+            <h3 class="text-lg font-bold mt-2">{{ property.title }}</h3>
+        </div>
+    </a>
+    {% endfor %}
 
 </div>
-
-{% endfor %}
-
 {% else %}
-    <p class="text-center text-gray-500">No properties added yet</p>
+<p>No properties</p>
 {% endif %}
 </div>
 </div>
@@ -216,7 +193,7 @@ text-white">
 
         <h2 class="text-2xl font-bold mb-4">Add Property</h2>
 
-        <form method="POST" enctype="multipart/form-data">
+        <form method="POST" action="{% url 'add_property' %}" enctype="multipart/form-data">
             {% csrf_token %}
 
             <input name="title" placeholder="Title" class="w-full mb-3 border p-2 rounded">
