@@ -81,8 +81,8 @@ class="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-6 shado
       <source src="{{ property.video.url }}">
     </video>
     {% else %}
-    <img src="{{ property.thumbnail.url }}"
-         class="w-full h-full object-cover group-hover:scale-110 transition duration-700">
+    <img src="{{ property.thumbnail.url|replace:'/upload/','/upload/q_auto,f_auto/' }}" 
+     class="w-full h-48 object-cover rounded-lg">
     {% endif %}
 
     <!-- DARK GRADIENT -->

@@ -11,8 +11,8 @@
   <div class="lg:col-span-8 relative group overflow-hidden rounded-3xl">
 
     {% if property.thumbnail %}
-    <img src="{{ property.thumbnail.url }}"
-         class="w-full h-[520px] object-cover transition duration-700 group-hover:scale-110">
+    <img src="{{ property.thumbnail.url|replace:'/upload/','/upload/q_auto,f_auto/' }}" 
+     class="w-full h-48 object-cover rounded-lg">
     {% else %}
     <img src="https://via.placeholder.com/600"
          class="w-full h-[520px] object-cover">

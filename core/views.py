@@ -375,11 +375,9 @@ def my_inquiries(request):
 @login_required
 def add_property(request):
     if request.method == "POST":
-        print("POST DATA:", request.POST)
-        print("FILES:", request.FILES)
         title = request.POST.get("title")
         location = request.POST.get("location")
-        status=request.POST.get('status')
+        status = request.POST.get('status')
         price = request.POST.get("price")
         beds = request.POST.get("beds")
         baths = request.POST.get("baths")
@@ -388,8 +386,11 @@ def add_property(request):
         type = request.POST.get("type")
         thumbnail = request.FILES.get("thumbnail")
 
-        # 🔥 यही जगह है जहाँ add करना है
-        Property.objects.create(
+        # 👇 MULTIPLE IMAGES
+        images = request.FILES.getlist("images")
+
+        # 🔥 PROPERTY CREATE
+        property = Property.objects.create(
             title=title,
             location=location,
             price=price,
@@ -400,10 +401,17 @@ def add_property(request):
             property_type=type,
             status=status,
             thumbnail=thumbnail,
-            builder=request.user   # ✅ FIX
-      )          
+            builder=request.user
+        )
 
-        return redirect("property_management")
+        # 🔥 SAVE MULTIPLE IMAGES
+        for img in images:
+            PropertyImage.objects.create(
+                property=property,
+                image=img
+            )
+
+        return redirect("my_property")
 
     return render(request, "user/add_property.html")
 @login_required
