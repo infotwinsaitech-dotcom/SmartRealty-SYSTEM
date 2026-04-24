@@ -1,27 +1,26 @@
-<nav class="bg-blue-900 text-white px-6 py-4 flex justify-between items-center shadow-lg">
-    
-    <h1 class="text-xl font-bold">
-        {{ site.site_name|default:"Uma Realty" }}
+<nav class="fixed top-0 w-full z-50 backdrop-blur-xl bg-black/40 border-b border-white/10 px-8 py-4 flex justify-between items-center">
+
+    <h1 class="text-xl font-bold gold">
+        {{ site.site_name|default:"EstateX" }}
     </h1>
 
-    <div class="space-x-6">
-        <a href="/" class="hover:text-yellow-300">Home</a>
-        <a href="/properties/" class="hover:text-yellow-300">Properties</a>
-        <a href="/about/" class="hover:text-yellow-300">About</a>
-        <a href="/contact/" class="hover:text-yellow-300">Contact</a>
-       {% if request.user.is_authenticated %}
+    <div class="flex items-center gap-6 text-sm">
 
-    <a href="{% url 'profile' %}" class="px-4 py-2 bg-indigo-600 text-white rounded-lg">
-        My Profile
-    </a>
+        <a href="/" class="hover:text-yellow-400 transition">Home</a>
+        <a href="/properties/" class="hover:text-yellow-400 transition">Properties</a>
+        <a href="/about/" class="hover:text-yellow-400 transition">About</a>
+        <a href="/contact/" class="hover:text-yellow-400 transition">Contact</a>
 
-{% else %}
+        {% if request.user.is_authenticated %}
+        <a href="{% url 'profile' %}" class="px-4 py-2 bg-gradient-to-r from-yellow-500 to-yellow-300 text-black rounded-lg font-bold hover:scale-105 transition">
+            Profile
+        </a>
+        {% else %}
+        <a href="{% url 'login' %}" class="px-4 py-2 border border-white/20 rounded-lg hover:bg-white/10 transition">
+            Login
+        </a>
+        {% endif %}
 
-    <a href="{% url 'login' %}" class="px-4 py-2 bg-indigo-600 text-white rounded-lg">
-        Login
-    </a>
-
-{% endif %}
     </div>
 
 </nav>
