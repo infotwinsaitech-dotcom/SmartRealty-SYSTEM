@@ -6,190 +6,90 @@
 
 <div class="max-w-7xl mx-auto px-6 py-20">
 
-<!-- HERO GRID -->
+<!-- HERO -->
 <div class="grid lg:grid-cols-12 gap-8 mb-16">
 
-  <!-- MAIN IMAGE -->
-  <div class="lg:col-span-8 relative group overflow-hidden rounded-3xl">
+<!-- MAIN IMAGE -->
+<div class="lg:col-span-8 relative rounded-3xl overflow-hidden">
 
-    {% if property.thumbnail %}
-
-      {% cloudinary property.thumbnail width=1200 height=700 crop="fill"
-      class="w-full h-[520px] object-cover group-hover:scale-110 transition duration-700" %}
-
-    {% else %}
-      <img src="https://via.placeholder.com/1200x700"
-           class="w-full h-[520px] object-cover">
-    {% endif %}
-
-    <!-- OVERLAY -->
-    <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent"></div>
-
-    <!-- PRICE -->
-    <div class="absolute bottom-6 left-6 text-4xl font-bold text-yellow-400">
-      ₹{{ property.price }}
-    </div>
-
-  </div>
-
-  <!-- SIDE GALLERY -->
-  <div class="lg:col-span-4 grid grid-cols-2 gap-4">
-
-    {% for img in property.images.all %}
-    <div class="overflow-hidden rounded-xl group">
-      {% cloudinary img.image width=400 height=300 crop="fill"
-      class="h-40 w-full object-cover group-hover:scale-110 transition duration-500" %}
-    </div>
-    {% empty %}
-      <img src="https://via.placeholder.com/300" class="rounded-xl">
-    {% endfor %}
-
-  </div>
-
-</div>
-
-<!-- VIDEO -->
-{% if property.video %}
-<div class="mb-16">
-  <video controls class="w-full rounded-3xl shadow-2xl">
-    <source src="{{ property.video.url }}">
-  </video>
-</div>
+{% if property.thumbnail %}
+  {% cloudinary property.thumbnail 
+    width=1400 height=800 crop="fill" quality="auto" fetch_format="auto"
+    class="w-full h-[520px] object-cover" %}
+{% else %}
+  <img src="https://via.placeholder.com/1200x700" class="w-full h-[520px] object-cover">
 {% endif %}
 
-<!-- MAIN GRID -->
+<div class="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent"></div>
+
+<div class="absolute bottom-6 left-6 text-4xl font-bold text-yellow-400">
+  ₹{{ property.price }}
+</div>
+
+</div>
+
+<!-- SIDE IMAGES -->
+<div class="lg:col-span-4 grid grid-cols-2 gap-4">
+
+{% for img in property.images.all %}
+<div class="rounded-xl overflow-hidden">
+  {% cloudinary img.image width=400 height=300 crop="fill" class="w-full h-40 object-cover" %}
+</div>
+{% empty %}
+<img src="https://via.placeholder.com/300" class="rounded-xl">
+{% endfor %}
+
+</div>
+
+</div>
+
+<!-- CONTENT -->
 <div class="grid lg:grid-cols-12 gap-12">
 
 <!-- LEFT -->
-<div class="lg:col-span-8 space-y-12">
+<div class="lg:col-span-8 space-y-10">
 
-  <!-- TITLE -->
-  <div>
-    <p class="text-gray-400 text-sm">{{ property.location }}</p>
-    <h1 class="text-5xl font-extrabold text-white leading-tight">
-      {{ property.title }}
-    </h1>
+<h1 class="text-5xl font-extrabold text-white">{{ property.title }}</h1>
+<p class="text-gray-400">{{ property.location }}</p>
+
+<div class="grid grid-cols-3 gap-6">
+  <div class="bg-white/5 p-6 rounded-xl text-center">
+    {{ property.beds }} Beds
   </div>
-
-  <!-- STATS -->
-  <div class="grid grid-cols-3 gap-6">
-
-    <div class="bg-white/5 backdrop-blur-xl p-6 rounded-2xl text-center border border-white/10">
-      <p class="text-3xl font-bold text-white">{{ property.beds }}</p>
-      <p class="text-xs text-gray-400">Bedrooms</p>
-    </div>
-
-    <div class="bg-white/5 backdrop-blur-xl p-6 rounded-2xl text-center border border-white/10">
-      <p class="text-3xl font-bold text-white">{{ property.baths }}</p>
-      <p class="text-xs text-gray-400">Bathrooms</p>
-    </div>
-
-    <div class="bg-white/5 backdrop-blur-xl p-6 rounded-2xl text-center border border-white/10">
-      <p class="text-3xl font-bold text-white">{{ property.sqft }}</p>
-      <p class="text-xs text-gray-400">Sq Ft</p>
-    </div>
-
+  <div class="bg-white/5 p-6 rounded-xl text-center">
+    {{ property.baths }} Baths
   </div>
-
-  <!-- DESCRIPTION -->
-  <div>
-    <h3 class="text-3xl font-bold mb-4 text-yellow-400">Description</h3>
-    <p class="text-gray-300 leading-relaxed">
-      {{ property.description }}
-    </p>
+  <div class="bg-white/5 p-6 rounded-xl text-center">
+    {{ property.sqft }} sqft
   </div>
+</div>
 
-  <!-- AMENITIES -->
-  <div>
-    <h3 class="text-3xl font-bold mb-6 text-yellow-400">Amenities</h3>
-
-    <div class="grid md:grid-cols-3 gap-6">
-
-      {% for item in property.amenities.all %}
-      <div class="flex items-center gap-4 bg-white/5 backdrop-blur-xl p-4 rounded-xl border border-white/10 hover:scale-105 transition">
-
-        <span class="material-symbols-outlined text-yellow-400">
-          {{ item.amenity.icon }}
-        </span>
-
-        <span class="text-white font-semibold">
-          {{ item.amenity.name }}
-        </span>
-
-      </div>
-      {% endfor %}
-
-    </div>
-  </div>
-
-  <!-- CTA -->
-  <a href="{% url 'add_to_cart' property.id %}"
-     class="inline-block bg-gradient-to-r from-yellow-400 to-yellow-300 text-black px-10 py-4 rounded-full font-bold hover:scale-110 transition shadow-xl">
-     ❤️ Save Property
-  </a>
+<div>
+  <h3 class="text-2xl text-yellow-400 mb-2">Description</h3>
+  <p class="text-gray-300">{{ property.description }}</p>
+</div>
 
 </div>
 
-<!-- RIGHT SIDEBAR -->
+<!-- RIGHT -->
 <div class="lg:col-span-4">
 
-<div class="sticky top-24 space-y-8">
+<div class="bg-white/5 p-6 rounded-3xl">
 
-<!-- AGENT -->
-<div class="bg-white/5 backdrop-blur-xl border border-white/10 p-6 rounded-3xl shadow-xl">
+<h3 class="text-xl text-yellow-400 mb-4">Contact Agent</h3>
 
-  <div class="flex items-center gap-4 mb-6">
+<form method="POST" class="space-y-4">
+{% csrf_token %}
 
-    {% if property.agent_image %}
-      {% cloudinary property.agent_image width=100 height=100 crop="fill"
-      class="w-16 h-16 rounded-full" %}
-    {% else %}
-      <img src="{% static 'images/default-agent.jpg' %}"
-           class="w-16 h-16 rounded-full">
-    {% endif %}
+<input name="name" placeholder="Name" class="w-full p-3 rounded bg-white/10 text-white">
+<input name="email" placeholder="Email" class="w-full p-3 rounded bg-white/10 text-white">
+<textarea name="message" placeholder="Message" class="w-full p-3 rounded bg-white/10 text-white"></textarea>
 
-    <div>
-      <h4 class="font-bold text-lg text-white">{{ property.agent_name }}</h4>
-      <p class="text-sm text-gray-400">{{ property.agent_role }}</p>
-    </div>
+<button class="w-full py-3 bg-yellow-400 text-black rounded font-bold">
+Send Inquiry
+</button>
 
-  </div>
-
-  <h3 class="text-xl font-bold mb-4 text-yellow-400">Request Inquiry</h3>
-
-  <form method="POST" class="space-y-4">
-    {% csrf_token %}
-
-    <input name="name" placeholder="Full Name"
-      class="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white">
-
-    <input name="phone" placeholder="Phone"
-      class="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white">
-
-    <input name="email" type="email" placeholder="Email"
-      class="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white">
-
-    <textarea name="message" placeholder="Message"
-      class="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white"></textarea>
-
-    <button class="w-full bg-gradient-to-r from-yellow-400 to-yellow-300 text-black font-bold py-3 rounded-lg hover:scale-105 transition">
-      Send Inquiry
-    </button>
-  </form>
-
-  <div class="flex justify-between mt-6 text-sm text-gray-400">
-    <span>ID: #{{ property.id }}</span>
-  </div>
-
-</div>
-
-<!-- MARKET -->
-<div class="bg-white/5 backdrop-blur-xl border border-white/10 p-6 rounded-2xl">
-  <p class="text-xs font-bold text-yellow-400 mb-2">Market Insight</p>
-  <p class="text-sm text-gray-400">
-    High demand zone with strong ROI potential and luxury buyer interest 📈
-  </p>
-</div>
+</form>
 
 </div>
 
