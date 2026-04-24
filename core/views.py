@@ -332,7 +332,7 @@ def create_user_profile(sender, instance, created, **kwargs):
 def profile(request):
     profile = Profile.objects.get(user=request.user)
 
-    return render(request, "user/profile.html", {
+    return render(request, "public/profile.html", {
         "profile": profile
     })
 
