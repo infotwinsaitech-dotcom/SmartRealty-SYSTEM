@@ -1,156 +1,42 @@
-<!DOCTYPE html>
+{% extends "public/base.html" %}
+{% block title %}Verify OTP{% endblock %}
 
-<html class="light" lang="en"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Azure Meridian - Verify Your Identity</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<script id="tailwind-config">
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    "colors": {
-                        "outline": "#757682",
-                        "on-surface": "#131b2e",
-                        "tertiary-container": "#334155",
-                        "surface-container": "#eaedff",
-                        "surface-bright": "#faf8ff",
-                        "on-secondary-container": "#fefcff",
-                        "surface-variant": "#dae2fd",
-                        "on-secondary-fixed": "#001a42",
-                        "tertiary-fixed": "#d5e3fd",
-                        "on-primary-fixed": "#00164e",
-                        "background": "#faf8ff",
-                        "surface": "#faf8ff",
-                        "primary-fixed": "#dce1ff",
-                        "surface-dim": "#d2d9f4",
-                        "outline-variant": "#c5c5d3",
-                        "surface-container-highest": "#dae2fd",
-                        "secondary": "#0058be",
-                        "on-tertiary-fixed-variant": "#3a485c",
-                        "on-secondary": "#ffffff",
-                        "tertiary-fixed-dim": "#b9c7e0",
-                        "secondary-container": "#2170e4",
-                        "on-tertiary-fixed": "#0d1c2f",
-                        "surface-container-low": "#f2f3ff",
-                        "inverse-surface": "#283044",
-                        "on-error-container": "#93000a",
-                        "on-secondary-fixed-variant": "#004395",
-                        "on-tertiary-container": "#9eadc5",
-                        "on-error": "#ffffff",
-                        "on-surface-variant": "#444651",
-                        "surface-container-lowest": "#ffffff",
-                        "inverse-primary": "#b6c4ff",
-                        "tertiary": "#1d2b3e",
-                        "on-primary-container": "#90a8ff",
-                        "on-tertiary": "#ffffff",
-                        "secondary-fixed-dim": "#adc6ff",
-                        "secondary-fixed": "#d8e2ff",
-                        "on-primary": "#ffffff",
-                        "error": "#ba1a1a",
-                        "error-container": "#ffdad6",
-                        "primary-container": "#1e3a8a",
-                        "surface-tint": "#4059aa",
-                        "primary": "#00236f",
-                        "on-background": "#131b2e",
-                        "primary-fixed-dim": "#b6c4ff",
-                        "on-primary-fixed-variant": "#264191",
-                        "inverse-on-surface": "#eef0ff",
-                        "surface-container-high": "#e2e7ff"
-                    },
-                    "borderRadius": {
-                        "DEFAULT": "0.5rem",
-                        "lg": "0.5rem",
-                        "xl": "0.75rem",
-                        "full": "9999px"
-                    },
-                    "fontFamily": {
-                        "headline": ["Manrope"],
-                        "body": ["Manrope"],
-                        "label": ["Manrope"]
-                    }
-                },
-            },
-        }
-    </script>
-<style>
-        .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-        }
-        body { font-family: 'Manrope', sans-serif; }
-    </style>
-</head>
-<body class="bg-surface text-on-surface min-h-screen flex flex-col">
-<!-- TopNavBar (Shared Component) -->
-<!-- Suppression Logic: Suppressed as this is a transactional/verification screen -->
-<main class="flex-grow flex items-center justify-center px-6 py-12 bg-surface-container-low">
-<!-- Center Card Layout -->
-<div class="max-w-md w-full bg-surface-container-lowest p-8 md:p-12 rounded-xl shadow-[0_24px_48px_-12px_rgba(19,27,46,0.06)] border-none">
-<!-- Identity & Header -->
-<div class="text-center mb-10">
-<div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-surface-container-highest text-primary mb-6">
-<span class="material-symbols-outlined text-3xl">verified_user</span>
-</div>
-<h1 class="text-2xl md:text-3xl font-extrabold tracking-tight text-on-surface mb-3">Verify Your Identity</h1>
-<p class="text-on-surface-variant text-sm leading-relaxed">
-                    We've sent a 6-digit code to your registered email address.
-                </p>
-</div>
-<!-- OTP Input Section -->
- 
-{% if error %}
-<p class="text-red-500 text-sm text-center">{{ error }}</p>
-{% endif %}
+{% block content %}
 
-<form method="POST" class="space-y-8">
-    {% csrf_token %}
+<section class="min-h-screen flex items-center justify-center luxury-bg px-6">
 
-    <input type="hidden" name="otp" id="finalOtp">
+<div class="max-w-md w-full backdrop-blur-xl bg-white/5 border border-white/10 p-10 rounded-3xl shadow-2xl text-center reveal">
 
-    <!-- OTP BOXES -->
-    <div class="flex justify-between gap-2 md:gap-4">
-        <input class="otp-input w-12 h-14 text-center text-xl font-bold rounded-lg bg-surface-container-high" maxlength="1" type="text"/>
-        <input class="otp-input w-12 h-14 text-center text-xl font-bold rounded-lg bg-surface-container-high" maxlength="1" type="text"/>
-        <input class="otp-input w-12 h-14 text-center text-xl font-bold rounded-lg bg-surface-container-high" maxlength="1" type="text"/>
-        <input class="otp-input w-12 h-14 text-center text-xl font-bold rounded-lg bg-surface-container-high" maxlength="1" type="text"/>
-        <input class="otp-input w-12 h-14 text-center text-xl font-bold rounded-lg bg-surface-container-high" maxlength="1" type="text"/>
-        <input class="otp-input w-12 h-14 text-center text-xl font-bold rounded-lg bg-surface-container-high" maxlength="1" type="text"/>
-    </div>
+    <h2 class="text-3xl font-bold gold mb-2">Verify Identity</h2>
+    <p class="text-gray-400 mb-8 text-sm">
+        Enter the 6-digit code sent to your email
+    </p>
 
-    <!-- BUTTON -->
-    <button class="w-full py-4 bg-primary-container text-white font-bold rounded-lg hover:bg-secondary transition-all">
-        Verify
-    </button>
-</form>
-<!-- Decorative Architectural Element -->
-<div class="mt-12 pt-8 flex items-center justify-center border-t border-outline-variant/10">
-<span class="text-[0.65rem] uppercase tracking-[0.2em] font-bold text-outline-variant">Azure Meridian Security Protocol</span>
+    {% if error %}
+    <p class="text-red-400 mb-4">{{ error }}</p>
+    {% endif %}
+
+    <form method="POST" class="space-y-8">
+        {% csrf_token %}
+        <input type="hidden" name="otp" id="finalOtp">
+
+        <!-- OTP BOXES -->
+        <div class="flex justify-center gap-3">
+            {% for i in "123456" %}
+            <input class="otp-input w-12 h-14 text-center text-xl font-bold rounded-xl bg-white/10 border border-white/20 text-white focus:ring-2 focus:ring-yellow-400"
+                   maxlength="1" type="text"/>
+            {% endfor %}
+        </div>
+
+        <button class="w-full py-3 bg-gradient-to-r from-yellow-500 to-yellow-300 text-black font-bold rounded-xl hover:scale-105 transition">
+            Verify OTP
+        </button>
+    </form>
+
 </div>
-</div>
-</main>
-<!-- Footer Mockup consistent with Azure Meridian UI -->
-<footer class="py-8 bg-surface-container-low border-none">
-<div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
-<div class="text-primary font-bold text-lg tracking-tight">Azure Meridian</div>
-<div class="flex gap-8 text-on-surface-variant text-xs font-medium uppercase tracking-widest">
-<a class="hover:text-primary transition-colors" href="#">Privacy Policy</a>
-<a class="hover:text-primary transition-colors" href="#">Terms of Service</a>
-<a class="hover:text-primary transition-colors" href="#">Support</a>
-</div>
-<div class="text-on-surface-variant text-sm">
-                © 2024 Azure Meridian. All rights reserved.
-            </div>
-</div>
-</footer>
-<!-- Background Decoration (Architectural Layers) -->
-<div class="fixed top-0 left-0 w-full h-full -z-10 overflow-hidden pointer-events-none">
-<div class="absolute -top-[10%] -left-[10%] w-[40%] h-[60%] rounded-full bg-gradient-to-br from-primary/5 to-transparent blur-[120px]"></div>
-<div class="absolute -bottom-[10%] -right-[10%] w-[40%] h-[60%] rounded-full bg-gradient-to-tl from-secondary/5 to-transparent blur-[120px]"></div>
-</div>
+
+</section>
+
 <script>
 const inputs = document.querySelectorAll(".otp-input");
 const hiddenInput = document.getElementById("finalOtp");
@@ -163,7 +49,6 @@ inputs.forEach((input, index) => {
         updateOTP();
     });
 
-    // backspace handling
     input.addEventListener("keydown", (e) => {
         if (e.key === "Backspace" && input.value === "" && index > 0) {
             inputs[index - 1].focus();
@@ -173,10 +58,9 @@ inputs.forEach((input, index) => {
 
 function updateOTP() {
     let otp = "";
-    inputs.forEach(input => {
-        otp += input.value;
-    });
+    inputs.forEach(input => otp += input.value);
     hiddenInput.value = otp;
 }
 </script>
-</body></html>
+
+{% endblock %}
