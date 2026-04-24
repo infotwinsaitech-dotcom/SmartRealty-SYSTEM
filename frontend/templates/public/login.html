@@ -4,57 +4,58 @@
 
 {% block content %}
 
-<div class="min-h-screen flex">
+<div class="min-h-screen flex bg-gradient-to-br from-slate-50 to-white">
 
-    <!-- LEFT (HERO - DESKTOP ONLY) -->
-    <div class="hidden lg:flex w-1/2 relative bg-black">
+    <!-- LEFT SIDE -->
+    <div class="hidden lg:flex w-1/2 relative overflow-hidden">
 
         <img src="{% static 'images/about.jpg' %}"
-             class="absolute w-full h-full object-cover opacity-80">
+             class="absolute w-full h-full object-cover scale-110">
 
-        <div class="relative z-10 p-12 flex flex-col justify-between text-white w-full">
+        <div class="absolute inset-0 bg-black/60"></div>
 
-            <h2 class="text-2xl font-bold">
-                Architectural Intelligence
+        <div class="relative z-10 p-16 flex flex-col justify-between text-white">
+
+            <h2 class="text-2xl font-bold tracking-wide">
+                EstateCRM
             </h2>
 
             <div>
                 <h1 class="text-5xl font-extrabold leading-tight mb-6">
-                    Manage your real estate business smarter
+                    Luxury Real Estate <br> Intelligence Platform
                 </h1>
-                <p class="text-gray-300">
-                    AI-powered CRM for modern real estate professionals.
+                <p class="text-gray-300 text-lg">
+                    Manage leads, agents, deals & properties — all in one intelligent system.
                 </p>
             </div>
 
-            <div class="flex gap-10">
+            <div class="flex gap-10 text-sm">
                 <div>
-                    <h3 class="text-2xl font-bold">4.2x</h3>
-                    <p class="text-sm text-gray-400">Efficiency</p>
+                    <p class="text-3xl font-bold">10K+</p>
+                    <p class="text-gray-300">Leads Managed</p>
                 </div>
                 <div>
-                    <h3 class="text-2xl font-bold">12K+</h3>
-                    <p class="text-sm text-gray-400">Agents</p>
+                    <p class="text-3xl font-bold">500+</p>
+                    <p class="text-gray-300">Properties</p>
                 </div>
             </div>
 
         </div>
     </div>
 
-    <!-- RIGHT (FORM) -->
-    <div class="w-full lg:w-1/2 flex items-center justify-center px-6 py-12 bg-white">
+    <!-- RIGHT SIDE -->
+    <div class="w-full lg:w-1/2 flex items-center justify-center px-6 py-12">
 
-        <div class="w-full max-w-md">
+        <div class="w-full max-w-md bg-white p-8 rounded-2xl shadow-xl border">
 
-            <!-- TITLE -->
             <h2 class="text-3xl font-bold mb-2">
-                Welcome Back
+                Welcome Back 👋
             </h2>
+
             <p class="text-gray-500 mb-6">
-                Login to access your dashboard
+                Access your dashboard & manage your real estate business
             </p>
 
-            <!-- SUCCESS MESSAGES -->
             {% if messages %}
                 {% for message in messages %}
                     <div class="mb-4 p-3 rounded bg-green-100 text-green-700">
@@ -63,14 +64,12 @@
                 {% endfor %}
             {% endif %}
 
-            <!-- ERROR -->
             {% if error %}
                 <div class="mb-4 p-3 rounded bg-red-100 text-red-600">
                     {{ error }}
                 </div>
             {% endif %}
 
-            <!-- FORM -->
             <form method="POST" class="space-y-5">
                 {% csrf_token %}
 
@@ -78,7 +77,7 @@
                 <div>
                     <label class="text-sm font-semibold">Username</label>
                     <input type="text" name="username" required
-                        class="w-full mt-1 p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                        class="w-full mt-1 p-3 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none">
                 </div>
 
                 <!-- PASSWORD -->
@@ -92,11 +91,11 @@
 
                     <div class="relative">
                         <input id="password" type="password" name="password" required
-                            class="w-full mt-1 p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                            class="w-full mt-1 p-3 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none">
 
                         <button type="button"
                             onclick="togglePassword()"
-                            class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500">
+                            class="absolute right-3 top-1/2 -translate-y-1/2">
                             👁
                         </button>
                     </div>
@@ -104,21 +103,20 @@
 
                 <!-- BUTTON -->
                 <button type="submit"
-                    class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 transition">
+                    class="w-full py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold rounded-xl hover:scale-[1.02] transition">
                     Login
                 </button>
 
-                <!-- OTP LOGIN -->
+                <!-- OTP -->
                 <a href="{% url 'otp_verification' %}"
-                   class="block text-center border py-3 rounded-lg hover:bg-gray-100 transition">
+                   class="block text-center py-3 border rounded-xl hover:bg-gray-50 transition">
                    Login with OTP
                 </a>
 
             </form>
 
-            <!-- REGISTER -->
             <p class="text-center text-sm mt-6 text-gray-500">
-                Don't have an account?
+                Don’t have an account?
                 <a href="{% url 'register' %}" class="text-blue-600 font-semibold hover:underline">
                     Register
                 </a>
@@ -130,7 +128,6 @@
 
 </div>
 
-<!-- JS -->
 <script>
 function togglePassword() {
     const input = document.getElementById("password");
