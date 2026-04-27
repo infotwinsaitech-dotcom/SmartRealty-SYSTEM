@@ -1,39 +1,38 @@
 {% extends "public/base.html" %}
-{% load static %}
-
+{% load cloudinary %}
 {% block content %}
 
-<div class="max-w-7xl mx-auto px-6 py-20 text-white">
+<div class="max-w-7xl mx-auto px-4 md:px-6 py-12 md:py-20 text-white">
 
 <!-- HERO -->
-<div class="grid lg:grid-cols-12 gap-10 mb-20">
+<div class="grid lg:grid-cols-12 gap-6 md:gap-10 mb-12 md:mb-20">
 
 <!-- MAIN IMAGE -->
-<div class="lg:col-span-8 relative rounded-3xl overflow-hidden group">
+<div class="lg:col-span-8 relative rounded-2xl md:rounded-3xl overflow-hidden group">
 
 {% if property.thumbnail %}
-    <img src="{{ property.thumbnail.url }}"
-         class="w-full h-[520px] object-cover group-hover:scale-110 transition duration-700 ease-out">
+    {% cloudinary property.thumbnail width=1200 height=700 crop="fill"
+    class="w-full h-[300px] sm:h-[400px] md:h-[520px] object-cover group-hover:scale-110 transition duration-700 ease-out" %}
 {% else %}
     <img src="https://via.placeholder.com/1200x700"
-         class="w-full h-[520px] object-cover">
+         class="w-full h-[300px] sm:h-[400px] md:h-[520px] object-cover">
 {% endif %}
 
 <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent"></div>
 
-<div class="absolute bottom-6 left-6 text-4xl font-bold text-yellow-400">
+<div class="absolute bottom-4 md:bottom-6 left-4 md:left-6 text-2xl md:text-4xl font-bold text-yellow-400">
 ₹{{ property.price }}
 </div>
 
 </div>
 
 <!-- SIDE IMAGES -->
-<div class="lg:col-span-4 grid grid-cols-2 gap-4">
+<div class="lg:col-span-4 grid grid-cols-2 gap-3 md:gap-4">
 
 {% for img in property.images.all %}
 <div class="overflow-hidden rounded-xl group">
-    <img src="{{ img.image.url }}"
-         class="w-full h-40 object-cover group-hover:scale-110 transition duration-500">
+    {% cloudinary img.image width=400 height=300 crop="fill"
+    class="w-full h-24 sm:h-32 md:h-40 object-cover group-hover:scale-110 transition duration-500" %}
 </div>
 {% empty %}
 <img src="https://via.placeholder.com/300" class="rounded-xl">
@@ -44,51 +43,66 @@
 </div>
 
 <!-- CONTENT -->
-<div class="grid lg:grid-cols-12 gap-12">
+<div class="grid lg:grid-cols-12 gap-8 md:gap-12">
 
-<div class="lg:col-span-8 space-y-10">
+<!-- LEFT -->
+<div class="lg:col-span-8 space-y-6 md:space-y-10">
 
-<h1 class="text-5xl font-extrabold">{{ property.title }}</h1>
-<p class="text-gray-400">{{ property.location }}</p>
+<h1 class="text-3xl md:text-5xl font-extrabold">
+{{ property.title }}
+</h1>
 
-<div class="grid grid-cols-3 gap-6">
+<p class="text-gray-400 text-sm md:text-base">
+{{ property.location }}
+</p>
 
-<div class="bg-white/5 p-6 rounded-xl text-center">
+<!-- STATS -->
+<div class="grid grid-cols-3 gap-3 md:gap-6">
+
+<div class="bg-white/5 p-4 md:p-6 rounded-xl text-center text-sm md:text-base">
 {{ property.beds }} Beds
 </div>
 
-<div class="bg-white/5 p-6 rounded-xl text-center">
+<div class="bg-white/5 p-4 md:p-6 rounded-xl text-center text-sm md:text-base">
 {{ property.baths }} Baths
 </div>
 
-<div class="bg-white/5 p-6 rounded-xl text-center">
+<div class="bg-white/5 p-4 md:p-6 rounded-xl text-center text-sm md:text-base">
 {{ property.sqft }} Sqft
 </div>
 
 </div>
 
+<!-- DESCRIPTION -->
 <div>
-<h3 class="text-2xl text-yellow-400 mb-2">Description</h3>
-<p class="text-gray-300">{{ property.description }}</p>
+<h3 class="text-xl md:text-2xl text-yellow-400 mb-2">Description</h3>
+<p class="text-gray-300 text-sm md:text-base leading-relaxed">
+{{ property.description }}
+</p>
 </div>
 
 </div>
 
-<!-- SIDEBAR -->
+<!-- RIGHT SIDEBAR -->
 <div class="lg:col-span-4">
 
-<div class="bg-white/5 p-6 rounded-3xl">
+<div class="bg-white/5 p-4 md:p-6 rounded-2xl md:rounded-3xl backdrop-blur-xl">
 
-<h3 class="text-xl text-yellow-400 mb-4">Contact Agent</h3>
+<h3 class="text-lg md:text-xl text-yellow-400 mb-4">Contact Agent</h3>
 
-<form method="POST" class="space-y-4">
+<form method="POST" class="space-y-3 md:space-y-4">
 {% csrf_token %}
 
-<input name="name" placeholder="Name" class="w-full p-3 rounded bg-white/10">
-<input name="email" placeholder="Email" class="w-full p-3 rounded bg-white/10">
-<textarea name="message" placeholder="Message" class="w-full p-3 rounded bg-white/10"></textarea>
+<input name="name" placeholder="Name"
+class="w-full p-2 md:p-3 rounded bg-white/10 text-sm md:text-base">
 
-<button class="w-full py-3 bg-yellow-400 text-black rounded font-bold">
+<input name="email" placeholder="Email"
+class="w-full p-2 md:p-3 rounded bg-white/10 text-sm md:text-base">
+
+<textarea name="message" placeholder="Message"
+class="w-full p-2 md:p-3 rounded bg-white/10 text-sm md:text-base"></textarea>
+
+<button class="w-full py-2 md:py-3 bg-yellow-400 text-black rounded font-bold hover:scale-105 transition">
 Send Inquiry
 </button>
 

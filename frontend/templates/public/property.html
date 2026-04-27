@@ -1,86 +1,90 @@
 {% extends "public/base.html" %}
+{% load cloudinary %}
 
 {% block title %}Luxury Properties{% endblock %}
 
 {% block content %}
 
 <!-- HERO -->
-<section class="relative py-32 text-center overflow-hidden">
+<section class="relative py-16 md:py-32 text-center overflow-hidden">
 
-  <div class="absolute inset-0 bg-gradient-to-br from-black via-gray-950 to-black"></div>
+<div class="absolute inset-0 bg-gradient-to-br from-black via-gray-950 to-black"></div>
 
-  <div class="relative z-10">
-    <h1 class="text-6xl md:text-7xl font-extrabold tracking-tight 
-    bg-gradient-to-r from-yellow-400 via-yellow-200 to-yellow-500 bg-clip-text text-transparent mb-6">
-      Exclusive Residences
-    </h1>
+<div class="relative z-10 px-4">
+<h1 class="text-3xl sm:text-5xl md:text-7xl font-extrabold tracking-tight
+bg-gradient-to-r from-yellow-400 via-yellow-200 to-yellow-500 bg-clip-text text-transparent mb-4 md:mb-6">
+Exclusive Residences
+</h1>
 
-    <p class="text-gray-400 max-w-2xl mx-auto text-lg leading-relaxed">
-      Discover ultra-premium living spaces crafted for elegance, status and timeless luxury.
-    </p>
-  </div>
+<p class="text-gray-400 max-w-2xl mx-auto text-sm md:text-lg leading-relaxed">
+Discover ultra-premium living spaces crafted for elegance, status and timeless luxury.
+</p>
+</div>
 
 </section>
 
 <!-- FILTER -->
-<section class="max-w-7xl mx-auto px-6 -mt-24 mb-20">
+<section class="max-w-7xl mx-auto px-4 md:px-6 -mt-10 md:-mt-24 mb-12 md:mb-20">
 
 <form method="GET"
-class="backdrop-blur-2xl bg-white/5 border border-white/10 rounded-3xl p-6 shadow-2xl grid md:grid-cols-6 gap-4">
+class="backdrop-blur-2xl bg-white/5 border border-white/10 rounded-2xl md:rounded-3xl p-4 md:p-6 shadow-2xl grid grid-cols-1 sm:grid-cols-2 md:grid-cols-6 gap-3 md:gap-4">
 
-  <input type="text" name="location" placeholder="Location"
-    class="bg-white/10 text-white placeholder-gray-400 p-3 rounded-xl focus:ring-2 focus:ring-yellow-400 outline-none">
+<input type="text" name="location" placeholder="Location"
+class="bg-white/10 text-white placeholder-gray-400 p-2 md:p-3 rounded-xl outline-none">
 
-  <select name="type" class="bg-white/10 text-white p-3 rounded-xl">
-    <option value="">Type</option>
-    <option>Villa</option>
-    <option>Penthouse</option>
-    <option>Apartment</option>
-  </select>
+<select name="type" class="bg-white/10 text-white p-2 md:p-3 rounded-xl">
+<option value="">Type</option>
+<option>Villa</option>
+<option>Penthouse</option>
+<option>Apartment</option>
+</select>
 
-  <input type="number" name="min_price" placeholder="Min Price"
-    class="bg-white/10 text-white p-3 rounded-xl">
+<input type="number" name="min_price" placeholder="Min Price"
+class="bg-white/10 text-white p-2 md:p-3 rounded-xl">
 
-  <input type="number" name="max_price" placeholder="Max Price"
-    class="bg-white/10 text-white p-3 rounded-xl">
+<input type="number" name="max_price" placeholder="Max Price"
+class="bg-white/10 text-white p-2 md:p-3 rounded-xl">
 
-  <select name="beds" class="bg-white/10 text-white p-3 rounded-xl">
-    <option>Beds</option>
-    <option>2+</option>
-    <option>3+</option>
-    <option>4+</option>
-  </select>
+<select name="beds" class="bg-white/10 text-white p-2 md:p-3 rounded-xl">
+<option>Beds</option>
+<option>2+</option>
+<option>3+</option>
+<option>4+</option>
+</select>
 
-  <button class="bg-gradient-to-r from-yellow-400 to-yellow-300 text-black font-bold rounded-xl hover:scale-105 transition">
-    Search
-  </button>
+<button class="bg-gradient-to-r from-yellow-400 to-yellow-300 text-black font-bold rounded-xl py-2 md:py-3 hover:scale-105 transition">
+Search
+</button>
 
 </form>
 </section>
 
 <!-- GRID -->
-<section class="max-w-7xl mx-auto px-6 pb-32">
+<section class="max-w-7xl mx-auto px-4 md:px-6 pb-20 md:pb-32">
 
-<div class="flex justify-between items-center mb-12">
-  <h2 class="text-4xl font-bold text-white">Signature Collection</h2>
-  <span class="text-gray-400 text-sm">{{ properties|length }} Listings</span>
+<div class="flex justify-between items-center mb-6 md:mb-12">
+<h2 class="text-2xl md:text-4xl font-bold text-white">
+Signature Collection
+</h2>
+<span class="text-gray-400 text-xs md:text-sm">
+{{ properties|length }} Listings
+</span>
 </div>
 
-<div class="grid md:grid-cols-2 xl:grid-cols-3 gap-10">
+<div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6 md:gap-10">
 
 {% for property in properties %}
-<div class="group relative rounded-3xl overflow-hidden shadow-2xl hover:shadow-yellow-500/20 transition duration-500">
+<div class="group relative rounded-2xl md:rounded-3xl overflow-hidden shadow-2xl hover:shadow-yellow-500/20 transition duration-500">
 
-  <!-- IMAGE -->
-  <!-- IMAGE -->
-<div class="relative h-[420px] overflow-hidden">
+<!-- IMAGE -->
+<div class="relative h-[260px] sm:h-[320px] md:h-[420px] overflow-hidden">
 
 {% if property.thumbnail %}
-    <img src="{{ property.thumbnail.url }}"
-     class="w-full h-full object-cover transform group-hover:scale-110 transition duration-700 ease-out">
+    {% cloudinary property.thumbnail width=1000 height=700 crop="fill"
+    class="w-full h-full object-cover transform group-hover:scale-110 transition duration-700 ease-out" %}
 {% else %}
     <img src="https://via.placeholder.com/800x600"
-         class="w-full h-full object-cover">
+    class="w-full h-full object-cover">
 {% endif %}
 
 <!-- OVERLAY -->
@@ -89,32 +93,40 @@ class="backdrop-blur-2xl bg-white/5 border border-white/10 rounded-3xl p-6 shado
 <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition duration-500 bg-yellow-400/5"></div>
 
 <!-- BADGE -->
-<div class="absolute top-5 left-5 bg-white/10 backdrop-blur px-4 py-1 rounded-full text-xs text-white border border-white/10">
-    Luxury
+<div class="absolute top-3 md:top-5 left-3 md:left-5 bg-white/10 backdrop-blur px-3 py-1 rounded-full text-[10px] md:text-xs text-white border border-white/10">
+Luxury
 </div>
 
 <!-- PRICE -->
-<div class="absolute bottom-6 left-6 text-3xl font-bold text-yellow-400">
-    ₹{{ property.price }}
+<div class="absolute bottom-4 md:bottom-6 left-4 md:left-6 text-xl md:text-3xl font-bold text-yellow-400">
+₹{{ property.price }}
 </div>
 
 </div>
-  <!-- CONTENT -->
-  <div class="absolute bottom-0 p-6 w-full">
 
-    <h3 class="text-2xl font-bold text-white">{{ property.title }}</h3>
-    <p class="text-gray-300 text-sm mb-4">{{ property.location }}</p>
+<!-- CONTENT -->
+<div class="absolute bottom-0 p-4 md:p-6 w-full">
 
-    <div class="opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition duration-500">
+<h3 class="text-lg md:text-2xl font-bold text-white">
+{{ property.title }}
+</h3>
 
-      <a href="{% url 'property_detail' property.id %}"
-         class="inline-block px-6 py-2 bg-white text-black rounded-full font-semibold hover:scale-110 transition">
-         Explore →
-      </a>
+<p class="text-gray-300 text-xs md:text-sm mb-2 md:mb-4">
+{{ property.location }}
+</p>
 
-    </div>
+<div class="opacity-100 md:opacity-0 md:group-hover:opacity-100 
+translate-y-0 md:translate-y-4 md:group-hover:translate-y-0 
+transition duration-500">
 
-  </div>
+<a href="{% url 'property_detail' property.id %}"
+class="inline-block px-4 md:px-6 py-2 bg-white text-black rounded-full text-sm md:text-base font-semibold hover:scale-110 transition">
+Explore →
+</a>
+
+</div>
+
+</div>
 
 </div>
 {% endfor %}
