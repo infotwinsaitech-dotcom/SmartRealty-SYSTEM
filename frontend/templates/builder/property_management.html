@@ -1,245 +1,162 @@
-
 {% extends "builder/base.html" %}
 {% block content %}
 
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<script id="tailwind-config">
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    "colors": {
-                        "on-tertiary-fixed-variant": "#3a485c",
-                        "primary-container": "#1e3a8a",
-                        "outline": "#757682",
-                        "error-container": "#ffdad6",
-                        "on-surface": "#131b2e",
-                        "error": "#ba1a1a",
-                        "outline-variant": "#c5c5d3",
-                        "tertiary-container": "#334155",
-                        "on-primary-container": "#90a8ff",
-                        "surface-variant": "#dae2fd",
-                        "tertiary": "#1d2b3e",
-                        "on-primary-fixed-variant": "#264191",
-                        "tertiary-fixed": "#d5e3fd",
-                        "surface-bright": "#faf8ff",
-                        "on-secondary-fixed": "#001a42",
-                        "inverse-on-surface": "#eef0ff",
-                        "on-tertiary-container": "#9eadc5",
-                        "on-background": "#131b2e",
-                        "surface": "#faf8ff",
-                        "on-surface-variant": "#444651",
-                        "secondary-container": "#2170e4",
-                        "secondary": "#0058be",
-                        "on-primary": "#ffffff",
-                        "on-error": "#ffffff",
-                        "surface-container-highest": "#dae2fd",
-                        "on-primary-fixed": "#00164e",
-                        "surface-container-low": "#f2f3ff",
-                        "surface-container-high": "#e2e7ff",
-                        "on-secondary": "#ffffff",
-                        "secondary-fixed-dim": "#adc6ff",
-                        "primary": "#00236f",
-                        "on-tertiary": "#ffffff",
-                        "surface-tint": "#4059aa",
-                        "surface-container-lowest": "#ffffff",
-                        "surface-container": "#eaedff",
-                        "on-secondary-fixed-variant": "#004395",
-                        "secondary-fixed": "#d8e2ff",
-                        "primary-fixed-dim": "#b6c4ff",
-                        "tertiary-fixed-dim": "#b9c7e0",
-                        "on-error-container": "#93000a",
-                        "surface-dim": "#d2d9f4",
-                        "on-tertiary-fixed": "#0d1c2f",
-                        "inverse-primary": "#b6c4ff",
-                        "primary-fixed": "#dce1ff",
-                        "background": "#faf8ff",
-                        "inverse-surface": "#283044",
-                        "on-secondary-container": "#fefcff"
-                    },
-                    "borderRadius": {
-                        "DEFAULT": "0.5rem",
-                        "lg": "0.5rem",
-                        "xl": "0.75rem",
-                        "full": "9999px"
-                    },
-                    "fontFamily": {
-                        "headline": ["Manrope"],
-                        "body": ["Manrope"],
-                        "label": ["Manrope"]
-                    }
-                },
-            },
-        }
-    </script>
+
 <style>
-        body { font-family: 'Manrope', sans-serif; }
-        .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-        }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-    </style>
+body { font-family: 'Manrope', sans-serif; }
+.material-symbols-outlined {
+    font-variation-settings: 'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;
+}
+</style>
 
+<main class="ml-64 min-h-screen bg-gray-50 flex flex-col">
 
-<!-- SideNavBar Anchor -->
-
-<!-- Main Content Wrapper -->
-<main class="ml-64 min-h-screen bg-surface flex flex-col">
-<!-- TopNavBar Anchor -->
-
-<!-- Content Canvas -->
 <section class="mt-16 p-8">
-<!-- Header Section -->
+
+<!-- HEADER -->
 <div class="flex justify-between items-end mb-10">
 <div>
-<h2 class="text-4xl font-extrabold text-on-surface tracking-tight mb-2">Properties</h2>
-<p class="text-on-surface-variant font-medium">Manage and monitor your architectural portfolio assets.</p>
+<h2 class="text-4xl font-extrabold text-gray-800 mb-2">Properties</h2>
+<p class="text-gray-500">Manage and monitor your properties</p>
 </div>
+
 <button onclick="openModal()"
-class="flex items-center gap-2 px-6 py-3 bg-gradient-to-br from-primary-container to-secondary text-white rounded-lg font-bold">
-    + Add Property
+class="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg font-bold hover:scale-105 transition">
++ Add Property
 </button>
 </div>
-<!-- Filters Section (No-Line Architecture) -->
-<div class="bg-surface-container-low p-6 rounded-xl flex flex-wrap gap-6 items-center mb-10">
+
+<!-- FILTER -->
+<div class="bg-white p-6 rounded-xl shadow flex flex-wrap gap-6 mb-10">
+
 <div class="flex-1 min-w-[200px]">
-<label class="block text-[10px] uppercase tracking-widest font-extrabold text-slate-500 mb-2">Location</label>
-<div class="relative">
-<select class="w-full bg-surface-container-lowest border-none rounded-lg py-2.5 pl-4 pr-10 text-sm font-semibold text-on-surface appearance-none focus:ring-2 focus:ring-blue-500/10">
+<label class="text-xs font-bold text-gray-400">Location</label>
+<select class="w-full mt-2 p-2 rounded border">
 <option>All Locations</option>
-<option>New York, NY</option>
-<option>Los Angeles, CA</option>
-<option>Chicago, IL</option>
 </select>
-<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">expand_more</span>
 </div>
-</div>
+
 <div class="flex-1 min-w-[200px]">
-<label class="block text-[10px] uppercase tracking-widest font-extrabold text-slate-500 mb-2">Price Range</label>
-<div class="relative">
-<select class="w-full bg-surface-container-lowest border-none rounded-lg py-2.5 pl-4 pr-10 text-sm font-semibold text-on-surface appearance-none focus:ring-2 focus:ring-blue-500/10">
+<label class="text-xs font-bold text-gray-400">Price</label>
+<select class="w-full mt-2 p-2 rounded border">
 <option>Any Price</option>
-<option>$500k - $1M</option>
-<option>$1M - $5M</option>
-<option>$5M+</option>
 </select>
-<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">expand_more</span>
 </div>
-</div>
+
 <div class="flex-1 min-w-[200px]">
-<label class="block text-[10px] uppercase tracking-widest font-extrabold text-slate-500 mb-2">Property Type</label>
-<div class="relative">
-<select class="w-full bg-surface-container-lowest border-none rounded-lg py-2.5 pl-4 pr-10 text-sm font-semibold text-on-surface appearance-none focus:ring-2 focus:ring-blue-500/10">
+<label class="text-xs font-bold text-gray-400">Type</label>
+<select class="w-full mt-2 p-2 rounded border">
 <option>Residential</option>
-<option>Commercial</option>
-<option>Industrial</option>
 </select>
-<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">expand_more</span>
 </div>
+
 </div>
-<div class="flex items-end self-end">
-<button class="bg-surface-container-highest text-primary font-bold px-6 py-2.5 rounded-lg text-sm hover:bg-blue-100 transition-colors">
-                        Clear Filters
-                    </button>
-</div>
-</div>
-<!-- Property Grid (Asymmetric Layout Feel) -->
+
+<!-- ✅ PROPERTY GRID (FIXED) -->
 <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
-<div class="grid grid-cols-3 gap-6">
-    
+
 {% if properties %}
-<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
 
-    {% for property in properties %}
-    <a href="{% url 'builder_property_detail' property.id %}">
-        <div class="bg-white rounded-xl shadow p-4">
+{% for property in properties %}
+<a href="{% url 'builder_property_detail' property.id %}">
 
-            {% if property.thumbnail %}
-                <img src="{{ property.thumbnail.url }}" class="w-full h-48 object-cover rounded">
-            {% else %}
-                <img src="https://via.placeholder.com/300" class="w-full h-48 object-cover rounded">
-            {% endif %}
+<div class="bg-white rounded-xl shadow hover:shadow-xl transition duration-300 overflow-hidden group">
 
-            <h3 class="text-lg font-bold mt-2">{{ property.title }}</h3>
-        </div>
-    </a>
-    {% endfor %}
-
-</div>
+<!-- IMAGE -->
+{% if property.thumbnail and property.thumbnail.url %}
+<img src="{{ property.thumbnail.url }}"
+     class="w-full h-52 object-cover group-hover:scale-110 transition duration-500">
 {% else %}
-<p>No properties</p>
+<img src="https://via.placeholder.com/400x300"
+     class="w-full h-52 object-cover">
 {% endif %}
-</div>
-</div>
-<!-- Empty "Add New" Bento Slot -->
-<div class="border-2 border-dashed border-surface-container-high rounded-xl flex flex-col items-center justify-center p-8 group cursor-pointer hover:bg-surface-container-low transition-colors min-h-[400px]">
-<div class="w-16 h-16 rounded-full bg-surface-container-high flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-<span class="material-symbols-outlined text-primary-container text-3xl">add</span>
-</div>
-<h3 class="text-lg font-bold text-on-surface">Add New Property</h3>
-<p class="text-sm text-on-surface-variant text-center max-w-[180px] mt-2">Expand your portfolio with a new high-end listing.</p>
-</div>
-</div>
-</section>
-<!-- Footer Pagination / Editorial Note -->
 
+<!-- CONTENT -->
+<div class="p-4">
+
+<h3 class="text-lg font-bold text-gray-800">
+{{ property.title }}
+</h3>
+
+<p class="text-sm text-gray-500">
+{{ property.location }}
+</p>
+
+<p class="text-blue-600 font-bold mt-2">
+₹{{ property.price }}
+</p>
+
+</div>
+
+</div>
+
+</a>
+{% endfor %}
+
+{% else %}
+<p>No properties found</p>
+{% endif %}
+
+</div>
+
+</section>
 </main>
-<!-- ADD PROPERTY MODAL -->
+
+<!-- MODAL -->
 <div id="propertyModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50">
 
-    <div class="bg-white w-[700px] max-h-[90vh] overflow-y-auto rounded-xl p-6 relative">
+<div class="bg-white w-[700px] max-h-[90vh] overflow-y-auto rounded-xl p-6 relative">
 
-        <button onclick="closeModal()" class="absolute top-2 right-3 text-gray-500">✕</button>
+<button onclick="closeModal()" class="absolute top-2 right-3 text-gray-500">✕</button>
 
-        <h2 class="text-2xl font-bold mb-4">Add Property</h2>
+<h2 class="text-2xl font-bold mb-4">Add Property</h2>
 
-        <form method="POST" action="{% url 'add_property' %}" enctype="multipart/form-data">
-            {% csrf_token %}
+<form method="POST" action="{% url 'add_property' %}" enctype="multipart/form-data">
+{% csrf_token %}
 
-            <input name="title" placeholder="Title" class="w-full mb-3 border p-2 rounded">
+<input name="title" placeholder="Title" class="w-full mb-3 border p-2 rounded">
+<input name="location" placeholder="Location" class="w-full mb-3 border p-2 rounded">
+<input name="price" placeholder="Price" class="w-full mb-3 border p-2 rounded">
 
-            <input name="location" placeholder="Location" class="w-full mb-3 border p-2 rounded">
+<div class="grid grid-cols-3 gap-2">
+<input name="beds" placeholder="Beds" class="border p-2 rounded">
+<input name="baths" placeholder="Baths" class="border p-2 rounded">
+<input name="sqft" placeholder="Sqft" class="border p-2 rounded">
+</div>
 
-            <input name="price" placeholder="Price" class="w-full mb-3 border p-2 rounded">
+<textarea name="description" placeholder="Description" class="w-full mt-3 mb-3 border p-2 rounded"></textarea>
 
-            <div class="grid grid-cols-3 gap-2">
-                <input name="beds" placeholder="Beds" class="border p-2 rounded">
-                <input name="baths" placeholder="Baths" class="border p-2 rounded">
-                <input name="sqft" placeholder="Sqft" class="border p-2 rounded">
-            </div>
+<select name="type" class="w-full mb-3 border p-2 rounded">
+<option value="Residential">Residential</option>
+<option value="Commercial">Commercial</option>
+</select>
 
-            <textarea name="description" placeholder="Description" class="w-full mt-3 mb-3 border p-2 rounded"></textarea>
+<select name="status" class="w-full mb-3 border p-2 rounded">
+<option value="Available">Available</option>
+<option value="Sold">Sold</option>
+</select>
 
-            <select name="type" class="w-full mb-3 border p-2 rounded">
-                <option value="Residential">Residential</option>
-                <option value="Commercial">Commercial</option>
-            </select>
-
-            <select name="status" class="w-full mb-3 border p-2 rounded">
-                <option value="Available">Available</option>
-                <option value="Sold">Sold</option>
-            </select>
-
-            <input type="file" name="thumbnail" class="w-full mb-3">
-            <input type="file" name="images" multiple class="w-full mb-3">
-
-            
+<input type="file" name="thumbnail" class="w-full mb-3">
+<input type="file" name="images" multiple class="w-full mb-3">
 
 <button type="submit"
 class="w-full mt-4 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold rounded-lg hover:scale-105 transition">
-    Save Property
+Save Property
 </button>
-        </form>
 
-    </div>
+</form>
+
 </div>
+</div>
+
 <script>
 function openModal() {
-    document.getElementById('propertyModal').classList.remove('hidden');
+document.getElementById('propertyModal').classList.remove('hidden');
 }
 function closeModal() {
-    document.getElementById('propertyModal').classList.add('hidden');
+document.getElementById('propertyModal').classList.add('hidden');
 }
 </script>
-</body>
+
 {% endblock %}
