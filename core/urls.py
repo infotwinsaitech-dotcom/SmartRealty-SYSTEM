@@ -1,6 +1,7 @@
 from django.urls import path
 from . import views
-
+from django.conf import settings
+from django.conf.urls.static import static
 from django.shortcuts import render
 
 urlpatterns = [
@@ -82,3 +83,5 @@ path('agent/site-visits/', views.site_visits, name='site_visits'),
 path('settings/', views.settings_view, name='settings'),
 path('privacy/', views.privacy, name='privacy'),
 ]
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
