@@ -11,8 +11,7 @@
 <div class="lg:col-span-8 relative rounded-2xl md:rounded-3xl overflow-hidden group">
 
 {% if property.thumbnail %}
-    {% cloudinary property.thumbnail width=1200 height=700 crop="fill"
-    class="w-full h-[300px] sm:h-[400px] md:h-[520px] object-cover group-hover:scale-110 transition duration-700 ease-out" %}
+    {% cloudinary property.thumbnail width=1200 height=700 crop="fill" class="w-full h-[300px] sm:h-[400px] md:h-[520px] object-cover group-hover:scale-110 transition duration-700 ease-out" %}
 {% else %}
     <img src="https://via.placeholder.com/1200x700"
          class="w-full h-[300px] sm:h-[400px] md:h-[520px] object-cover">
