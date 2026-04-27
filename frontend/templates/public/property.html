@@ -80,12 +80,14 @@ Signature Collection
 <div class="relative h-[260px] sm:h-[320px] md:h-[420px] overflow-hidden">
 
 {% if property.thumbnail %}
-    {% cloudinary property.thumbnail width=1000 height=700 crop="fill"
-    class="w-full h-full object-cover transform group-hover:scale-110 transition duration-700 ease-out" %}
+    <div class="w-full h-[520px] overflow-hidden rounded-3xl">
+        {% cloudinary property.thumbnail width=1200 height=700 crop="fill" %}
+    </div>
 {% else %}
-    <img src="https://via.placeholder.com/800x600"
-    class="w-full h-full object-cover">
+    <img src="https://via.placeholder.com/1200x700"
+         class="w-full h-[520px] object-cover">
 {% endif %}
+
 
 <!-- OVERLAY -->
 <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent"></div>
