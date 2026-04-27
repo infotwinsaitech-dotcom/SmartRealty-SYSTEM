@@ -8,10 +8,12 @@
 <div class="grid lg:grid-cols-12 gap-6 md:gap-10 mb-12 md:mb-20">
 
 <!-- MAIN IMAGE -->
-<div class="lg:col-span-8 relative rounded-2xl md:rounded-3xl overflow-hidden group">
+<div class="lg:col-span-8 relative rounded-2xl md:rounded-3xl overflow-hidden group cursor-pointer"
+     onclick="openImage('{% cloudinary_url property.thumbnail width=1400 height=900 crop='fill' %}')">
 
 {% if property.thumbnail %}
-    {% cloudinary property.thumbnail width=1200 height=700 crop="fill" class="w-full h-[300px] sm:h-[400px] md:h-[520px] object-cover group-hover:scale-110 transition duration-700 ease-out" %}
+    <img src="{% cloudinary_url property.thumbnail width=1200 height=700 crop='fill' %}"
+         class="w-full h-[300px] sm:h-[400px] md:h-[520px] object-cover group-hover:scale-110 transition duration-700 ease-out">
 {% else %}
     <img src="https://via.placeholder.com/1200x700"
          class="w-full h-[300px] sm:h-[400px] md:h-[520px] object-cover">
@@ -29,9 +31,12 @@
 <div class="lg:col-span-4 grid grid-cols-2 gap-3 md:gap-4">
 
 {% for img in property.images.all %}
-<div class="overflow-hidden rounded-xl group">
-   <img src="{% cloudinary_url img.image width=200 height=150 crop='fill' %}"
-     class="w-full h-28 object-cover rounded-lg">
+<div class="overflow-hidden rounded-xl group cursor-pointer"
+     onclick="openImage('{% cloudinary_url img.image width=1400 height=900 crop='fill' %}')">
+
+   <img src="{% cloudinary_url img.image width=300 height=200 crop='fill' %}"
+        class="w-full h-28 object-cover rounded-lg group-hover:scale-110 transition duration-500">
+
 </div>
 {% empty %}
 <img src="https://via.placeholder.com/300" class="rounded-xl">
@@ -114,5 +119,33 @@ Send Inquiry
 </div>
 
 </div>
+
+<!-- ✅ IMAGE MODAL -->
+<div id="imageModal"
+     class="fixed inset-0 bg-black/90 hidden items-center justify-center z-50">
+
+    <span onclick="closeImage()"
+          class="absolute top-5 right-6 text-white text-4xl cursor-pointer">&times;</span>
+
+    <img id="modalImage"
+         class="max-w-[90%] max-h-[90%] rounded-xl shadow-2xl">
+
+</div>
+
+<!-- ✅ JS -->
+<script>
+function openImage(src) {
+    const modal = document.getElementById("imageModal");
+    const img = document.getElementById("modalImage");
+
+    modal.classList.remove("hidden");
+    modal.classList.add("flex");
+    img.src = src;
+}
+
+function closeImage() {
+    document.getElementById("imageModal").classList.add("hidden");
+}
+</script>
 
 {% endblock %}
