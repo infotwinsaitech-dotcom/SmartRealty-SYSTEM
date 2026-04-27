@@ -30,8 +30,8 @@
 
 {% for img in property.images.all %}
 <div class="overflow-hidden rounded-xl group">
-    {% cloudinary img.image width=400 height=300 crop="fill"
-    class="w-full h-24 sm:h-32 md:h-40 object-cover group-hover:scale-110 transition duration-500" %}
+   <img src="{% cloudinary_url img.image width=200 height=150 crop='fill' %}"
+     class="w-full h-28 object-cover rounded-lg">
 </div>
 {% empty %}
 <img src="https://via.placeholder.com/300" class="rounded-xl">
