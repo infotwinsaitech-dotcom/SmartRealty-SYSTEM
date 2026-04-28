@@ -428,7 +428,8 @@ def property_management(request):
 def lead_management(request):
 
     inquiries = Inquiry.objects.all()
-    leads = Lead.objects.all()
+
+    leads = Lead.objects.filter(builder=request.user)  # 🔒 important
     properties = Property.objects.filter(builder=request.user)
 
     # 🔍 search
@@ -446,22 +447,26 @@ def lead_management(request):
 
     # 🔄 sorting
     sort = request.GET.get('sort')
-    if sort == "new":
-        leads = leads.order_by('-id')
-    elif sort == "old":
+    if sort == "old":
         leads = leads.order_by('id')
+    else:
+        leads = leads.order_by('-id')  # ✅ default
 
-    # 👤 selected lead
+    # ✅ SELECTED LEAD (SAFE)
     selected_lead = None
     lead_id = request.GET.get('lead')
+
     if lead_id:
-        selected_lead = get_object_or_404(Lead, id=lead_id)
+        selected_lead = Lead.objects.filter(
+            id=lead_id,
+            builder=request.user
+        ).first()
 
     # 📊 stats
     total_pipeline = Deal.objects.aggregate(total=Sum('amount'))['total'] or 0
-    hot_leads = Lead.objects.filter(status='HOT').count()
+    hot_leads = Lead.objects.filter(status='HOT', builder=request.user).count()
 
-    # 👥 agents (for dropdown)
+    # 👥 agents
     agents = Agent.objects.filter(builder=request.user)
 
     # 📄 pagination
@@ -1432,9 +1437,12 @@ def register_user(request):
 def delete_lead(request, id):
     lead = get_object_or_404(Lead, id=id)
 
-    # 🔒 security (builder only delete his leads)
-    if lead.builder == request.user:
-        lead.delete()
+    if request.method == "POST":
+        if lead.builder == request.user:
+            lead.delete()
+            messages.success(request, "Lead deleted successfully")
+        else:
+            messages.error(request, "Permission denied")
 
     return redirect('lead_management')
 

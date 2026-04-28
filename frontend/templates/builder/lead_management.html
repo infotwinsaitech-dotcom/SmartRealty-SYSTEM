@@ -1,7 +1,7 @@
 {% extends "builder/base.html" %}
 {% block content %}
 
-<main class="ml-64 mr-[400px] mt-16 min-h-screen bg-gradient-to-br from-slate-50 to-white p-8">
+<main class="ml-64 mr-[400px] mt-16 min-h-screen bg-gradient-to-br from-slate-50 to-white p-8 overflow-y-auto">
 
 <!-- HEADER -->
 <header class="flex justify-between items-center mb-10">
@@ -9,6 +9,14 @@
         <h2 class="text-4xl font-extrabold text-gray-800">Lead Management</h2>
         <p class="text-gray-500 text-sm mt-1">Smart pipeline control</p>
     </div>
+
+    <form method="GET">
+        <input name="q" value="{{ request.GET.q }}"
+        class="px-4 py-2 w-72 rounded-xl border shadow-sm"
+        placeholder="Search leads...">
+    </form>
+</header>
+
 {% if messages %}
 <div class="mb-4">
   {% for message in messages %}
@@ -18,15 +26,9 @@
   {% endfor %}
 </div>
 {% endif %}
-    <form method="GET">
-        <input name="q" value="{{ request.GET.q }}"
-        class="px-4 py-2 w-72 rounded-xl border shadow-sm"
-        placeholder="Search leads...">
-    </form>
-</header>
 
 <!-- TABLE -->
-<div class="bg-white rounded-2xl shadow-lg border">
+<div class="bg-white rounded-2xl shadow-lg border overflow-hidden">
 
 <div class="p-6 flex justify-between">
     <h3 class="text-xl font-bold">Lead Inventory</h3>
@@ -52,15 +54,18 @@
 <tbody>
 
 {% for lead in leads %}
-<tr onclick="window.location='?lead={{ lead.id }}'"
-class="hover:bg-blue-50 cursor-pointer">
+<tr class="hover:bg-blue-50 cursor-pointer
+{% if selected_lead and selected_lead.id == lead.id %}bg-blue-100{% endif %}">
 
-<td class="px-6 py-4">
+<td class="px-6 py-4"
+    onclick="selectLead({{ lead.id }})">
+
 <b>{{ lead.name }}</b><br>
 <span class="text-sm text-gray-500">{{ lead.email }}</span>
+
 </td>
 
-<td>
+<td onclick="selectLead({{ lead.id }})">
 {% for p in lead.properties.all %}
 {{ p.title }}<br>
 {% empty %}
@@ -68,9 +73,9 @@ class="hover:bg-blue-50 cursor-pointer">
 {% endfor %}
 </td>
 
-<td>{{ lead.source }}</td>
+<td onclick="selectLead({{ lead.id }})">{{ lead.source }}</td>
 
-<td>
+<td onclick="selectLead({{ lead.id }})">
 <span class="px-2 py-1 text-white text-xs rounded
 {% if lead.status == 'HOT' %}bg-red-500
 {% elif lead.status == 'WARM' %}bg-yellow-500
@@ -79,7 +84,7 @@ class="hover:bg-blue-50 cursor-pointer">
 </span>
 </td>
 
-<td>
+<td onclick="selectLead({{ lead.id }})">
 {% if lead.assigned_to %}
     <span class="px-2 py-1 bg-green-100 text-green-700 rounded text-xs">
         {{ lead.assigned_to.name }}
@@ -90,13 +95,6 @@ class="hover:bg-blue-50 cursor-pointer">
 </td>
 
 </tr>
-
-{% empty %}
-<tr>
-<td colspan="5" class="text-center py-10 text-gray-400">
-No Leads Found
-</td>
-</tr>
 {% endfor %}
 
 </tbody>
@@ -105,8 +103,8 @@ No Leads Found
 </div>
 </main>
 
-<!-- SIDE PANEL -->
-<aside class="fixed right-0 top-16 h-full w-[400px] bg-white shadow-xl p-6">
+<!-- ================= SIDEBAR ================= -->
+<aside class="fixed right-0 top-16 h-full w-[400px] bg-white shadow-xl p-6 overflow-y-auto">
 
 {% if selected_lead %}
 
@@ -117,7 +115,9 @@ No Leads Found
 <p><b>Phone:</b> {{ selected_lead.phone }}</p>
 <p><b>Status:</b> {{ selected_lead.status }}</p>
 </div>
+
 <p><b>Assigned Agent:</b> {{ selected_lead.assigned_to.name|default:"Not Assigned" }}</p>
+
 <!-- PROPERTY -->
 <div class="mt-4">
 <b>Property:</b><br>
@@ -132,16 +132,23 @@ No Leads Found
 {{ selected_lead.notes }}
 </div>
 
+<!-- ACTION BUTTONS -->
 <div class="flex gap-3 mt-6">
+
 <a href="tel:{{ selected_lead.phone }}"
-class="bg-blue-600 text-white px-4 py-2 rounded">Call</a>
+class="bg-blue-600 text-white px-4 py-2 rounded">
+Call
+</a>
 
 <a href="https://wa.me/{{ selected_lead.phone }}"
-class="bg-green-500 text-white px-4 py-2 rounded">WhatsApp</a>
-<!-- ✅ DELETE BUTTON -->
+class="bg-green-500 text-white px-4 py-2 rounded">
+WhatsApp
+</a>
+
+<!-- DELETE -->
 <form method="POST"
       action="{% url 'delete_lead' selected_lead.id %}"
-      onsubmit="return confirm('Delete this lead?');">
+      onsubmit="event.stopPropagation(); return confirm('Delete this lead?');">
 
     {% csrf_token %}
 
@@ -151,6 +158,7 @@ class="bg-green-500 text-white px-4 py-2 rounded">WhatsApp</a>
     </button>
 
 </form>
+
 </div>
 
 {% else %}
@@ -159,7 +167,7 @@ class="bg-green-500 text-white px-4 py-2 rounded">WhatsApp</a>
 
 </aside>
 
-<!-- MODAL -->
+<!-- ================= MODAL ================= -->
 <div id="leadModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center">
 
 <div class="bg-white p-6 rounded-xl w-[400px]">
@@ -172,7 +180,6 @@ class="bg-green-500 text-white px-4 py-2 rounded">WhatsApp</a>
 <input name="name" placeholder="Name" class="w-full mb-2 border p-2 rounded">
 <input name="email" placeholder="Email" class="w-full mb-2 border p-2 rounded">
 <input name="phone" placeholder="Phone" class="w-full mb-2 border p-2 rounded">
-
 <input name="source" placeholder="Source" class="w-full mb-2 border p-2 rounded">
 
 <select name="status" class="w-full mb-2 border p-2 rounded">
@@ -187,7 +194,6 @@ class="bg-green-500 text-white px-4 py-2 rounded">WhatsApp</a>
 {% endfor %}
 </select>
 
-<!-- PROPERTY SELECT -->
 <select name="property_id" class="w-full mb-2 border p-2 rounded">
 {% for property in properties %}
 <option value="{{ property.id }}">{{ property.title }}</option>
@@ -206,10 +212,28 @@ Save Lead
 </div>
 </div>
 
+<!-- ================= JS ================= -->
 <script>
+
+// FIX: no jump scroll
+function selectLead(id){
+    const scrollY = window.scrollY;
+    window.location.href = "?lead=" + id + "&scroll=" + scrollY;
+}
+
+// restore scroll
+window.onload = function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const scroll = urlParams.get('scroll');
+    if(scroll){
+        window.scrollTo(0, scroll);
+    }
+}
+
 function openModal(){
 document.getElementById('leadModal').classList.remove('hidden')
 }
+
 </script>
 
 {% endblock %}
