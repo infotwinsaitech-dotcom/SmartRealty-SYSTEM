@@ -82,6 +82,7 @@ path('builder/lead/delete/<int:id>/', views.delete_lead, name='delete_lead'),
 path('agent/site-visits/', views.site_visits, name='site_visits'),
 path('settings/', views.settings_view, name='settings'),
 path('privacy/', views.privacy, name='privacy'),
+path('delete-lead/<int:id>/', views.delete_lead, name='delete_lead'),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
