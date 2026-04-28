@@ -1,44 +1,126 @@
 {% extends "public/base.html" %}
-{% block title %}Privacy Policy{% endblock %}
 
 {% block content %}
 
-<!-- HERO -->
-<section class="relative h-[400px] flex items-center justify-center overflow-hidden">
+<div class="bg-gradient-to-br from-black via-gray-900 to-black text-white min-h-screen">
 
-    <img src="{% static 'images/about.jpg' %}" class="absolute w-full h-full object-cover scale-110">
+<div class="max-w-6xl mx-auto px-6 py-20">
 
-    <div class="absolute inset-0 bg-black/70"></div>
-
-    <div class="relative z-10 text-center">
-        <h1 class="text-5xl font-extrabold gold mb-2">Privacy Policy</h1>
-        <p class="text-gray-300">Your data. Our responsibility.</p>
-    </div>
-
-</section>
+<!-- HEADER -->
+<div class="text-center mb-16">
+    <h1 class="text-4xl md:text-6xl font-extrabold text-yellow-400 mb-4">
+        Privacy Policy
+    </h1>
+    <p class="text-gray-400 max-w-2xl mx-auto">
+        Your privacy is important to us. This policy explains how we collect, use, and protect your information.
+    </p>
+</div>
 
 <!-- CONTENT -->
-<section class="py-24 px-6 luxury-bg">
+<div class="space-y-10">
 
-<div class="max-w-5xl mx-auto space-y-10">
+<!-- SECTION -->
+<div class="bg-white/5 backdrop-blur-lg p-6 md:p-8 rounded-2xl border border-white/10 shadow-xl">
+    <h2 class="text-2xl font-bold text-yellow-400 mb-3">
+        1. Information We Collect
+    </h2>
+    <p class="text-gray-300 leading-relaxed">
+        We collect personal information such as your name, email address, phone number, and any details you provide when submitting inquiries or forms on our website.
+    </p>
+</div>
 
-    {% for title, content in [
-        ("Introduction","We respect your privacy and ensure complete protection of your personal data."),
-        ("Data Collection","We collect essential information such as name, email, phone, and usage behavior."),
-        ("Usage","We use your data to improve services and connect buyers with agents."),
-        ("Security","Your data is protected with enterprise-grade encryption."),
-        ("Rights","You can access, edit, or delete your data anytime.")
-    ] %}
+<!-- SECTION -->
+<div class="bg-white/5 backdrop-blur-lg p-6 md:p-8 rounded-2xl border border-white/10 shadow-xl">
+    <h2 class="text-2xl font-bold text-yellow-400 mb-3">
+        2. How We Use Your Information
+    </h2>
+    <ul class="list-disc pl-6 text-gray-300 space-y-2">
+        <li>To respond to inquiries and provide customer support</li>
+        <li>To improve our services and user experience</li>
+        <li>To send updates or promotional offers (if applicable)</li>
+    </ul>
+</div>
 
-    <div class="backdrop-blur-xl bg-white/5 p-8 rounded-2xl border border-white/10 reveal hover:scale-[1.02] transition">
-        <h2 class="text-2xl font-bold gold mb-3">{{ title }}</h2>
-        <p class="text-gray-300 leading-relaxed">{{ content }}</p>
-    </div>
+<!-- SECTION -->
+<div class="bg-white/5 backdrop-blur-lg p-6 md:p-8 rounded-2xl border border-white/10 shadow-xl">
+    <h2 class="text-2xl font-bold text-yellow-400 mb-3">
+        3. Data Protection
+    </h2>
+    <p class="text-gray-300 leading-relaxed">
+        We implement strict security measures to protect your personal data. However, no method of transmission over the internet is 100% secure.
+    </p>
+</div>
 
-    {% endfor %}
+<!-- SECTION -->
+<div class="bg-white/5 backdrop-blur-lg p-6 md:p-8 rounded-2xl border border-white/10 shadow-xl">
+    <h2 class="text-2xl font-bold text-yellow-400 mb-3">
+        4. Sharing of Information
+    </h2>
+    <p class="text-gray-300 leading-relaxed">
+        We do not sell, trade, or rent your personal information. Your data may only be shared with trusted partners for operational purposes.
+    </p>
+</div>
+
+<!-- SECTION -->
+<div class="bg-white/5 backdrop-blur-lg p-6 md:p-8 rounded-2xl border border-white/10 shadow-xl">
+    <h2 class="text-2xl font-bold text-yellow-400 mb-3">
+        5. Cookies
+    </h2>
+    <p class="text-gray-300 leading-relaxed">
+        Our website may use cookies to enhance user experience and analyze website traffic.
+    </p>
+</div>
+
+<!-- SECTION -->
+<div class="bg-white/5 backdrop-blur-lg p-6 md:p-8 rounded-2xl border border-white/10 shadow-xl">
+    <h2 class="text-2xl font-bold text-yellow-400 mb-3">
+        6. Your Rights
+    </h2>
+    <ul class="list-disc pl-6 text-gray-300 space-y-2">
+        <li>You can request access to your data</li>
+        <li>You can request correction or deletion of your data</li>
+        <li>You can opt out of communications</li>
+    </ul>
+</div>
+
+<!-- SECTION -->
+<div class="bg-white/5 backdrop-blur-lg p-6 md:p-8 rounded-2xl border border-white/10 shadow-xl">
+    <h2 class="text-2xl font-bold text-yellow-400 mb-3">
+        7. Third-Party Services
+    </h2>
+    <p class="text-gray-300 leading-relaxed">
+        We may use third-party services such as analytics tools or payment providers. These services have their own privacy policies.
+    </p>
+</div>
+
+<!-- SECTION -->
+<div class="bg-white/5 backdrop-blur-lg p-6 md:p-8 rounded-2xl border border-white/10 shadow-xl">
+    <h2 class="text-2xl font-bold text-yellow-400 mb-3">
+        8. Changes to This Policy
+    </h2>
+    <p class="text-gray-300 leading-relaxed">
+        We may update this privacy policy from time to time. Any changes will be posted on this page.
+    </p>
+</div>
+
+<!-- SECTION -->
+<div class="bg-white/5 backdrop-blur-lg p-6 md:p-8 rounded-2xl border border-white/10 shadow-xl">
+    <h2 class="text-2xl font-bold text-yellow-400 mb-3">
+        9. Contact Us
+    </h2>
+    <p class="text-gray-300 leading-relaxed">
+        If you have any questions about this Privacy Policy, feel free to contact us through our website.
+    </p>
+</div>
 
 </div>
 
-</section>
+<!-- FOOTER -->
+<div class="text-center mt-16 text-gray-500 text-sm">
+    © 2026 EstateX. All rights reserved.
+</div>
+
+</div>
+</div>
 
 {% endblock %}
