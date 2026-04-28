@@ -1654,7 +1654,10 @@ def settings_view(request):
     return render(request, "settings.html")
 
 def privacy(request):
-    return render(request, "public/privacy.html")
+    property = Property.objects.first()  # या कोई logic
+    return render(request, "public/privacy.html", {
+        "property": property
+    })
 
 def auto_assign_agent(builder):
     agents = Agent.objects.filter(builder=builder)
