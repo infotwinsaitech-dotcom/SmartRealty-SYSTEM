@@ -265,7 +265,7 @@ def forgot_password(request):
                     f"Your OTP is {otp}",
                     settings.EMAIL_HOST_USER,
                     [email],
-                    fail_silently=False,
+                    fail_silently=True,
                 )
                 print("MAIL SENT SUCCESS")
 
