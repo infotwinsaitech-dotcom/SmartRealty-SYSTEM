@@ -235,38 +235,42 @@ def agent_dashboard(request):
     return render(request, "agent/agent_dashboard.html")
 
 def forgot_password(request):
+    print("METHOD:", request.method)  # 👈 ADD THIS
+
     if request.method == "POST":
+        print("POST HIT")  # 👈 ADD THIS
+
         email = request.POST.get("email")
+        print("EMAIL:", email)  # 👈 ADD THIS
 
         try:
             user = User.objects.get(email=email)
 
-            # OTP generate
             otp = random.randint(100000, 999999)
-
-            # session में save
             request.session['reset_email'] = email
             request.session['otp'] = str(otp)
 
-            # email send
+            print("OTP:", otp)  # 👈 ADD THIS
+
             send_mail(
                 "OTP Verification",
                 f"Your OTP is {otp}",
                 settings.EMAIL_HOST_USER,
                 [email],
-                fail_silently=True,
+                fail_silently=True,  # 👈 IMPORTANT
             )
 
-            # 🔥 IMPORTANT REDIRECT
+            print("MAIL SENT")  # 👈 ADD THIS
+
             return redirect("otp_verification")
 
-        except User.DoesNotExist:
+        except Exception as e:
+            print("ERROR:", str(e))  # 👈 THIS WILL REVEAL EVERYTHING
             return render(request, "public/forgot_password.html", {
-                "error": "Email not registered"
+                "error": str(e)
             })
 
     return render(request, "public/forgot_password.html")
-
 def otp_verification(request):
     email = request.session.get("reset_email")
     session_otp = request.session.get("otp")
