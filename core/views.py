@@ -259,6 +259,7 @@ def forgot_password(request):
                 [email],
                 fail_silently=True,  # 👈 IMPORTANT
             )
+            print("OTP:", otp)
 
             print("MAIL SENT")  # 👈 ADD THIS
 
