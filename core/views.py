@@ -246,10 +246,9 @@ def forgot_password(request):
         try:
             user = User.objects.get(email=email)
 
-            # 🔥 OTP generate
             otp = random.randint(100000, 999999)
 
-            # 🔥 session fix (VERY IMPORTANT)
+            # ✅ session fix
             request.session.flush()
             request.session['reset_email'] = email
             request.session['otp'] = str(otp)
@@ -258,19 +257,8 @@ def forgot_password(request):
             print("OTP:", otp)
             print("SESSION AFTER SET:", request.session.items())
 
-            # 🔥 EMAIL SAFE SEND (NO CRASH)
-            try:
-                send_mail(
-                    "OTP Verification",
-                    f"Your OTP is {otp}",
-                    settings.EMAIL_HOST_USER,
-                    [email],
-                    fail_silently=True,   # ✅ crash नहीं होगा
-                )
-                print("MAIL SENT")
-
-            except Exception as e:
-                print("MAIL ERROR:", str(e))
+            # ❌ TEMP: MAIL DISABLED
+            print("EMAIL DISABLED - OTP:", otp)
 
             return redirect("otp_verification")
 
