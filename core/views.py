@@ -235,39 +235,49 @@ def agent_dashboard(request):
     return render(request, "agent/agent_dashboard.html")
 
 def forgot_password(request):
-    print("METHOD:", request.method)  # 👈 ADD THIS
+    print("METHOD:", request.method)
 
     if request.method == "POST":
-        print("POST HIT")  # 👈 ADD THIS
+        print("POST HIT")
 
         email = request.POST.get("email")
-        print("EMAIL:", email)  # 👈 ADD THIS
+        print("EMAIL:", email)
 
         try:
             user = User.objects.get(email=email)
 
+            # 🔥 OTP generate
             otp = random.randint(100000, 999999)
+
+            # 🔥 IMPORTANT FIX (session clear + save)
+            request.session.flush()   # old session remove
             request.session['reset_email'] = email
             request.session['otp'] = str(otp)
+            request.session.save()    # force save
 
-            print("OTP:", otp)  # 👈 ADD THIS
+            print("OTP:", otp)
+            print("SESSION AFTER SET:", request.session.items())
 
+            # 🔥 email send
             send_mail(
                 "OTP Verification",
                 f"Your OTP is {otp}",
                 settings.EMAIL_HOST_USER,
                 [email],
-                fail_silently=True,  # 👈 IMPORTANT
+                fail_silently=False,   # error दिखे तो better है
             )
-            print("OTP:", otp)
-            print("SESSION:", request.session.items())
 
-            print("MAIL SENT")  # 👈 ADD THIS
+            print("MAIL SENT")
 
             return redirect("otp_verification")
 
+        except User.DoesNotExist:
+            return render(request, "public/forgot_password.html", {
+                "error": "Email not registered"
+            })
+
         except Exception as e:
-            print("ERROR:", str(e))  # 👈 THIS WILL REVEAL EVERYTHING
+            print("ERROR:", str(e))
             return render(request, "public/forgot_password.html", {
                 "error": str(e)
             })
@@ -276,6 +286,7 @@ def forgot_password(request):
 def otp_verification(request):
     email = request.session.get("reset_email")
     session_otp = request.session.get("otp")
+
     print("OTP PAGE SESSION:", request.session.items())
 
     # 🔒 direct access block
@@ -293,7 +304,6 @@ def otp_verification(request):
             })
 
     return render(request, "public/otp_verification.html")
-
 def reset_password(request):
     email = request.session.get("reset_email")
 
