@@ -261,16 +261,15 @@ def forgot_password(request):
             # 🔥 EMAIL SEND (FINAL FIX)
             try:
                 send_mail(
-                    "OTP Verification",
-                    f"Your OTP is {otp}",
-                    settings.EMAIL_HOST_USER,
-                    [email],
-                    fail_silently=True,
-                )
-                print("MAIL SENT SUCCESS")
+        "OTP Verification",
+        f"Your OTP is {otp}",
+        settings.EMAIL_HOST_USER,
+        [email],
+        fail_silently=True,
+    )
 
-            except Exception as mail_error:
-                print("MAIL ERROR:", str(mail_error))
+            except Exception as e:
+                print("MAIL FAILED:", e)
                 return render(request, "public/forgot_password.html", {
                     "error": f"Email failed: {mail_error}"
                 })
