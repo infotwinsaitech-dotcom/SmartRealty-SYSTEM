@@ -161,3 +161,10 @@ cloudinary.config(
     api_key="177977239851829",
     api_secret="Dbmyb7hfE9787oUh-7J79aX6ZUo"
 )
+SESSION_ENGINE = "django.contrib.sessions.backends.db"
+SESSION_COOKIE_AGE = 300
+SESSION_SAVE_EVERY_REQUEST = True
+
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SAMESITE = "Lax"

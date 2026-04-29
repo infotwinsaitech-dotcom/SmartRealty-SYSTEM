@@ -260,6 +260,7 @@ def forgot_password(request):
                 fail_silently=True,  # 👈 IMPORTANT
             )
             print("OTP:", otp)
+            print("SESSION:", request.session.items())
 
             print("MAIL SENT")  # 👈 ADD THIS
 
@@ -275,6 +276,7 @@ def forgot_password(request):
 def otp_verification(request):
     email = request.session.get("reset_email")
     session_otp = request.session.get("otp")
+    print("OTP PAGE SESSION:", request.session.items())
 
     # 🔒 direct access block
     if not email or not session_otp:
