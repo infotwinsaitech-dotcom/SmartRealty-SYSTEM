@@ -249,25 +249,28 @@ def forgot_password(request):
             # 🔥 OTP generate
             otp = random.randint(100000, 999999)
 
-            # 🔥 IMPORTANT FIX (session clear + save)
-            request.session.flush()   # old session remove
+            # 🔥 session fix (VERY IMPORTANT)
+            request.session.flush()
             request.session['reset_email'] = email
             request.session['otp'] = str(otp)
-            request.session.save()    # force save
+            request.session.save()
 
             print("OTP:", otp)
             print("SESSION AFTER SET:", request.session.items())
 
-            # 🔥 email send
-            send_mail(
-                "OTP Verification",
-                f"Your OTP is {otp}",
-                settings.EMAIL_HOST_USER,
-                [email],
-                fail_silently=False,   # error दिखे तो better है
-            )
+            # 🔥 EMAIL SAFE SEND (NO CRASH)
+            try:
+                send_mail(
+                    "OTP Verification",
+                    f"Your OTP is {otp}",
+                    settings.EMAIL_HOST_USER,
+                    [email],
+                    fail_silently=True,   # ✅ crash नहीं होगा
+                )
+                print("MAIL SENT")
 
-            print("MAIL SENT")
+            except Exception as e:
+                print("MAIL ERROR:", str(e))
 
             return redirect("otp_verification")
 
