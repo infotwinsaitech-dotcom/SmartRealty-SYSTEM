@@ -1,0 +1,85 @@
+[33m10dfbb7[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m update
+[33m0d71650[m update
+[33mc972b8e[m update
+[33m6c3ddde[m update
+[33m0a13427[m update
+[33m352b3d1[m update
+[33md47b6d7[m update
+[33mb291804[m update
+[33m38f84a1[m update
+[33mbb6cadf[m update
+[33m3d192ce[m update
+[33m6ea29c6[m update
+[33mce6bb9e[m update
+[33m3469ace[m update
+[33mf7414e6[m update
+[33me89ad52[m update
+[33mfc05e4d[m update
+[33m756160d[m update
+[33m8448eb2[m update
+[33m92b31e1[m update
+[33m54f5572[m update
+[33m5eaead5[m update
+[33ma58d3d1[m update
+[33m096fd57[m update
+[33m55ed654[m update property detail
+[33m144d116[m add cloudinary dependency
+[33m6a4cfb2[m add cloudinary dependency
+[33m032a02c[m add cloudinary dependency
+[33m4dbb8e3[m add cloudinary dependency
+[33m01de742[m add cloudinary dependency
+[33mcd06df3[m add cloudinary dependency
+[33mb4bc508[m add cloudinary dependency
+[33m78afff3[m add cloudinary dependency
+[33m90c5b9f[m add cloudinary dependency
+[33m4f451e2[m add cloudinary dependency
+[33m5236a30[m add cloudinary dependency
+[33m8fc8c04[m add cloudinary dependency
+[33m1915e50[m add cloudinary dependency
+[33m642d47c[m add cloudinary dependency
+[33mf20d893[m add cloudinary dependency
+[33m0148be3[m add cloudinary dependency
+[33mf52c1ed[m add cloudinary dependency
+[33m157b89a[m add cloudinary dependency
+[33m0fe40f9[m add cloudinary dependency
+[33m3f15d1a[m add cloudinary dependency
+[33m33adad6[m add cloudinary dependency
+[33m197e2d6[m add cloudinary dependency
+[33m74bf999[m Fixed ALLOWED_HOSTS for Render
+[33mdbed956[m fix static
+[33mb9a787f[m fix static
+[33m1416ddf[m fix static
+[33m75971e0[m fix static
+[33m8cc8319[m fix static
+[33madc806e[m fix static
+[33m8ac76bb[m fix static
+[33me19a7e2[m fix static
+[33mc6a70e5[m fix static
+[33mb09cd4d[m fix static
+[33m6c25345[m fix static
+[33m5840418[m fix static
+[33ma4efb49[m fix static
+[33mbf5622d[m fix static
+[33mcc4dae3[m fix static
+[33mec1e156[m fix static
+[33m309fd7b[m fix static
+[33m92f734c[m fix static
+[33m7e98af6[m fix static
+[33m3d9f845[m fix static
+[33m84fe580[m fix static
+[33mf334b25[m fix static
+[33md21ec3b[m fix static
+[33m480ef9c[m fix static
+[33mc052389[m fix static
+[33mc24c181[m fix static
+[33m556efa7[m fix static
+[33m60afd14[m fix static
+[33mf091aba[m fix static
+[33m9b7449f[m fix static
+[33mc7d9642[m fix static
+[33m7a5e75f[m fix static
+[33mea55af1[m fix static
+[33mea469e7[m Fixed ALLOWED_HOSTS for Render
+[33me806c14[m Fixed ALLOWED_HOSTS for Render
+[33mbe8f82d[m Updated database config for Render
+[33m8675e20[m First commit - Django project
