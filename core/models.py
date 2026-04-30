@@ -50,10 +50,6 @@ class Amenity(models.Model):
         return self.name
 
 
-class PropertyAmenity(models.Model):
-    property = models.ForeignKey(Property, on_delete=models.CASCADE, related_name='amenities')
-    amenity = models.ForeignKey(Amenity, on_delete=models.CASCADE)
-
 class Inquiry(models.Model):
     property = models.ForeignKey(Property, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
