@@ -264,15 +264,14 @@ def forgot_password(request):
             # 🔥 EMAIL SEND (SendGrid API - NO TIMEOUT)
             try:
                 message = Mail(
-                    from_email=os.getenv("DEFAULT_FROM_EMAIL"),
-                    to_emails=email,
-                    subject="OTP Verification",
-                    html_content=f"<strong>Your OTP is: {otp}</strong>"
-                )
+                   from_email=os.getenv("DEFAULT_FROM_EMAIL"),
+                   to_emails=email,
+                   subject="OTP Verification",
+                   html_content=f"<strong>Your OTP is {otp}</strong>"
+)
 
                 sg = SendGridAPIClient(os.getenv("SENDGRID_API_KEY"))
-                sg.send(message)
-
+                response = sg.send(message)
                 print("MAIL SENT")
 
             except Exception as e:
