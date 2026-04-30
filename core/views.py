@@ -415,6 +415,7 @@ def add_property(request):
         description = request.POST.get("description")
         type = request.POST.get("type")
         thumbnail = request.FILES.get("thumbnail")
+        amenities = request.POST.getlist("amenities")
 
         # ✅ FIRST CREATE PROPERTY
         property = Property.objects.create(

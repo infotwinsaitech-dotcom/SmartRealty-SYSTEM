@@ -31,6 +31,7 @@ class Property(models.Model):
     agent_name = models.CharField(max_length=100, default="Agent")
     agent_role = models.CharField(max_length=100, default="Advisor")
     agent_image = models.ImageField(upload_to='agents/', blank=True, null=True)
+    amenities = models.JSONField(default=list, blank=True)
 
     def __str__(self):
         return self.title
