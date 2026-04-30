@@ -79,7 +79,7 @@ def property_detail(request, id):
         messages.success(request, "Inquiry sent successfully!")
 
         # ✅ IMPORTANT
-        return redirect("builder_property_detail", id=property.id)
+        return redirect("public/property_detail.html", id=property.id)
         # ⚠️ correct URL name use करो
 
     return render(request, "public/property_detail.html", {
