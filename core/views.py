@@ -468,7 +468,7 @@ def lead_management(request):
 
     inquiries = Inquiry.objects.all()
 
-    # ✅ FIX: builder issue handle + proper sorting
+    # ✅ FINAL QUERY (DON'T OVERRIDE LATER)
     leads = Lead.objects.filter(
         Q(builder=request.user) | Q(builder__isnull=True)
     ).order_by('-id')
@@ -500,9 +500,7 @@ def lead_management(request):
     lead_id = request.GET.get('lead')
 
     if lead_id:
-        selected_lead = Lead.objects.filter(
-            id=lead_id
-        ).first()
+        selected_lead = Lead.objects.filter(id=lead_id).first()
 
     # 📊 stats
     total_pipeline = Deal.objects.aggregate(total=Sum('amount'))['total'] or 0
@@ -515,9 +513,9 @@ def lead_management(request):
     # 👥 agents
     agents = Agent.objects.filter(builder=request.user)
 
-    # 📄 pagination
+    # ✅ PAGINATION (same queryset use karo)
     paginator = Paginator(leads, 10)
-    page = request.GET.get('page')
+    page = request.GET.get('page', 1)
     leads = paginator.get_page(page)
 
     return render(request, "builder/lead_management.html", {
@@ -529,7 +527,6 @@ def lead_management(request):
         "agents": agents,
         "properties": properties,
     })
-
 @login_required
 def builder_dashboard(request):
     
