@@ -28,7 +28,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['smartrealty-system.onrender.com', 'localhost', '127.0.0.1']
 
@@ -169,3 +169,6 @@ SESSION_SAVE_EVERY_REQUEST = True
 SESSION_COOKIE_SECURE = not DEBUG
 CSRF_COOKIE_SECURE = not DEBUG
 SESSION_COOKIE_SAMESITE = "Lax"
+print("SECRET_KEY:", os.getenv("SECRET_KEY"))
+print("SENDGRID:", os.getenv("SENDGRID_API_KEY"))
+print("DB:", os.getenv("DATABASE_URL"))
