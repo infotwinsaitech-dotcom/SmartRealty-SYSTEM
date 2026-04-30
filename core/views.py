@@ -23,6 +23,8 @@ from django.db.models import Count
 from django.db.models import Q
 from django.contrib.auth import update_session_auth_hash
 from .models import Property, PropertyImage
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail
 def home(request):
     properties = Property.objects.all()[:6]
 
