@@ -52,9 +52,18 @@ def property_detail(request, id):
         phone = request.POST.get("phone")
         message = request.POST.get("message")
 
-        agents = Agent.objects.filter(builder=property.builder)
-        agent = agents.first() if agents.exists() else None
+        # ✅ ROUND ROBIN LOGIC
+        agents = list(Agent.objects.filter(builder=property.builder).order_by('id'))
 
+        last_lead = Lead.objects.filter(builder=property.builder).order_by('-id').first()
+
+        if last_lead and last_lead.assigned_to in agents:
+            last_index = agents.index(last_lead.assigned_to)
+            agent = agents[(last_index + 1) % len(agents)]
+        else:
+            agent = agents[0] if agents else None
+
+        # ✅ CREATE LEAD
         lead = Lead.objects.create(
             name=name,
             email=email,
@@ -78,12 +87,12 @@ def property_detail(request, id):
 
         messages.success(request, "Inquiry sent successfully!")
 
-        # ✅ MUST: redirect
         return redirect('property_detail', id=property.id)
 
     return render(request, "public/property_detail.html", {
         "property": property
     })
+
 
 def property_list(request):
     properties = Property.objects.all().order_by('-created_at')
@@ -1690,8 +1699,13 @@ def privacy(request):
     })
 
 def auto_assign_agent(builder):
-    agents = Agent.objects.filter(builder=builder)
-    return agents.first() if agents.exists() else None
+    agents = list(Agent.objects.filter(builder=builder).order_by('id'))
+    last_lead = Lead.objects.filter(builder=builder).order_by('-id').first()
+
+    if last_lead and last_lead.assigned_to in agents:
+        last_index = agents.index(last_lead.assigned_to)
+        return agents[(last_index + 1) % len(agents)]
+    return agents[0] if agents else None
 
 @receiver(post_save, sender=User)
 def create_agent_for_user(sender, instance, created, **kwargs):
