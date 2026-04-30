@@ -49,18 +49,16 @@ def property_detail(request, id):
     if request.method == "POST":
         name = request.POST.get("name")
         email = request.POST.get("email")
-        phone = request.POST.get("phone")   # ✅ FIX
+        phone = request.POST.get("phone")
         message = request.POST.get("message")
 
-        # ✅ AUTO ASSIGN
         agents = Agent.objects.filter(builder=property.builder)
         agent = agents.first() if agents.exists() else None
 
-        # ✅ CREATE LEAD
         lead = Lead.objects.create(
             name=name,
             email=email,
-            phone=phone,   # ✅ NOW SAVED
+            phone=phone,
             status='HOT',
             source='Website',
             interest=property.title,
@@ -69,17 +67,20 @@ def property_detail(request, id):
             notes=message
         )
 
-        # ✅ PROPERTY LINK
         lead.properties.add(property)
 
-        # ✅ SAVE INQUIRY
         Inquiry.objects.create(
             property=property,
             name=name,
             email=email,
             message=message
         )
+
         messages.success(request, "Inquiry sent successfully!")
+
+        # ✅ IMPORTANT
+        return redirect("builder_property_detail", id=property.id)
+        # ⚠️ correct URL name use करो
 
     return render(request, "public/property_detail.html", {
         "property": property
