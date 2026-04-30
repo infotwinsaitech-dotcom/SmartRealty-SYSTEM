@@ -78,14 +78,12 @@ def property_detail(request, id):
 
         messages.success(request, "Inquiry sent successfully!")
 
-        # ✅ IMPORTANT
-       
-        # ⚠️ correct URL name use करो
+        # ✅ MUST: redirect
+        return redirect('property_detail', id=property.id)
 
     return render(request, "public/property_detail.html", {
         "property": property
     })
-
 
 def property_list(request):
     properties = Property.objects.all().order_by('-created_at')
