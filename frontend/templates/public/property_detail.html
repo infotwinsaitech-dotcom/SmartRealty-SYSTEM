@@ -1,5 +1,19 @@
 {% extends "public/base.html" %}
 {% load cloudinary %}
+
+{% if messages %}
+<div id="popup" class="fixed top-5 right-5 bg-green-500 text-white px-6 py-3 rounded shadow-lg">
+    {% for message in messages %}
+        {{ message }}
+    {% endfor %}
+</div>
+
+<script>
+setTimeout(() => {
+    document.getElementById("popup").style.display = "none";
+}, 3000);
+</script>
+{% endif %}
 {% block content %}
 
 <div class="max-w-7xl mx-auto px-4 md:px-6 py-12 md:py-20 text-white">

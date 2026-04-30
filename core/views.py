@@ -79,6 +79,7 @@ def property_detail(request, id):
             email=email,
             message=message
         )
+        messages.success(request, "Inquiry sent successfully!")
 
     return render(request, "public/property_detail.html", {
         "property": property
