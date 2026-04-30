@@ -469,9 +469,7 @@ def lead_management(request):
     inquiries = Inquiry.objects.all()
 
     # ✅ FINAL QUERY (DON'T OVERRIDE LATER)
-    leads = Lead.objects.filter(
-        Q(builder=request.user) | Q(builder__isnull=True)
-    ).order_by('-id')
+    leads = Lead.objects.filter(builder=request.user).order_by('-id')
 
     properties = Property.objects.filter(builder=request.user)
 
@@ -514,9 +512,9 @@ def lead_management(request):
     agents = Agent.objects.filter(builder=request.user)
 
     # ✅ PAGINATION (same queryset use karo)
-    paginator = Paginator(leads, 10)
-    page = request.GET.get('page', 1)
-    leads = paginator.get_page(page)
+    #paginator = Paginator(leads, 10)
+    #page = request.GET.get('page', 1)
+    #leads = paginator.get_page(page)
 
     return render(request, "builder/lead_management.html", {
         "inquiries": inquiries,
