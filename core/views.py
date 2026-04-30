@@ -249,8 +249,7 @@ def forgot_password(request):
             # 🔥 OTP generate
             otp = random.randint(100000, 999999)
 
-            # 🔥 session fix (IMPORTANT)
-            request.session.flush()
+            # 🔥 session set (safe way)
             request.session['reset_email'] = email
             request.session['otp'] = str(otp)
             request.session.save()
@@ -258,20 +257,24 @@ def forgot_password(request):
             print("OTP:", otp)
             print("SESSION AFTER SET:", request.session.items())
 
-            # 🔥 EMAIL SEND (FINAL FIX)
+            # 🔥 EMAIL SEND (SendGrid API - NO TIMEOUT)
             try:
-                send_mail(
-        "OTP Verification",
-        f"Your OTP is {otp}",
-        settings.EMAIL_HOST_USER,
-        [email],
-        fail_silently=True,
-    )
+                message = Mail(
+                    from_email=os.getenv("DEFAULT_FROM_EMAIL"),
+                    to_emails=email,
+                    subject="OTP Verification",
+                    html_content=f"<strong>Your OTP is: {otp}</strong>"
+                )
+
+                sg = SendGridAPIClient(os.getenv("SENDGRID_API_KEY"))
+                sg.send(message)
+
+                print("MAIL SENT")
 
             except Exception as e:
                 print("MAIL FAILED:", e)
                 return render(request, "public/forgot_password.html", {
-                    "error": f"Email failed: {mail_error}"
+                    "error": f"Email failed: {str(e)}"
                 })
 
             return redirect("otp_verification")
