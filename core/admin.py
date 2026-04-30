@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Property, PropertyImage,PropertyAmenity,Inquiry,SiteSettings,User,Profile,Lead, Deal, Task, Activity,admin,Document,Notification,AIInsight,LeadScore,Campaign
+from .models import Property, PropertyImage,Inquiry,SiteSettings,User,Profile,Lead, Deal, Task, Activity,admin,Document,Notification,AIInsight,LeadScore,Campaign
 
 class PropertyImageInline(admin.TabularInline):
     model = PropertyImage
@@ -7,13 +7,6 @@ class PropertyImageInline(admin.TabularInline):
 
 class PropertyAdmin(admin.ModelAdmin):
     inlines = [PropertyImageInline]
-
-class PropertyAmenityInline(admin.TabularInline):
-    model = PropertyAmenity
-    extra = 3
-
-class PropertyAdmin(admin.ModelAdmin):
-    inlines = [PropertyAmenityInline]
 
 admin.site.register(Property, PropertyAdmin)
 
