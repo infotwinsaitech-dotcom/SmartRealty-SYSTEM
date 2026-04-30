@@ -468,7 +468,11 @@ def lead_management(request):
 
     inquiries = Inquiry.objects.all()
 
-    leads = Lead.objects.filter(builder=request.user)  # 🔒 important
+    # ✅ FIX: builder issue handle + proper sorting
+    leads = Lead.objects.filter(
+        Q(builder=request.user) | Q(builder__isnull=True)
+    ).order_by('-id')
+
     properties = Property.objects.filter(builder=request.user)
 
     # 🔍 search
@@ -489,21 +493,24 @@ def lead_management(request):
     if sort == "old":
         leads = leads.order_by('id')
     else:
-        leads = leads.order_by('-id')  # ✅ default
+        leads = leads.order_by('-id')
 
-    # ✅ SELECTED LEAD (SAFE)
+    # ✅ SELECTED LEAD
     selected_lead = None
     lead_id = request.GET.get('lead')
 
     if lead_id:
         selected_lead = Lead.objects.filter(
-            id=lead_id,
-            builder=request.user
+            id=lead_id
         ).first()
 
     # 📊 stats
     total_pipeline = Deal.objects.aggregate(total=Sum('amount'))['total'] or 0
-    hot_leads = Lead.objects.filter(status='HOT', builder=request.user).count()
+
+    hot_leads = Lead.objects.filter(
+        Q(builder=request.user) | Q(builder__isnull=True),
+        status='HOT'
+    ).count()
 
     # 👥 agents
     agents = Agent.objects.filter(builder=request.user)
@@ -522,7 +529,6 @@ def lead_management(request):
         "agents": agents,
         "properties": properties,
     })
-
 
 @login_required
 def builder_dashboard(request):
