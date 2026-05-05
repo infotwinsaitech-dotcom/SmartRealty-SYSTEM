@@ -45,6 +45,10 @@ from .models import Inquiry
 
 def property_detail(request, id):
     property = get_object_or_404(Property, id=id)
+    # ✅ highlights split fix
+    highlights_list = []
+    if property.highlights:
+        highlights_list = property.highlights.split(",")
 
     if request.method == "POST":
         name = request.POST.get("name")
@@ -91,7 +95,8 @@ def property_detail(request, id):
         return redirect('property_detail', id=property.id)
 
     return render(request, "public/property_detail.html", {
-        "property": property
+        "property": property,
+        "highlights_list": highlights_list
     })
 
 
