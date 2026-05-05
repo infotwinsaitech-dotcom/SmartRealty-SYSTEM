@@ -63,6 +63,7 @@ class Inquiry(models.Model):
     name = models.CharField(max_length=100)
     email = models.EmailField()
     message = models.TextField()
+    phone = models.CharField(max_length=15, blank=True, null=True)
 
     agent = models.ForeignKey('core.User', on_delete=models.SET_NULL, null=True, blank=True)
 

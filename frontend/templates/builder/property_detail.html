@@ -4,11 +4,10 @@
 
 <div class="ml-64 mt-16 p-6">
 
-<!-- HEADER -->
 <div class="flex justify-between items-center mb-8">
 <div>
 <h2 class="text-4xl font-extrabold text-gray-800">Edit Property</h2>
-<p class="text-gray-500">Update your premium listing details</p>
+<p class="text-gray-500">Update your property</p>
 </div>
 
 <a href="{% url 'property_management' %}"
@@ -17,155 +16,102 @@ class="bg-gray-200 px-4 py-2 rounded-lg hover:bg-gray-300">
 </a>
 </div>
 
-<div class="grid grid-cols-12 gap-8">
+<div class="bg-white p-8 rounded-2xl shadow-xl">
 
-<!-- ================= LEFT ================= -->
-<div class="col-span-12 lg:col-span-8 bg-white p-8 rounded-2xl shadow-xl">
-
-<form method="POST" enctype="multipart/form-data" class="space-y-6">
+<form method="POST" enctype="multipart/form-data" class="space-y-4">
 {% csrf_token %}
 
-<!-- TITLE -->
-<div>
-<label class="text-sm font-semibold text-gray-600">Property Title</label>
-<input type="text" name="title" value="{{ property.title }}"
-class="w-full mt-2 p-3 border rounded-xl focus:ring-2 focus:ring-blue-500">
+<!-- BASIC -->
+<input name="title" value="{{ property.title }}" class="w-full border p-2 rounded">
+<input name="location" value="{{ property.location }}" class="w-full border p-2 rounded">
+<input name="price" value="{{ property.price }}" class="w-full border p-2 rounded">
+
+<div class="grid grid-cols-3 gap-2">
+<input name="beds" value="{{ property.beds }}" class="border p-2 rounded">
+<input name="baths" value="{{ property.baths }}" class="border p-2 rounded">
+<input name="sqft" value="{{ property.sqft }}" class="border p-2 rounded">
 </div>
 
-<!-- LOCATION -->
-<div>
-<label class="text-sm font-semibold text-gray-600">Location</label>
-<input type="text" name="location" value="{{ property.location }}"
-class="w-full mt-2 p-3 border rounded-xl">
-</div>
+<textarea name="description" class="w-full border p-2 rounded">{{ property.description }}</textarea>
 
-<!-- PRICE -->
-<div>
-<label class="text-sm font-semibold text-gray-600">Price</label>
-<input type="number" name="price" value="{{ property.price }}"
-class="w-full mt-2 p-3 border rounded-xl">
-</div>
+<select name="type" class="w-full border p-2 rounded">
+<option value="Residential" {% if property.property_type == "Residential" %}selected{% endif %}>Residential</option>
+<option value="Commercial" {% if property.property_type == "Commercial" %}selected{% endif %}>Commercial</option>
+</select>
 
-<!-- DESCRIPTION -->
-<div>
-<label class="text-sm font-semibold text-gray-600">Description</label>
-<textarea name="description" rows="5"
-class="w-full mt-2 p-3 border rounded-xl">{{ property.description }}</textarea>
-</div>
-
-<!-- STATUS -->
-<div>
-<label class="text-sm font-semibold text-gray-600">Status</label>
-<select name="status" class="w-full mt-2 p-3 border rounded-xl">
+<select name="status" class="w-full border p-2 rounded">
 <option value="Available" {% if property.status == "Available" %}selected{% endif %}>Available</option>
 <option value="Sold" {% if property.status == "Sold" %}selected{% endif %}>Sold</option>
 </select>
-</div>
 
-<!-- ✅ UPDATE THUMBNAIL -->
-<div>
-<label class="text-sm font-semibold text-gray-600">Update Thumbnail</label>
-
+<!-- THUMBNAIL -->
+<label>Thumbnail</label>
 {% if property.thumbnail %}
-    <img src="{% cloudinary_url property.thumbnail width=600 height=400 crop='fill' %}"
-         class="w-full h-52 object-cover group-hover:scale-110 transition duration-500">
-{% else %}
-    <img src="https://via.placeholder.com/400x300"
-         class="w-full h-52 object-cover">
+<img src="{% cloudinary_url property.thumbnail width=400 height=250 crop='fill' %}" class="mb-2 rounded">
 {% endif %}
-
 <input type="file" name="thumbnail" class="w-full border p-2 rounded">
-</div>
 
-<!-- ✅ ADD MORE GALLERY IMAGES -->
-<div>
-<label class="text-sm font-semibold text-gray-600">Add Gallery Images</label>
-
-<div id="image-container" class="space-y-3 mt-2">
-<div class="flex gap-2">
+<!-- GALLERY -->
+<label>Gallery Images</label>
+<div id="image-container">
 <input type="file" name="images" class="w-full border p-2 rounded">
-<button type="button" onclick="removeField(this)"
-class="bg-red-500 text-white px-3 rounded hidden">✕</button>
-</div>
 </div>
 
 <button type="button" onclick="addImageField()"
-class="mt-3 px-4 py-2 bg-green-600 text-white rounded-lg">
-+ Add More Images
-</button>
-</div>
-
-<!-- BUTTON -->
-<button class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 rounded-xl font-bold text-lg">
-💾 Update Property
+class="mt-2 bg-green-600 text-white px-3 py-1 rounded">
++ Add More
 </button>
 
-</form>
+<!-- AMENITIES -->
+<label class="font-semibold">Amenities</label>
+<div class="grid grid-cols-2 gap-2">
 
-</div>
-
-<!-- ================= RIGHT ================= -->
-<div class="col-span-12 lg:col-span-4 space-y-6">
-
-<!-- ✅ GALLERY PREVIEW -->
-<div class="bg-white p-6 rounded-2xl shadow-xl">
-
-<h3 class="font-bold mb-4">Gallery Images</h3>
-
-<div class="grid grid-cols-2 gap-3">
-
-{% for img in property.images.all %}
-<div class="relative">
-    <img src="{% cloudinary_url img.image width=200 height=150 crop='fill' %}"
-     class="w-full h-28 object-cover rounded-lg">
-</div>
-{% empty %}
-<p class="text-gray-400 text-sm">No images</p>
+{% for item in "Parking,Lift,Gym,Pool,Security,Garden".split(",") %}
+<label>
+<input type="checkbox" name="amenities" value="{{ item }}"
+{% if item in property.amenities %}checked{% endif %}>
+{{ item }}
+</label>
 {% endfor %}
 
 </div>
-</div>
 
-<!-- ✅ DELETE -->
-<div class="bg-red-50 p-6 rounded-2xl shadow-xl text-center">
+<!-- EXTRA -->
+<input name="configuration" value="{{ property.configuration }}" placeholder="Configuration"
+class="w-full border p-2 rounded">
 
-<h3 class="font-bold text-red-600 mb-3">Danger Zone</h3>
+<input name="rera_number" value="{{ property.rera_number }}" placeholder="RERA"
+class="w-full border p-2 rounded">
 
-<form method="POST" action="{% url 'delete_property' property.id %}">
-{% csrf_token %}
+<input name="possession_date" value="{{ property.possession_date }}" placeholder="Possession"
+class="w-full border p-2 rounded">
 
-<button class="w-full bg-red-600 text-white py-3 rounded-xl font-bold hover:bg-red-700">
-🗑 Delete Property
+<textarea name="highlights" class="w-full border p-2 rounded">{{ property.highlights }}</textarea>
+
+<input name="map_link" value="{{ property.map_link }}" class="w-full border p-2 rounded">
+
+<!-- BROCHURE -->
+<label>Brochure</label>
+<input type="file" name="brochure" class="w-full border p-2 rounded">
+
+<!-- SUBMIT -->
+<button class="w-full mt-4 bg-blue-600 text-white py-3 rounded">
+Update Property
 </button>
 
 </form>
-
 </div>
 
 </div>
 
-</div>
-</div>
-
-<!-- ================= JS ================= -->
 <script>
 function addImageField() {
 const container = document.getElementById("image-container");
-
-const div = document.createElement("div");
-div.classList.add("flex", "gap-2");
-
-div.innerHTML = `
-<input type="file" name="images" class="w-full border p-2 rounded">
-<button type="button" onclick="removeField(this)"
-class="bg-red-500 text-white px-3 rounded">✕</button>
-`;
-
-container.appendChild(div);
-}
-
-function removeField(btn) {
-btn.parentElement.remove();
+const input = document.createElement("input");
+input.type = "file";
+input.name = "images";
+input.className = "w-full border p-2 rounded mt-2";
+container.appendChild(input);
 }
 </script>
 

@@ -48,7 +48,7 @@ def property_detail(request, id):
     # ✅ highlights split fix
     highlights_list = []
     if property.highlights:
-        highlights_list = property.highlights.split(",")
+        highlights_list = property.highlights.split(",") if property.highlights else []
 
     if request.method == "POST":
         name = request.POST.get("name")
