@@ -434,7 +434,7 @@ def add_property(request):
         thumbnail = request.FILES.get("thumbnail")
         brochure = request.FILES.get("brochure")
 
-        amenities = request.POST.getlist("amenities")
+        property.amenities = request.POST.getlist("amenities")
 
         # ✅ FIXED NAMES
         highlights = request.POST.get("highlights")
