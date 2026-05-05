@@ -119,7 +119,23 @@ class="bg-red-500 text-white px-3 rounded hidden">✕</button>
 <label><input type="checkbox" name="amenities" value="Pool"> Pool</label>
 <label><input type="checkbox" name="amenities" value="Security"> Security</label>
 <label><input type="checkbox" name="amenities" value="Garden"> Garden</label>
+<input name="configuration" placeholder="Configuration (2BHK, 3BHK)"
+class="w-full mb-3 border p-2 rounded">
 
+<input name="rera_number" placeholder="RERA Number"
+class="w-full mb-3 border p-2 rounded">
+
+<input name="possession_date" placeholder="Possession (Dec 2027)"
+class="w-full mb-3 border p-2 rounded">
+
+<textarea name="highlights" placeholder="Highlights (comma separated)"
+class="w-full mb-3 border p-2 rounded"></textarea>
+
+<input name="map_link" placeholder="Google Map Embed Link"
+class="w-full mb-3 border p-2 rounded">
+
+<label class="font-semibold">Brochure (PDF)</label>
+<input type="file" name="brochure" class="w-full mb-3 border p-2 rounded">
 </div>
 <button type="button" onclick="addImageField()"
 class="mt-3 px-4 py-2 bg-green-600 text-white rounded-lg hover:scale-105 transition">

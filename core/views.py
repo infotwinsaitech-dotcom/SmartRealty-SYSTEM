@@ -82,6 +82,7 @@ def property_detail(request, id):
             property=property,
             name=name,
             email=email,
+            phone=phone,
             message=message
         )
 
@@ -422,11 +423,21 @@ def add_property(request):
         baths = request.POST.get("baths")
         sqft = request.POST.get("sqft")
         description = request.POST.get("description")
-        type = request.POST.get("type")
+
+        property_type = request.POST.get("type")
+
         thumbnail = request.FILES.get("thumbnail")
+        brochure = request.FILES.get("brochure")
+
         amenities = request.POST.getlist("amenities")
 
-        # ✅ FIRST CREATE PROPERTY
+        # ✅ FIXED NAMES
+        highlights = request.POST.get("highlights")
+        rera_number = request.POST.get("rera")
+        possession_date = request.POST.get("possession")
+        map_link = request.POST.get("map")
+        configuration = request.POST.get("configuration")
+
         property = Property.objects.create(
             title=title,
             location=location,
@@ -435,21 +446,23 @@ def add_property(request):
             baths=baths,
             sqft=sqft,
             description=description,
-            property_type=type,
+            property_type=property_type,
             status=status,
             thumbnail=thumbnail,
+            brochure=brochure,
             amenities=amenities,
+            highlights=highlights,
+            rera_number=rera_number,
+            possession_date=possession_date,
+            map_link=map_link,
+            configuration=configuration,
             builder=request.user
         )
 
-        # ✅ THEN SAVE MULTIPLE IMAGES
+        # ✅ MULTIPLE IMAGES
         images = request.FILES.getlist("images")
-
         for img in images:
-            PropertyImage.objects.create(
-                property=property,
-                image=img
-            )
+            PropertyImage.objects.create(property=property, image=img)
 
         return redirect("my_property")
 

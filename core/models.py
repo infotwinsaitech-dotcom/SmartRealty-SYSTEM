@@ -27,11 +27,19 @@ class Property(models.Model):
     thumbnail = CloudinaryField('image')
     video = models.FileField(upload_to='videos/', blank=True, null=True)
 
-    created_at = models.DateTimeField(auto_now_add=True)
+    
     agent_name = models.CharField(max_length=100, default="Agent")
     agent_role = models.CharField(max_length=100, default="Advisor")
     agent_image = models.ImageField(upload_to='agents/', blank=True, null=True)
     amenities = models.JSONField(default=list, blank=True)
+    highlights = models.TextField(blank=True, null=True)
+    rera_number = models.CharField(max_length=100, blank=True, null=True)
+    possession_date = models.CharField(max_length=100, blank=True, null=True)
+    map_link = models.TextField(blank=True, null=True)
+    configuration = models.CharField(max_length=100, blank=True, null=True)
+    brochure = models.FileField(upload_to='brochures/', null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
 
     def __str__(self):
         return self.title

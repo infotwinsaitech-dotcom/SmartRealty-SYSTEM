@@ -3,7 +3,7 @@
 
 {% block content %}
 
-<!-- ✅ POPUP -->
+<!-- POPUP -->
 {% if messages %}
 <div id="popup" class="fixed top-20 right-5 bg-green-500 text-white px-6 py-3 rounded shadow-lg z-[9999] animate-bounce">
     {% for message in messages %}
@@ -21,42 +21,34 @@ setTimeout(() => {
 
 <div class="max-w-7xl mx-auto px-4 md:px-6 py-12 md:py-20 text-white">
 
-
-<!-- ================= IMAGE SECTION ================= -->
+<!-- IMAGE SECTION -->
 <div class="grid lg:grid-cols-12 gap-6 md:gap-10 mb-12">
 
-<!-- MAIN IMAGE -->
 {% if property.thumbnail %}
 {% cloudinary_url property.thumbnail width=1400 height=900 crop="fill" as main_img %}
 
-<div class="lg:col-span-8 cursor-pointer"
-     onclick="openGallery(0)">
+<div class="lg:col-span-8 cursor-pointer" onclick="openGallery(0)">
     <img src="{{ main_img }}"
          class="w-full h-[300px] sm:h-[400px] md:h-[520px] object-cover rounded-2xl">
 </div>
 {% endif %}
 
-<!-- SIDE IMAGES -->
 <div class="lg:col-span-4 grid grid-cols-2 gap-3">
 
 {% for img in property.images.all %}
-{% cloudinary_url img.image width=1400 height=900 crop="fill" as full_img %}
 {% cloudinary_url img.image width=300 height=200 crop="fill" as thumb_img %}
 
-<div class="cursor-pointer"
-     onclick="openGallery({{ forloop.counter }})">
-
+<div class="cursor-pointer" onclick="openGallery({{ forloop.counter }})">
     <img src="{{ thumb_img }}"
          class="w-full h-28 object-cover rounded-xl hover:scale-110 transition">
-
 </div>
 {% endfor %}
 
 </div>
 
 </div>
-
-<!-- ================= CONTENT ================= -->
+<p class="text-gray-300"><b>Type:</b> {{ property.property_type }}</p>
+<!-- CONTENT -->
 <div class="grid lg:grid-cols-12 gap-8 md:gap-12">
 
 <div class="lg:col-span-8 space-y-6">
@@ -65,9 +57,10 @@ setTimeout(() => {
 {{ property.title }}
 </h1>
 
-<p class="text-gray-400">
-{{ property.location }}
-</p>
+<p class="text-gray-400">{{ property.location }}</p>
+
+<!-- 🔥 PRICE ADD -->
+<h2 class="text-2xl text-yellow-400 font-bold">₹ {{ property.price }}</h2>
 
 <div class="grid grid-cols-3 gap-4">
 
@@ -85,48 +78,67 @@ setTimeout(() => {
 
 </div>
 
+<!-- DESCRIPTION -->
 <div>
 <h3 class="text-xl text-yellow-400 mb-2">Description</h3>
-
-<p class="text-gray-300">
-{{ property.description }}
-</p>
+<p class="text-gray-300">{{ property.description }}</p>
+</div>
+{% if property.configuration %}
+<p class="text-gray-300"><b>Configuration:</b> {{ property.configuration }}</p>
+{% endif %}
+<!-- 🔥 HIGHLIGHTS -->
+{% if property.highlights %}
 <div>
-    <h3 class="text-xl text-yellow-400 mb-2">Amenities</h3>
+<h3 class="text-xl text-yellow-400 mb-2">Highlights</h3>
+<ul class="text-gray-300">
+{% for h in property.highlights.split(",") %}
+<li>✔ {{ h }}</li>
+{% endfor %}
+</ul>
+</div>
+{% endif %}
 
-    <div class="grid grid-cols-2 gap-3 text-gray-300">
+<!-- AMENITIES -->
+<div>
+<h3 class="text-xl text-yellow-400 mb-2">Amenities</h3>
 
-        {% for item in property.amenities %}
-            <div class="bg-white/5 p-2 rounded">
-                ✔ {{ item }}
-            </div>
-        {% empty %}
-            <p>No amenities available</p>
-        {% endfor %}
+<div class="grid grid-cols-2 gap-3 text-gray-300">
 
-    </div>
+{% for item in property.amenities %}
+<div class="bg-white/5 p-2 rounded">
+✔ {{ item }}
+</div>
+{% empty %}
+<p>No amenities available</p>
+{% endfor %}
+
+</div>
 </div>
 
-<!-- ================= MAP ================= -->
-<div class="mt-10">
+<!-- 🔥 EXTRA INFO -->
+<div class="text-gray-300 space-y-1">
+<p><b>RERA:</b> {{ property.rera_number|default:"N/A" }}</p>
+<p><b>Possession:</b> {{ property.possession_date|default:"N/A" }}</p>
+</div>
 
-<h3 class="text-xl md:text-2xl text-yellow-400 mb-4">
-Location
-</h3>
+<!-- 🔥 BROCHURE -->
+{% if property.brochure %}
+<a href="{{ property.brochure.url }}" target="_blank"
+class="inline-block bg-blue-600 px-4 py-2 rounded mt-3">
+Download Brochure
+</a>
+{% endif %}
+
+<!-- MAP -->
+<div class="mt-10">
+<h3 class="text-xl md:text-2xl text-yellow-400 mb-4">Location</h3>
 
 <div class="w-full h-[300px] md:h-[400px] rounded-2xl overflow-hidden shadow-lg">
 
 <iframe
-    src="https://www.google.com/maps?q=Ahmedabad&output=embed"
-    width="100%"
-    height="100%"
-    style="border:0;"
-    allowfullscreen=""
-    loading="lazy"
-    referrerpolicy="no-referrer-when-downgrade">
+    src="{{ property.map_link|default:'https://maps.google.com/maps?q=Ahmedabad&output=embed' }}"
+    width="100%" height="100%" style="border:0;">
 </iframe>
-
-</div>
 
 </div>
 </div>
@@ -143,12 +155,13 @@ Location
 <form method="POST" class="space-y-4">
 {% csrf_token %}
 
-<input name="name" placeholder="Name" class="w-full p-3 rounded bg-white/10">
-<input name="email" placeholder="Email" class="w-full p-3 rounded bg-white/10">
-<!-- ✅ MOBILE NUMBER -->
+<input name="name" placeholder="Name" required class="w-full p-3 rounded bg-white/10">
+<input name="email" placeholder="Email" required class="w-full p-3 rounded bg-white/10">
 <input type="tel" name="phone" placeholder="Mobile Number"
-       class="w-full p-3 rounded bg-white/10">
-<textarea name="message" placeholder="Message" class="w-full p-3 rounded bg-white/10"></textarea>
+       required class="w-full p-3 rounded bg-white/10">
+
+<textarea name="message" placeholder="Message"
+class="w-full p-3 rounded bg-white/10"></textarea>
 
 <button class="w-full py-3 bg-yellow-400 text-black rounded font-bold">
 Send Inquiry
@@ -164,103 +177,58 @@ Send Inquiry
 
 </div>
 
-<!-- ================= SLIDER MODAL ================= -->
+<!-- GALLERY -->
 <div id="galleryModal"
      class="fixed inset-0 bg-black/95 hidden items-center justify-center z-50">
 
-<!-- CLOSE -->
 <span onclick="closeGallery()"
-      class="absolute top-5 right-6 text-white text-4xl cursor-pointer z-50">
-×
-</span>
+      class="absolute top-5 right-6 text-white text-4xl cursor-pointer z-50">×</span>
 
-<!-- PREV -->
-<button onclick="prevImage()"
-    class="absolute left-5 text-white text-5xl z-50">
-‹
-</button>
+<button onclick="prevImage()" class="absolute left-5 text-white text-5xl z-50">‹</button>
 
-<!-- IMAGE -->
 <img id="galleryImage"
      class="max-w-[90%] max-h-[90%] rounded-xl shadow-2xl">
 
-<!-- NEXT -->
-<button onclick="nextImage()"
-    class="absolute right-5 text-white text-5xl z-50">
-›
-</button>
+<button onclick="nextImage()" class="absolute right-5 text-white text-5xl z-50">›</button>
 
 </div>
 
-<!-- ================= JS ================= -->
 <script>
-
 let images = [
-    {% if property.thumbnail %}
-    "{% cloudinary_url property.thumbnail width=1400 height=900 crop='fill' %}",
-    {% endif %}
-
-    {% for img in property.images.all %}
-    "{% cloudinary_url img.image width=1400 height=900 crop='fill' %}",
-    {% endfor %}
+{% if property.thumbnail %}
+"{% cloudinary_url property.thumbnail width=1400 height=900 crop='fill' %}",
+{% endif %}
+{% for img in property.images.all %}
+"{% cloudinary_url img.image width=1400 height=900 crop='fill' %}",
+{% endfor %}
 ];
 
 let currentIndex = 0;
 
-// OPEN
-function openGallery(index) {
+function openGallery(index){
     currentIndex = index;
     updateImage();
-
-    let modal = document.getElementById("galleryModal");
-    modal.classList.remove("hidden");
-    modal.classList.add("flex");
+    document.getElementById("galleryModal").classList.remove("hidden");
+    document.getElementById("galleryModal").classList.add("flex");
 }
 
-// CLOSE
-function closeGallery() {
-    let modal = document.getElementById("galleryModal");
-    modal.classList.add("hidden");
+function closeGallery(){
+    document.getElementById("galleryModal").classList.add("hidden");
 }
 
-// UPDATE IMAGE
-function updateImage() {
+function updateImage(){
     document.getElementById("galleryImage").src = images[currentIndex];
 }
 
-// NEXT
-function nextImage() {
+function nextImage(){
     currentIndex = (currentIndex + 1) % images.length;
     updateImage();
 }
 
-// PREV
-function prevImage() {
+function prevImage(){
     currentIndex = (currentIndex - 1 + images.length) % images.length;
     updateImage();
 }
-
-// KEYBOARD
-document.addEventListener("keydown", function(e) {
-    if (e.key === "ArrowRight") nextImage();
-    if (e.key === "ArrowLeft") prevImage();
-    if (e.key === "Escape") closeGallery();
-});
-
-// MOBILE SWIPE
-let startX = 0;
-
-document.getElementById("galleryModal").addEventListener("touchstart", e => {
-    startX = e.touches[0].clientX;
-});
-
-document.getElementById("galleryModal").addEventListener("touchend", e => {
-    let endX = e.changedTouches[0].clientX;
-
-    if (startX - endX > 50) nextImage();
-    if (endX - startX > 50) prevImage();
-});
-
 </script>
 
 {% endblock %}
