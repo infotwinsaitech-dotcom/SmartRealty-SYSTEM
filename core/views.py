@@ -434,13 +434,13 @@ def add_property(request):
         thumbnail = request.FILES.get("thumbnail")
         brochure = request.FILES.get("brochure")
 
-        property.amenities = request.POST.getlist("amenities")
+        # ✅ FIX HERE
+        amenities = request.POST.getlist("amenities")
 
-        # ✅ FIXED NAMES
         highlights = request.POST.get("highlights")
-        rera_number = request.POST.get("rera")
-        possession_date = request.POST.get("possession")
-        map_link = request.POST.get("map")
+        rera_number = request.POST.get("rera_number")   # ✅ FIX name
+        possession_date = request.POST.get("possession_date")  # ✅ FIX name
+        map_link = request.POST.get("map_link")  # ✅ FIX name
         configuration = request.POST.get("configuration")
 
         property = Property.objects.create(
@@ -455,7 +455,7 @@ def add_property(request):
             status=status,
             thumbnail=thumbnail,
             brochure=brochure,
-            amenities=amenities,
+            amenities=amenities,   # ✅ NOW WORKING
             highlights=highlights,
             rera_number=rera_number,
             possession_date=possession_date,
@@ -464,7 +464,6 @@ def add_property(request):
             builder=request.user
         )
 
-        # ✅ MULTIPLE IMAGES
         images = request.FILES.getlist("images")
         for img in images:
             PropertyImage.objects.create(property=property, image=img)
