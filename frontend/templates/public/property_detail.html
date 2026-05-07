@@ -3,33 +3,34 @@
 
 {% block content %}
 
-<!-- HERO SECTION -->
+<!-- HERO -->
 <div class="relative h-[90vh]">
 
 {% if property.thumbnail %}
-<img src="{% cloudinary_url property.thumbnail width=1600 height=900 crop='fill' %}"
+<img src="{% cloudinary_url property.thumbnail width=1800 height=900 crop='fill' %}"
      class="w-full h-full object-cover">
 {% endif %}
 
-<div class="absolute inset-0 bg-black/60 flex flex-col justify-center px-10">
+<div class="absolute inset-0 bg-gradient-to-r from-black/80 to-black/40 flex flex-col justify-center px-10">
 
 <h1 class="text-5xl md:text-6xl font-extrabold text-white">
 {{ property.title }}
 </h1>
 
-<p class="text-xl text-gray-300 mt-3">
+<p class="text-lg text-gray-300 mt-2">
 {{ property.location }}
 </p>
 
-<h2 class="text-3xl text-yellow-400 mt-5 font-bold">
+<h2 class="text-3xl text-yellow-400 mt-4 font-bold">
 ₹ {{ property.price }}
 </h2>
 
 </div>
+
 </div>
 
-<!-- QUICK INFO -->
-<div class="max-w-6xl mx-auto -mt-12 bg-white text-black p-6 rounded-xl shadow-lg grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+<!-- QUICK INFO BAR -->
+<div class="relative z-20 max-w-6xl mx-auto -mt-16 bg-white text-black p-6 rounded-xl shadow-2xl grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
 
 <div><b>{{ property.beds }}</b><br>Beds</div>
 <div><b>{{ property.baths }}</b><br>Baths</div>
@@ -38,16 +39,18 @@
 
 </div>
 
-<!-- MAIN -->
-<div class="max-w-7xl mx-auto px-4 py-16 grid lg:grid-cols-12 gap-10 text-white">
+<!-- MAIN SECTION -->
+<div class="max-w-7xl mx-auto px-4 py-16 grid lg:grid-cols-12 gap-12 text-white">
 
 <!-- LEFT -->
-<div class="lg:col-span-8 space-y-10">
+<div class="lg:col-span-8 space-y-12">
 
 <!-- ABOUT -->
 <div>
 <h2 class="text-3xl font-bold text-yellow-400 mb-3">About Project</h2>
-<p class="text-gray-300 leading-relaxed">{{ property.description }}</p>
+<p class="text-gray-300 leading-relaxed text-lg">
+{{ property.description }}
+</p>
 </div>
 
 <!-- HIGHLIGHTS -->
@@ -57,7 +60,7 @@
 
 <div class="flex flex-wrap gap-3">
 {% for h in highlights_list %}
-<span class="bg-yellow-400 text-black px-4 py-2 rounded-full text-sm font-semibold">
+<span class="bg-yellow-400 text-black px-5 py-2 rounded-full text-sm font-semibold shadow">
 {{ h }}
 </span>
 {% endfor %}
@@ -70,11 +73,12 @@
 <div>
 <h2 class="text-3xl font-bold text-yellow-400 mb-4">Amenities</h2>
 
-<div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+<div class="grid grid-cols-2 md:grid-cols-3 gap-5">
 
 {% for item in property.amenities %}
-<div class="bg-white/10 p-4 rounded-lg flex items-center gap-2 hover:bg-white/20 transition">
-✔ <span>{{ item }}</span>
+<div class="bg-white/10 p-4 rounded-xl flex items-center gap-3 hover:bg-white/20 transition shadow">
+<span class="text-yellow-400 text-xl">✔</span>
+<span>{{ item }}</span>
 </div>
 {% endfor %}
 
@@ -88,18 +92,24 @@
 <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
 
 {% for img in property.images.all %}
-<img src="{% cloudinary_url img.image width=400 height=300 crop='fill' %}"
-     class="rounded-xl hover:scale-105 transition cursor-pointer">
+<img src="{% cloudinary_url img.image width=500 height=350 crop='fill' %}"
+     class="rounded-xl cursor-pointer hover:scale-105 transition duration-300 shadow-lg">
 {% endfor %}
 
 </div>
+</div>
+
+<!-- EXTRA INFO -->
+<div class="bg-white/5 p-6 rounded-xl space-y-2">
+<p><b>RERA:</b> {{ property.rera_number|default:"N/A" }}</p>
+<p><b>Configuration:</b> {{ property.configuration|default:"N/A" }}</p>
 </div>
 
 <!-- MAP -->
 <div>
 <h2 class="text-3xl font-bold text-yellow-400 mb-4">Location</h2>
 
-<div class="rounded-xl overflow-hidden">
+<div class="rounded-xl overflow-hidden shadow-xl">
 <iframe
 src="{{ property.map_link|default:'https://maps.google.com/maps?q=Ahmedabad&output=embed' }}"
 width="100%" height="350" style="border:0;">
@@ -115,7 +125,7 @@ width="100%" height="350" style="border:0;">
 
 <div class="sticky top-24">
 
-<div class="bg-white text-black p-6 rounded-xl shadow-xl">
+<div class="bg-white text-black p-6 rounded-xl shadow-2xl">
 
 <h3 class="text-xl font-bold mb-4">Enquire Now</h3>
 
@@ -129,7 +139,7 @@ width="100%" height="350" style="border:0;">
 <textarea name="message" placeholder="Message"
 class="w-full p-3 border rounded"></textarea>
 
-<button class="w-full bg-yellow-400 py-3 font-bold rounded">
+<button class="w-full bg-yellow-400 py-3 font-bold rounded hover:bg-yellow-500 transition">
 Submit
 </button>
 
