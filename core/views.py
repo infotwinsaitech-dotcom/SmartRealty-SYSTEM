@@ -49,6 +49,10 @@ def property_detail(request, id):
     highlights_list = []
     if property.highlights:
         highlights_list = property.highlights.split(",") if property.highlights else []
+    
+    similar_properties = Property.objects.filter(
+    location=property.location
+).exclude(id=property.id)[:3]
 
     if request.method == "POST":
         name = request.POST.get("name")
@@ -96,7 +100,8 @@ def property_detail(request, id):
 
     return render(request, "public/property_detail.html", {
         "property": property,
-        "highlights_list": highlights_list
+        "highlights_list": highlights_list,
+        "similar_properties": similar_properties
     })
 
 
