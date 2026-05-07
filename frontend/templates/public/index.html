@@ -227,18 +227,22 @@ Get Consultation
 
 <!-- SCROLL ANIMATION SCRIPT -->
 <script>
-const reveals = document.querySelectorAll(".reveal");
+document.addEventListener("DOMContentLoaded", function () {
 
-function revealOnScroll() {
-    reveals.forEach(el => {
-        const top = el.getBoundingClientRect().top;
-        if (top < window.innerHeight - 100) {
-            el.classList.add("active");
-        }
-    });
-}
+    const reveals = document.querySelectorAll(".reveal");
 
-window.addEventListener("scroll", revealOnScroll);
+    function revealOnScroll() {
+        reveals.forEach(el => {
+            const top = el.getBoundingClientRect().top;
+            if (top < window.innerHeight - 100) {
+                el.classList.add("active");
+            }
+        });
+    }
+
+    revealOnScroll(); // ✅ THIS FIXES BLANK SCREEN
+    window.addEventListener("scroll", revealOnScroll);
+
+});
 </script>
-
 {% endblock %}
