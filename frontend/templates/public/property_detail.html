@@ -3,168 +3,134 @@
 
 {% block content %}
 
-<!-- POPUP -->
-{% if messages %}
-<div id="popup" class="fixed top-20 right-5 bg-green-500 text-white px-6 py-3 rounded shadow-lg z-[9999] animate-bounce">
-    {% for message in messages %}
-        {{ message }}
-    {% endfor %}
-</div>
-
-<script>
-setTimeout(() => {
-    const popup = document.getElementById("popup");
-    if (popup) popup.style.display = "none";
-}, 3000);
-</script>
-{% endif %}
-
-<div class="max-w-7xl mx-auto px-4 md:px-6 py-12 md:py-20 text-white">
-
-<!-- IMAGE SECTION -->
-<div class="grid lg:grid-cols-12 gap-6 md:gap-10 mb-12">
+<!-- HERO SECTION -->
+<div class="relative h-[90vh]">
 
 {% if property.thumbnail %}
-{% cloudinary_url property.thumbnail width=1400 height=900 crop="fill" as main_img %}
-
-<div class="lg:col-span-8 cursor-pointer" onclick="openGallery(0)">
-    <img src="{{ main_img }}"
-         class="w-full h-[300px] sm:h-[400px] md:h-[520px] object-cover rounded-2xl">
-</div>
+<img src="{% cloudinary_url property.thumbnail width=1600 height=900 crop='fill' %}"
+     class="w-full h-full object-cover">
 {% endif %}
 
-<div class="lg:col-span-4 grid grid-cols-2 gap-3">
+<div class="absolute inset-0 bg-black/60 flex flex-col justify-center px-10">
 
-{% for img in property.images.all %}
-{% cloudinary_url img.image width=300 height=200 crop="fill" as thumb_img %}
-
-<div class="cursor-pointer" onclick="openGallery({{ forloop.counter }})">
-    <img src="{{ thumb_img }}"
-         class="w-full h-28 object-cover rounded-xl hover:scale-110 transition">
-</div>
-{% endfor %}
-
-</div>
-
-</div>
-<p class="text-gray-300"><b>Type:</b> {{ property.property_type }}</p>
-<!-- CONTENT -->
-<div class="grid lg:grid-cols-12 gap-8 md:gap-12">
-
-<div class="lg:col-span-8 space-y-6">
-
-<h1 class="text-3xl md:text-5xl font-extrabold">
+<h1 class="text-5xl md:text-6xl font-extrabold text-white">
 {{ property.title }}
 </h1>
 
-<p class="text-gray-400">{{ property.location }}</p>
+<p class="text-xl text-gray-300 mt-3">
+{{ property.location }}
+</p>
 
-<!-- 🔥 PRICE ADD -->
-<h2 class="text-2xl text-yellow-400 font-bold">₹ {{ property.price }}</h2>
-
-<div class="grid grid-cols-3 gap-4">
-
-<div class="bg-white/5 p-4 rounded-xl text-center">
-{{ property.beds }} Beds
-</div>
-
-<div class="bg-white/5 p-4 rounded-xl text-center">
-{{ property.baths }} Baths
-</div>
-
-<div class="bg-white/5 p-4 rounded-xl text-center">
-{{ property.sqft }} Sqft
-</div>
+<h2 class="text-3xl text-yellow-400 mt-5 font-bold">
+₹ {{ property.price }}
+</h2>
 
 </div>
+</div>
 
-<!-- DESCRIPTION -->
+<!-- QUICK INFO -->
+<div class="max-w-6xl mx-auto -mt-12 bg-white text-black p-6 rounded-xl shadow-lg grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+
+<div><b>{{ property.beds }}</b><br>Beds</div>
+<div><b>{{ property.baths }}</b><br>Baths</div>
+<div><b>{{ property.sqft }}</b><br>Sqft</div>
+<div><b>{{ property.possession_date|default:"N/A" }}</b><br>Possession</div>
+
+</div>
+
+<!-- MAIN -->
+<div class="max-w-7xl mx-auto px-4 py-16 grid lg:grid-cols-12 gap-10 text-white">
+
+<!-- LEFT -->
+<div class="lg:col-span-8 space-y-10">
+
+<!-- ABOUT -->
 <div>
-<h3 class="text-xl text-yellow-400 mb-2">Description</h3>
-<p class="text-gray-300">{{ property.description }}</p>
+<h2 class="text-3xl font-bold text-yellow-400 mb-3">About Project</h2>
+<p class="text-gray-300 leading-relaxed">{{ property.description }}</p>
 </div>
-{% if property.configuration %}
-<p class="text-gray-300"><b>Configuration:</b> {{ property.configuration }}</p>
-{% endif %}
-<!-- 🔥 HIGHLIGHTS -->
-{% if property.highlights %}
+
+<!-- HIGHLIGHTS -->
+{% if highlights_list %}
 <div>
-<h3 class="text-xl text-yellow-400 mb-2">Highlights</h3>
-<ul class="text-gray-300">
+<h2 class="text-3xl font-bold text-yellow-400 mb-4">Highlights</h2>
+
+<div class="flex flex-wrap gap-3">
 {% for h in highlights_list %}
-<li>✔ {{ h }}</li>
+<span class="bg-yellow-400 text-black px-4 py-2 rounded-full text-sm font-semibold">
+{{ h }}
+</span>
 {% endfor %}
-</ul>
+</div>
+
 </div>
 {% endif %}
 
 <!-- AMENITIES -->
 <div>
-<h3 class="text-xl text-yellow-400 mb-2">Amenities</h3>
+<h2 class="text-3xl font-bold text-yellow-400 mb-4">Amenities</h2>
 
-<div class="grid grid-cols-2 gap-3 text-gray-300">
+<div class="grid grid-cols-2 md:grid-cols-3 gap-4">
 
 {% for item in property.amenities %}
-<div class="bg-white/5 p-2 rounded">
-✔ {{ item }}
+<div class="bg-white/10 p-4 rounded-lg flex items-center gap-2 hover:bg-white/20 transition">
+✔ <span>{{ item }}</span>
 </div>
-{% empty %}
-<p>No amenities available</p>
 {% endfor %}
 
 </div>
 </div>
 
-<!-- 🔥 EXTRA INFO -->
-<div class="text-gray-300 space-y-1">
-<p><b>RERA:</b> {{ property.rera_number|default:"N/A" }}</p>
-<p><b>Possession:</b> {{ property.possession_date|default:"N/A" }}</p>
-</div>
+<!-- GALLERY -->
+<div>
+<h2 class="text-3xl font-bold text-yellow-400 mb-4">Gallery</h2>
 
-<!-- 🔥 BROCHURE -->
-{% if property.brochure %}
-<a href="{{ property.brochure.url }}" target="_blank"
-class="inline-block bg-blue-600 px-4 py-2 rounded mt-3">
-Download Brochure
-</a>
-{% endif %}
+<div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+
+{% for img in property.images.all %}
+<img src="{% cloudinary_url img.image width=400 height=300 crop='fill' %}"
+     class="rounded-xl hover:scale-105 transition cursor-pointer">
+{% endfor %}
+
+</div>
+</div>
 
 <!-- MAP -->
-<div class="mt-10">
-<h3 class="text-xl md:text-2xl text-yellow-400 mb-4">Location</h3>
+<div>
+<h2 class="text-3xl font-bold text-yellow-400 mb-4">Location</h2>
 
-<div class="w-full h-[300px] md:h-[400px] rounded-2xl overflow-hidden shadow-lg">
-
+<div class="rounded-xl overflow-hidden">
 <iframe
-    src="{{ property.map_link|default:'https://maps.google.com/maps?q=Ahmedabad&output=embed' }}"
-    width="100%" height="100%" style="border:0;">
+src="{{ property.map_link|default:'https://maps.google.com/maps?q=Ahmedabad&output=embed' }}"
+width="100%" height="350" style="border:0;">
 </iframe>
-
-</div>
 </div>
 
 </div>
 
-<!-- RIGHT -->
+</div>
+
+<!-- RIGHT (STICKY FORM) -->
 <div class="lg:col-span-4">
 
-<div class="bg-white/5 p-6 rounded-2xl backdrop-blur">
+<div class="sticky top-24">
 
-<h3 class="text-lg text-yellow-400 mb-4">Contact Agent</h3>
+<div class="bg-white text-black p-6 rounded-xl shadow-xl">
+
+<h3 class="text-xl font-bold mb-4">Enquire Now</h3>
 
 <form method="POST" class="space-y-4">
 {% csrf_token %}
 
-<input name="name" placeholder="Name" required class="w-full p-3 rounded bg-white/10">
-<input name="email" placeholder="Email" required class="w-full p-3 rounded bg-white/10">
-<input type="tel" name="phone" placeholder="Mobile Number"
-       required class="w-full p-3 rounded bg-white/10">
+<input name="name" placeholder="Name" required class="w-full p-3 border rounded">
+<input name="email" placeholder="Email" required class="w-full p-3 border rounded">
+<input name="phone" placeholder="Phone" required class="w-full p-3 border rounded">
 
 <textarea name="message" placeholder="Message"
-class="w-full p-3 rounded bg-white/10"></textarea>
+class="w-full p-3 border rounded"></textarea>
 
-<button class="w-full py-3 bg-yellow-400 text-black rounded font-bold">
-Send Inquiry
+<button class="w-full bg-yellow-400 py-3 font-bold rounded">
+Submit
 </button>
 
 </form>
@@ -176,59 +142,5 @@ Send Inquiry
 </div>
 
 </div>
-
-<!-- GALLERY -->
-<div id="galleryModal"
-     class="fixed inset-0 bg-black/95 hidden items-center justify-center z-50">
-
-<span onclick="closeGallery()"
-      class="absolute top-5 right-6 text-white text-4xl cursor-pointer z-50">×</span>
-
-<button onclick="prevImage()" class="absolute left-5 text-white text-5xl z-50">‹</button>
-
-<img id="galleryImage"
-     class="max-w-[90%] max-h-[90%] rounded-xl shadow-2xl">
-
-<button onclick="nextImage()" class="absolute right-5 text-white text-5xl z-50">›</button>
-
-</div>
-
-<script>
-let images = [
-{% if property.thumbnail %}
-"{% cloudinary_url property.thumbnail width=1400 height=900 crop='fill' %}",
-{% endif %}
-{% for img in property.images.all %}
-"{% cloudinary_url img.image width=1400 height=900 crop='fill' %}",
-{% endfor %}
-];
-
-let currentIndex = 0;
-
-function openGallery(index){
-    currentIndex = index;
-    updateImage();
-    document.getElementById("galleryModal").classList.remove("hidden");
-    document.getElementById("galleryModal").classList.add("flex");
-}
-
-function closeGallery(){
-    document.getElementById("galleryModal").classList.add("hidden");
-}
-
-function updateImage(){
-    document.getElementById("galleryImage").src = images[currentIndex];
-}
-
-function nextImage(){
-    currentIndex = (currentIndex + 1) % images.length;
-    updateImage();
-}
-
-function prevImage(){
-    currentIndex = (currentIndex - 1 + images.length) % images.length;
-    updateImage();
-}
-</script>
 
 {% endblock %}
