@@ -4,35 +4,73 @@
 
 {% block content %}
 
+<!-- ANIMATION STYLES -->
+<style>
+@keyframes zoom {
+    0% { transform: scale(1); }
+    100% { transform: scale(1.2); }
+}
+
+.reveal {
+    opacity: 0;
+    transform: translateY(60px);
+    transition: all 1s ease;
+}
+.reveal.active {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.glass {
+    backdrop-filter: blur(20px);
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+.floating {
+    animation: float 6s ease-in-out infinite;
+}
+@keyframes float {
+    0%,100% { transform: translateY(0px); }
+    50% { transform: translateY(-15px); }
+}
+</style>
+
 <!-- HERO -->
 <section class="relative h-screen flex items-center justify-center overflow-hidden">
 
 <img src="{% static 'images/hero.jpg' %}"
-     class="absolute w-full h-full object-cover scale-110 animate-[zoom_20s_linear_infinite]">
+     class="absolute w-full h-full object-cover animate-[zoom_25s_linear_infinite]">
 
-<div class="absolute inset-0 bg-gradient-to-b from-black/70 via-black/60 to-black"></div>
+<div class="absolute inset-0 bg-gradient-to-b from-black/80 via-black/60 to-black"></div>
+
+<!-- floating glow -->
+<div class="absolute w-[500px] h-[500px] bg-yellow-400/10 blur-[120px] rounded-full top-10 left-10 floating"></div>
+<div class="absolute w-[400px] h-[400px] bg-yellow-400/10 blur-[100px] rounded-full bottom-10 right-10 floating"></div>
 
 <div class="relative z-10 text-center px-6 max-w-4xl">
 
 <h1 class="text-5xl md:text-7xl font-extrabold mb-6
-bg-gradient-to-r from-yellow-400 via-yellow-200 to-yellow-500 bg-clip-text text-transparent">
+bg-gradient-to-r from-yellow-400 via-yellow-200 to-yellow-500 bg-clip-text text-transparent reveal">
 Ultra Luxury Living
 </h1>
 
-<p class="text-gray-300 text-lg md:text-xl mb-10 leading-relaxed">
+<p class="text-gray-300 text-lg md:text-xl mb-10 leading-relaxed reveal">
 Experience elite real estate crafted for prestige, comfort and timeless elegance.
 </p>
 
-<div class="flex flex-col md:flex-row gap-4 justify-center">
+<div class="flex flex-col md:flex-row gap-4 justify-center reveal">
+
 <a href="#properties"
-class="px-8 py-4 bg-yellow-400 text-black font-semibold rounded-full hover:scale-105 transition">
+class="px-8 py-4 bg-yellow-400 text-black font-semibold rounded-full hover:scale-110 transition duration-300 shadow-lg shadow-yellow-400/20">
 Explore Projects
 </a>
 
 <a href="/contact"
-class="px-8 py-4 border border-white text-white rounded-full hover:bg-white hover:text-black transition">
+class="px-8 py-4 border border-white text-white rounded-full hover:bg-white hover:text-black transition duration-300">
 Contact Us
 </a>
+
 </div>
 
 </div>
@@ -40,37 +78,37 @@ Contact Us
 </section>
 
 <!-- TRUST BAR -->
-<section class="bg-white text-black py-6">
+<section class="bg-white text-black py-6 reveal">
 <div class="max-w-6xl mx-auto flex flex-wrap justify-center gap-10 text-center text-sm font-semibold">
 <span>✔ Trusted by 5000+ Families</span>
-<span>✔ RERA Approved Projects</span>
+<span>✔ RERA Approved</span>
 <span>✔ 15+ Years Experience</span>
 <span>✔ Premium Locations</span>
 </div>
 </section>
 
 <!-- STATS -->
-<section class="py-20 bg-black text-center">
+<section class="py-24 bg-black text-center">
 
 <div class="grid grid-cols-2 md:grid-cols-4 gap-10 max-w-6xl mx-auto">
 
-<div>
-<h2 class="text-4xl font-bold text-yellow-400">250+</h2>
+<div class="reveal">
+<h2 class="text-5xl font-bold text-yellow-400">250+</h2>
 <p class="text-gray-400">Projects Delivered</p>
 </div>
 
-<div>
-<h2 class="text-4xl font-bold text-yellow-400">15+</h2>
+<div class="reveal">
+<h2 class="text-5xl font-bold text-yellow-400">15+</h2>
 <p class="text-gray-400">Years Experience</p>
 </div>
 
-<div>
-<h2 class="text-4xl font-bold text-yellow-400">5000+</h2>
+<div class="reveal">
+<h2 class="text-5xl font-bold text-yellow-400">5000+</h2>
 <p class="text-gray-400">Happy Clients</p>
 </div>
 
-<div>
-<h2 class="text-4xl font-bold text-yellow-400">20+</h2>
+<div class="reveal">
+<h2 class="text-5xl font-bold text-yellow-400">20+</h2>
 <p class="text-gray-400">Cities</p>
 </div>
 
@@ -78,62 +116,44 @@ Contact Us
 
 </section>
 
-<!-- FEATURED PROPERTIES -->
+<!-- PROPERTIES -->
 <section id="properties" class="py-28 px-6 max-w-7xl mx-auto">
 
-<div class="flex justify-between items-center mb-16">
-<h2 class="text-4xl md:text-5xl font-bold text-white">
+<h2 class="text-5xl font-bold text-white mb-16 reveal">
 Signature Collection
 </h2>
-
-<a href="/properties" class="text-yellow-400 hover:underline">
-View All →
-</a>
-</div>
 
 <div class="grid md:grid-cols-2 xl:grid-cols-3 gap-10">
 
 {% for property in properties %}
-<div class="group relative rounded-3xl overflow-hidden bg-white/5 border border-white/10 hover:shadow-yellow-500/20 transition">
+<div class="group relative rounded-3xl overflow-hidden glass hover:scale-[1.03] transition duration-500 reveal">
 
-<!-- IMAGE -->
 <div class="relative h-[350px] overflow-hidden">
 
 {% if property.thumbnail %}
 {% cloudinary_url property.thumbnail width=800 height=600 crop='fill' as img_url %}
 <img src="{{ img_url }}"
      class="w-full h-full object-cover group-hover:scale-110 transition duration-700">
-{% else %}
-<img src="https://via.placeholder.com/800x600"
-     class="w-full h-full object-cover">
 {% endif %}
 
-<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent"></div>
 
-<!-- BADGE -->
-<div class="absolute top-4 left-4 flex gap-2">
-<span class="bg-yellow-400 text-black text-xs px-3 py-1 rounded-full font-semibold">
+<div class="absolute top-4 left-4">
+<span class="bg-yellow-400 text-black px-3 py-1 text-xs rounded-full font-semibold">
 Featured
 </span>
 </div>
 
-<!-- PRICE -->
 <div class="absolute bottom-4 left-4 text-2xl font-bold text-yellow-400">
 ₹{{ property.price }}
 </div>
 
 </div>
 
-<!-- CONTENT -->
 <div class="p-5">
 
-<h3 class="text-xl font-bold text-white mb-1">
-{{ property.title }}
-</h3>
-
-<p class="text-gray-400 text-sm mb-4">
-{{ property.location }}
-</p>
+<h3 class="text-xl font-bold text-white">{{ property.title }}</h3>
+<p class="text-gray-400 text-sm mb-3">{{ property.location }}</p>
 
 <div class="flex justify-between text-sm text-gray-300 mb-4">
 <span>🛏 {{ property.beds }}</span>
@@ -160,63 +180,65 @@ View Details
 
 <div class="max-w-7xl mx-auto grid md:grid-cols-2 gap-16 items-center px-6">
 
-<div>
+<div class="reveal">
 <img src="{% static 'images/about.jpg' %}"
-     class="rounded-3xl shadow-2xl hover:scale-105 transition">
+     class="rounded-3xl shadow-2xl hover:scale-105 transition duration-500">
 </div>
 
-<div>
-<h2 class="text-4xl md:text-5xl font-bold text-yellow-400 mb-6">
+<div class="reveal">
+<h2 class="text-5xl font-bold text-yellow-400 mb-6">
 Redefining Luxury Living
 </h2>
 
 <p class="text-gray-300 leading-relaxed mb-6 text-lg">
-We build more than homes — we craft iconic living experiences.
-Each project reflects excellence, innovation and prestige.
+We craft experiences, not just homes. Designed for prestige and modern lifestyle.
 </p>
 
 <div class="space-y-3 text-gray-300">
 <p>✔ Prime Locations</p>
-<p>✔ World-Class Amenities</p>
-<p>✔ Modern Architecture</p>
-<p>✔ High ROI Investment</p>
+<p>✔ Smart Living</p>
+<p>✔ Luxury Amenities</p>
+<p>✔ High ROI</p>
 </div>
 
 </div>
 
-</div>
-
-</section>
-
-<!-- TESTIMONIAL -->
-<section class="py-24 text-center bg-black">
-
-<h2 class="text-4xl font-bold text-yellow-400 mb-12">
-What Our Clients Say
-</h2>
-
-<div class="max-w-4xl mx-auto text-gray-300 italic text-lg">
-“Absolutely seamless experience. The quality and service exceeded expectations.”
 </div>
 
 </section>
 
 <!-- CTA -->
-<section class="py-32 text-center bg-gradient-to-r from-yellow-400 to-yellow-200 text-black">
+<section class="py-32 text-center bg-gradient-to-r from-yellow-400 to-yellow-200 text-black reveal">
 
-<h2 class="text-4xl md:text-5xl font-bold mb-6">
-Find Your Dream Property Today
+<h2 class="text-5xl font-bold mb-6">
+Find Your Dream Property
 </h2>
 
 <p class="mb-8 text-lg">
-Talk to our experts and unlock exclusive deals
+Talk to our experts today
 </p>
 
 <a href="/contact"
-class="px-10 py-4 bg-black text-white rounded-full hover:scale-105 transition">
+class="px-10 py-4 bg-black text-white rounded-full hover:scale-110 transition">
 Get Consultation
 </a>
 
 </section>
+
+<!-- SCROLL ANIMATION SCRIPT -->
+<script>
+const reveals = document.querySelectorAll(".reveal");
+
+function revealOnScroll() {
+    reveals.forEach(el => {
+        const top = el.getBoundingClientRect().top;
+        if (top < window.innerHeight - 100) {
+            el.classList.add("active");
+        }
+    });
+}
+
+window.addEventListener("scroll", revealOnScroll);
+</script>
 
 {% endblock %}
