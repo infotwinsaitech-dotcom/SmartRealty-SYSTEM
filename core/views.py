@@ -447,6 +447,20 @@ def add_property(request):
         possession_date = request.POST.get("possession_date")  # ✅ FIX name
         map_link = request.POST.get("map_link")  # ✅ FIX name
         configuration = request.POST.get("configuration")
+        import json
+
+        nearby_names = request.POST.getlist("nearby_name")
+        nearby_distances = request.POST.getlist("nearby_distance")
+        nearby_icons = request.POST.getlist("nearby_icon")
+
+        nearby_data = []
+
+        for i in range(len(nearby_names)):
+          nearby_data.append({
+        "name": nearby_names[i],
+        "distance": nearby_distances[i],
+        "icon": nearby_icons[i]
+    })
 
         property = Property.objects.create(
             title=title,
@@ -466,6 +480,7 @@ def add_property(request):
             possession_date=possession_date,
             map_link=map_link,
             configuration=configuration,
+            nearby_places=nearby_data,
             builder=request.user
         )
 

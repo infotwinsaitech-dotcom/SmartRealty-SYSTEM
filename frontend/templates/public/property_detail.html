@@ -26,10 +26,9 @@
 </h2>
 
 </div>
-
 </div>
 
-<!-- QUICK INFO BAR -->
+<!-- QUICK INFO -->
 <div class="relative z-20 max-w-6xl mx-auto -mt-16 bg-white text-black p-6 rounded-xl shadow-2xl grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
 
 <div><b>{{ property.beds }}</b><br>Beds</div>
@@ -39,7 +38,7 @@
 
 </div>
 
-<!-- MAIN SECTION -->
+<!-- MAIN -->
 <div class="max-w-7xl mx-auto px-4 py-16 grid lg:grid-cols-12 gap-12 text-white">
 
 <!-- LEFT -->
@@ -57,7 +56,6 @@
 {% if highlights_list %}
 <div>
 <h2 class="text-3xl font-bold text-yellow-400 mb-4">Highlights</h2>
-
 <div class="flex flex-wrap gap-3">
 {% for h in highlights_list %}
 <span class="bg-yellow-400 text-black px-5 py-2 rounded-full text-sm font-semibold shadow">
@@ -65,14 +63,12 @@
 </span>
 {% endfor %}
 </div>
-
 </div>
 {% endif %}
 
 <!-- AMENITIES -->
 <div>
 <h2 class="text-3xl font-bold text-yellow-400 mb-4">Amenities</h2>
-
 <div class="grid grid-cols-2 md:grid-cols-3 gap-5">
 
 {% for item in property.amenities %}
@@ -86,22 +82,19 @@
 </div>
 
 <!-- GALLERY -->
-<!-- GALLERY -->
 <div>
 <h2 class="text-3xl font-bold text-yellow-400 mb-4">Gallery</h2>
 
 <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-
 {% for img in property.images.all %}
 <img src="{% cloudinary_url img.image width=500 height=350 crop='fill' %}"
      onclick="openGallery({{ forloop.counter0 }})"
      class="rounded-xl cursor-pointer hover:scale-105 transition duration-300 shadow-lg">
 {% endfor %}
-
 </div>
 </div>
 
-<!-- MODAL -->
+<!-- GALLERY MODAL -->
 <div id="galleryModal"
      class="fixed inset-0 bg-black/95 hidden items-center justify-center z-50">
 
@@ -151,15 +144,17 @@ function prevImage(){
     updateImage();
 }
 </script>
+
 <!-- EXTRA INFO -->
 <div class="bg-white/5 p-6 rounded-xl space-y-2">
 <p><b>RERA:</b> {{ property.rera_number|default:"N/A" }}</p>
 <p><b>Configuration:</b> {{ property.configuration|default:"N/A" }}</p>
 </div>
+
+<!-- FLOOR PLAN -->
 {% if property.brochure %}
 <div>
 <h2 class="text-3xl font-bold text-yellow-400 mb-4">Floor Plan</h2>
-
 <a href="{{ property.brochure.url }}" target="_blank"
 class="bg-blue-600 px-6 py-3 rounded-lg inline-block">
 View Floor Plan
@@ -167,19 +162,43 @@ View Floor Plan
 </div>
 {% endif %}
 
+<!-- OVERVIEW -->
 <div>
 <h2 class="text-3xl font-bold text-yellow-400 mb-4">Overview</h2>
 
 <div class="grid grid-cols-2 md:grid-cols-3 gap-4 text-gray-300">
-
 <div>Type: {{ property.property_type }}</div>
 <div>Status: {{ property.status }}</div>
 <div>RERA: {{ property.rera_number|default:"N/A" }}</div>
 <div>Configuration: {{ property.configuration }}</div>
 <div>Possession: {{ property.possession_date }}</div>
+</div>
+
+</div>
+
+<!-- NEARBY -->
+{% if property.nearby_places %}
+<div>
+<h2 class="text-3xl font-bold text-yellow-400 mb-6">What's Nearby</h2>
+
+<div class="grid md:grid-cols-2 gap-4">
+
+{% for place in property.nearby_places %}
+<div class="bg-white/10 p-4 rounded-xl flex items-center justify-between hover:bg-white/20 transition">
+
+<div class="flex items-center gap-3">
+<span class="text-2xl">{{ place.icon }}</span>
+<span class="font-semibold">{{ place.name }}</span>
+</div>
+
+<span class="text-gray-300">{{ place.distance }}</span>
+
+</div>
+{% endfor %}
 
 </div>
 </div>
+{% endif %}
 
 <!-- MAP -->
 <div>
@@ -194,7 +213,7 @@ width="100%" height="350" style="border:0;">
 
 </div>
 
-</div>
+<!-- SIMILAR -->
 <div>
 <h2 class="text-3xl font-bold text-yellow-400 mb-4">Similar Properties</h2>
 
@@ -220,7 +239,10 @@ width="100%" height="350" style="border:0;">
 
 </div>
 </div>
-<!-- RIGHT (STICKY FORM) -->
+
+</div>
+
+<!-- RIGHT SIDE -->
 <div class="lg:col-span-4">
 
 <div class="sticky top-24">
