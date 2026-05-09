@@ -63,7 +63,13 @@ class="mt-2 bg-green-600 text-white px-3 py-1 rounded">
 </button>
 
 <!-- AMENITIES -->
-<label class="font-semibold">Amenities</label>
+{% for item in amenities_list %}
+<label>
+<input type="checkbox" name="amenities" value="{{ item }}"
+{% if item in property.amenities %}checked{% endif %}>
+{{ item }}
+</label>
+{% endfor %}
 <div class="grid grid-cols-2 gap-2">
 
 {% for item in "Parking,Lift,Gym,Pool,Security,Garden".split(",") %}

@@ -744,6 +744,7 @@ def add_to_cart(request, id):
 @login_required
 def builder_property_detail(request, id):
     property = Property.objects.get(id=id)
+    amenities_list = ["Parking", "Lift", "Gym", "Pool", "Security", "Garden"]
     leads = Lead.objects.filter(properties=property)
 
     if request.method == "POST":
