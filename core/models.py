@@ -198,6 +198,7 @@ class Deal(models.Model):
 class Task(models.Model):
     lead = models.ForeignKey(Lead, on_delete=models.CASCADE, null=True, blank=True)
     title = models.CharField(max_length=200)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     date = models.DateField(null=True, blank=True)
     time = models.TimeField(null=True, blank=True)
     order = models.IntegerField(default=0)

@@ -1178,10 +1178,20 @@ def task_done(request, id):
 
 def scheduler_overview(request):
 
-    tasks = Task.objects.all()
+    # ✅ Only builder ke tasks
+    tasks = Task.objects.filter(user=request.user)
+
+    # ✅ Leads for builder
     leads = Lead.objects.filter(builder=request.user)
 
     today = date.today()
+
+    # ✅ Current month ke tasks
+    tasks = tasks.filter(
+        date__year=today.year,
+        date__month=today.month
+    )
+
     cal = calendar.monthcalendar(today.year, today.month)
 
     calendar_days = []
@@ -1192,6 +1202,7 @@ def scheduler_overview(request):
                 calendar_days.append({"date": "", "tasks": []})
             else:
                 day_tasks = tasks.filter(date__day=d)
+
                 calendar_days.append({
                     "date": d,
                     "tasks": day_tasks
@@ -1201,10 +1212,8 @@ def scheduler_overview(request):
         "tasks": tasks,
         "leads": leads,
         "calendar_days": calendar_days,
-        "today": date.today()
+        "today": today
     })
-
-
 @csrf_exempt
 def reorder_task(request):
 
@@ -1661,7 +1670,7 @@ def agent_profile(request):
 
 @login_required
 def scheduler(request):
-    agent = getattr(request.user, 'agent_profile', None)
+    agent = request.user.agent_profile
 
     leads = Lead.objects.filter(assigned_to=agent)
 
