@@ -1661,7 +1661,7 @@ def agent_profile(request):
 
 @login_required
 def scheduler(request):
-    agent = request.user.agent_profile
+    agent = getattr(request.user, 'agent_profile', None)
 
     leads = Lead.objects.filter(assigned_to=agent)
 
