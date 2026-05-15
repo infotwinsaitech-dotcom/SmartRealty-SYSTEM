@@ -3,18 +3,19 @@
 <!-- 🔘 Mobile Top Bar -->
 <div class="md:hidden fixed top-0 left-0 w-full bg-[#0F172A] z-50 flex items-center justify-between px-4 py-3">
     <h1 class="text-white font-bold">EstateArchitect</h1>
-    <button onclick="toggleSidebar()" class="text-white">
+    <button onclick="toggleSidebar()" class="text-white text-2xl">
         ☰
     </button>
 </div>
 
-<!-- 🔥 Overlay (mobile) -->
-<div id="overlay" onclick="toggleSidebar()"
+<!-- 🔥 Overlay -->
+<div id="overlay" onclick="toggleSidebar()" 
      class="fixed inset-0 bg-black/50 hidden z-40"></div>
 
 <!-- 📌 Sidebar -->
 <aside id="sidebar"
-    class="h-screen w-64 fixed left-0 top-0 bg-[#0F172A] flex flex-col gap-2 py-6 shadow-2xl z-50
+    class="h-screen w-64 fixed left-0 top-0 overflow-y-auto bg-[#0F172A]
+    flex flex-col gap-2 py-6 shadow-2xl z-50
     transform -translate-x-full md:translate-x-0 transition-transform duration-300">
 
     <!-- Logo -->
@@ -31,31 +32,64 @@
     </div>
 
     <!-- Navigation -->
-    <nav class="flex flex-col gap-1 overflow-y-auto">
+    <nav class="flex flex-col gap-1">
 
-        {% for name, icon, url in [
-            ('Dashboard','dashboard','builder_dashboard'),
-            ('Properties','domain','property_management'),
-            ('AI Insights','psychology','ai_insights'),
-            ('Leads','person_search','lead_management'),
-            ('Assign Property','real_estate_agent','assign_property'),
-            ('Agents','group','create_agent'),
-            ('Pipeline','account_tree','pipeline'),
-            ('Analytics','insights','analytics'),
-            ('Documents','description','document_management'),
-            ('Communication','chat','communication'),
-            ('Scheduler','event','scheduler'),
-            ('Marketing','campaign','marketing_automation'),
-            ('Manage Users','group','manage_users'),
-            ('Settings','settings','settings')
-        ] %}
-        <a href="{% url url %}"
-           class="mx-3 px-4 py-3 rounded-lg flex items-center gap-3 text-white hover:bg-blue-700
-           {% if request.resolver_match.url_name == url %} bg-blue-700 {% endif %}">
-            <span class="material-symbols-outlined">{{ icon }}</span>
-            {{ name }}
+        <!-- SAME LINKS (no change) -->
+        <a href="{% url 'builder_dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'builder_dashboard' %}active{% endif %}">
+            <span class="material-symbols-outlined">dashboard</span> Dashboard
         </a>
-        {% endfor %}
+
+        <a href="{% url 'property_management' %}" class="nav-link {% if request.resolver_match.url_name == 'property_management' %}active{% endif %}">
+            <span class="material-symbols-outlined">domain</span> Properties
+        </a>
+
+        <a href="{% url 'ai_insights' %}" class="nav-link {% if request.resolver_match.url_name == 'ai_insights' %}active{% endif %}">
+            <span class="material-symbols-outlined">psychology</span> AI Insights
+        </a>
+
+        <a href="{% url 'lead_management' %}" class="nav-link {% if request.resolver_match.url_name == 'lead_management' %}active{% endif %}">
+            <span class="material-symbols-outlined">person_search</span> Leads
+        </a>
+
+        <a href="{% url 'assign_property' %}" class="nav-link {% if request.resolver_match.url_name == 'assign_property' %}active{% endif %}">
+            <span class="material-symbols-outlined">real_estate_agent</span> Assign Property
+        </a>
+
+        <a href="{% url 'create_agent' %}" class="nav-link {% if request.resolver_match.url_name == 'create_agent' %}active{% endif %}">
+            <span class="material-symbols-outlined">group</span> Agents
+        </a>
+
+        <a href="{% url 'pipeline' %}" class="nav-link {% if request.resolver_match.url_name == 'pipeline' %}active{% endif %}">
+            <span class="material-symbols-outlined">account_tree</span> Pipeline
+        </a>
+
+        <a href="{% url 'analytics' %}" class="nav-link {% if request.resolver_match.url_name == 'analytics' %}active{% endif %}">
+            <span class="material-symbols-outlined">insights</span> Analytics
+        </a>
+
+        <a href="{% url 'document_management' %}" class="nav-link {% if request.resolver_match.url_name == 'document_management' %}active{% endif %}">
+            <span class="material-symbols-outlined">description</span> Documents
+        </a>
+
+        <a href="{% url 'communication' %}" class="nav-link {% if request.resolver_match.url_name == 'communication' %}active{% endif %}">
+            💬 Communication
+        </a>
+
+        <a href="{% url 'scheduler' %}" class="nav-link {% if request.resolver_match.url_name == 'scheduler' %}active{% endif %}">
+            <span class="material-symbols-outlined">event</span> Scheduler
+        </a>
+
+        <a href="{% url 'marketing_automation' %}" class="nav-link {% if request.resolver_match.url_name == 'marketing_automation' %}active{% endif %}">
+            <span class="material-symbols-outlined">campaign</span> Marketing
+        </a>
+
+        <a href="{% url 'manage_users' %}" class="nav-link {% if request.resolver_match.url_name == 'manage_users' %}active{% endif %}">
+            <span class="material-symbols-outlined">group</span> Manage Users
+        </a>
+
+        <a href="{% url 'settings' %}" class="nav-link {% if request.resolver_match.url_name == 'settings' %}active{% endif %}">
+            <span class="material-symbols-outlined">settings</span> Settings
+        </a>
 
     </nav>
 
@@ -69,6 +103,16 @@
     </div>
 
 </aside>
+
+<!-- ✅ Common Styles -->
+<style>
+.nav-link {
+    @apply mx-3 px-4 py-3 rounded-lg flex items-center gap-3 text-white hover:bg-blue-700;
+}
+.nav-link.active {
+    @apply bg-blue-700;
+}
+</style>
 
 <!-- ⚙️ JS -->
 <script>
