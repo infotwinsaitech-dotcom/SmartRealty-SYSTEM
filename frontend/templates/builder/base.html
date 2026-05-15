@@ -121,5 +121,20 @@
     {% endblock %}
 
 </body>
+<body>
 
+    {% include 'components/sidebar.html' %}
+
+    <!-- MAIN CONTENT -->
+    <div class="md:ml-64 pt-16 md:pt-0">
+
+        {% include 'components/builder_navbar.html' %}
+
+        <div class="p-6">
+            {% block content %}{% endblock %}
+        </div>
+
+    </div>
+
+</body>
 </html>

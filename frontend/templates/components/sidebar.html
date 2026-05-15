@@ -34,62 +34,30 @@
     <!-- Navigation -->
     <nav class="flex flex-col gap-1">
 
-        <!-- SAME LINKS (no change) -->
-        <a href="{% url 'builder_dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'builder_dashboard' %}active{% endif %}">
-            <span class="material-symbols-outlined">dashboard</span> Dashboard
+        <!-- links -->
+        {% for item, url, icon in [
+            ('Dashboard','builder_dashboard','dashboard'),
+            ('Properties','property_management','domain'),
+            ('AI Insights','ai_insights','psychology'),
+            ('Leads','lead_management','person_search'),
+            ('Assign Property','assign_property','real_estate_agent'),
+            ('Agents','create_agent','group'),
+            ('Pipeline','pipeline','account_tree'),
+            ('Analytics','analytics','insights'),
+            ('Documents','document_management','description'),
+            ('Communication','communication','chat'),
+            ('Scheduler','scheduler','event'),
+            ('Marketing','marketing_automation','campaign'),
+            ('Manage Users','manage_users','group'),
+            ('Settings','settings','settings')
+        ] %}
+        <a href="{% url url %}"
+           class="mx-3 px-4 py-3 rounded-lg flex items-center gap-3 text-white hover:bg-blue-700
+           {% if request.resolver_match.url_name == url %} bg-blue-700 {% endif %}">
+            <span class="material-symbols-outlined">{{ icon }}</span>
+            {{ item }}
         </a>
-
-        <a href="{% url 'property_management' %}" class="nav-link {% if request.resolver_match.url_name == 'property_management' %}active{% endif %}">
-            <span class="material-symbols-outlined">domain</span> Properties
-        </a>
-
-        <a href="{% url 'ai_insights' %}" class="nav-link {% if request.resolver_match.url_name == 'ai_insights' %}active{% endif %}">
-            <span class="material-symbols-outlined">psychology</span> AI Insights
-        </a>
-
-        <a href="{% url 'lead_management' %}" class="nav-link {% if request.resolver_match.url_name == 'lead_management' %}active{% endif %}">
-            <span class="material-symbols-outlined">person_search</span> Leads
-        </a>
-
-        <a href="{% url 'assign_property' %}" class="nav-link {% if request.resolver_match.url_name == 'assign_property' %}active{% endif %}">
-            <span class="material-symbols-outlined">real_estate_agent</span> Assign Property
-        </a>
-
-        <a href="{% url 'create_agent' %}" class="nav-link {% if request.resolver_match.url_name == 'create_agent' %}active{% endif %}">
-            <span class="material-symbols-outlined">group</span> Agents
-        </a>
-
-        <a href="{% url 'pipeline' %}" class="nav-link {% if request.resolver_match.url_name == 'pipeline' %}active{% endif %}">
-            <span class="material-symbols-outlined">account_tree</span> Pipeline
-        </a>
-
-        <a href="{% url 'analytics' %}" class="nav-link {% if request.resolver_match.url_name == 'analytics' %}active{% endif %}">
-            <span class="material-symbols-outlined">insights</span> Analytics
-        </a>
-
-        <a href="{% url 'document_management' %}" class="nav-link {% if request.resolver_match.url_name == 'document_management' %}active{% endif %}">
-            <span class="material-symbols-outlined">description</span> Documents
-        </a>
-
-        <a href="{% url 'communication' %}" class="nav-link {% if request.resolver_match.url_name == 'communication' %}active{% endif %}">
-            💬 Communication
-        </a>
-
-        <a href="{% url 'scheduler' %}" class="nav-link {% if request.resolver_match.url_name == 'scheduler' %}active{% endif %}">
-            <span class="material-symbols-outlined">event</span> Scheduler
-        </a>
-
-        <a href="{% url 'marketing_automation' %}" class="nav-link {% if request.resolver_match.url_name == 'marketing_automation' %}active{% endif %}">
-            <span class="material-symbols-outlined">campaign</span> Marketing
-        </a>
-
-        <a href="{% url 'manage_users' %}" class="nav-link {% if request.resolver_match.url_name == 'manage_users' %}active{% endif %}">
-            <span class="material-symbols-outlined">group</span> Manage Users
-        </a>
-
-        <a href="{% url 'settings' %}" class="nav-link {% if request.resolver_match.url_name == 'settings' %}active{% endif %}">
-            <span class="material-symbols-outlined">settings</span> Settings
-        </a>
+        {% endfor %}
 
     </nav>
 
@@ -103,16 +71,6 @@
     </div>
 
 </aside>
-
-<!-- ✅ Common Styles -->
-<style>
-.nav-link {
-    @apply mx-3 px-4 py-3 rounded-lg flex items-center gap-3 text-white hover:bg-blue-700;
-}
-.nav-link.active {
-    @apply bg-blue-700;
-}
-</style>
 
 <!-- ⚙️ JS -->
 <script>
