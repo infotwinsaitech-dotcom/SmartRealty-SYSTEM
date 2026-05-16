@@ -2,18 +2,19 @@
 {% load static %}
 {% block content %}
 
-<div class="ml-64 mt-16 min-h-screen bg-gradient-to-br from-slate-50 to-white p-10">
+<main class="min-h-screen bg-gradient-to-br from-slate-50 to-white p-4 md:p-10">
 
-<div class="max-w-5xl mx-auto bg-white rounded-3xl shadow-2xl p-10">
+<div class="max-w-5xl mx-auto bg-white rounded-2xl md:rounded-3xl shadow-xl md:shadow-2xl p-5 md:p-10">
 
 <!-- HEADER -->
-<div class="flex justify-between items-center mb-10">
+<div class="flex flex-col md:flex-row md:justify-between md:items-center gap-3 mb-6 md:mb-10">
+    
     <div>
-        <h2 class="text-3xl font-extrabold">Account Settings</h2>
-        <p class="text-gray-500 text-sm">Manage your profile & security</p>
+        <h2 class="text-xl md:text-3xl font-extrabold">Account Settings</h2>
+        <p class="text-gray-500 text-xs md:text-sm">Manage your profile & security</p>
     </div>
 
-    <span class="px-4 py-2 bg-indigo-100 text-indigo-600 rounded-full text-sm">
+    <span class="px-3 py-1 md:px-4 md:py-2 bg-indigo-100 text-indigo-600 rounded-full text-xs md:text-sm w-fit">
         {{ request.user.role|title }}
     </span>
 </div>
@@ -21,75 +22,76 @@
 <!-- ALERTS -->
 {% if messages %}
     {% for message in messages %}
-        <div class="mb-4 p-3 rounded bg-green-100 text-green-700">
+        <div class="mb-4 p-3 rounded bg-green-100 text-green-700 text-sm">
             {{ message }}
         </div>
     {% endfor %}
 {% endif %}
 
-<form method="POST" enctype="multipart/form-data" class="grid md:grid-cols-2 gap-10">
+<form method="POST" enctype="multipart/form-data" 
+      class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10">
 {% csrf_token %}
 
 <!-- LEFT -->
-<div class="space-y-6">
+<div class="space-y-5 md:space-y-6">
 
 <!-- PROFILE IMAGE -->
 <div class="text-center">
     {% if request.user.profile_image %}
         <img src="{{ request.user.profile_image.url }}"
-        class="w-28 h-28 rounded-full mx-auto object-cover shadow">
+        class="w-20 h-20 md:w-28 md:h-28 rounded-full mx-auto object-cover shadow">
     {% else %}
         <img src="{% static 'images/default-agent.jpg' %}"
-        class="w-28 h-28 rounded-full mx-auto object-cover shadow">
+        class="w-20 h-20 md:w-28 md:h-28 rounded-full mx-auto object-cover shadow">
     {% endif %}
 
-    <input type="file" name="profile_image" class="mt-3 text-sm">
+    <input type="file" name="profile_image" class="mt-3 text-xs md:text-sm w-full">
 </div>
 
 <!-- USERNAME -->
 <div>
-<label class="text-sm font-semibold">Username</label>
+<label class="text-xs md:text-sm font-semibold">Username</label>
 <input name="username" value="{{ request.user.username }}"
-class="w-full mt-2 px-4 py-3 rounded-xl border focus:ring-2 focus:ring-indigo-500">
+class="w-full mt-1 md:mt-2 px-3 md:px-4 py-2 md:py-3 rounded-xl border focus:ring-2 focus:ring-indigo-500">
 </div>
 
 <!-- EMAIL -->
 <div>
-<label class="text-sm font-semibold">Email</label>
+<label class="text-xs md:text-sm font-semibold">Email</label>
 <input name="email" value="{{ request.user.email }}"
-class="w-full mt-2 px-4 py-3 rounded-xl border focus:ring-2 focus:ring-indigo-500">
+class="w-full mt-1 md:mt-2 px-3 md:px-4 py-2 md:py-3 rounded-xl border focus:ring-2 focus:ring-indigo-500">
 </div>
 
 <!-- PHONE -->
 <div>
-<label class="text-sm font-semibold">Phone</label>
+<label class="text-xs md:text-sm font-semibold">Phone</label>
 <input name="phone" value="{{ request.user.phone }}"
-class="w-full mt-2 px-4 py-3 rounded-xl border focus:ring-2 focus:ring-indigo-500">
+class="w-full mt-1 md:mt-2 px-3 md:px-4 py-2 md:py-3 rounded-xl border focus:ring-2 focus:ring-indigo-500">
 </div>
 
 </div>
 
 <!-- RIGHT -->
-<div class="space-y-6">
+<div class="space-y-5 md:space-y-6">
 
-<h3 class="text-xl font-bold">Security</h3>
+<h3 class="text-lg md:text-xl font-bold">Security</h3>
 
 <!-- PASSWORD -->
 <div>
-<label class="text-sm font-semibold">New Password</label>
+<label class="text-xs md:text-sm font-semibold">New Password</label>
 <input type="password" name="password"
-class="w-full mt-2 px-4 py-3 rounded-xl border focus:ring-2 focus:ring-indigo-500">
+class="w-full mt-1 md:mt-2 px-3 md:px-4 py-2 md:py-3 rounded-xl border focus:ring-2 focus:ring-indigo-500">
 </div>
 
 <div>
-<label class="text-sm font-semibold">Confirm Password</label>
+<label class="text-xs md:text-sm font-semibold">Confirm Password</label>
 <input type="password" name="confirm_password"
-class="w-full mt-2 px-4 py-3 rounded-xl border focus:ring-2 focus:ring-indigo-500">
+class="w-full mt-1 md:mt-2 px-3 md:px-4 py-2 md:py-3 rounded-xl border focus:ring-2 focus:ring-indigo-500">
 </div>
 
 <!-- SAVE BUTTON -->
 <button type="submit"
-class="w-full mt-6 py-4 bg-gradient-to-r from-indigo-600 to-blue-600 text-white font-bold rounded-xl shadow-lg hover:scale-105 transition">
+class="w-full mt-4 md:mt-6 py-3 md:py-4 bg-gradient-to-r from-indigo-600 to-blue-600 text-white font-bold rounded-xl shadow hover:scale-105 transition">
 Save Changes
 </button>
 
@@ -99,6 +101,6 @@ Save Changes
 
 </div>
 
-</div>
+</main>
 
 {% endblock %}
