@@ -2,164 +2,235 @@
 {% block content %}
 
 <!-- TOP BAR -->
-<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
-    <div>
-        <h1 class="text-2xl md:text-3xl font-bold text-gray-900">Namaste, {{ request.user.username }} 👋</h1>
-        <p class="text-sm text-gray-500 mt-1">Apna aaj ka kaam yahan dekhein.</p>
+<div class="flex justify-between items-center mb-8">
+
+    <h1 class="text-3xl font-bold">
+        Welcome, {{ request.user.username }}
+    </h1>
+
+    <div class="flex gap-3">
+
+        <a href="{% url 'agent_leads' %}"
+           class="bg-blue-600 text-white px-4 py-2 rounded-lg">
+            + Add Lead
+        </a>
+
+        <a href="{% url 'site_visits' %}"
+           class="bg-gray-200 px-4 py-2 rounded-lg">
+            Schedule Visit
+        </a>
+
     </div>
 
-    <div class="flex gap-3 w-full sm:w-auto">
-        <a href="{% url 'agent_leads' %}" class="flex-1 sm:flex-none justify-center inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-5 py-3 rounded-xl shadow-md transition">
-            <i data-lucide="plus-circle" class="w-5 h-5"></i> Naya Lead Jodein
-        </a>
-    </div>
 </div>
 
-<!-- STATS (Bade Number aur Rang) -->
-<div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-    <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
-        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Kul Leads</p>
-        <h2 class="text-3xl font-extrabold text-slate-800 mt-2">{{ total_leads }}</h2>
+<!-- STATS -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
+
+    <div class="bg-white p-6 rounded-xl shadow">
+        <p class="text-gray-500 text-sm">My Leads</p>
+        <h2 class="text-3xl font-bold">{{ total_leads }}</h2>
     </div>
 
-    <div class="bg-red-50 p-5 rounded-2xl border border-red-100">
-        <p class="text-xs font-semibold text-red-500 uppercase tracking-wider">Hot Leads 🔥</p>
-        <h2 class="text-3xl font-extrabold text-red-600 mt-2">{{ hot }}</h2>
+    <div class="bg-white p-6 rounded-xl shadow">
+        <p class="text-gray-500 text-sm">Hot Leads</p>
+        <!-- ✅ FIXED VARIABLE -->
+        <h2 class="text-3xl font-bold text-red-500">{{ hot }}</h2>
     </div>
 
-    <div class="bg-green-50 p-5 rounded-2xl border border-green-100">
-        <p class="text-xs font-semibold text-green-600 uppercase tracking-wider">Aaj ki Visits 📅</p>
-        <h2 class="text-3xl font-extrabold text-green-700 mt-2">{{ today_visits }}</h2>
+    <div class="bg-white p-6 rounded-xl shadow">
+        <p class="text-gray-500 text-sm">Visits Today</p>
+        <h2 class="text-3xl font-bold">{{ today_visits }}</h2>
     </div>
 
-    <div class="bg-blue-50 p-5 rounded-2xl border border-blue-100">
-        <p class="text-xs font-semibold text-blue-600 uppercase tracking-wider">Total Deals Done</p>
-        <h2 class="text-3xl font-extrabold text-blue-700 mt-2">{{ total_deals }}</h2>
+    <div class="bg-white p-6 rounded-xl shadow">
+        <p class="text-gray-500 text-sm">Total Deals</p>
+        <h2 class="text-3xl font-bold">{{ total_deals }}</h2>
     </div>
+
 </div>
 
 <!-- MAIN GRID -->
-<div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+<div class="grid grid-cols-12 gap-8">
 
-    <!-- LEFT: LEADS LIST -->
-    <div class="lg:col-span-8 space-y-6">
-        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-                <h3 class="font-bold text-xl text-gray-800">Mere Leads</h3>
-                <form method="GET" class="w-full sm:w-64">
-                    <input name="q" value="{{ request.GET.q }}" placeholder="🔍 Lead ka naam dhundhein..." class="w-full border border-gray-200 px-4 py-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+    <!-- LEFT SIDE -->
+    <div class="col-span-12 lg:col-span-8 space-y-8">
+
+        <!-- LEADS -->
+        <div class="bg-white p-6 rounded-xl shadow">
+
+            <div class="flex justify-between mb-4">
+                <h3 class="font-bold text-lg">My Leads</h3>
+
+                <form method="GET">
+                    <input name="q"
+                           value="{{ request.GET.q }}"
+                           placeholder="Search..."
+                           class="border px-3 py-1 rounded">
                 </form>
             </div>
 
             {% if leads %}
-            <div class="space-y-4">
+            <table class="w-full text-left">
+
+                <thead>
+                <tr class="text-gray-400 text-sm">
+                    <th>Name</th>
+                    <th>Status</th>
+                    <th>Phone</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+
+                <tbody>
+
                 {% for lead in leads %}
-                <div class="p-4 border border-gray-100 rounded-xl hover:bg-gray-50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 transition">
+                <tr class="border-t hover:bg-gray-50">
+
+                    <td class="py-3 font-semibold">
+                        {{ lead.name }}
+                    </td>
+
+                    <td>
+                        <span class="px-2 py-1 rounded text-xs
+                        {% if lead.status == 'HOT' %} bg-red-500 text-white
+                        {% elif lead.status == 'WARM' %} bg-yellow-500 text-white
+                        {% else %} bg-blue-500 text-white
+                        {% endif %}">
+                            {{ lead.status }}
+                        </span>
+                    </td>
+
+                    <td>{{ lead.phone }}</td>
+
+                    <td class="flex gap-3">
+
+                        <a href="https://wa.me/{{ lead.phone }}"
+                           target="_blank"
+                           class="text-green-600 text-sm hover:underline">
+                            WhatsApp
+                        </a>
+
+                        <a href="{% url 'delete_lead' lead.id %}"
+                           class="text-red-600 text-sm hover:underline">
+                            Delete
+                        </a>
+
+                    </td>
+
+                </tr>
+                {% endfor %}
+
+                </tbody>
+
+            </table>
+            {% else %}
+                <p class="text-center text-gray-400 py-6">
+                    No Leads Found
+                </p>
+            {% endif %}
+
+        </div>
+
+        <!-- TASKS -->
+        <div class="bg-white p-6 rounded-xl shadow">
+
+            <h3 class="font-bold mb-4">My Tasks</h3>
+
+            {% if tasks %}
+                {% for task in tasks %}
+                <div class="flex justify-between items-center border-b py-3">
+
                     <div>
-                        <div class="flex items-center gap-2">
-                            <h4 class="font-bold text-gray-900 text-base">{{ lead.name }}</h4>
-                            <span class="px-2.5 py-0.5 rounded-full text-xs font-bold 
-                            {% if lead.status == 'HOT' %} bg-red-100 text-red-700
-                            {% elif lead.status == 'WARM' %} bg-yellow-100 text-yellow-700
-                            {% else %} bg-blue-100 text-blue-700 {% endif %}">
-                                {{ lead.status }}
-                            </span>
-                        </div>
-                        <p class="text-sm text-gray-500 mt-1 flex items-center gap-1">
-                            <i data-lucide="phone" class="w-3.5 h-3.5"></i> {{ lead.phone }}
+                        <p class="font-semibold">{{ task.title }}</p>
+                        <p class="text-xs text-gray-500">
+                            {{ task.description }}
                         </p>
                     </div>
 
-                    <!-- Bade Action Buttons -->
-                    <div class="flex gap-2 w-full sm:w-auto">
-                        <a href="https://wa.me/{{ lead.phone }}" target="_blank" class="flex-1 sm:flex-none justify-center inline-flex items-center gap-1.5 bg-green-500 hover:bg-green-600 text-white font-semibold px-4 py-2 rounded-xl text-sm transition shadow-sm">
-                            <i data-lucide="message-square" class="w-4 h-4"></i> WhatsApp
-                        </a>
-                        <a href="{% url 'delete_lead' lead.id %}" class="justify-center inline-flex items-center p-2 text-red-500 hover:bg-red-50 rounded-xl transition" title="Hataayein">
-                            <i data-lucide="trash-2" class="w-5 h-5"></i>
-                        </a>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-            {% else %}
-                <p class="text-center text-gray-400 py-8 text-sm">Koi lead nahi mili.</p>
-            {% endif %}
-        </div>
-
-        <!-- TASKS SECTION -->
-        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-            <h3 class="font-bold text-xl text-gray-800 mb-4">Mera Aaj ka Kaam (Tasks)</h3>
-            {% if tasks %}
-                <div class="space-y-3">
-                {% for task in tasks %}
-                <div class="flex justify-between items-center p-4 border border-gray-50 bg-gray-50/50 rounded-xl">
-                    <div>
-                        <p class="font-bold text-gray-900">{{ task.title }}</p>
-                        <p class="text-xs text-gray-500 mt-0.5">{{ task.description }}</p>
-                    </div>
                     <form method="POST" action="{% url 'complete_task' task.id %}">
                         {% csrf_token %}
-                        <button class="inline-flex items-center gap-1 bg-green-600 text-white font-bold px-4 py-2 rounded-xl text-sm hover:bg-green-700 transition shadow-sm">
-                            <i data-lucide="check-circle" class="w-4 h-4"></i> Ho Gaya
+                        <button class="text-green-600 text-sm hover:underline">
+                            Done
                         </button>
                     </form>
+
                 </div>
                 {% endfor %}
-                </div>
             {% else %}
-                <p class="text-gray-400 text-sm py-4">Sare kaam poore ho chuke hain! 👍</p>
+                <p class="text-gray-400 text-sm">No tasks available</p>
             {% endif %}
+
         </div>
+
     </div>
 
-    <!-- RIGHT: VISITS & CHART -->
-    <div class="lg:col-span-4 space-y-6">
-        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-            <h3 class="font-bold text-lg text-gray-800 mb-4">Aane Wali Visits 📅</h3>
+    <!-- RIGHT SIDE -->
+    <div class="col-span-12 lg:col-span-4 space-y-6">
+
+        <!-- SITE VISITS -->
+        <div class="bg-white p-6 rounded-xl shadow">
+
+            <h3 class="font-bold mb-4">Upcoming Visits</h3>
+
             {% if visits %}
-                <div class="space-y-3">
                 {% for visit in visits %}
-                <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
-                    <p class="font-bold text-slate-900 text-sm">{{ visit.property.name }}</p>
-                    <p class="text-xs text-blue-600 font-semibold mt-1 flex items-center gap-1">
-                        <i data-lucide="clock" class="w-3.5 h-3.5"></i> {{ visit.date }} | {{ visit.time }}
+                <div class="border-b py-3">
+
+                    <p class="font-semibold">
+                        {{ visit.property.name }}
                     </p>
+
+                    <p class="text-sm text-gray-500">
+                        {{ visit.date }} | {{ visit.time }}
+                    </p>
+
                 </div>
                 {% endfor %}
-                </div>
             {% else %}
-                <p class="text-gray-400 text-sm py-2">Koi visit schedule nahi hai.</p>
+                <p class="text-gray-400 text-sm">No visits scheduled</p>
             {% endif %}
+
         </div>
 
-        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-            <h3 class="font-bold text-lg text-gray-800 mb-4">Meri Performance 📈</h3>
-            <div class="h-48">
-                <canvas id="chart"></canvas>
-            </div>
+        <!-- PERFORMANCE -->
+        <div class="bg-white p-6 rounded-xl shadow">
+
+            <h3 class="font-bold mb-4">Performance</h3>
+
+            <canvas id="chart"></canvas>
+
         </div>
+
     </div>
+
 </div>
 
-<!-- ChartJS Script -->
+<!-- CHART -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <script>
 const ctx = document.getElementById('chart');
+
 new Chart(ctx, {
     type: 'line',
     data: {
         labels: {{ chart_labels|default:"[]"|safe }},
         datasets: [{
-            label: 'Deals Done',
+            label: 'Deals',
             data: {{ chart_data|default:"[]"|safe }},
-            borderColor: '#2563EB',
-            borderWidth: 3,
+            borderColor: '#3B82F6',
             fill: false,
             tension: 0.3
         }]
     },
-    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+    options: {
+        responsive: true,
+        plugins: {
+            legend: { display: true }
+        }
+    }
 });
 </script>
+
 {% endblock %}

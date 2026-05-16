@@ -1,108 +1,151 @@
 {% extends "agent/base.html" %}
 {% block content %}
 
-<div class="max-w-4xl mx-auto">
+<div class="p-6">
+
     <!-- HEADER -->
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
-        <h1 class="text-2xl font-bold text-gray-900">Mere Leads Ki List</h1>
-        
-        <!-- Filters Box Simplification -->
-        <form method="GET" class="w-full flex flex-wrap gap-2 bg-white p-3 rounded-2xl border border-gray-100 shadow-sm">
-            <input type="text" name="q" value="{{ request.GET.q }}" placeholder="Naam ya phone se khojein..." class="flex-1 min-w-[180px] border border-gray-200 px-3 py-2 rounded-xl text-sm">
-            
-            <select name="status" class="border border-gray-200 px-3 py-2 rounded-xl text-sm font-semibold text-gray-600">
-                <option value="">Sabhi Status</option>
-                <option value="HOT">HOT 🔥</option>
-                <option value="WARM">WARM 🟡</option>
-                <option value="COLD">COLD 🔵</option>
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-bold">My Leads</h1>
+
+        <form method="GET" class="flex gap-2">
+
+            <input type="text" name="q" value="{{ request.GET.q }}"
+                placeholder="Search name, phone, email..."
+                class="border px-3 py-2 rounded w-64">
+
+            <select name="status" class="border px-2 py-2 rounded">
+                <option value="">All</option>
+                <option value="HOT">HOT</option>
+                <option value="WARM">WARM</option>
+                <option value="COLD">COLD</option>
             </select>
 
-            <button class="bg-slate-900 text-white font-bold px-4 py-2 rounded-xl text-sm hover:bg-slate-800">
+            <select name="sort" class="border px-2 py-2 rounded">
+                <option value="new">Newest</option>
+                <option value="old">Oldest</option>
+            </select>
+
+            <button class="bg-blue-600 text-white px-4 rounded">
                 Apply
             </button>
+
         </form>
     </div>
 
-    <!-- LEADS CARDS -->
-    <div class="space-y-4">
-        {% for lead in leads %}
-        <div class="bg-white border border-gray-100 shadow-sm rounded-2xl p-5 hover:shadow-md transition">
-            
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-gray-100 pb-4">
-                <div>
-                    <div class="flex items-center gap-2 flex-wrap">
-                        <h2 class="text-lg font-bold text-gray-900">{{ lead.name }}</h2>
-                        <span class="px-2.5 py-0.5 text-xs font-bold rounded-full text-white
-                            {% if lead.status == 'HOT' %} bg-red-500
-                            {% elif lead.status == 'WARM' %} bg-yellow-500
-                            {% else %} bg-gray-400 {% endif %}">
-                            {{ lead.status }}
-                        </span>
-                    </div>
-                    <p class="text-sm text-gray-600 mt-1 font-medium">📞 {{ lead.phone }}</p>
-                    {% if lead.email %}<p class="text-xs text-gray-400">{{ lead.email }}</p>{% endif %}
-                </div>
+    <!-- STATS -->
+    <div class="grid grid-cols-3 gap-4 mb-6">
+        <div class="bg-red-500 text-white p-4 rounded">HOT Leads</div>
+        <div class="bg-yellow-500 text-white p-4 rounded">WARM Leads</div>
+        <div class="bg-gray-500 text-white p-4 rounded">COLD Leads</div>
+    </div>
 
-                <!-- BADE CALL / WHATSAPP BUTTONS -->
-                <div class="flex items-center gap-2 w-full sm:w-auto">
-                    <a href="tel:{{ lead.phone }}" class="flex-1 sm:flex-none justify-center inline-flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold px-4 py-2.5 rounded-xl text-sm shadow-sm">
-                        <i data-lucide="phone-call" class="w-4 h-4"></i> Call Karein
-                    </a>
-                    <a href="https://wa.me/{{ lead.phone }}" class="flex-1 sm:flex-none justify-center inline-flex items-center gap-1.5 bg-green-500 hover:bg-green-600 text-white font-bold px-4 py-2.5 rounded-xl text-sm shadow-sm">
-                        <i data-lucide="message-circle" class="w-4 h-4"></i> WhatsApp
-                    </a>
-                </div>
+    <!-- LEADS LIST -->
+    <div class="space-y-4">
+
+        {% for lead in leads %}
+        <div class="bg-white shadow-lg rounded-xl p-4 flex justify-between items-center hover:shadow-xl transition">
+
+            <!-- LEFT -->
+            <div>
+                <h2 class="text-lg font-semibold">{{ lead.name }}</h2>
+                <p class="text-sm text-gray-500">{{ lead.email }}</p>
+                <p class="text-sm">{{ lead.phone }}</p>
+
+                {% if lead.last_contacted %}
+                <p class="text-xs text-gray-400 mt-1">
+                    Last Contact: {{ lead.last_contacted }}
+                </p>
+                {% endif %}
             </div>
 
-            <!-- NOTES SECTION (Simple list) -->
-            <div class="mt-4 bg-gray-50 p-3 rounded-xl">
-                <p class="text-xs font-bold text-gray-400 uppercase tracking-wide mb-2">Yaad rakhne ke liye notes:</p>
-                <div id="notes-{{ lead.id }}" class="text-sm text-gray-700 space-y-1 mb-3">
-                    {% for n in lead.leadnote_set.all %}
-                        <p class="flex items-start gap-1">⏱️ <span class="flex-1">{{ n.note }}</span></p>
-                    {% empty %}
-                        <p class="text-xs text-gray-400 italic id="no-notes-text-{{ lead.id }}">Abhi tak koi note nahi likha gaya.</p>
-                    {% endfor %}
+            <!-- RIGHT -->
+            <div class="text-right">
+
+                <!-- STATUS -->
+                <span class="px-3 py-1 text-sm rounded-full text-white
+                    {% if lead.status == 'HOT' %} bg-red-500
+                    {% elif lead.status == 'WARM' %} bg-yellow-500
+                    {% else %} bg-gray-500 {% endif %}">
+                    {{ lead.status }}
+                </span>
+<div class="mt-3">
+
+    <!-- NOTES LIST -->
+    <div id="notes-{{ lead.id }}" class="text-xs text-gray-600 mb-2">
+        {% for n in lead.leadnote_set.all %}
+            <p>• {{ n.note }}</p>
+        {% endfor %}
+    </div>
+
+    <!-- ADD NOTE -->
+    <div class="flex gap-2">
+        <input type="text"
+               id="note-input-{{ lead.id }}"
+               placeholder="Add note..."
+               class="border p-1 rounded text-sm w-full">
+
+        <button onclick="addNote({{ lead.id }})"
+                class="bg-blue-500 text-white px-2 rounded text-sm">
+            Add
+        </button>
+    </div>
+
+</div>
+                <!-- ACTIONS -->
+                <div class="mt-3 flex gap-2 justify-end">
+
+                    <a href="tel:{{ lead.phone }}"
+                       class="bg-blue-100 text-blue-600 px-3 py-1 rounded text-sm">
+                        Call
+                    </a>
+
+                    <a href="https://wa.me/{{ lead.phone }}"
+                       class="bg-green-100 text-green-600 px-3 py-1 rounded text-sm">
+                        WhatsApp
+                    </a>
+
+                    <a href="#"
+                       class="bg-purple-100 text-purple-600 px-3 py-1 rounded text-sm">
+                        Update
+                    </a>
+
                 </div>
 
-                <!-- ADD NOTE INPUT -->
-                <div class="flex gap-2">
-                    <input type="text" id="note-input-{{ lead.id }}" placeholder="Yahan likhein (jaise: kal baat hogi)..." class="flex-1 border border-gray-200 px-3 py-2 rounded-xl text-sm focus:outline-none focus:border-blue-500 bg-white">
-                    <button onclick="addNote({{ lead.id }})" class="bg-slate-800 text-white font-bold px-4 rounded-xl text-sm hover:bg-slate-900 transition">
-                        Save Note
-                    </button>
-                </div>
             </div>
 
         </div>
         {% empty %}
-        <div class="bg-white text-center p-8 rounded-2xl border border-gray-100 text-gray-400">
-            <i data-lucide="users" class="w-12 h-12 mx-auto opacity-30 mb-2"></i>
-            <p>Koi lead nahi mili.</p>
-        </div>
+        <p class="text-gray-500">No leads found</p>
         {% endfor %}
-    </div>
-</div>
 
+    </div>
+
+</div>
 <script>
 function addNote(leadId) {
     let input = document.getElementById("note-input-" + leadId);
     let note = input.value;
+
     if (!note) return;
 
     fetch("/add-note/", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ lead_id: leadId, note: note })
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            lead_id: leadId,
+            note: note
+        })
     })
     .then(res => res.json())
     .then(data => {
         if (data.success) {
             let notesDiv = document.getElementById("notes-" + leadId);
-            let noNotesText = document.getElementById("no-notes-text" + leadId);
-            if(noNotesText) noNotesText.remove();
-            
-            notesDiv.innerHTML += `<p class="flex items-start gap-1">⏱️ <span class="flex-1">${note}</span></p>`;
+
+            // 🔥 instant UI update
+            notesDiv.innerHTML += `<p>• ${note}</p>`;
+
             input.value = "";
         }
     });
