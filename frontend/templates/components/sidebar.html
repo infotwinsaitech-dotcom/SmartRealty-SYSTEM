@@ -1,9 +1,14 @@
 {% load static %}
 
-<aside class="h-screen w-64 fixed left-0 top-0 overflow-y-auto bg-[#0F172A] flex flex-col gap-2 py-6 shadow-2xl shadow-blue-900/20 z-50">
+<!-- 
+    मुख्य बदलाव: 
+    1. 'fixed' को हटाकर 'h-full w-64' किया ताकि यह base.html के wrapper के अनुसार काम करे।
+    2. 'z-50' को बनाए रखा ताकि मोबाइल पर यह बाकी सब चीजों के ऊपर तैरता हुआ दिखे।
+-->
+<aside class="h-full w-64 overflow-y-auto bg-[#0F172A] flex flex-col gap-2 py-6 shadow-2xl shadow-blue-900/20 z-50">
 
-    <!-- Logo -->
-    <div class="px-7 mb-8">
+    <!-- Logo + Close Button (क्लोज बटन सिर्फ मोबाइल पर दिखेगा) -->
+    <div class="px-7 mb-8 flex items-center justify-between">
         <div class="flex items-center gap-3">
             <div class="w-8 h-8 rounded bg-gradient-to-br from-[#1E3A8A] to-[#3B82F6] flex items-center justify-center">
                 <span class="material-symbols-outlined text-white text-sm">architecture</span>
@@ -13,6 +18,11 @@
                 <p class="text-[10px] text-slate-500 font-extrabold">CRM Premium</p>
             </div>
         </div>
+        
+        <!-- मोबाइल के लिए कट (X) बटन ताकि यूज़र साइडबार बंद कर सके -->
+        <button onclick="toggleSidebar()" class="text-slate-400 hover:text-white p-1 rounded-md md:hidden">
+            <span class="material-symbols-outlined">close</span>
+        </button>
     </div>
 
     <!-- Navigation -->
@@ -84,7 +94,7 @@
         <a href="{% url 'communication' %}"
            class="mx-3 px-4 py-3 rounded-lg flex items-center gap-3 text-white hover:bg-blue-700
            {% if request.resolver_match.url_name == 'communication' %} bg-blue-700 {% endif %}">
-            💬 Communication
+            <span class="text-lg">💬</span> Communication
         </a>
 
         <a href="{% url 'scheduler' %}"
