@@ -1,54 +1,64 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Agent Panel</title>
-
-<script src="https://cdn.tailwindcss.com"></script>
-
-<style>
-body { font-family: sans-serif; }
-</style>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent Panel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&display=swap" rel="stylesheet">
+    <!-- Lucide Icons for simple visuals -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body { font-family: 'Manrope', sans-serif; }
+    </style>
 </head>
+<body class="bg-gray-50 text-gray-800">
 
-<body class="bg-gray-100 pb-20">
+<!-- SIDEBAR -->
+<aside class="fixed left-0 top-0 h-full w-64 bg-slate-950 text-white p-5 flex flex-col justify-between hidden md:flex z-50">
+    <div>
+        <div class="flex items-center gap-2 mb-8 px-2">
+            <div class="bg-blue-600 p-2 rounded-lg text-white">
+                <i data-lucide="layout-dashboard" class="w-6 h-6"></i>
+            </div>
+            <h1 class="text-xl font-bold tracking-wide">Agent Panel</h1>
+        </div>
 
-<!-- TOP BAR -->
-<div class="bg-blue-600 text-white p-4 text-lg font-bold">
-    Agent Panel
-</div>
+        <nav class="space-y-2">
+            <a href="{% url 'agent_dashboard' %}" class="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-800 transition font-medium text-gray-300 hover:text-white">
+                <i data-lucide="home" class="w-5 #h-5"></i> Dashboard
+            </a>
+            <a href="{% url 'agent_leads' %}" class="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-800 transition font-medium text-gray-300 hover:text-white">
+                <i data-lucide="users" class="w-5 h-5"></i> Mere Leads
+            </a>
+            <a href="{% url 'agent_properties' %}" class="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-800 transition font-medium text-gray-300 hover:text-white">
+                <i data-lucide="building-2" class="w-5 h-5"></i> Properties
+            </a>
+            <a href="{% url 'scheduler' %}" class="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-800 transition font-medium text-gray-300 hover:text-white">
+                <i data-lucide="calendar" class="w-5 h-5"></i> Site Visits
+            </a>
+            <a href="{% url 'agent_profile' %}" class="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-800 transition font-medium text-gray-300 hover:text-white">
+                <i data-lucide="user" class="w-5 h-5"></i> Profile
+            </a>
+        </nav>
+    </div>
 
-<!-- CONTENT -->
-<div class="p-4">
+    <div>
+        <a href="/logout/" class="flex items-center gap-3 p-3 rounded-xl bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white transition font-medium">
+            <i data-lucide="log-out" class="w-5 h-5"></i> Logout
+        </a>
+    </div>
+</aside>
+
+<!-- MAIN CONTENT -->
+<main class="md:ml-64 p-4 md:p-8 min-h-screen">
     {% block content %}
     {% endblock %}
-</div>
+</main>
 
-<!-- 🔥 BOTTOM NAV (VERY IMPORTANT) -->
-<div class="fixed bottom-0 left-0 w-full bg-white border-t flex justify-around py-2">
-
-    <a href="{% url 'agent_dashboard' %}" class="text-center text-xs">
-        🏠 <br> Home
-    </a>
-
-    <a href="{% url 'agent_leads' %}" class="text-center text-xs">
-        👤 <br> Leads
-    </a>
-
-    <a href="{% url 'agent_properties' %}" class="text-center text-xs">
-        🏢 <br> Properties
-    </a>
-
-    <a href="{% url 'scheduler' %}" class="text-center text-xs">
-        📅 <br> Visits
-    </a>
-
-    <a href="{% url 'agent_profile' %}" class="text-center text-xs">
-        ⚙️ <br> Profile
-    </a>
-
-</div>
-
+<script>
+    // Icons ko activate karne ke liye
+    lucide.createIcons();
+</script>
 </body>
 </html>
