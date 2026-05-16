@@ -1778,3 +1778,45 @@ def create_agent_for_user(sender, instance, created, **kwargs):
             }
         )
 
+import csv
+from django.http import HttpResponse
+from django.contrib.auth.decorators import login_required
+from .models import Lead  # अपने सही मॉडल इम्पोर्ट का उपयोग करें
+
+@login_required
+def export_leads_csv(request):
+    # HTTP Response को CSV Content-Type के साथ सेट करें
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="leads_report.csv"'
+
+    writer = csv.writer(response)
+    # CSV के कॉलम हेडर (Headers)
+    writer.writerow(['Lead Name', 'Email', 'Phone', 'Source', 'Status', 'Assigned Agent', 'Properties'])
+
+    # केवल इस बिल्डर से जुड़े लीड्स प्राप्त करें
+    leads = Lead.objects.filter(builder=request.user)
+
+    # अगर यूज़र ने कोई सर्च क्वेरी डाली हुई है, तो उसी हिसाब से फ़िल्टर करें
+    search_query = request.GET.get('q')
+    if search_query:
+        leads = leads.filter(name__icontains=search_query) | leads.filter(email__icontains=search_query)
+
+    for lead in leads:
+        # एजेंट का नाम निकालें
+        agent_name = lead.assigned_to.name if lead.assigned_to else "Not Assigned"
+        
+        # प्रॉपर्टीज़ के नाम कॉमा (,) से अलग करके एक लाइन में लाएं
+        properties_list = ", ".join([p.title for p in lead.properties.all()]) if lead.properties.exists() else "-"
+
+        # CSV में रो (Row) राइट करें
+        writer.writerow([
+            lead.name,
+            lead.email,
+            lead.phone,
+            lead.source,
+            lead.status,
+            agent_name,
+            properties_list
+        ])
+
+    return response

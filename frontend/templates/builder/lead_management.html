@@ -1,227 +1,241 @@
 {% extends "builder/base.html" %}
 {% block content %}
 
-<main class="ml-64 mr-[400px] mt-16 min-h-screen bg-gradient-to-br from-slate-50 to-white p-8 overflow-y-auto">
+<main class="w-full lg:pl-64 lg:pr-[400px] mt-16 min-h-screen bg-gradient-to-br from-slate-50 to-white p-4 md:p-8 overflow-y-auto">
 
-<!-- HEADER -->
-<header class="flex justify-between items-center mb-10">
-    <div>
-        <h2 class="text-4xl font-extrabold text-gray-800">Lead Management</h2>
-        <p class="text-gray-500 text-sm mt-1">Smart pipeline control</p>
+    <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-10">
+        <div>
+            <h2 class="text-3xl md:text-4xl font-extrabold text-gray-800">Lead Management</h2>
+            <p class="text-gray-500 text-sm mt-1">Smart pipeline control</p>
+        </div>
+
+        <form method="GET" class="w-full sm:w-auto">
+            <input name="q" value="{{ request.GET.q }}"
+            class="px-4 py-2 w-full sm:w-72 rounded-xl border shadow-sm text-sm"
+            placeholder="Search leads...">
+        </form>
+    </header>
+
+    {% if messages %}
+    <div class="mb-4">
+      {% for message in messages %}
+        <div class="p-3 rounded-lg bg-green-100 text-green-700 shadow text-sm">
+          {{ message }}
+        </div>
+      {% endfor %}
     </div>
+    {% endif %}
 
-    <form method="GET">
-        <input name="q" value="{{ request.GET.q }}"
-        class="px-4 py-2 w-72 rounded-xl border shadow-sm"
-        placeholder="Search leads...">
-    </form>
-</header>
+    <div class="bg-white rounded-2xl shadow-lg border overflow-hidden">
 
-{% if messages %}
-<div class="mb-4">
-  {% for message in messages %}
-    <div class="p-3 rounded-lg bg-green-100 text-green-700 shadow">
-      {{ message }}
+        <div class="p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b">
+            <h3 class="text-xl font-bold">Lead Inventory</h3>
+
+            <div class="flex items-center gap-2 w-full sm:w-auto justify-between">
+                <a href="{% url 'export_leads_csv' %}{% if request.GET.q %}?q={{ request.GET.q }}{% endif %}"
+                   class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 shadow transition-all">
+                    <span class="material-symbols-outlined text-sm">download</span>
+                    Export CSV
+                </a>
+
+                <button onclick="openModal()"
+                        class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow transition-all">
+                    + Add Lead
+                </button>
+            </div>
+        </div>
+
+        <div class="w-full overflow-x-auto">
+            <table class="w-full text-left border-collapse min-w-[600px]">
+                <thead class="bg-gray-50 text-xs uppercase text-gray-500 border-b">
+                    <tr>
+                        <th class="px-6 py-4">Lead</th>
+                        <th class="px-4 py-4">Property</th>
+                        <th class="px-4 py-4">Source</th>
+                        <th class="px-4 py-4">Status</th>
+                        <th class="px-6 py-4">Agent</th>
+                    </tr>
+                </thead>
+
+                <tbody class="divide-y divide-gray-100">
+                    {% for lead in leads %}
+                    <tr class="hover:bg-blue-50/50 cursor-pointer transition-colors {% if selected_lead and selected_lead.id == lead.id %}bg-blue-50{% endif %}">
+                        
+                        <td class="px-6 py-4" onclick="selectLead({{ lead.id }})">
+                            <span class="font-bold text-gray-800 text-sm block">{{ lead.name }}</span>
+                            <span class="text-xs text-gray-500 block mt-0.5">{{ lead.email }}</span>
+                        </td>
+
+                        <td class="px-4 py-4 text-sm text-gray-700" onclick="selectLead({{ lead.id }})">
+                            {% for p in lead.properties.all %}
+                                {{ p.title }}<br>
+                            {% empty %}
+                                <span class="text-gray-400">-</span>
+                            {% endfor %}
+                        </td>
+
+                        <td class="px-4 py-4 text-sm text-gray-600" onclick="selectLead({{ lead.id }})">
+                            {{ lead.source }}
+                        </td>
+
+                        <td class="px-4 py-4" onclick="selectLead({{ lead.id }})">
+                            <span class="px-2 py-1 text-white text-[10px] font-bold rounded tracking-wider {% if lead.status == 'HOT' %}bg-red-500{% elif lead.status == 'WARM' %}bg-yellow-500{% else %}bg-blue-500{% endif %}">
+                                {{ lead.status }}
+                            </span>
+                        </td>
+
+                        <td class="px-6 py-4" onclick="selectLead({{ lead.id }})">
+                            {% if lead.assigned_to %}
+                                <span class="px-2 py-1 bg-green-50 text-green-700 border border-green-200 rounded text-xs font-medium">
+                                    {{ lead.assigned_to.name }}
+                                </span>
+                            {% else %}
+                                <span class="text-gray-400 text-xs italic">Not Assigned</span>
+                            {% endif %}
+                        </td>
+
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="px-6 py-10 text-center text-gray-400 text-sm">
+                            No leads found.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
     </div>
-  {% endfor %}
-</div>
-{% endif %}
-
-<!-- TABLE -->
-<div class="bg-white rounded-2xl shadow-lg border overflow-hidden">
-
-<div class="p-6 flex justify-between">
-    <h3 class="text-xl font-bold">Lead Inventory</h3>
-
-    <button onclick="openModal()"
-    class="bg-blue-600 text-white px-4 py-2 rounded-lg">
-        + Add Lead
-    </button>
-</div>
-
-<table class="w-full">
-
-<thead class="bg-gray-50 text-xs uppercase">
-<tr>
-<th class="px-6 py-4">Lead</th>
-<th>Property</th>
-<th>Source</th>
-<th>Status</th>
-<th>Agent</th>
-</tr>
-</thead>
-
-<tbody>
-
-{% for lead in leads %}
-<tr class="hover:bg-blue-50 cursor-pointer
-{% if selected_lead and selected_lead.id == lead.id %}bg-blue-100{% endif %}">
-
-<td class="px-6 py-4"
-    onclick="selectLead({{ lead.id }})">
-
-<b>{{ lead.name }}</b><br>
-<span class="text-sm text-gray-500">{{ lead.email }}</span>
-
-</td>
-
-<td onclick="selectLead({{ lead.id }})">
-{% for p in lead.properties.all %}
-{{ p.title }}<br>
-{% empty %}
--
-{% endfor %}
-</td>
-
-<td onclick="selectLead({{ lead.id }})">{{ lead.source }}</td>
-
-<td onclick="selectLead({{ lead.id }})">
-<span class="px-2 py-1 text-white text-xs rounded
-{% if lead.status == 'HOT' %}bg-red-500
-{% elif lead.status == 'WARM' %}bg-yellow-500
-{% else %}bg-blue-500{% endif %}">
-{{ lead.status }}
-</span>
-</td>
-
-<td onclick="selectLead({{ lead.id }})">
-{% if lead.assigned_to %}
-    <span class="px-2 py-1 bg-green-100 text-green-700 rounded text-xs">
-        {{ lead.assigned_to.name }}
-    </span>
-{% else %}
-    <span class="text-gray-400">Not Assigned</span>
-{% endif %}
-</td>
-
-</tr>
-{% endfor %}
-
-</tbody>
-</table>
-
-</div>
 </main>
 
-<!-- ================= SIDEBAR ================= -->
-<aside class="fixed right-0 top-16 h-full w-[400px] bg-white shadow-xl p-6 overflow-y-auto">
+<aside id="detailSidebar" class="fixed bottom-0 right-0 top-auto lg:top-16 h-[75vh] lg:h-full w-full lg:w-[400px] bg-white shadow-2xl lg:shadow-xl p-6 overflow-y-auto border-t lg:border-t-0 lg:border-l border-gray-100 z-40 transition-transform duration-300 transform {% if selected_lead %}translate-y-0 lg:translate-x-0{% else %}translate-y-full lg:translate-x-full lg:translate-y-0{% endif %} rounded-t-3xl lg:rounded-t-none">
 
-{% if selected_lead %}
+    {% if selected_lead %}
+        <div class="flex justify-between items-center mb-4 lg:mb-0">
+            <div class="w-12 h-1.5 bg-gray-200 rounded-full mx-auto mb-4 block lg:hidden absolute top-3 left-1/2 transform -translate-x-1/2"></div>
+            <h2 class="text-xl font-bold text-gray-800 pt-2 lg:pt-0">{{ selected_lead.name }}</h2>
+            <button onclick="closeSidebar()" class="text-gray-400 hover:text-gray-600 block lg:hidden pt-2">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+        
+        <p class="text-gray-500 text-sm mt-0.5">{{ selected_lead.email }}</p>
 
-<h2 class="text-xl font-bold">{{ selected_lead.name }}</h2>
-<p class="text-gray-500">{{ selected_lead.email }}</p>
+        <div class="mt-6 space-y-3 text-sm border-t pt-4">
+            <p class="text-gray-700"><b class="text-gray-800">Phone:</b> {{ selected_lead.phone }}</p>
+            <p class="text-gray-700"><b class="text-gray-800">Status:</b> {{ selected_lead.status }}</p>
+            <p class="text-gray-700"><b class="text-gray-800">Assigned Agent:</b> {{ selected_lead.assigned_to.name|default:"Not Assigned" }}</p>
+        </div>
 
-<div class="mt-4 space-y-2 text-sm">
-<p><b>Phone:</b> {{ selected_lead.phone }}</p>
-<p><b>Status:</b> {{ selected_lead.status }}</p>
-</div>
+        <div class="mt-4 border-t pt-4 text-sm">
+            <b class="text-gray-800">Property:</b>
+            <p class="text-gray-600 mt-1">
+                {% for p in selected_lead.properties.all %}
+                    {{ p.title }}<br>
+                {% empty %}
+                    <span class="text-gray-400">-</span>
+                {% endfor %}
+            </p>
+        </div>
 
-<p><b>Assigned Agent:</b> {{ selected_lead.assigned_to.name|default:"Not Assigned" }}</p>
+        <div class="mt-4 border-t pt-4 text-sm">
+            <b class="text-gray-800">Message:</b>
+            <p class="text-gray-600 mt-1 bg-gray-50 p-3 rounded-lg border border-gray-100">
+                {{ selected_lead.notes|default:"No notes available." }}
+            </p>
+        </div>
 
-<!-- PROPERTY -->
-<div class="mt-4">
-<b>Property:</b><br>
-{% for p in selected_lead.properties.all %}
-{{ p.title }}<br>
-{% endfor %}
-</div>
+        <div class="flex gap-3 mt-6 border-t pt-6 pb-8 lg:pb-0">
+            <a href="tel:{{ selected_lead.phone }}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-semibold flex-1 text-center shadow">
+                Call
+            </a>
 
-<!-- MESSAGE -->
-<div class="mt-4">
-<b>Message:</b><br>
-{{ selected_lead.notes }}
-</div>
+            <a href="https://wa.me/{{ selected_lead.phone }}" target="_blank" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-semibold flex-1 text-center shadow">
+                WhatsApp
+            </a>
 
-<!-- ACTION BUTTONS -->
-<div class="flex gap-3 mt-6">
-
-<a href="tel:{{ selected_lead.phone }}"
-class="bg-blue-600 text-white px-4 py-2 rounded">
-Call
-</a>
-
-<a href="https://wa.me/{{ selected_lead.phone }}"
-class="bg-green-500 text-white px-4 py-2 rounded">
-WhatsApp
-</a>
-
-<!-- DELETE -->
-<form method="POST"
-      action="{% url 'delete_lead' selected_lead.id %}"
-      onsubmit="event.stopPropagation(); return confirm('Delete this lead?');">
-
-    {% csrf_token %}
-
-    <button type="submit"
-    class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
-        Delete
-    </button>
-
-</form>
-
-</div>
-
-{% else %}
-<p class="text-gray-400 text-center mt-20">Select a lead</p>
-{% endif %}
-
+            <form method="POST" action="{% url 'delete_lead' selected_lead.id %}" onsubmit="event.stopPropagation(); return confirm('Delete this lead?');" class="inline-block">
+                {% csrf_token %}
+                <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-red-700 shadow transition-colors">
+                    Delete
+                </button>
+            </form>
+        </div>
+    {% else %}
+        <div class="hidden lg:flex flex-col items-center justify-center h-full text-gray-400 mt-[-50px]">
+            <span class="material-symbols-outlined text-4xl mb-2">info</span>
+            <p class="text-sm">Select a lead to view details</p>
+        </div>
+    {% endif %}
 </aside>
 
-<!-- ================= MODAL ================= -->
-<div id="leadModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center">
+<div id="leadModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+    <div class="bg-white p-6 rounded-xl w-full max-w-[420px] shadow-2xl relative max-h-[90vh] overflow-y-auto">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-bold text-gray-800">Add New Lead</h2>
+            <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
 
-<div class="bg-white p-6 rounded-xl w-[400px]">
+        <form method="POST" action="{% url 'add_lead' %}" class="space-y-3 text-sm">
+            {% csrf_token %}
 
-<h2 class="text-xl font-bold mb-4">Add Lead</h2>
+            <input name="name" required placeholder="Name" class="w-full border p-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <input name="email" required type="email" placeholder="Email" class="w-full border p-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <input name="phone" required placeholder="Phone" class="w-full border p-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <input name="source" placeholder="Source (e.g. Website, Meta Ads)" class="w-full border p-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
 
-<form method="POST" action="{% url 'add_lead' %}">
-{% csrf_token %}
+            <div>
+                <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Status</label>
+                <select name="status" class="w-full border p-2.5 rounded-lg bg-white">
+                    <option value="HOT">HOT</option>
+                    <option value="WARM">WARM</option>
+                    <option value="COLD">COLD</option>
+                </select>
+            </div>
 
-<input name="name" placeholder="Name" class="w-full mb-2 border p-2 rounded">
-<input name="email" placeholder="Email" class="w-full mb-2 border p-2 rounded">
-<input name="phone" placeholder="Phone" class="w-full mb-2 border p-2 rounded">
-<input name="source" placeholder="Source" class="w-full mb-2 border p-2 rounded">
+            <div>
+                <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Assign Agent</label>
+                <select name="assigned_to" class="w-full border p-2.5 rounded-lg bg-white">
+                    <option value="">Select Agent</option>
+                    {% for agent in agents %}
+                        <option value="{{ agent.id }}">{{ agent.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
 
-<select name="status" class="w-full mb-2 border p-2 rounded">
-<option value="HOT">HOT</option>
-<option value="WARM">WARM</option>
-<option value="COLD">COLD</option>
-</select>
+            <div>
+                <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Property Interest</label>
+                <select name="property_id" class="w-full border p-2.5 rounded-lg bg-white">
+                    <option value="">Select Property</option>
+                    {% for property in properties %}
+                        <option value="{{ property.id }}">{{ property.title }}</option>
+                    {% endfor %}
+                </select>
+            </div>
 
-<select name="assigned_to" class="w-full mb-2 border p-2 rounded">
-{% for agent in agents %}
-<option value="{{ agent.id }}">{{ agent.name }}</option>
-{% endfor %}
-</select>
+            <div>
+                <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Message / Notes</label>
+                <textarea name="message" placeholder="Type here..." class="w-full border p-2.5 rounded-lg h-20 focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+            </div>
 
-<select name="property_id" class="w-full mb-2 border p-2 rounded">
-{% for property in properties %}
-<option value="{{ property.id }}">{{ property.title }}</option>
-{% endfor %}
-</select>
-
-<textarea name="message" placeholder="Message"
-class="w-full mb-2 border p-2 rounded"></textarea>
-
-<button class="bg-blue-600 text-white px-4 py-2 rounded w-full">
-Save Lead
-</button>
-
-</form>
-
+            <button type="submit" class="bg-blue-600 text-white py-3 rounded-lg w-full font-bold shadow-md hover:bg-blue-700 transition-colors mt-2">
+                Save Lead
+            </button>
+        </form>
+    </div>
 </div>
-</div>
 
-<!-- ================= JS ================= -->
 <script>
-
-// FIX: no jump scroll
 function selectLead(id){
     const scrollY = window.scrollY;
-    window.location.href = "?lead=" + id + "&scroll=" + scrollY;
+    const urlParams = new URLSearchParams(window.location.search);
+    const q = urlParams.get('q') || '';
+    window.location.href = "?q=" + q + "&lead=" + id + "&scroll=" + scrollY;
 }
 
-// restore scroll
 window.onload = function() {
     const urlParams = new URLSearchParams(window.location.search);
     const scroll = urlParams.get('scroll');
@@ -231,9 +245,23 @@ window.onload = function() {
 }
 
 function openModal(){
-document.getElementById('leadModal').classList.remove('hidden')
+    document.getElementById('leadModal').classList.remove('hidden')
 }
 
+function closeModal(){
+    document.getElementById('leadModal').classList.add('hidden')
+}
+
+// मोबाइल पर साइडबार/बॉटम शीट बंद करने के लिए फंक्शन
+if (window.innerWidth < 1024) {
+    function closeSidebar(){
+        document.getElementById('detailSidebar').style.transform = 'translateY(110%)';
+        // URL से सिलेक्टेड लीड हटा दें ताकि स्टेट साफ़ हो जाए
+        const url = new URL(window.location.href);
+        url.searchParams.delete('lead');
+        window.history.replaceState({}, '', url);
+    }
+}
 </script>
 
 {% endblock %}
