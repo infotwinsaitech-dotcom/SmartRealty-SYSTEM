@@ -1,32 +1,46 @@
 {% extends "builder/base.html" %}
 {% block content %}
 
-<main class="ml-64 mt-16 p-8 bg-gray-100 min-h-screen">
+<main class="bg-gray-100 min-h-screen p-4 md:p-8">
 
-<h1 class="text-2xl font-bold mb-6">🔔 Notifications</h1>
+<h1 class="text-xl md:text-2xl font-bold mb-4 md:mb-6">
+    🔔 Notifications
+</h1>
 
-<div class="space-y-4">
+<div class="space-y-3 md:space-y-4">
 
 {% for n in notifications %}
 <div onclick="markRead({{ n.id }})"
-     class="bg-white p-4 rounded-xl shadow flex justify-between items-center cursor-pointer
+     class="bg-white p-4 rounded-xl shadow flex flex-col md:flex-row md:justify-between md:items-center gap-3 cursor-pointer
      {% if not n.is_read %}border-l-4 border-blue-500{% endif %}">
 
+    <!-- LEFT CONTENT -->
     <div>
-        <p class="font-semibold">{{ n.title }}</p>
-        <p class="text-sm text-gray-500">{{ n.message }}</p>
-        <p class="text-xs text-gray-400 mt-1">{{ n.created_at }}</p>
+        <p class="font-semibold text-sm md:text-base">
+            {{ n.title }}
+        </p>
+
+        <p class="text-xs md:text-sm text-gray-500">
+            {{ n.message }}
+        </p>
+
+        <p class="text-[10px] md:text-xs text-gray-400 mt-1">
+            {{ n.created_at }}
+        </p>
     </div>
 
-    <span class="px-3 py-1 text-xs rounded
-        {% if n.type == 'lead' %}bg-blue-100 text-blue-600
-        {% elif n.type == 'message' %}bg-green-100 text-green-600
-        {% elif n.type == 'task' %}bg-yellow-100 text-yellow-600
-        {% elif n.type == 'document' %}bg-purple-100 text-purple-600
-        {% endif %}
-    ">
-        {{ n.type }}
-    </span>
+    <!-- TYPE BADGE -->
+    <div>
+        <span class="px-3 py-1 text-xs rounded inline-block
+            {% if n.type == 'lead' %}bg-blue-100 text-blue-600
+            {% elif n.type == 'message' %}bg-green-100 text-green-600
+            {% elif n.type == 'task' %}bg-yellow-100 text-yellow-600
+            {% elif n.type == 'document' %}bg-purple-100 text-purple-600
+            {% endif %}
+        ">
+            {{ n.type }}
+        </span>
+    </div>
 
 </div>
 {% endfor %}

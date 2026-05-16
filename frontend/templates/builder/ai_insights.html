@@ -1,55 +1,59 @@
 {% extends 'builder/base.html' %}
 {% block content %}
 
-<main class="ml-64 min-h-screen flex flex-col">
-
-<div class="p-11 space-y-8">
+<div class="p-4 md:p-8 space-y-6 max-w-[1600px] mx-auto">
 
 <!-- HEADER -->
-<section class="flex justify-between items-end">
+<section class="flex flex-col md:flex-row md:justify-between md:items-end gap-3">
     <div>
-        <h1 class="text-4xl font-extrabold">AI & Predictive Intelligence</h1>
-        <p class="text-gray-500 text-sm">Real-time smart insights from your CRM data</p>
+        <h1 class="text-2xl md:text-4xl font-extrabold">
+            AI & Predictive Intelligence
+        </h1>
+        <p class="text-gray-500 text-sm">
+            Real-time smart insights from your CRM data
+        </p>
     </div>
 </section>
 
 <!-- KPI CARDS -->
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
 
-    <div class="bg-white p-6 rounded-xl shadow border-l-4 border-red-500">
+    <div class="bg-white p-5 md:p-6 rounded-xl shadow border-l-4 border-red-500">
         <p class="text-sm text-gray-500">High Intent Leads</p>
-        <h2 class="text-3xl font-bold">{{ high_intent }}</h2>
+        <h2 class="text-2xl md:text-3xl font-bold">{{ high_intent }}</h2>
     </div>
 
-    <div class="bg-white p-6 rounded-xl shadow border-l-4 border-yellow-500">
+    <div class="bg-white p-5 md:p-6 rounded-xl shadow border-l-4 border-yellow-500">
         <p class="text-sm text-gray-500">Likely to Close</p>
-        <h2 class="text-3xl font-bold">{{ closing }}</h2>
+        <h2 class="text-2xl md:text-3xl font-bold">{{ closing }}</h2>
     </div>
 
-    <div class="bg-white p-6 rounded-xl shadow border-l-4 border-blue-500">
+    <div class="bg-white p-5 md:p-6 rounded-xl shadow border-l-4 border-blue-500">
         <p class="text-sm text-gray-500">Churn Risk</p>
-        <h2 class="text-3xl font-bold">{{ risk }}</h2>
+        <h2 class="text-2xl md:text-3xl font-bold">{{ risk }}</h2>
     </div>
 
 </div>
 
 <!-- REVENUE -->
-<div class="bg-white p-6 rounded-xl shadow">
-    <h3 class="text-xl font-bold mb-2">Revenue Forecast</h3>
+<div class="bg-white p-5 md:p-6 rounded-xl shadow">
+    <h3 class="text-lg md:text-xl font-bold mb-2">Revenue Forecast</h3>
     <p class="text-gray-500 text-sm">AI predicted revenue growth</p>
 
-    <div class="mt-4">
-        <p>Current: ₹{{ total_revenue }}</p>
-        <p class="text-green-600 font-bold">Forecast: ₹{{ forecast }}</p>
+    <div class="mt-4 space-y-1">
+        <p class="text-sm md:text-base">Current: ₹{{ total_revenue }}</p>
+        <p class="text-green-600 font-bold text-base md:text-lg">
+            Forecast: ₹{{ forecast }}
+        </p>
     </div>
 </div>
 
 <!-- AI RECOMMENDATIONS -->
-<div class="bg-blue-900 text-white p-6 rounded-xl shadow">
-    <h3 class="text-xl font-bold mb-4">Top AI Actions</h3>
+<div class="bg-blue-900 text-white p-5 md:p-6 rounded-xl shadow">
+    <h3 class="text-lg md:text-xl font-bold mb-4">Top AI Actions</h3>
 
     {% for r in recommendations %}
-        <div class="mb-3 p-3 bg-white/10 rounded">
+        <div class="mb-3 p-3 bg-white/10 rounded text-sm md:text-base">
             {{ r }}
         </div>
     {% empty %}
@@ -58,62 +62,62 @@
 </div>
 
 <!-- INSIGHTS -->
-<div class="bg-white p-6 rounded-xl shadow">
-    <h3 class="text-xl font-bold mb-4">AI Insights</h3>
+<div class="bg-white p-5 md:p-6 rounded-xl shadow">
+    <h3 class="text-lg md:text-xl font-bold mb-4">AI Insights</h3>
 
     {% for i in insights %}
         <div class="mb-4">
-            <p class="font-bold">{{ i.title }}</p>
-            <p class="text-gray-500 text-sm">{{ i.desc }}</p>
+            <p class="font-bold text-sm md:text-base">{{ i.title }}</p>
+            <p class="text-gray-500 text-xs md:text-sm">{{ i.desc }}</p>
         </div>
     {% endfor %}
 </div>
 
 <!-- LEADS TABLE -->
-<div class="bg-white rounded-xl shadow overflow-hidden">
+<div class="bg-white rounded-xl shadow overflow-x-auto">
 
-<div class="p-6 border-b">
-    <h3 class="text-xl font-bold">High Value Leads</h3>
+    <div class="p-4 md:p-6 border-b">
+        <h3 class="text-lg md:text-xl font-bold">High Value Leads</h3>
+    </div>
+
+    <table class="w-full min-w-[500px] text-sm md:text-base">
+
+        <thead class="bg-gray-100 text-gray-500">
+            <tr>
+                <th class="p-3 md:p-4 text-left">Name</th>
+                <th>Score</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+        {% for item in scored_leads %}
+        <tr class="border-t">
+
+            <td class="p-3 md:p-4 whitespace-nowrap">
+                {{ item.lead.name }}
+            </td>
+
+            <td>{{ item.score }}</td>
+
+            <td>
+                {% if item.intent == "High" %}
+                    <span class="text-green-600 font-semibold">High</span>
+                {% elif item.intent == "Medium" %}
+                    <span class="text-yellow-600 font-semibold">Medium</span>
+                {% else %}
+                    <span class="text-red-600 font-semibold">Low</span>
+                {% endif %}
+            </td>
+
+        </tr>
+        {% endfor %}
+
+        </tbody>
+    </table>
 </div>
 
-<table class="w-full">
-
-<thead class="bg-gray-100 text-sm text-gray-500">
-<tr>
-    <th class="p-4 text-left">Name</th>
-    <th>Score</th>
-    <th>Status</th>
-</tr>
-</thead>
-
-<tbody>
-
-{% for item in scored_leads %}
-<tr class="border-t">
-
-<td class="p-4">{{ item.lead.name }}</td>
-
-<td>{{ item.score }}</td>
-
-<td>
-    {% if item.intent == "High" %}
-        <span class="text-green-600">High</span>
-    {% elif item.intent == "Medium" %}
-        <span class="text-yellow-600">Medium</span>
-    {% else %}
-        <span class="text-red-600">Low</span>
-    {% endif %}
-</td>
-
-</tr>
-{% endfor %}
-
-</tbody>
-
-</table>
 </div>
-
-</div>
-</main>
 
 {% endblock %}

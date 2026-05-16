@@ -1,35 +1,37 @@
 {% extends "builder/base.html" %}
 {% block content %}
 
-<main class="ml-64 mt-16 p-8 bg-gray-50 min-h-screen">
+<main class="p-4 md:p-8 bg-gray-50 min-h-screen">
 
-<h1 class="text-2xl font-bold mb-6">Documents</h1>
+<h1 class="text-xl md:text-2xl font-bold mb-4 md:mb-6">Documents</h1>
 
 <!-- UPLOAD FORM -->
 <form method="POST" enctype="multipart/form-data"
-      class="bg-white p-4 rounded-xl shadow mb-6 flex gap-4 items-center">
+      class="bg-white p-4 rounded-xl shadow mb-6 flex flex-col md:flex-row gap-3 md:gap-4 md:items-center">
 
     {% csrf_token %}
 
     <input type="file" name="file" required
-           class="border p-2 rounded w-full">
+           class="border p-2 rounded w-full text-sm md:text-base">
 
-    <select name="category" class="border p-2 rounded">
+    <select name="category"
+            class="border p-2 rounded w-full md:w-auto text-sm md:text-base">
         <option value="LEGAL">Legal</option>
         <option value="SALES">Sales</option>
         <option value="PROPERTY">Property</option>
     </select>
 
-    <button class="bg-blue-600 text-white px-4 py-2 rounded">
+    <button class="bg-blue-600 text-white px-4 py-2 rounded w-full md:w-auto">
         Upload
     </button>
 
 </form>
 
 <!-- DOCUMENT LIST -->
-<div class="bg-white rounded-xl shadow">
+<div class="bg-white rounded-xl shadow overflow-hidden">
 
-    <div class="grid grid-cols-5 p-4 font-bold border-b">
+    <!-- TABLE (Desktop) -->
+    <div class="hidden md:grid grid-cols-5 p-4 font-bold border-b">
         <div>Name</div>
         <div>Category</div>
         <div>Date</div>
@@ -38,32 +40,55 @@
     </div>
 
     {% for doc in documents %}
-    <div class="grid grid-cols-5 p-4 border-b items-center">
+
+    <!-- DESKTOP ROW -->
+    <div class="hidden md:grid grid-cols-5 p-4 border-b items-center">
 
         <div>{{ doc.name }}</div>
-
         <div>{{ doc.category }}</div>
-
         <div>{{ doc.created_at|date:"d M Y" }}</div>
 
-        <!-- PREVIEW -->
         <div>
             <a href="{{ doc.file.url }}" target="_blank"
                class="text-blue-600">View</a>
         </div>
 
-        <!-- ACTION -->
         <div class="flex gap-3">
+            <a href="{{ doc.file.url }}" download
+               class="text-green-600">Download</a>
+
+            <a href="{% url 'delete_document' doc.id %}"
+               class="text-red-600">Delete</a>
+        </div>
+
+    </div>
+
+    <!-- MOBILE CARD -->
+    <div class="md:hidden p-4 border-b space-y-2">
+
+        <p class="font-semibold">{{ doc.name }}</p>
+
+        <p class="text-sm text-gray-500">
+            Category: {{ doc.category }}
+        </p>
+
+        <p class="text-sm text-gray-500">
+            Date: {{ doc.created_at|date:"d M Y" }}
+        </p>
+
+        <div class="flex gap-4 text-sm mt-2">
+            <a href="{{ doc.file.url }}" target="_blank"
+               class="text-blue-600">View</a>
 
             <a href="{{ doc.file.url }}" download
                class="text-green-600">Download</a>
 
             <a href="{% url 'delete_document' doc.id %}"
                class="text-red-600">Delete</a>
-
         </div>
 
     </div>
+
     {% empty %}
     <div class="p-6 text-center text-gray-400">
         No documents uploaded yet

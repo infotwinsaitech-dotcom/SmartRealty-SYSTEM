@@ -2,27 +2,31 @@
 {% load cloudinary %}
 {% block content %}
 
-<script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+<main class="min-h-screen bg-gray-50 flex flex-col">
 
-<main class="ml-64 min-h-screen bg-gray-50 flex flex-col">
-
-<section class="mt-16 p-8">
+<section class="p-4 md:p-8">
 
 <!-- HEADER -->
-<div class="flex justify-between items-end mb-10">
+<div class="flex flex-col md:flex-row md:justify-between md:items-end gap-4 mb-6 md:mb-10">
+
 <div>
-<h2 class="text-4xl font-extrabold text-gray-800 mb-2">Properties</h2>
-<p class="text-gray-500">Manage and monitor your properties</p>
+<h2 class="text-2xl md:text-4xl font-extrabold text-gray-800 mb-1 md:mb-2">
+Properties
+</h2>
+<p class="text-gray-500 text-sm md:text-base">
+Manage and monitor your properties
+</p>
 </div>
 
 <button onclick="openModal()"
-class="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg font-bold hover:scale-105 transition">
+class="w-full md:w-auto px-4 md:px-6 py-2 md:py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg font-bold hover:scale-105 transition">
 + Add Property
 </button>
+
 </div>
 
 <!-- PROPERTY GRID -->
-<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+<div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-8">
 
 {% if properties %}
 
@@ -31,20 +35,24 @@ class="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded
 
 <div class="bg-white rounded-xl shadow hover:shadow-xl transition overflow-hidden group">
 
-<!-- ✅ CLOUDINARY IMAGE FIX -->
 {% if property.thumbnail %}
-    <img src="{% cloudinary_url property.thumbnail width=600 height=400 crop='fill' %}"
-         class="w-full h-52 object-cover group-hover:scale-110 transition duration-500">
+<img src="{% cloudinary_url property.thumbnail width=600 height=400 crop='fill' %}"
+class="w-full h-44 md:h-52 object-cover group-hover:scale-110 transition duration-500">
 {% else %}
-    <img src="https://via.placeholder.com/400x300"
-         class="w-full h-52 object-cover">
+<img src="https://via.placeholder.com/400x300"
+class="w-full h-44 md:h-52 object-cover">
 {% endif %}
 
-<!-- CONTENT -->
-<div class="p-4">
-<h3 class="text-lg font-bold text-gray-800">{{ property.title }}</h3>
-<p class="text-sm text-gray-500">{{ property.location }}</p>
-<p class="text-blue-600 font-bold mt-2">₹{{ property.price }}</p>
+<div class="p-3 md:p-4">
+<h3 class="text-base md:text-lg font-bold text-gray-800">
+{{ property.title }}
+</h3>
+<p class="text-xs md:text-sm text-gray-500">
+{{ property.location }}
+</p>
+<p class="text-blue-600 font-bold mt-1 md:mt-2">
+₹{{ property.price }}
+</p>
 </div>
 
 </div>
@@ -61,107 +69,127 @@ class="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded
 </main>
 
 <!-- ================= MODAL ================= -->
-<div id="propertyModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+<div id="propertyModal"
+class="hidden fixed inset-0 bg-black/50 flex items-end md:items-center justify-center z-50">
 
-<div class="bg-white w-[700px] max-h-[90vh] overflow-y-auto rounded-xl p-6 relative">
+<!-- MOBILE: bottom sheet -->
+<div class="bg-white w-full md:w-[700px] max-h-[90vh] overflow-y-auto rounded-t-2xl md:rounded-xl p-4 md:p-6 relative">
 
-<button onclick="closeModal()" class="absolute top-2 right-3 text-gray-500">✕</button>
+<button onclick="closeModal()"
+class="absolute top-2 right-3 text-gray-500 text-xl">✕</button>
 
-<h2 class="text-2xl font-bold mb-4">Add Property</h2>
+<h2 class="text-lg md:text-2xl font-bold mb-4">
+Add Property
+</h2>
 
 <form method="POST" action="{% url 'add_property' %}" enctype="multipart/form-data">
 {% csrf_token %}
 
-<input name="title" placeholder="Title" class="w-full mb-3 border p-2 rounded">
-<input name="location" placeholder="Location" class="w-full mb-3 border p-2 rounded">
-<input name="price" placeholder="Price" class="w-full mb-3 border p-2 rounded">
+<input name="title" placeholder="Title"
+class="w-full mb-3 border p-2 rounded text-sm">
 
-<div class="grid grid-cols-3 gap-2">
-<input name="beds" placeholder="Beds" class="border p-2 rounded">
-<input name="baths" placeholder="Baths" class="border p-2 rounded">
-<input name="sqft" placeholder="Sqft" class="border p-2 rounded">
+<input name="location" placeholder="Location"
+class="w-full mb-3 border p-2 rounded text-sm">
+
+<input name="price" placeholder="Price"
+class="w-full mb-3 border p-2 rounded text-sm">
+
+<!-- GRID FIX -->
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+<input name="beds" placeholder="Beds" class="border p-2 rounded text-sm">
+<input name="baths" placeholder="Baths" class="border p-2 rounded text-sm">
+<input name="sqft" placeholder="Sqft" class="border p-2 rounded text-sm">
 </div>
 
-<textarea name="description" placeholder="Description" class="w-full mt-3 mb-3 border p-2 rounded"></textarea>
+<textarea name="description" placeholder="Description"
+class="w-full mt-3 mb-3 border p-2 rounded text-sm"></textarea>
 
-<select name="type" class="w-full mb-3 border p-2 rounded">
+<select name="type" class="w-full mb-3 border p-2 rounded text-sm">
 <option value="Residential">Residential</option>
 <option value="Commercial">Commercial</option>
 </select>
 
-<select name="status" class="w-full mb-3 border p-2 rounded">
+<select name="status" class="w-full mb-3 border p-2 rounded text-sm">
 <option value="Available">Available</option>
 <option value="Sold">Sold</option>
 </select>
 
-<!-- ✅ THUMBNAIL -->
-<label class="font-semibold mt-3 block">Thumbnail</label>
-<input type="file" name="thumbnail" class="w-full mb-3 border p-2 rounded">
+<!-- THUMBNAIL -->
+<label class="font-semibold mt-3 block text-sm">Thumbnail</label>
+<input type="file" name="thumbnail"
+class="w-full mb-3 border p-2 rounded text-sm">
 
-<!-- ✅ GALLERY WITH + BUTTON -->
-<label class="font-semibold block mb-2">Gallery Images</label>
+<!-- GALLERY -->
+<label class="font-semibold block mb-2 text-sm">Gallery Images</label>
 
-<div id="image-container" class="space-y-3">
+<div id="image-container" class="space-y-2">
 
 <div class="flex gap-2">
-<input type="file" name="images" class="w-full border p-2 rounded">
+<input type="file" name="images"
+class="w-full border p-2 rounded text-sm">
 <button type="button" onclick="removeField(this)"
 class="bg-red-500 text-white px-3 rounded hidden">✕</button>
 </div>
 
 </div>
+
 <button type="button" onclick="addImageField()"
-class="mt-3 px-4 py-2 bg-green-600 text-white rounded-lg hover:scale-105 transition">
+class="mt-2 px-3 py-2 bg-green-600 text-white rounded text-sm">
 + Add More Images
 </button>
-<br>
-<label class="font-semibold">Amenities</label>
-<div class="grid grid-cols-2 gap-2 mb-3">
 
+<!-- AMENITIES -->
+<label class="font-semibold mt-4 block text-sm">Amenities</label>
+
+<div class="grid grid-cols-2 gap-2 mb-3 text-sm">
 <label><input type="checkbox" name="amenities" value="Parking"> Parking</label>
 <label><input type="checkbox" name="amenities" value="Lift"> Lift</label>
 <label><input type="checkbox" name="amenities" value="Gym"> Gym</label>
 <label><input type="checkbox" name="amenities" value="Pool"> Pool</label>
 <label><input type="checkbox" name="amenities" value="Security"> Security</label>
 <label><input type="checkbox" name="amenities" value="Garden"> Garden</label>
-<input name="configuration" placeholder="Configuration (2BHK, 3BHK)"
-class="w-full mb-3 border p-2 rounded">
+</div>
+
+<input name="configuration" placeholder="2BHK, 3BHK"
+class="w-full mb-3 border p-2 rounded text-sm">
 
 <input name="rera_number" placeholder="RERA Number"
-class="w-full mb-3 border p-2 rounded">
+class="w-full mb-3 border p-2 rounded text-sm">
 
-<input name="possession_date" placeholder="Possession (Dec 2027)"
-class="w-full mb-3 border p-2 rounded">
+<input name="possession_date" placeholder="Possession"
+class="w-full mb-3 border p-2 rounded text-sm">
 
-<textarea name="highlights" placeholder="Highlights (comma separated)"
-class="w-full mb-3 border p-2 rounded"></textarea>
+<textarea name="highlights" placeholder="Highlights"
+class="w-full mb-3 border p-2 rounded text-sm"></textarea>
 
-<input name="map_link" placeholder="Google Map Embed Link"
-class="w-full mb-3 border p-2 rounded">
-<br>
-<label class="font-semibold">Brochure (PDF)</label>
-<input type="file" name="brochure" class="w-full mb-3 border p-2 rounded">
-</div>
-<label class="font-semibold block mb-2">Nearby Places</label>
+<input name="map_link" placeholder="Google Map Link"
+class="w-full mb-3 border p-2 rounded text-sm">
 
-<div id="nearby-container" class="space-y-3">
+<!-- BROCHURE -->
+<label class="font-semibold text-sm">Brochure (PDF)</label>
+<input type="file" name="brochure"
+class="w-full mb-3 border p-2 rounded text-sm">
 
-<div class="grid grid-cols-3 gap-2">
-<input name="nearby_name" placeholder="Place (School, Mall)" class="border p-2 rounded">
-<input name="nearby_distance" placeholder="Distance (2 km)" class="border p-2 rounded">
-<input name="nearby_icon" placeholder="Icon (🏫 🏥 🛒)" class="border p-2 rounded">
+<!-- NEARBY -->
+<label class="font-semibold block mb-2 text-sm">Nearby Places</label>
+
+<div id="nearby-container" class="space-y-2">
+
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+<input name="nearby_name" placeholder="Place" class="border p-2 rounded text-sm">
+<input name="nearby_distance" placeholder="Distance" class="border p-2 rounded text-sm">
+<input name="nearby_icon" placeholder="Icon" class="border p-2 rounded text-sm">
 </div>
 
 </div>
 
 <button type="button" onclick="addNearbyField()"
-class="mt-2 px-3 py-2 bg-green-600 text-white rounded">
+class="mt-2 px-3 py-2 bg-green-600 text-white rounded text-sm">
 + Add More Nearby
 </button>
 
-
 <button type="submit"
-class="w-full mt-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold rounded-lg hover:scale-105 transition">
+class="w-full mt-5 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold rounded-lg">
 Save Property
 </button>
 
@@ -170,51 +198,38 @@ Save Property
 </div>
 </div>
 
-<!-- ================= JS ================= -->
+<!-- JS SAME -->
 <script>
 function openModal() {
 document.getElementById('propertyModal').classList.remove('hidden');
 }
-
 function closeModal() {
 document.getElementById('propertyModal').classList.add('hidden');
 }
-
-// ADD IMAGE FIELD
 function addImageField() {
 const container = document.getElementById("image-container");
-
 const div = document.createElement("div");
-div.classList.add("flex", "gap-2");
-
+div.classList.add("flex","gap-2");
 div.innerHTML = `
 <input type="file" name="images" class="w-full border p-2 rounded">
-<button type="button" onclick="removeField(this)"
-class="bg-red-500 text-white px-3 rounded">✕</button>
+<button type="button" onclick="removeField(this)" class="bg-red-500 text-white px-3 rounded">✕</button>
 `;
-
 container.appendChild(div);
 }
-
-// REMOVE FIELD
 function removeField(btn) {
 btn.parentElement.remove();
 }
-</script>
-<script>
 function addNearbyField() {
-    const container = document.getElementById("nearby-container");
-
-    const div = document.createElement("div");
-    div.classList.add("grid", "grid-cols-3", "gap-2");
-
-    div.innerHTML = `
-    <input name="nearby_name" placeholder="Place" class="border p-2 rounded">
-    <input name="nearby_distance" placeholder="Distance" class="border p-2 rounded">
-    <input name="nearby_icon" placeholder="Icon" class="border p-2 rounded">
-    `;
-
-    container.appendChild(div);
+const container = document.getElementById("nearby-container");
+const div = document.createElement("div");
+div.classList.add("grid","grid-cols-1","sm:grid-cols-3","gap-2");
+div.innerHTML = `
+<input name="nearby_name" placeholder="Place" class="border p-2 rounded">
+<input name="nearby_distance" placeholder="Distance" class="border p-2 rounded">
+<input name="nearby_icon" placeholder="Icon" class="border p-2 rounded">
+`;
+container.appendChild(div);
 }
 </script>
+
 {% endblock %}

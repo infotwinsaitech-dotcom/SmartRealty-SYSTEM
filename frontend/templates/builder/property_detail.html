@@ -2,96 +2,128 @@
 {% load cloudinary %}
 {% block content %}
 
-<div class="ml-64 mt-16 p-6">
+<main class="min-h-screen bg-gray-50 p-4 md:p-6">
 
-<div class="flex justify-between items-center mb-8">
+<div class="max-w-4xl mx-auto">
+
+<!-- HEADER -->
+<div class="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6 md:mb-8">
+
 <div>
-<h2 class="text-4xl font-extrabold text-gray-800">Edit Property</h2>
-<p class="text-gray-500">Update your property</p>
+<h2 class="text-2xl md:text-4xl font-extrabold text-gray-800">
+Edit Property
+</h2>
+<p class="text-gray-500 text-sm md:text-base">
+Update your property
+</p>
 </div>
 
 <a href="{% url 'property_management' %}"
-class="bg-gray-200 px-4 py-2 rounded-lg hover:bg-gray-300">
+class="bg-gray-200 px-4 py-2 rounded-lg hover:bg-gray-300 text-center w-full md:w-auto">
 ← Back
 </a>
+
 </div>
 
-<div class="bg-white p-8 rounded-2xl shadow-xl">
+<!-- FORM CARD -->
+<div class="bg-white p-4 md:p-8 rounded-2xl shadow-xl">
 
 <form method="POST" enctype="multipart/form-data" class="space-y-4">
 {% csrf_token %}
 
 <!-- BASIC -->
-<input name="title" value="{{ property.title }}" class="w-full border p-2 rounded">
-<input name="location" value="{{ property.location }}" class="w-full border p-2 rounded">
-<input name="price" value="{{ property.price }}" class="w-full border p-2 rounded">
+<input name="title" value="{{ property.title }}"
+class="w-full border p-2 rounded text-sm">
 
-<div class="grid grid-cols-3 gap-2">
-<input name="beds" value="{{ property.beds }}" class="border p-2 rounded">
-<input name="baths" value="{{ property.baths }}" class="border p-2 rounded">
-<input name="sqft" value="{{ property.sqft }}" class="border p-2 rounded">
+<input name="location" value="{{ property.location }}"
+class="w-full border p-2 rounded text-sm">
+
+<input name="price" value="{{ property.price }}"
+class="w-full border p-2 rounded text-sm">
+
+<!-- GRID FIX -->
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+<input name="beds" value="{{ property.beds }}" class="border p-2 rounded text-sm">
+<input name="baths" value="{{ property.baths }}" class="border p-2 rounded text-sm">
+<input name="sqft" value="{{ property.sqft }}" class="border p-2 rounded text-sm">
 </div>
 
-<textarea name="description" class="w-full border p-2 rounded">{{ property.description }}</textarea>
+<textarea name="description"
+class="w-full border p-2 rounded text-sm">{{ property.description }}</textarea>
 
-<select name="type" class="w-full border p-2 rounded">
+<select name="type" class="w-full border p-2 rounded text-sm">
 <option value="Residential" {% if property.property_type == "Residential" %}selected{% endif %}>Residential</option>
 <option value="Commercial" {% if property.property_type == "Commercial" %}selected{% endif %}>Commercial</option>
 </select>
 
-<select name="status" class="w-full border p-2 rounded">
+<select name="status" class="w-full border p-2 rounded text-sm">
 <option value="Available" {% if property.status == "Available" %}selected{% endif %}>Available</option>
 <option value="Sold" {% if property.status == "Sold" %}selected{% endif %}>Sold</option>
 </select>
 
 <!-- THUMBNAIL -->
-<label>Thumbnail</label>
+<label class="text-sm font-semibold">Thumbnail</label>
+
 {% if property.thumbnail %}
-<img src="{% cloudinary_url property.thumbnail width=400 height=250 crop='fill' %}" class="mb-2 rounded">
+<img src="{% cloudinary_url property.thumbnail width=400 height=250 crop='fill' %}"
+class="mb-2 rounded w-full h-40 object-cover">
 {% endif %}
-<input type="file" name="thumbnail" class="w-full border p-2 rounded">
+
+<input type="file" name="thumbnail"
+class="w-full border p-2 rounded text-sm">
 
 <!-- GALLERY -->
-<label>Gallery Images</label>
-<div id="image-container">
-<input type="file" name="images" class="w-full border p-2 rounded">
+<label class="text-sm font-semibold">Gallery Images</label>
+
+<div id="image-container" class="space-y-2">
+<input type="file" name="images"
+class="w-full border p-2 rounded text-sm">
 </div>
 
 <button type="button" onclick="addImageField()"
-class="mt-2 bg-green-600 text-white px-3 py-1 rounded">
+class="mt-2 bg-green-600 text-white px-3 py-2 rounded text-sm">
 + Add More
 </button>
 
 <!-- AMENITIES -->
-<div class="grid grid-cols-2 gap-2">
+<label class="text-sm font-semibold mt-4 block">Amenities</label>
+
+<div class="grid grid-cols-2 gap-2 text-sm">
 {% for item in amenities_list %}
-<label>
+<label class="flex items-center gap-2">
 <input type="checkbox" name="amenities" value="{{ item }}"
 {% if item in property.amenities %}checked{% endif %}>
 {{ item }}
 </label>
 {% endfor %}
 </div>
+
 <!-- EXTRA -->
-<input name="configuration" value="{{ property.configuration }}" placeholder="Configuration"
-class="w-full border p-2 rounded">
+<input name="configuration" value="{{ property.configuration }}"
+placeholder="Configuration"
+class="w-full border p-2 rounded text-sm">
 
-<input name="rera_number" value="{{ property.rera_number }}" placeholder="RERA"
-class="w-full border p-2 rounded">
+<input name="rera_number" value="{{ property.rera_number }}"
+placeholder="RERA"
+class="w-full border p-2 rounded text-sm">
 
-<input name="possession_date" value="{{ property.possession_date }}" placeholder="Possession"
-class="w-full border p-2 rounded">
+<input name="possession_date" value="{{ property.possession_date }}"
+placeholder="Possession"
+class="w-full border p-2 rounded text-sm">
 
-<textarea name="highlights" class="w-full border p-2 rounded">{{ property.highlights }}</textarea>
+<textarea name="highlights"
+class="w-full border p-2 rounded text-sm">{{ property.highlights }}</textarea>
 
-<input name="map_link" value="{{ property.map_link }}" class="w-full border p-2 rounded">
+<input name="map_link" value="{{ property.map_link }}"
+class="w-full border p-2 rounded text-sm">
 
 <!-- BROCHURE -->
-<label>Brochure</label>
-<input type="file" name="brochure" class="w-full border p-2 rounded">
+<label class="text-sm font-semibold">Brochure</label>
+<input type="file" name="brochure"
+class="w-full border p-2 rounded text-sm">
 
 <!-- SUBMIT -->
-<button class="w-full mt-4 bg-blue-600 text-white py-3 rounded">
+<button class="w-full mt-4 bg-blue-600 text-white py-3 rounded font-bold">
 Update Property
 </button>
 
@@ -99,6 +131,7 @@ Update Property
 </div>
 
 </div>
+</main>
 
 <script>
 function addImageField() {

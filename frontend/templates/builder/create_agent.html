@@ -1,43 +1,47 @@
 {% extends "builder/base.html" %}
 {% block content %}
 
-<main class="ml-64 mt-16 p-8 min-h-screen bg-surface">
+<main class="p-4 md:p-8 min-h-screen bg-surface">
 
 <!-- HEADER -->
-<div class="flex justify-between items-center mb-10">
+<div class="flex flex-col md:flex-row md:justify-between md:items-center mb-6 md:mb-10 gap-2">
     <div>
-        <h2 class="text-3xl font-extrabold">Create Agent</h2>
-        <p class="text-gray-500">Add and manage your sales team</p>
+        <h2 class="text-2xl md:text-3xl font-extrabold">Create Agent</h2>
+        <p class="text-gray-500 text-sm md:text-base">
+            Add and manage your sales team
+        </p>
     </div>
 </div>
 
-<div class="grid grid-cols-12 gap-8">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8">
 
     <!-- FORM -->
-    <div class="col-span-12 lg:col-span-5 bg-white p-8 rounded-2xl shadow-xl">
+    <div class="lg:col-span-5 bg-white p-5 md:p-8 rounded-2xl shadow">
 
-        <h3 class="text-xl font-bold mb-6">Add New Agent</h3>
+        <h3 class="text-lg md:text-xl font-bold mb-4 md:mb-6">
+            Add New Agent
+        </h3>
 
-        <form method="POST" class="space-y-4">
+        <form method="POST" class="space-y-3 md:space-y-4">
             {% csrf_token %}
 
             <input name="name" placeholder="Full Name"
-                class="w-full p-3 border rounded-xl">
+                class="w-full p-2.5 md:p-3 border rounded-lg md:rounded-xl text-sm md:text-base">
 
             <input name="email" placeholder="Email"
-                class="w-full p-3 border rounded-xl">
+                class="w-full p-2.5 md:p-3 border rounded-lg md:rounded-xl text-sm md:text-base">
 
             <input name="phone" placeholder="Phone"
-                class="w-full p-3 border rounded-xl">
+                class="w-full p-2.5 md:p-3 border rounded-lg md:rounded-xl text-sm md:text-base">
 
             <input name="username" placeholder="Username"
-                class="w-full p-3 border rounded-xl">
+                class="w-full p-2.5 md:p-3 border rounded-lg md:rounded-xl text-sm md:text-base">
 
             <input name="password" type="password" placeholder="Password"
-                class="w-full p-3 border rounded-xl">
+                class="w-full p-2.5 md:p-3 border rounded-lg md:rounded-xl text-sm md:text-base">
 
             <button
-                class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 rounded-xl font-bold">
+                class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-2.5 md:py-3 rounded-lg md:rounded-xl font-bold text-sm md:text-base">
                 🚀 Create Agent
             </button>
 
@@ -45,28 +49,36 @@
     </div>
 
     <!-- AGENT LIST -->
-    <div class="col-span-12 lg:col-span-7 bg-white p-8 rounded-2xl shadow-xl">
+    <div class="lg:col-span-7 bg-white p-5 md:p-8 rounded-2xl shadow">
 
-        <h3 class="text-xl font-bold mb-6">Agent List</h3>
+        <h3 class="text-lg md:text-xl font-bold mb-4 md:mb-6">
+            Agent List
+        </h3>
 
-        <div class="space-y-4">
+        <div class="space-y-3 md:space-y-4 max-h-[60vh] overflow-y-auto">
 
             {% for agent in agents %}
-            <div class="p-4 border rounded-xl flex justify-between items-center">
+            <div class="p-3 md:p-4 border rounded-lg md:rounded-xl flex justify-between items-center">
 
-                <div>
-                    <p class="font-bold">{{ agent.name }}</p>
-                    <p class="text-sm text-gray-500">{{ agent.email }}</p>
-                    <p class="text-xs text-gray-400">{{ agent.phone }}</p>
+                <div class="min-w-0">
+                    <p class="font-bold text-sm md:text-base truncate">
+                        {{ agent.name }}
+                    </p>
+                    <p class="text-xs md:text-sm text-gray-500 truncate">
+                        {{ agent.email }}
+                    </p>
+                    <p class="text-[11px] md:text-xs text-gray-400">
+                        {{ agent.phone }}
+                    </p>
                 </div>
 
-                <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs">
+                <span class="bg-green-100 text-green-700 px-2 md:px-3 py-1 rounded-full text-[10px] md:text-xs whitespace-nowrap">
                     Active
                 </span>
 
             </div>
             {% empty %}
-            <p class="text-gray-400">No agents yet</p>
+            <p class="text-gray-400 text-sm">No agents yet</p>
             {% endfor %}
 
         </div>
