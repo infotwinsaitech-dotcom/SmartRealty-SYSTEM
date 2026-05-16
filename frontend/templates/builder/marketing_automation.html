@@ -42,14 +42,13 @@
 <!-- MAIN GRID -->
 <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8">
 
-<!-- LEFT SIDE (CAMPAIGNS) -->
+<!-- LEFT SIDE -->
 <div class="lg:col-span-8">
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
 
     {% for c in campaigns %}
     <div class="bg-white rounded-xl shadow overflow-hidden">
 
-        <!-- IMAGE -->
         <div class="h-40 md:h-48 bg-gray-200">
             {% if c.image %}
                 <img src="{{ c.image.url }}" class="w-full h-full object-cover">
@@ -83,14 +82,13 @@
                 </span>
 
                 <div class="flex gap-3">
-                    <a href="{% url 'run_campaign' c.id %}"
-                       class="text-blue-600">
-                       Run
+                    <a href="{% url 'run_campaign' c.id %}" class="text-blue-600">
+                        Run
                     </a>
 
                     <a href="{% url 'delete_campaign' c.id %}"
                        class="text-red-600 font-semibold"
-                       onclick="return confirm('Are you sure you want to delete this campaign?')">
+                       onclick="return confirm('Are you sure?')">
                        Delete
                     </a>
                 </div>
@@ -104,7 +102,7 @@
     </div>
 </div>
 
-<!-- RIGHT SIDE (ANALYTICS) -->
+<!-- RIGHT SIDE -->
 <div class="lg:col-span-4 space-y-4 md:space-y-6">
 
     <!-- BAR CHART -->
@@ -112,7 +110,11 @@
         <h3 class="font-bold mb-3 md:mb-4 text-sm md:text-base">
             Monthly Performance
         </h3>
-        <canvas id="marketingChart"></canvas>
+
+        <!-- FIX: height wrapper -->
+        <div class="h-64">
+            <canvas id="marketingChart"></canvas>
+        </div>
     </div>
 
     <!-- DONUT CHART -->
@@ -120,7 +122,11 @@
         <h3 class="font-bold mb-3 md:mb-4 text-sm md:text-base">
             Channel Distribution
         </h3>
-        <canvas id="donutChart"></canvas>
+
+        <!-- FIX -->
+        <div class="h-64">
+            <canvas id="donutChart"></canvas>
+        </div>
     </div>
 
 </div>
@@ -134,7 +140,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
-// BAR CHART
+
 const ctx = document.getElementById('marketingChart');
 
 new Chart(ctx, {
@@ -149,14 +155,10 @@ new Chart(ctx, {
     },
     options: {
         responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-            legend: { display: false }
-        }
+        maintainAspectRatio: false
     }
 });
 
-// DONUT CHART
 const ctx2 = document.getElementById('donutChart');
 
 new Chart(ctx2, {
@@ -173,6 +175,7 @@ new Chart(ctx2, {
         maintainAspectRatio: false
     }
 });
+
 </script>
 
 {% endblock %}
