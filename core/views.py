@@ -1253,6 +1253,13 @@ def mark_notification_read(request, id):
     n.save()
 
     return JsonResponse({"status": "ok"})
+import json
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render
+from django.db.models import Sum
+from django.core.exceptions import FieldError
+# अपने मॉडल्स को यहाँ सही से इम्पोर्ट रखें (उदा. from .models import Agent, Lead, Deal)
+
 @login_required
 def agent_performance(request):
 
@@ -1270,8 +1277,11 @@ def agent_performance(request):
     total_deals = 0
 
     for agent in agents:
-
-        leads = Lead.objects.filter(agent=agent)
+        # 🛠️ सुधार: 'agent=agent' को बदलकर 'assigned_to=agent' किया गया है
+        leads = Lead.objects.filter(assigned_to=agent)
+        
+        # ध्यान दें: अगर Deal मॉडल में भी ऐसी ही एरर आए, तो वहां भी 'agent' की जगह सही फ़ील्ड नाम (जैसे assigned_to) जांच लें।
+        # अभी के लिए एरर सिर्फ Lead पर थी, इसलिए इसे बदला गया है।
         deals = Deal.objects.filter(agent=agent, status="closed")
 
         # ✅ FILTER APPLY
