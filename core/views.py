@@ -1351,7 +1351,7 @@ def export_agents(request):
     writer.writerow(['Name', 'Leads', 'Deals', 'Revenue'])
 
     for agent in Agent.objects.filter(builder=request.user):
-        leads = Lead.objects.filter(agent=agent).count()
+        leads = Lead.objects.filter(assigned_to=agent).count()
         deals = Deal.objects.filter(agent=agent).count()
         revenue = Deal.objects.filter(agent=agent).aggregate(total=Sum('amount'))['total'] or 0
 
