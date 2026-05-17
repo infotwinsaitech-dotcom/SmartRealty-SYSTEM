@@ -1,111 +1,122 @@
 {% extends "agent/base.html" %}
 {% block content %}
 
-<div class="p-6">
+<div class="p-4 md:p-6">
 
     <!-- HEADER -->
-    <div class="flex justify-between items-center mb-6">
-        <h1 class="text-2xl font-bold">My Leads</h1>
+    <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-3 mb-6">
+        <h1 class="text-xl md:text-2xl font-bold">My Leads</h1>
 
-        <form method="GET" class="flex gap-2">
+        <form method="GET" class="flex flex-col md:flex-row gap-2 w-full md:w-auto">
 
             <input type="text" name="q" value="{{ request.GET.q }}"
-                placeholder="Search name, phone, email..."
-                class="border px-3 py-2 rounded w-64">
+                placeholder="Search name / phone..."
+                class="border px-3 py-2 rounded w-full md:w-64 text-sm">
 
-            <select name="status" class="border px-2 py-2 rounded">
+            <select name="status" class="border px-2 py-2 rounded text-sm">
                 <option value="">All</option>
                 <option value="HOT">HOT</option>
                 <option value="WARM">WARM</option>
                 <option value="COLD">COLD</option>
             </select>
 
-            <select name="sort" class="border px-2 py-2 rounded">
+            <select name="sort" class="border px-2 py-2 rounded text-sm">
                 <option value="new">Newest</option>
                 <option value="old">Oldest</option>
             </select>
 
-            <button class="bg-blue-600 text-white px-4 rounded">
-                Apply
+            <button class="bg-blue-600 text-white px-4 py-2 rounded text-sm">
+                Search
             </button>
 
         </form>
     </div>
 
     <!-- STATS -->
-    <div class="grid grid-cols-3 gap-4 mb-6">
-        <div class="bg-red-500 text-white p-4 rounded">HOT Leads</div>
-        <div class="bg-yellow-500 text-white p-4 rounded">WARM Leads</div>
-        <div class="bg-gray-500 text-white p-4 rounded">COLD Leads</div>
+    <div class="grid grid-cols-3 gap-2 md:gap-4 mb-6 text-center text-xs md:text-sm">
+
+        <div class="bg-red-500 text-white p-3 md:p-4 rounded">
+            HOT
+        </div>
+
+        <div class="bg-yellow-500 text-white p-3 md:p-4 rounded">
+            WARM
+        </div>
+
+        <div class="bg-gray-500 text-white p-3 md:p-4 rounded">
+            COLD
+        </div>
+
     </div>
 
     <!-- LEADS LIST -->
     <div class="space-y-4">
 
         {% for lead in leads %}
-        <div class="bg-white shadow-lg rounded-xl p-4 flex justify-between items-center hover:shadow-xl transition">
+        <div class="bg-white shadow rounded-xl p-4 flex flex-col md:flex-row md:justify-between md:items-center gap-3">
 
             <!-- LEFT -->
             <div>
-                <h2 class="text-lg font-semibold">{{ lead.name }}</h2>
-                <p class="text-sm text-gray-500">{{ lead.email }}</p>
+                <h2 class="text-base md:text-lg font-semibold">{{ lead.name }}</h2>
+                <p class="text-xs md:text-sm text-gray-500">{{ lead.email }}</p>
                 <p class="text-sm">{{ lead.phone }}</p>
 
                 {% if lead.last_contacted %}
                 <p class="text-xs text-gray-400 mt-1">
-                    Last Contact: {{ lead.last_contacted }}
+                    Last: {{ lead.last_contacted }}
                 </p>
                 {% endif %}
             </div>
 
             <!-- RIGHT -->
-            <div class="text-right">
+            <div class="w-full md:w-auto">
 
                 <!-- STATUS -->
-                <span class="px-3 py-1 text-sm rounded-full text-white
+                <span class="inline-block px-3 py-1 text-xs rounded-full text-white mb-2
                     {% if lead.status == 'HOT' %} bg-red-500
                     {% elif lead.status == 'WARM' %} bg-yellow-500
                     {% else %} bg-gray-500 {% endif %}">
                     {{ lead.status }}
                 </span>
-<div class="mt-3">
 
-    <!-- NOTES LIST -->
-    <div id="notes-{{ lead.id }}" class="text-xs text-gray-600 mb-2">
-        {% for n in lead.leadnote_set.all %}
-            <p>• {{ n.note }}</p>
-        {% endfor %}
-    </div>
+                <!-- NOTES -->
+                <div class="mt-2">
 
-    <!-- ADD NOTE -->
-    <div class="flex gap-2">
-        <input type="text"
-               id="note-input-{{ lead.id }}"
-               placeholder="Add note..."
-               class="border p-1 rounded text-sm w-full">
+                    <div id="notes-{{ lead.id }}" class="text-xs text-gray-600 mb-2">
+                        {% for n in lead.leadnote_set.all %}
+                            <p>• {{ n.note }}</p>
+                        {% endfor %}
+                    </div>
 
-        <button onclick="addNote({{ lead.id }})"
-                class="bg-blue-500 text-white px-2 rounded text-sm">
-            Add
-        </button>
-    </div>
+                    <div class="flex gap-2">
+                        <input type="text"
+                               id="note-input-{{ lead.id }}"
+                               placeholder="Add note..."
+                               class="border p-2 rounded text-xs w-full">
 
-</div>
+                        <button onclick="addNote({{ lead.id }})"
+                                class="bg-blue-500 text-white px-3 rounded text-xs">
+                            Add
+                        </button>
+                    </div>
+
+                </div>
+
                 <!-- ACTIONS -->
-                <div class="mt-3 flex gap-2 justify-end">
+                <div class="mt-3 flex flex-wrap gap-2">
 
                     <a href="tel:{{ lead.phone }}"
-                       class="bg-blue-100 text-blue-600 px-3 py-1 rounded text-sm">
+                       class="bg-blue-100 text-blue-600 px-3 py-1 rounded text-xs">
                         Call
                     </a>
 
                     <a href="https://wa.me/{{ lead.phone }}"
-                       class="bg-green-100 text-green-600 px-3 py-1 rounded text-sm">
+                       class="bg-green-100 text-green-600 px-3 py-1 rounded text-xs">
                         WhatsApp
                     </a>
 
                     <a href="#"
-                       class="bg-purple-100 text-purple-600 px-3 py-1 rounded text-sm">
+                       class="bg-purple-100 text-purple-600 px-3 py-1 rounded text-xs">
                         Update
                     </a>
 
@@ -115,12 +126,13 @@
 
         </div>
         {% empty %}
-        <p class="text-gray-500">No leads found</p>
+        <p class="text-gray-500 text-center">No leads found</p>
         {% endfor %}
 
     </div>
 
 </div>
+
 <script>
 function addNote(leadId) {
     let input = document.getElementById("note-input-" + leadId);
@@ -142,13 +154,11 @@ function addNote(leadId) {
     .then(data => {
         if (data.success) {
             let notesDiv = document.getElementById("notes-" + leadId);
-
-            // 🔥 instant UI update
             notesDiv.innerHTML += `<p>• ${note}</p>`;
-
             input.value = "";
         }
     });
 }
 </script>
+
 {% endblock %}

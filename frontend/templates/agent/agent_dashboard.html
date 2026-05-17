@@ -2,79 +2,77 @@
 {% block content %}
 
 <!-- TOP BAR -->
-<div class="flex justify-between items-center mb-8">
+<div class="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6">
 
-    <h1 class="text-3xl font-bold">
+    <h1 class="text-xl md:text-3xl font-bold">
         Welcome, {{ request.user.username }}
     </h1>
 
-    <div class="flex gap-3">
-
+    <div class="flex gap-2">
         <a href="{% url 'agent_leads' %}"
-           class="bg-blue-600 text-white px-4 py-2 rounded-lg">
+           class="bg-blue-600 text-white px-4 py-2 rounded-lg w-full text-center">
             + Add Lead
         </a>
 
         <a href="{% url 'site_visits' %}"
-           class="bg-gray-200 px-4 py-2 rounded-lg">
-            Schedule Visit
+           class="bg-gray-200 px-4 py-2 rounded-lg w-full text-center">
+            Visit
         </a>
-
     </div>
 
 </div>
 
 <!-- STATS -->
-<div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-6 md:mb-10">
 
-    <div class="bg-white p-6 rounded-xl shadow">
-        <p class="text-gray-500 text-sm">My Leads</p>
-        <h2 class="text-3xl font-bold">{{ total_leads }}</h2>
+    <div class="bg-white p-4 md:p-6 rounded-xl shadow text-center">
+        <p class="text-xs md:text-sm text-gray-500">Leads</p>
+        <h2 class="text-xl md:text-3xl font-bold">{{ total_leads }}</h2>
     </div>
 
-    <div class="bg-white p-6 rounded-xl shadow">
-        <p class="text-gray-500 text-sm">Hot Leads</p>
-        <!-- ✅ FIXED VARIABLE -->
-        <h2 class="text-3xl font-bold text-red-500">{{ hot }}</h2>
+    <div class="bg-white p-4 md:p-6 rounded-xl shadow text-center">
+        <p class="text-xs md:text-sm text-gray-500">Hot</p>
+        <h2 class="text-xl md:text-3xl font-bold text-red-500">{{ hot }}</h2>
     </div>
 
-    <div class="bg-white p-6 rounded-xl shadow">
-        <p class="text-gray-500 text-sm">Visits Today</p>
-        <h2 class="text-3xl font-bold">{{ today_visits }}</h2>
+    <div class="bg-white p-4 md:p-6 rounded-xl shadow text-center">
+        <p class="text-xs md:text-sm text-gray-500">Visits</p>
+        <h2 class="text-xl md:text-3xl font-bold">{{ today_visits }}</h2>
     </div>
 
-    <div class="bg-white p-6 rounded-xl shadow">
-        <p class="text-gray-500 text-sm">Total Deals</p>
-        <h2 class="text-3xl font-bold">{{ total_deals }}</h2>
+    <div class="bg-white p-4 md:p-6 rounded-xl shadow text-center">
+        <p class="text-xs md:text-sm text-gray-500">Deals</p>
+        <h2 class="text-xl md:text-3xl font-bold">{{ total_deals }}</h2>
     </div>
 
 </div>
 
 <!-- MAIN GRID -->
-<div class="grid grid-cols-12 gap-8">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8">
 
     <!-- LEFT SIDE -->
-    <div class="col-span-12 lg:col-span-8 space-y-8">
+    <div class="lg:col-span-8 space-y-6">
 
         <!-- LEADS -->
-        <div class="bg-white p-6 rounded-xl shadow">
+        <div class="bg-white p-4 md:p-6 rounded-xl shadow">
 
-            <div class="flex justify-between mb-4">
+            <div class="flex flex-col md:flex-row md:justify-between gap-3 mb-4">
                 <h3 class="font-bold text-lg">My Leads</h3>
 
-                <form method="GET">
+                <form method="GET" class="flex gap-2">
                     <input name="q"
                            value="{{ request.GET.q }}"
                            placeholder="Search..."
-                           class="border px-3 py-1 rounded">
+                           class="border px-3 py-2 rounded w-full md:w-48 text-sm">
                 </form>
             </div>
 
             {% if leads %}
-            <table class="w-full text-left">
+            <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm">
 
                 <thead>
-                <tr class="text-gray-400 text-sm">
+                <tr class="text-gray-400">
                     <th>Name</th>
                     <th>Status</th>
                     <th>Phone</th>
@@ -103,16 +101,16 @@
 
                     <td>{{ lead.phone }}</td>
 
-                    <td class="flex gap-3">
+                    <td class="flex gap-2 text-xs">
 
                         <a href="https://wa.me/{{ lead.phone }}"
                            target="_blank"
-                           class="text-green-600 text-sm hover:underline">
+                           class="text-green-600">
                             WhatsApp
                         </a>
 
                         <a href="{% url 'delete_lead' lead.id %}"
-                           class="text-red-600 text-sm hover:underline">
+                           class="text-red-600">
                             Delete
                         </a>
 
@@ -124,6 +122,7 @@
                 </tbody>
 
             </table>
+            </div>
             {% else %}
                 <p class="text-center text-gray-400 py-6">
                     No Leads Found
@@ -133,13 +132,13 @@
         </div>
 
         <!-- TASKS -->
-        <div class="bg-white p-6 rounded-xl shadow">
+        <div class="bg-white p-4 md:p-6 rounded-xl shadow">
 
             <h3 class="font-bold mb-4">My Tasks</h3>
 
             {% if tasks %}
                 {% for task in tasks %}
-                <div class="flex justify-between items-center border-b py-3">
+                <div class="flex justify-between items-center border-b py-3 text-sm">
 
                     <div>
                         <p class="font-semibold">{{ task.title }}</p>
@@ -150,7 +149,7 @@
 
                     <form method="POST" action="{% url 'complete_task' task.id %}">
                         {% csrf_token %}
-                        <button class="text-green-600 text-sm hover:underline">
+                        <button class="text-green-600 text-xs">
                             Done
                         </button>
                     </form>
@@ -166,22 +165,22 @@
     </div>
 
     <!-- RIGHT SIDE -->
-    <div class="col-span-12 lg:col-span-4 space-y-6">
+    <div class="lg:col-span-4 space-y-6">
 
         <!-- SITE VISITS -->
-        <div class="bg-white p-6 rounded-xl shadow">
+        <div class="bg-white p-4 md:p-6 rounded-xl shadow">
 
             <h3 class="font-bold mb-4">Upcoming Visits</h3>
 
             {% if visits %}
                 {% for visit in visits %}
-                <div class="border-b py-3">
+                <div class="border-b py-3 text-sm">
 
                     <p class="font-semibold">
                         {{ visit.property.name }}
                     </p>
 
-                    <p class="text-sm text-gray-500">
+                    <p class="text-gray-500">
                         {{ visit.date }} | {{ visit.time }}
                     </p>
 
@@ -194,11 +193,13 @@
         </div>
 
         <!-- PERFORMANCE -->
-        <div class="bg-white p-6 rounded-xl shadow">
+        <div class="bg-white p-4 md:p-6 rounded-xl shadow">
 
             <h3 class="font-bold mb-4">Performance</h3>
 
-            <canvas id="chart"></canvas>
+            <div class="h-40">
+                <canvas id="chart"></canvas>
+            </div>
 
         </div>
 
@@ -226,9 +227,7 @@ new Chart(ctx, {
     },
     options: {
         responsive: true,
-        plugins: {
-            legend: { display: true }
-        }
+        maintainAspectRatio: false
     }
 });
 </script>

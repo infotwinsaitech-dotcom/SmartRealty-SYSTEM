@@ -1,21 +1,25 @@
 {% extends "agent/base.html" %}
 {% block content %}
 
-<div class="p-6">
+<div class="p-4 md:p-6">
 
     <!-- HEADER -->
-    <h1 class="text-2xl font-bold mb-6">Site Visit Scheduler</h1>
+    <h1 class="text-xl md:text-2xl font-bold mb-6">
+        Site Visits
+    </h1>
 
     <!-- FORM -->
-    <div class="bg-white p-6 rounded-xl shadow mb-8">
+    <div class="bg-white p-4 md:p-6 rounded-xl shadow mb-6">
 
-        <h2 class="text-lg font-semibold mb-4">Schedule New Visit</h2>
+        <h2 class="text-base md:text-lg font-semibold mb-4">
+            New Visit
+        </h2>
 
-        <form method="POST" class="grid grid-cols-4 gap-4">
+        <form method="POST" class="grid grid-cols-1 md:grid-cols-4 gap-3">
             {% csrf_token %}
 
             <!-- Lead -->
-            <select name="lead" class="border p-2 rounded col-span-1">
+            <select name="lead" class="border p-3 rounded text-sm">
                 {% for lead in leads %}
                 <option value="{{ lead.id }}">
                     {{ lead.name }} ({{ lead.phone }})
@@ -24,41 +28,51 @@
             </select>
 
             <!-- Date -->
-            <input type="date" name="date" class="border p-2 rounded">
+            <input type="date" name="date"
+                   class="border p-3 rounded text-sm">
 
             <!-- Time -->
-            <input type="time" name="time" class="border p-2 rounded">
+            <input type="time" name="time"
+                   class="border p-3 rounded text-sm">
 
             <!-- Submit -->
-            <button class="bg-blue-600 text-white rounded px-4">
-                Schedule
+            <button class="bg-blue-600 text-white py-3 rounded text-sm">
+                Save Visit
             </button>
         </form>
 
     </div>
 
     <!-- VISITS LIST -->
-    <div class="bg-white p-6 rounded-xl shadow">
+    <div class="bg-white p-4 md:p-6 rounded-xl shadow">
 
-        <h2 class="text-lg font-semibold mb-4">Upcoming Visits</h2>
+        <h2 class="text-base md:text-lg font-semibold mb-4">
+            Upcoming
+        </h2>
 
         <div class="space-y-4">
 
             {% for visit in visits %}
-            <div class="flex justify-between items-center border p-4 rounded-lg hover:shadow">
+            <div class="border rounded-xl p-4 flex flex-col md:flex-row md:justify-between md:items-center gap-3">
 
-                <!-- LEFT -->
+                <!-- INFO -->
                 <div>
-                    <h3 class="font-bold">{{ visit.lead.name }}</h3>
-                    <p class="text-sm text-gray-500">{{ visit.lead.phone }}</p>
-                    <p class="text-sm">
-                        {{ visit.date }} | {{ visit.time }}
+                    <h3 class="font-semibold text-sm md:text-base">
+                        {{ visit.lead.name }}
+                    </h3>
+
+                    <p class="text-xs md:text-sm text-gray-500">
+                        {{ visit.lead.phone }}
+                    </p>
+
+                    <p class="text-xs md:text-sm">
+                        📅 {{ visit.date }} | ⏰ {{ visit.time }}
                     </p>
                 </div>
 
                 <!-- STATUS -->
                 <div>
-                    <span class="px-3 py-1 text-white text-sm rounded
+                    <span class="px-3 py-1 text-xs md:text-sm rounded text-white
                         {% if visit.status == 'DONE' %} bg-green-500
                         {% elif visit.status == 'CANCELLED' %} bg-red-500
                         {% else %} bg-blue-500 {% endif %}">
@@ -67,18 +81,16 @@
                 </div>
 
                 <!-- ACTIONS -->
-                <div class="flex gap-2">
+                <div class="grid grid-cols-2 gap-2 w-full md:w-auto">
 
-                    <!-- CALL -->
                     <a href="tel:{{ visit.lead.phone }}"
-                       class="bg-blue-100 text-blue-600 px-3 py-1 rounded text-sm">
+                       class="bg-blue-100 text-blue-600 py-2 rounded text-center text-sm">
                         Call
                     </a>
 
-                    <!-- WHATSAPP -->
-                    <a href="https://wa.me/{{ visit.lead.phone }}?text=Hi {{ visit.lead.name }}, your site visit is scheduled on {{ visit.date }} at {{ visit.time }}"
+                    <a href="https://wa.me/{{ visit.lead.phone }}?text=Hi {{ visit.lead.name }}, your visit is on {{ visit.date }} at {{ visit.time }}"
                        target="_blank"
-                       class="bg-green-100 text-green-600 px-3 py-1 rounded text-sm">
+                       class="bg-green-100 text-green-600 py-2 rounded text-center text-sm">
                         WhatsApp
                     </a>
 
@@ -86,7 +98,9 @@
 
             </div>
             {% empty %}
-            <p class="text-gray-500">No visits scheduled</p>
+            <p class="text-gray-500 text-center text-sm">
+                No visits scheduled
+            </p>
             {% endfor %}
 
         </div>
