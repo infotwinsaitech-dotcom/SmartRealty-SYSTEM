@@ -15,7 +15,7 @@ body { font-family: 'Manrope', sans-serif; }
 </head>
 
 <body class="bg-gray-100 flex">
-
+<script src="https://cdn.tailwindcss.com"></script>
 <!-- MOBILE OVERLAY -->
 <div id="overlay" class="fixed inset-0 bg-black/40 hidden z-40" onclick="toggleSidebar()"></div>
 
@@ -69,6 +69,12 @@ sidebar.classList.toggle("-translate-x-full");
 overlay.classList.toggle("hidden");
 }
 </script>
-
+<script>
+tailwind.config = {
+theme: {
+extend: {},
+},
+}
+</script>
 </body>
 </html>
