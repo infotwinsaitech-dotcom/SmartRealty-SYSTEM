@@ -1,98 +1,17 @@
-{% extends "agent/base.html" %}
-{% block content %}
+<form method="POST" class="space-y-3">
+{% csrf_token %}
 
-<div class="p-6">
+<select name="lead" class="w-full border p-2 rounded">
+{% for lead in leads %}
+<option value="{{ lead.id }}">{{ lead.name }}</option>
+{% endfor %}
+</select>
 
-    <!-- HEADER -->
-    <h1 class="text-2xl font-bold mb-6">Site Visit Scheduler</h1>
+<input type="date" name="date" class="w-full border p-2 rounded">
+<input type="time" name="time" class="w-full border p-2 rounded">
 
-    <!-- FORM -->
-    <div class="bg-white p-6 rounded-xl shadow mb-8">
+<button class="bg-blue-600 text-white w-full py-2 rounded">
+Schedule
+</button>
 
-        <h2 class="text-lg font-semibold mb-4">Schedule New Visit</h2>
-
-        <form method="POST" class="grid grid-cols-4 gap-4">
-            {% csrf_token %}
-
-            <!-- Lead -->
-            <select name="lead" class="border p-2 rounded col-span-1">
-                {% for lead in leads %}
-                <option value="{{ lead.id }}">
-                    {{ lead.name }} ({{ lead.phone }})
-                </option>
-                {% endfor %}
-            </select>
-
-            <!-- Date -->
-            <input type="date" name="date" class="border p-2 rounded">
-
-            <!-- Time -->
-            <input type="time" name="time" class="border p-2 rounded">
-
-            <!-- Submit -->
-            <button class="bg-blue-600 text-white rounded px-4">
-                Schedule
-            </button>
-        </form>
-
-    </div>
-
-    <!-- VISITS LIST -->
-    <div class="bg-white p-6 rounded-xl shadow">
-
-        <h2 class="text-lg font-semibold mb-4">Upcoming Visits</h2>
-
-        <div class="space-y-4">
-
-            {% for visit in visits %}
-            <div class="flex justify-between items-center border p-4 rounded-lg hover:shadow">
-
-                <!-- LEFT -->
-                <div>
-                    <h3 class="font-bold">{{ visit.lead.name }}</h3>
-                    <p class="text-sm text-gray-500">{{ visit.lead.phone }}</p>
-                    <p class="text-sm">
-                        {{ visit.date }} | {{ visit.time }}
-                    </p>
-                </div>
-
-                <!-- STATUS -->
-                <div>
-                    <span class="px-3 py-1 text-white text-sm rounded
-                        {% if visit.status == 'DONE' %} bg-green-500
-                        {% elif visit.status == 'CANCELLED' %} bg-red-500
-                        {% else %} bg-blue-500 {% endif %}">
-                        {{ visit.status }}
-                    </span>
-                </div>
-
-                <!-- ACTIONS -->
-                <div class="flex gap-2">
-
-                    <!-- CALL -->
-                    <a href="tel:{{ visit.lead.phone }}"
-                       class="bg-blue-100 text-blue-600 px-3 py-1 rounded text-sm">
-                        Call
-                    </a>
-
-                    <!-- WHATSAPP -->
-                    <a href="https://wa.me/{{ visit.lead.phone }}?text=Hi {{ visit.lead.name }}, your site visit is scheduled on {{ visit.date }} at {{ visit.time }}"
-                       target="_blank"
-                       class="bg-green-100 text-green-600 px-3 py-1 rounded text-sm">
-                        WhatsApp
-                    </a>
-
-                </div>
-
-            </div>
-            {% empty %}
-            <p class="text-gray-500">No visits scheduled</p>
-            {% endfor %}
-
-        </div>
-
-    </div>
-
-</div>
-
-{% endblock %}
+</form>
