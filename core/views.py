@@ -1825,57 +1825,20 @@ from django.http import HttpResponse
 from core.models import Property
 from twilio.twiml.messaging_response import MessagingResponse
 
+
 @csrf_exempt
 def whatsapp_bot(request):
     if request.method == "POST":
         msg = request.POST.get("Body", "").lower()
 
         resp = MessagingResponse()
+        reply = ""
 
-        # STEP 1
-        if "hi" in msg or "hello" in msg:
-            resp.message("Welcome to Smart Realty 🏠\n\nChoose option:\n1️⃣ Residential\n2️⃣ Commercial")
-
-        # STEP 2
-        elif msg == "1":
-            resp.message("Select Location:\n📍 Ahmedabad\n📍 Surat\n📍 Rajkot")
-
-        elif msg == "2":
-            resp.message("Commercial selected 🏢\nSend location name")
-
-        # STEP 3
-        elif "ahmedabad" in msg:
-            resp.message("Select type:\n2BHK / 3BHK / 4BHK")
-
-        elif "surat" in msg:
-            resp.message("Select type:\n2BHK / 3BHK")
-
-        # STEP 4
-        elif "2bhk" in msg:
-            properties = Property.objects.filter(title__icontains="2bhk")[:3]
-
-            if properties:
-                text = "Top Properties:\n\n"
-                for p in properties:
-                    text += f"{p.title}\n{p.location}\n👉 https://smartrealty-system.onrender.com/property/{p.id}\n\n"
-                resp.message(text)
-            else:
-                resp.message("No properties found 😢")
-
-        elif "3bhk" in msg:
-            properties = Property.objects.filter(title__icontains="3bhk")[:3]
-
-            if properties:
-                text = "Top Properties:\n\n"
-                for p in properties:
-                    text += f"{p.title}\n{p.location}\n👉 https://smartrealty-system.onrender.com/property/{p.id}\n\n"
-                resp.message(text)
-            else:
-                resp.message("No properties found 😢")
+        if "hi" in msg:
+            reply = "Welcome to Smart Realty 🏠\n1 Residential\n2 Commercial"
 
         else:
-            resp.message("Type 'Hi' to start again 😊")
+            reply = "Type Hi"
 
+        resp.message(reply)
         return HttpResponse(str(resp), content_type="application/xml")
-
-    return HttpResponse("OK")
