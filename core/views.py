@@ -1822,58 +1822,60 @@ def export_leads_csv(request):
     return response
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
-from core.models import Property  # apna model import kar
+from core.models import Property
+from twilio.twiml.messaging_response import MessagingResponse
 
 @csrf_exempt
 def whatsapp_bot(request):
     if request.method == "POST":
         msg = request.POST.get("Body", "").lower()
-        phone = request.POST.get("From")
 
-        response = ""
+        resp = MessagingResponse()
 
-        # STEP 1 → First message
+        # STEP 1
         if "hi" in msg or "hello" in msg:
-            response = "Welcome to Smart Realty 🏠\n\nChoose option:\n1️⃣ Residential\n2️⃣ Commercial"
+            resp.message("Welcome to Smart Realty 🏠\n\nChoose option:\n1️⃣ Residential\n2️⃣ Commercial")
 
-        # STEP 2 → Residential / Commercial
+        # STEP 2
         elif msg == "1":
-            response = "Select Location:\n📍 Ahmedabad\n📍 Surat\n📍 Rajkot"
+            resp.message("Select Location:\n📍 Ahmedabad\n📍 Surat\n📍 Rajkot")
 
         elif msg == "2":
-            response = "Commercial selected 🏢\nSend location name"
+            resp.message("Commercial selected 🏢\nSend location name")
 
-        # STEP 3 → Location
+        # STEP 3
         elif "ahmedabad" in msg:
-            response = "Select type:\n2BHK / 3BHK / 4BHK"
+            resp.message("Select type:\n2BHK / 3BHK / 4BHK")
 
         elif "surat" in msg:
-            response = "Select type:\n2BHK / 3BHK"
+            resp.message("Select type:\n2BHK / 3BHK")
 
-        # STEP 4 → BHK
+        # STEP 4
         elif "2bhk" in msg:
             properties = Property.objects.filter(title__icontains="2bhk")[:3]
 
             if properties:
-                response = "Top Properties:\n\n"
+                text = "Top Properties:\n\n"
                 for p in properties:
-                    response += f"{p.title}\n{p.location}\n👉 https://smartrealty-system.onrender.com/property/{p.id}\n\n"
+                    text += f"{p.title}\n{p.location}\n👉 https://smartrealty-system.onrender.com/property/{p.id}\n\n"
+                resp.message(text)
             else:
-                response = "No properties found 😢"
+                resp.message("No properties found 😢")
 
         elif "3bhk" in msg:
             properties = Property.objects.filter(title__icontains="3bhk")[:3]
 
             if properties:
-                response = "Top Properties:\n\n"
+                text = "Top Properties:\n\n"
                 for p in properties:
-                    response += f"{p.title}\n{p.location}\n👉 https://smartrealty-system.onrender.com/property/{p.id}\n\n"
+                    text += f"{p.title}\n{p.location}\n👉 https://smartrealty-system.onrender.com/property/{p.id}\n\n"
+                resp.message(text)
             else:
-                response = "No properties found 😢"
+                resp.message("No properties found 😢")
 
         else:
-            response = "Type 'Hi' to start again 😊"
+            resp.message("Type 'Hi' to start again 😊")
 
-        return HttpResponse(response)
+        return HttpResponse(str(resp), content_type="application/xml")
 
     return HttpResponse("OK")
