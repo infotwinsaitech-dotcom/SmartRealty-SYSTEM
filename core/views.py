@@ -1823,7 +1823,7 @@ def export_leads_csv(request):
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
 from core.models import Property  # apna model import kar
-from core.views import whatsapp_bot
+
 @csrf_exempt
 def whatsapp_bot(request):
     if request.method == "POST":
