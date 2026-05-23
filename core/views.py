@@ -114,33 +114,35 @@ def property_list(request):
     min_price = request.GET.get('min_price')
     max_price = request.GET.get('max_price')
     beds = request.GET.get('beds')
-    baths = request.GET.get('baths')
 
+    # LOCATION (smart match)
     if location:
         properties = properties.filter(location__icontains=location)
 
+    # TYPE (exact + similar)
     if property_type:
         properties = properties.filter(
             Q(property_type__iexact=property_type) |
             Q(property_type__icontains=property_type)
         )
 
+    # POSSESSION (important fix)
     if possession:
         properties = properties.filter(
-            Q(possession_date__icontains=possession)
+            Q(possession__iexact=possession) |
+            Q(possession__icontains=possession)
         )
 
+    # PRICE RANGE
     if min_price:
         properties = properties.filter(price__gte=min_price)
 
     if max_price:
         properties = properties.filter(price__lte=max_price)
 
+    # BEDS
     if beds:
         properties = properties.filter(beds__gte=beds)
-
-    if baths:
-        properties = properties.filter(baths__gte=baths)
 
     return render(request, "public/property.html", {
         "properties": properties
