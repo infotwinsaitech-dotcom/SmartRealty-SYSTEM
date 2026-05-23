@@ -108,40 +108,47 @@ def property_detail(request, id):
 def property_list(request):
     properties = Property.objects.all().order_by('-created_at')
 
+    # GET values
     location = request.GET.get('location')
     property_type = request.GET.get('type')
+    possession = request.GET.get('possession')
     min_price = request.GET.get('min_price')
     max_price = request.GET.get('max_price')
     beds = request.GET.get('beds')
     baths = request.GET.get('baths')
 
+    # 🔍 LOCATION (flexible search)
     if location:
         properties = properties.filter(location__icontains=location)
 
+    # 🔍 TYPE (exact + similar)
     if property_type:
-        properties = properties.filter(property_type__iexact=property_type)
+        properties = properties.filter(
+            Q(property_type__iexact=property_type) |
+            Q(property_type__icontains=property_type)
+        )
 
+    # 🔍 POSSESSION (exact + similar)
+    if possession:
+        properties = properties.filter(
+            Q(possession__iexact=possession) |
+            Q(possession__icontains=possession)
+        )
+
+    # 💰 PRICE RANGE
     if min_price:
         properties = properties.filter(price__gte=min_price)
 
     if max_price:
         properties = properties.filter(price__lte=max_price)
 
+    # 🛏 BEDS (near match allowed)
     if beds:
         properties = properties.filter(beds__gte=beds)
 
+    # 🛁 BATHS
     if baths:
         properties = properties.filter(baths__gte=baths)
-
-    
-        whatsapp_message = f"""
-        New Inquiry!
-        Name: {name}
-        Property: {property.title}
-        Message: {message}
-        """
-
-        encoded_msg = urllib.parse.quote(whatsapp_message)
 
     return render(request, "public/property.html", {
         "properties": properties

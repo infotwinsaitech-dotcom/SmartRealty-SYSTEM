@@ -32,12 +32,18 @@ class="backdrop-blur-2xl bg-white/5 border border-white/10 rounded-3xl p-6 shado
 <input type="text" name="location" placeholder="Location"
 class="bg-white/10 text-white placeholder-gray-400 p-3 rounded-xl outline-none">
 
-<select name="type"
-class="bg-gray-900 text-white p-3 rounded-xl">
-    <option class="bg-gray-900 text-white">Type</option>
-    <option class="bg-gray-900 text-white">Villa</option>
-    <option class="bg-gray-900 text-white">Penthouse</option>
-    <option class="bg-gray-900 text-white">Apartment</option>
+<select name="type" class="bg-gray-900 text-white p-3 rounded-xl">
+<option value="">Type</option>
+<option value="Bungalow">Bungalow</option>
+<option value="Duplex">Duplex</option>
+<option value="Duplex Penthouse">Duplex Penthouse</option>
+<option value="Flat">Flat</option>
+<option value="Penthouse">Penthouse</option>
+<option value="Plots">Plots</option>
+<option value="Triplex">Triplex</option>
+<option value="Villa">Villa</option>
+<option value="Villas">Villas</option>
+<option value="Weekend Villa">Weekend Villa</option>
 </select>
 
 <input type="number" name="min_price" placeholder="Min Price"
@@ -54,6 +60,14 @@ class="bg-gray-900 text-white p-3 rounded-xl border border-gray-700">
     <option value="3" class="bg-gray-900 text-white">3+</option>
     <option value="4" class="bg-gray-900 text-white">4+</option>
 
+</select>
+
+<select name="possession" class="bg-gray-900 text-white p-3 rounded-xl">
+<option value="">Possession</option>
+<option value="Ready to Move">Ready to Move</option>
+<option value="Upto 1 Year">Upto 1 Year</option>
+<option value="Upto 2 Years">Upto 2 Years</option>
+<option value="2+ Years">2+ Years</option>
 </select>
 
 <button class="bg-gradient-to-r from-yellow-400 to-yellow-300 text-black font-bold rounded-xl py-3 hover:scale-105 transition">

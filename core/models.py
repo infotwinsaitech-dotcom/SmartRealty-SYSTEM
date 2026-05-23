@@ -40,6 +40,9 @@ class Property(models.Model):
     brochure = models.FileField(upload_to='brochures/', null=True, blank=True)
     nearby_places = models.JSONField(default=list, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    type = models.CharField(max_length=50)
+    possession = models.CharField(max_length=100)
+
 
 
     def __str__(self):
