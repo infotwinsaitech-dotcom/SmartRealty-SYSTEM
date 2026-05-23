@@ -24,15 +24,19 @@ Curated collection of premium residences crafted for elegance, comfort and statu
 </section>
 
 <!-- FILTER -->
+<!-- FILTER -->
 <section class="max-w-7xl mx-auto px-4 md:px-6 -mt-20 mb-20">
 
 <form method="GET"
-class="backdrop-blur-2xl bg-white/5 border border-white/10 rounded-3xl p-6 shadow-2xl grid grid-cols-1 md:grid-cols-6 gap-4">
+class="backdrop-blur-2xl bg-white/5 border border-white/10 rounded-3xl p-4 md:p-6 shadow-2xl 
+grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 md:gap-4">
 
+<!-- LOCATION -->
 <input type="text" name="location" placeholder="Location"
-class="bg-white/10 text-white placeholder-gray-400 p-3 rounded-xl outline-none">
+class="bg-white/10 text-white placeholder-gray-400 p-2 md:p-3 rounded-xl outline-none col-span-2 sm:col-span-1">
 
-<select name="type" class="bg-gray-900 text-white p-3 rounded-xl">
+<!-- TYPE -->
+<select name="type" class="bg-gray-900 text-white p-2 md:p-3 rounded-xl">
 <option value="">Type</option>
 <option value="Bungalow">Bungalow</option>
 <option value="Duplex">Duplex</option>
@@ -46,23 +50,25 @@ class="bg-white/10 text-white placeholder-gray-400 p-3 rounded-xl outline-none">
 <option value="Weekend Villa">Weekend Villa</option>
 </select>
 
+<!-- MIN PRICE -->
 <input type="number" name="min_price" placeholder="Min Price"
-class="bg-white/10 text-white p-3 rounded-xl">
+class="bg-white/10 text-white p-2 md:p-3 rounded-xl">
 
+<!-- MAX PRICE -->
 <input type="number" name="max_price" placeholder="Max Price"
-class="bg-white/10 text-white p-3 rounded-xl">
+class="bg-white/10 text-white p-2 md:p-3 rounded-xl">
 
+<!-- BEDS -->
 <select name="beds"
-class="bg-gray-900 text-white p-3 rounded-xl border border-gray-700">
-    
-    <option value="" class="bg-gray-900 text-white">Beds</option>
-    <option value="2" class="bg-gray-900 text-white">2+</option>
-    <option value="3" class="bg-gray-900 text-white">3+</option>
-    <option value="4" class="bg-gray-900 text-white">4+</option>
-
+class="bg-gray-900 text-white p-2 md:p-3 rounded-xl border border-gray-700">
+<option value="">Beds</option>
+<option value="2">2+</option>
+<option value="3">3+</option>
+<option value="4">4+</option>
 </select>
 
-<select name="possession" class="bg-gray-900 text-white p-3 rounded-xl">
+<!-- POSSESSION -->
+<select name="possession" class="bg-gray-900 text-white p-2 md:p-3 rounded-xl">
 <option value="">Possession</option>
 <option value="Ready to Move">Ready to Move</option>
 <option value="Upto 1 Year">Upto 1 Year</option>
@@ -70,7 +76,9 @@ class="bg-gray-900 text-white p-3 rounded-xl border border-gray-700">
 <option value="2+ Years">2+ Years</option>
 </select>
 
-<button class="bg-gradient-to-r from-yellow-400 to-yellow-300 text-black font-bold rounded-xl py-3 hover:scale-105 transition">
+<!-- BUTTON -->
+<button type="submit"
+class="col-span-2 sm:col-span-3 md:col-span-1 bg-gradient-to-r from-yellow-400 to-yellow-300 text-black font-bold rounded-xl py-2 md:py-3 hover:scale-105 transition">
 Search
 </button>
 
