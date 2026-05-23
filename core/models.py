@@ -4,45 +4,80 @@ from django.contrib import admin
 from cloudinary.models import CloudinaryField
 
 class Property(models.Model):
+
+    PROPERTY_TYPE_CHOICES = [
+        ("Flat", "Flat"),
+        ("Villa", "Villa"),
+        ("Bungalow", "Bungalow"),
+        ("Duplex", "Duplex"),
+        ("Penthouse", "Penthouse"),
+
+        ("Office", "Office"),
+        ("Shop", "Shop"),
+        ("Showroom", "Showroom"),
+        ("Warehouse", "Warehouse"),
+
+        ("Land", "Land"),
+        ("Plot", "Plot"),
+        ("Plots", "Plots"),
+        ("Farmhouse", "Farmhouse"),
+        ("Industrial", "Industrial"),
+    ]
+
     title = models.CharField(max_length=255)
     location = models.CharField(max_length=255)
     price = models.DecimalField(max_digits=12, decimal_places=2)
-    beds = models.IntegerField()
+
+    beds = models.IntegerField(null=True, blank=True)
     baths = models.FloatField()
     sqft = models.IntegerField()
+
     description = models.TextField(blank=True)
     status = models.CharField(max_length=50)
 
-    # ✅ FIX (builder add)
-    
     builder = models.ForeignKey(
-    'User',
-    on_delete=models.CASCADE,
-    related_name="properties",
-    null=True,
-    blank=True
-)
+        'User',
+        on_delete=models.CASCADE,
+        related_name="properties",
+        null=True,
+        blank=True
+    )
 
-    property_type = models.CharField(max_length=50)
+    property_type = models.CharField(
+        max_length=50,
+        choices=PROPERTY_TYPE_CHOICES,
+        default="Flat",
+    )
+
     thumbnail = CloudinaryField('image')
     video = models.FileField(upload_to='videos/', blank=True, null=True)
 
-    
     agent_name = models.CharField(max_length=100, default="Agent")
     agent_role = models.CharField(max_length=100, default="Advisor")
     agent_image = models.ImageField(upload_to='agents/', blank=True, null=True)
+
     amenities = models.JSONField(default=list, blank=True)
     highlights = models.TextField(blank=True, null=True)
     rera_number = models.CharField(max_length=100, blank=True, null=True)
+
     possession_date = models.CharField(max_length=100, blank=True, null=True)
+
+    possession = models.CharField(
+        max_length=100,
+        blank=True,
+        null=True,
+        default="Ready to Move"
+    )
+
     map_link = models.TextField(blank=True, null=True)
     configuration = models.CharField(max_length=100, blank=True, null=True)
     brochure = models.FileField(upload_to='brochures/', null=True, blank=True)
     nearby_places = models.JSONField(default=list, blank=True)
+
     created_at = models.DateTimeField(auto_now_add=True)
-    possession = models.CharField(max_length=100, blank=True, null=True)
 
-
+    def has_bhk(self):
+        return self.property_type in ["Flat", "Villa", "Bungalow", "Duplex", "Penthouse"]
 
     def __str__(self):
         return self.title

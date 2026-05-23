@@ -121,14 +121,14 @@ def property_list(request):
 
     # TYPE (exact + similar)
     if property_type:
-        properties = properties.filter(
+       properties = properties.filter(
             Q(property_type__iexact=property_type) |
             Q(property_type__icontains=property_type)
         )
 
     # POSSESSION (important fix)
     if possession:
-        properties = properties.filter(
+      properties = properties.filter(
             Q(possession__iexact=possession) |
             Q(possession__icontains=possession)
         )
