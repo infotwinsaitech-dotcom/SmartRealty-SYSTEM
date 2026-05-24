@@ -72,7 +72,7 @@
 
         <tbody>
         {% for agent in agents %}
-            <tr onclick="window.location='/builder/agent/{{ agent.id }}/'"
+            <tr onclick="window.location='/builder/agent/{{ agent.id }}'"
                 class="cursor-pointer border-b hover:bg-gray-50">
 
                 <td class="py-3 font-semibold whitespace-nowrap">
@@ -130,27 +130,33 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
-const ctx = document.getElementById('agentChart');
+document.addEventListener("DOMContentLoaded", function() {
 
-new Chart(ctx, {
-type: 'bar',
- data: {
-labels: {{ chart_labels|default:"[]"|safe }},
- datasets: [{
- label: 'Revenue',
- data: {{ chart_data|default:"[]"|safe }},
- backgroundColor: '#6366F1'
- }]
- },
- options: {
- responsive: true,
- maintainAspectRatio: false,
- scales: {
- y: {
- beginAtZero: true
- }
- }
- }
+    const ctx = document.getElementById('agentChart');
+
+    if (!ctx) return;
+
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: {{ chart_labels|default:"[]"|safe }},
+            datasets: [{
+                label: 'Revenue',
+                data: {{ chart_data|default:"[]"|safe }},
+                backgroundColor: '#6366F1'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
 });
 </script>
 
