@@ -140,6 +140,43 @@
     {% endfor %}
 </p>
 {% endif %}
+
+<form method="POST" action="{% url 'add_deal' %}">
+{% csrf_token %}
+
+<input type="hidden" name="property_id" value="{{ property.id }}">
+
+<input name="client_name" placeholder="Client Name"
+class="border p-2 rounded w-full mb-2">
+
+<input name="amount" placeholder="Amount"
+class="border p-2 rounded w-full mb-2">
+
+<select name="status" class="border p-2 rounded w-full mb-2">
+    <option value="NEW">New</option>
+    <option value="NEGOTIATION">Negotiation</option>
+    <option value="BOOKED">Booked</option>
+    <option value="CLOSED">Closed</option>
+    <option value="FAILED">Failed</option>
+</select>
+
+<button class="bg-green-600 text-white px-4 py-2 rounded w-full">
+    Save Deal
+</button>
+
+</form>
+<form method="POST" action="{% url 'update_deal' deal.id %}">
+{% csrf_token %}
+
+<select name="status" onchange="this.form.submit()">
+    <option value="NEW">New</option>
+    <option value="NEGOTIATION">Negotiation</option>
+    <option value="BOOKED">Booked</option>
+    <option value="CLOSED">Closed</option>
+    <option value="FAILED">Failed</option>
+</select>
+
+</form>
 <script>
 function addNote(leadId) {
     let input = document.getElementById("note-input-" + leadId);

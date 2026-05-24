@@ -97,7 +97,34 @@
                 </div>
             </div>
         </div>
+{% for deal in deals %}
+<div class="bg-white p-4 rounded shadow mb-3">
 
+    <h3 class="font-bold">{{ deal.property.title }}</h3>
+
+    <p class="text-sm text-gray-500">
+        Client: {{ deal.client_name }}
+    </p>
+
+    <p class="text-blue-600 font-bold">
+        ₹{{ deal.amount }}
+    </p>
+
+    <span class="px-3 py-1 text-xs rounded text-white
+        {% if deal.status == 'NEW' %} bg-gray-500
+        {% elif deal.status == 'NEGOTIATION' %} bg-yellow-500
+        {% elif deal.status == 'BOOKED' %} bg-blue-500
+        {% elif deal.status == 'CLOSED' %} bg-green-600
+        {% else %} bg-red-500
+        {% endif %}
+    ">
+        {{ deal.status }}
+    </span>
+
+</div>
+{% empty %}
+<p>No deals yet</p>
+{% endfor %}
         <div class="grid grid-cols-12 gap-4 md:gap-6 mb-8 md:mb-10">
             
             <div class="col-span-12 lg:col-span-8 bg-surface-container-lowest p-5 md:p-8 rounded-2xl border border-outline-variant/10 shadow-sm">

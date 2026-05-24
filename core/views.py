@@ -565,12 +565,10 @@ def lead_management(request):
     })
 @login_required
 def builder_dashboard(request):
-    
 
-    #   # 👇 existing code...
-
+    # ===== MONTHLY REVENUE CHART =====
     monthly_data = (
-        Deal.objects.filter(status="closed")
+        Deal.objects.filter(builder=request.user, status="CLOSED")
         .annotate(month=ExtractMonth('created_at'))
         .values('month')
         .annotate(total=Sum('amount'))
@@ -582,63 +580,90 @@ def builder_dashboard(request):
 
     for item in monthly_data:
         chart_labels.append(calendar.month_abbr[item['month']])
-        chart_data.append(item['total']) 
-    
+        chart_data.append(float(item['total']))
+
+    # ===== BASIC STATS =====
     total_leads = Lead.objects.filter(builder=request.user).count()
-    active_deals = Deal.objects.filter(status="active").count()
 
-    total_revenue = Deal.objects.filter(status="closed").aggregate(
-        total=Sum('amount')
-    )['total'] or 0
+    active_deals = Deal.objects.filter(
+        builder=request.user,
+        status__in=["NEW", "NEGOTIATION", "BOOKED"]
+    ).count()
 
-    closed_deals = Deal.objects.filter(status="closed").count()
+    total_revenue = Deal.objects.filter(
+        builder=request.user,
+        status="CLOSED"
+    ).aggregate(total=Sum('amount'))['total'] or 0
 
+    closed_deals = Deal.objects.filter(
+        builder=request.user,
+        status="CLOSED"
+    ).count()
+
+    # ===== CONVERSION RATE =====
     conversion_rate = 0
     if total_leads > 0:
         conversion_rate = (closed_deals / total_leads) * 100
 
     # ===== ACTIVITY + TASK =====
-    activities = Activity.objects.order_by('-created_at')[:5]
-    tasks = Task.objects.order_by('-date', '-time')[:5]
+    activities = Activity.objects.filter().order_by('-created_at')[:5]
+    tasks = Task.objects.filter().order_by('-date', '-time')[:5]
+
+    # ===== DATE CALC =====
     today = date.today()
     start_of_month = today.replace(day=1)
+
     last_month_end = start_of_month - timedelta(days=1)
     last_month_start = last_month_end.replace(day=1)
 
-# Leads
-    current_leads = Lead.objects.filter(created_at__date__gte=start_of_month).count()
-    last_leads = Lead.objects.filter(created_at__date__range=[last_month_start, last_month_end]).count()
+    # ===== LEADS GROWTH =====
+    current_leads = Lead.objects.filter(
+        builder=request.user,
+        created_at__date__gte=start_of_month
+    ).count()
 
-    lead_growth = ((current_leads - last_leads) / last_leads * 100) if last_leads else 0
+    last_leads = Lead.objects.filter(
+        builder=request.user,
+        created_at__date__range=[last_month_start, last_month_end]
+    ).count()
 
-# Deals
-    current_deals = Deal.objects.filter(created_at__date__gte=start_of_month).count()
-    last_deals = Deal.objects.filter(created_at__date__range=[last_month_start, last_month_end]).count()
+    lead_growth = ((current_leads - last_leads) / last_leads * 100) if last_leads > 0 else 0
 
-    deal_growth = ((current_deals - last_deals) / last_deals * 100) if last_deals else 0
+    # ===== DEALS GROWTH =====
+    current_deals = Deal.objects.filter(
+        builder=request.user,
+        created_at__date__gte=start_of_month
+    ).count()
 
-# Revenue
+    last_deals = Deal.objects.filter(
+        builder=request.user,
+        created_at__date__range=[last_month_start, last_month_end]
+    ).count()
+
+    deal_growth = ((current_deals - last_deals) / last_deals * 100) if last_deals > 0 else 0
+
+    # ===== REVENUE GROWTH =====
     current_revenue = Deal.objects.filter(
-    status="closed",
-    created_at__date__gte=start_of_month
+        builder=request.user,
+        status="CLOSED",
+        created_at__date__gte=start_of_month
     ).aggregate(total=Sum('amount'))['total'] or 0
 
     last_revenue = Deal.objects.filter(
-        status="closed",
+        builder=request.user,
+        status="CLOSED",
         created_at__date__range=[last_month_start, last_month_end]
     ).aggregate(total=Sum('amount'))['total'] or 0
 
-    revenue_growth = ((current_revenue - last_revenue) / last_revenue * 100) if last_revenue else 0    
+    revenue_growth = ((current_revenue - last_revenue) / last_revenue * 100) if last_revenue > 0 else 0
 
+    # ===== LEAD SOURCES =====
+    total = Lead.objects.filter(builder=request.user).count()
 
-
-    # ===== LEAD SOURCES (dynamic) =====
-    total = Lead.objects.count()
-
-    search = Lead.objects.filter(source='search').count()
-    referral = Lead.objects.filter(source='referral').count()
-    social = Lead.objects.filter(source='social').count()
-    direct = Lead.objects.filter(source='direct').count()
+    search = Lead.objects.filter(builder=request.user, source='search').count()
+    referral = Lead.objects.filter(builder=request.user, source='referral').count()
+    social = Lead.objects.filter(builder=request.user, source='social').count()
+    direct = Lead.objects.filter(builder=request.user, source='direct').count()
 
     lead_sources = {
         "search": (search / total * 100) if total else 0,
@@ -647,25 +672,29 @@ def builder_dashboard(request):
         "direct": (direct / total * 100) if total else 0,
     }
 
-    # ===== CONTEXT =====
+    # ===== DEAL LIST (SHOW IN UI) =====
+    deals = Deal.objects.filter(builder=request.user).order_by('-created_at')
+
+    # ===== FINAL CONTEXT =====
     context = {
         "total_leads": total_leads,
         "active_deals": active_deals,
         "total_revenue": total_revenue,
-        "conversion_rate": conversion_rate,
+        "conversion_rate": round(conversion_rate, 2),
+
         "activities": activities,
         "tasks": tasks,
 
-        "lead_growth": lead_growth,
-        "deal_growth": deal_growth,
-        "revenue_growth": revenue_growth,
+        "lead_growth": round(lead_growth, 2),
+        "deal_growth": round(deal_growth, 2),
+        "revenue_growth": round(revenue_growth, 2),
 
         "lead_sources": lead_sources,
 
-        "start_date": date.today().replace(day=1),
-        "end_date": date.today(),
         "chart_labels": json.dumps(chart_labels),
-        "chart_data": json.dumps(chart_data),    
+        "chart_data": json.dumps(chart_data),
+
+        "deals": deals,
     }
 
     return render(request, "builder/dashboard.html", context)
@@ -1845,3 +1874,29 @@ def whatsapp_bot(request):
 
         resp.message(reply)
         return HttpResponse(str(resp), content_type="application/xml")
+    
+def add_deal(request):
+    if request.method == "POST":
+
+        property_id = request.POST.get('property_id')
+
+        agent = request.user.agent_profile
+        builder = agent.builder
+
+        Deal.objects.create(
+            property_id=property_id,
+            client_name=request.POST.get('client_name'),
+            amount=request.POST.get('amount'),
+            status=request.POST.get('status'),
+            agent=agent,
+            builder=builder  # 🔥 LINK
+        )
+
+        return redirect('agent_leads')
+def update_deal(request, id):
+    deal = Deal.objects.get(id=id)
+
+    deal.status = request.POST.get('status')
+    deal.save()
+
+    return redirect('agent_leads')
