@@ -27,6 +27,7 @@ from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 import random
 import os
+from decimal import Decimal
 def home(request):
     properties = Property.objects.all()[:6]
 
@@ -1874,35 +1875,34 @@ def whatsapp_bot(request):
         resp.message(reply)
         return HttpResponse(str(resp), content_type="application/xml")
     
+from decimal import Decimal
+
 def add_deal(request):
     if request.method == "POST":
-        property_id = request.POST.get("property_id")
-        client_name = request.POST.get("client_name")
-        amount = request.POST.get("amount")
-        status = request.POST.get("status")
-
-        # ✅ FIX: empty handling
-        if not amount:
-            amount = 0
-        else:
-            amount = Decimal(amount)
-
-        if not client_name:
-            client_name = "Unknown"
+        property_id = request.POST.get('property_id')
+        client_name = request.POST.get('client_name') or "Unknown"
+        amount = request.POST.get('amount')
+        status = request.POST.get('status')
 
         property_obj = Property.objects.get(id=property_id)
-        agent = request.user.agent_profile
+
+        # 🔥 amount fix
+        if amount:
+            amount = amount.lower().replace("lakh", "00000").replace(",", "")
+            amount = Decimal(amount)
+        else:
+            amount = Decimal(0)
 
         Deal.objects.create(
             property=property_obj,
             client_name=client_name,
             amount=amount,
             status=status,
-            agent=agent,
-            builder=request.user   # 👈 IMPORTANT (your model has builder)
+            agent=request.user.agent,
+            builder=property_obj.builder  # IMPORTANT
         )
 
-    return redirect("agent_leads")
+        return redirect('agent_leads')
 
 def update_deal(request, deal_id):
     if request.method == "POST":
