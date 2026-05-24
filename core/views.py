@@ -580,7 +580,7 @@ def builder_dashboard(request):
 
     for item in monthly_data:
         chart_labels.append(calendar.month_abbr[item['month']])
-        chart_data.append(float(item['total']))
+        chart_data.append(float(item['total'] or 0))  # ✅ FIX
 
     # ===== BASIC STATS =====
     total_leads = Lead.objects.filter(builder=request.user).count()
@@ -593,7 +593,7 @@ def builder_dashboard(request):
     total_revenue = Deal.objects.filter(
         builder=request.user,
         status="CLOSED"
-    ).aggregate(total=Sum('amount'))['total'] or 0
+    ).aggregate(total=Sum('amount'))['total'] or 0  # ✅ already correct
 
     closed_deals = Deal.objects.filter(
         builder=request.user,
@@ -606,8 +606,8 @@ def builder_dashboard(request):
         conversion_rate = (closed_deals / total_leads) * 100
 
     # ===== ACTIVITY + TASK =====
-    activities = Activity.objects.filter().order_by('-created_at')[:5]
-    tasks = Task.objects.filter().order_by('-date', '-time')[:5]
+    activities = Activity.objects.order_by('-created_at')[:5]  # ✅ remove empty filter()
+    tasks = Task.objects.order_by('-date', '-time')[:5]
 
     # ===== DATE CALC =====
     today = date.today()
@@ -672,7 +672,7 @@ def builder_dashboard(request):
         "direct": (direct / total * 100) if total else 0,
     }
 
-    # ===== DEAL LIST (SHOW IN UI) =====
+    # ===== DEAL LIST =====
     deals = Deal.objects.filter(builder=request.user).order_by('-created_at')
 
     # ===== FINAL CONTEXT =====
@@ -698,7 +698,6 @@ def builder_dashboard(request):
     }
 
     return render(request, "builder/dashboard.html", context)
-
 
 
 @require_POST
