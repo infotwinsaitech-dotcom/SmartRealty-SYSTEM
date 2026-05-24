@@ -72,7 +72,6 @@ class="w-full h-44 md:h-52 object-cover">
 <div id="propertyModal"
 class="hidden fixed inset-0 bg-black/50 flex items-end md:items-center justify-center z-50">
 
-<!-- MOBILE: bottom sheet -->
 <div class="bg-white w-full md:w-[700px] max-h-[90vh] overflow-y-auto rounded-t-2xl md:rounded-xl p-4 md:p-6 relative">
 
 <button onclick="closeModal()"
@@ -94,8 +93,37 @@ class="w-full mb-3 border p-2 rounded text-sm">
 <input name="price" placeholder="Price"
 class="w-full mb-3 border p-2 rounded text-sm">
 
-<!-- GRID FIX -->
-<div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+<!-- PROPERTY TYPE -->
+<select name="property_type" id="propertyType"
+class="bg-gray-900 text-white p-2 md:p-3 rounded-xl w-full mb-3"
+onchange="toggleBHK()">
+
+<option value="">Select Type</option>
+
+<!-- Residential -->
+<option value="Flat">Flat</option>
+<option value="Villa">Villa</option>
+<option value="Bungalow">Bungalow</option>
+<option value="Duplex">Duplex</option>
+<option value="Penthouse">Penthouse</option>
+
+<!-- Commercial -->
+<option value="Office">Office</option>
+<option value="Shop">Shop</option>
+<option value="Showroom">Showroom</option>
+<option value="Warehouse">Warehouse</option>
+<option value="Industrial">Industrial</option>
+
+<!-- Land -->
+<option value="Land">Land</option>
+<option value="Plot">Plot</option>
+<option value="Plots">Plots</option>
+<option value="Farmhouse">Farmhouse</option>
+
+</select>
+
+<!-- GRID FIX (BHK SECTION) -->
+<div id="bhkSection" class="grid grid-cols-1 sm:grid-cols-3 gap-2">
 <input name="beds" placeholder="Beds" class="border p-2 rounded text-sm">
 <input name="baths" placeholder="Baths" class="border p-2 rounded text-sm">
 <input name="sqft" placeholder="Sqft" class="border p-2 rounded text-sm">
@@ -103,33 +131,6 @@ class="w-full mb-3 border p-2 rounded text-sm">
 
 <textarea name="description" placeholder="Description"
 class="w-full mt-3 mb-3 border p-2 rounded text-sm"></textarea>
-
-<select name="type" class="bg-gray-900 text-white p-2 md:p-3 rounded-xl flex-1 min-w-[140px]">
-<option value="">Type</option>
-
-<option value="Bungalow">Bungalow</option>
-<option value="Duplex">Duplex</option>
-<option value="Duplex Penthouse">Duplex Penthouse</option>
-<option value="Flat">Flat</option>
-<option value="Penthouse">Penthouse</option>
-
-<option value="Villa">Villa</option>
-<option value="Villas">Villas</option>
-<option value="Weekend Villa">Weekend Villa</option>
-
-<option value="Office">Office</option>
-<option value="Shop">Shop</option>
-<option value="Showroom">Showroom</option>
-<option value="Warehouse">Warehouse</option>
-
-<option value="Land">Land</option>
-<option value="Plot">Plot</option>
-<option value="Plots">Plots</option>
-
-<option value="Farmhouse">Farmhouse</option>
-<option value="Industrial">Industrial</option>
-
-</select>
 
 <select name="status" class="w-full mb-3 border p-2 rounded text-sm">
 <option value="Available">Available</option>
@@ -225,14 +226,16 @@ Save Property
 </div>
 </div>
 
-<!-- JS SAME -->
+<!-- JS -->
 <script>
 function openModal() {
 document.getElementById('propertyModal').classList.remove('hidden');
 }
+
 function closeModal() {
 document.getElementById('propertyModal').classList.add('hidden');
 }
+
 function addImageField() {
 const container = document.getElementById("image-container");
 const div = document.createElement("div");
@@ -243,9 +246,11 @@ div.innerHTML = `
 `;
 container.appendChild(div);
 }
+
 function removeField(btn) {
 btn.parentElement.remove();
 }
+
 function addNearbyField() {
 const container = document.getElementById("nearby-container");
 const div = document.createElement("div");
@@ -256,6 +261,20 @@ div.innerHTML = `
 <input name="nearby_icon" placeholder="Icon" class="border p-2 rounded">
 `;
 container.appendChild(div);
+}
+
+/* 🔥 BHK SHOW/HIDE */
+function toggleBHK() {
+let type = document.getElementById("propertyType").value;
+let bhk = document.getElementById("bhkSection");
+
+let residential = ["Flat","Villa","Bungalow","Duplex","Penthouse"];
+
+if (residential.includes(type)) {
+bhk.style.display = "grid";
+} else {
+bhk.style.display = "none";
+}
 }
 </script>
 

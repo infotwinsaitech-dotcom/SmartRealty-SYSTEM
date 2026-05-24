@@ -142,7 +142,7 @@ def property_list(request):
 
     # BEDS
     if beds:
-        properties = properties.filter(beds__gte=beds)
+       properties = properties.filter(beds__gte=beds)
 
     return render(request, "public/property.html", {
         "properties": properties
