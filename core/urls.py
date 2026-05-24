@@ -84,6 +84,8 @@ path('settings/', views.settings_view, name='settings'),
 path('privacy/', views.privacy, name='privacy'),
 path('delete-lead/<int:id>/', views.delete_lead, name='delete_lead'),
 path('builder/export-leads/', views.export_leads_csv, name='export_leads_csv'),
+path('add-deal/', views.add_deal, name='add_deal'),
+path('update-deal/<int:deal_id>/', views.update_deal, name='update_deal'),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

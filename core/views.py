@@ -1877,26 +1877,27 @@ def whatsapp_bot(request):
     
 def add_deal(request):
     if request.method == "POST":
+        property_id = request.POST.get("property_id")
+        client_name = request.POST.get("client_name")
+        amount = request.POST.get("amount")
 
-        property_id = request.POST.get('property_id')
-
-        agent = request.user.agent_profile
-        builder = agent.builder
+        property_obj = Property.objects.get(id=property_id)
 
         Deal.objects.create(
-            property_id=property_id,
-            client_name=request.POST.get('client_name'),
-            amount=request.POST.get('amount'),
-            status=request.POST.get('status'),
-            agent=agent,
-            builder=builder  # 🔥 LINK
+            property=property_obj,
+            client_name=client_name,
+            amount=amount,
+            status="NEW",  # default
+            agent=request.user.agent_profile,  # 👈 IMPORTANT
         )
 
-        return redirect('agent_leads')
-def update_deal(request, id):
-    deal = Deal.objects.get(id=id)
+    return redirect("agent_leads")
 
-    deal.status = request.POST.get('status')
-    deal.save()
+def update_deal(request, deal_id):
+    if request.method == "POST":
+        deal = Deal.objects.get(id=deal_id)
+        status = request.POST.get("status")
+        deal.status = status
+        deal.save()
 
-    return redirect('agent_leads')
+    return redirect("agent_leads")

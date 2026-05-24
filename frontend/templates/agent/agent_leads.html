@@ -66,6 +66,15 @@
                     Last: {{ lead.last_contacted }}
                 </p>
                 {% endif %}
+
+                {% if lead.properties.all %}
+                <p class="text-xs text-gray-400 mt-1">
+                    Interested in:
+                    {% for p in lead.properties.all %}
+                        {{ p.title }}{% if not forloop.last %}, {% endif %}
+                    {% endfor %}
+                </p>
+                {% endif %}
             </div>
 
             <!-- RIGHT -->
@@ -122,6 +131,50 @@
 
                 </div>
 
+                <!-- ✅ DEAL FORM FIX -->
+                <form method="POST" action="{% url 'add_deal' %}">
+                {% csrf_token %}
+
+                <input type="hidden" name="property_id" value="{{ lead.properties.first.id }}">
+
+                <input name="client_name" placeholder="Client Name"
+                class="border p-2 rounded w-full mb-2">
+
+                <input name="amount" placeholder="Amount"
+                class="border p-2 rounded w-full mb-2">
+
+                <select name="status" class="border p-2 rounded w-full mb-2">
+                    <option value="NEW">New</option>
+                    <option value="NEGOTIATION">Negotiation</option>
+                    <option value="BOOKED">Booked</option>
+                    <option value="CLOSED">Closed</option>
+                    <option value="FAILED">Failed</option>
+                </select>
+
+                <button class="bg-green-600 text-white px-4 py-2 rounded w-full">
+                    Save Deal
+                </button>
+
+                </form>
+
+                <!-- ✅ UPDATE DEAL SAFE -->
+                {% if lead.deal_set.all %}
+                {% for deal in lead.deal_set.all %}
+                <form method="POST" action="{% url 'update_deal' deal.id %}">
+                {% csrf_token %}
+
+                <select name="status" onchange="this.form.submit()">
+                    <option value="NEW" {% if deal.status == "NEW" %}selected{% endif %}>New</option>
+                    <option value="NEGOTIATION" {% if deal.status == "NEGOTIATION" %}selected{% endif %}>Negotiation</option>
+                    <option value="BOOKED" {% if deal.status == "BOOKED" %}selected{% endif %}>Booked</option>
+                    <option value="CLOSED" {% if deal.status == "CLOSED" %}selected{% endif %}>Closed</option>
+                    <option value="FAILED" {% if deal.status == "FAILED" %}selected{% endif %}>Failed</option>
+                </select>
+
+                </form>
+                {% endfor %}
+                {% endif %}
+
             </div>
 
         </div>
@@ -132,51 +185,7 @@
     </div>
 
 </div>
-{% if lead.properties.all %}
-<p class="text-xs text-gray-400 mt-1">
-    Interested in:
-    {% for p in lead.properties.all %}
-        {{ p.title }}{% if not forloop.last %}, {% endif %}
-    {% endfor %}
-</p>
-{% endif %}
 
-<form method="POST" action="{% url 'add_deal' %}">
-{% csrf_token %}
-
-<input type="hidden" name="property_id" value="{{ property.id }}">
-
-<input name="client_name" placeholder="Client Name"
-class="border p-2 rounded w-full mb-2">
-
-<input name="amount" placeholder="Amount"
-class="border p-2 rounded w-full mb-2">
-
-<select name="status" class="border p-2 rounded w-full mb-2">
-    <option value="NEW">New</option>
-    <option value="NEGOTIATION">Negotiation</option>
-    <option value="BOOKED">Booked</option>
-    <option value="CLOSED">Closed</option>
-    <option value="FAILED">Failed</option>
-</select>
-
-<button class="bg-green-600 text-white px-4 py-2 rounded w-full">
-    Save Deal
-</button>
-
-</form>
-<form method="POST" action="{% url 'update_deal' deal.id %}">
-{% csrf_token %}
-
-<select name="status" onchange="this.form.submit()">
-    <option value="NEW">New</option>
-    <option value="NEGOTIATION">Negotiation</option>
-    <option value="BOOKED">Booked</option>
-    <option value="CLOSED">Closed</option>
-    <option value="FAILED">Failed</option>
-</select>
-
-</form>
 <script>
 function addNote(leadId) {
     let input = document.getElementById("note-input-" + leadId);
