@@ -1886,7 +1886,7 @@ def add_deal(request):
         amount = request.POST.get('amount')
         status = request.POST.get('status')
 
-        property_obj = Property.objects.get(id=property_id)
+        property_obj = get_object_or_404(Property, id=property_id)
 
         # amount fix
         if amount:
@@ -1895,12 +1895,15 @@ def add_deal(request):
         else:
             amount = Decimal(0)
 
+        # ✅ GET AGENT INSTANCE SAFE WAY
+        agent = get_object_or_404(Agent, user=request.user)
+
         Deal.objects.create(
             property=property_obj,
             client_name=client_name,
             amount=amount,
             status=status,
-            agent=request.user,  # ✅ FIXED
+            agent=agent,  # ✅ FIXED
             builder=property_obj.builder
         )
 
