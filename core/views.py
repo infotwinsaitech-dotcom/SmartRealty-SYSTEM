@@ -1877,6 +1877,8 @@ def whatsapp_bot(request):
     
 from decimal import Decimal
 
+from decimal import Decimal
+
 def add_deal(request):
     if request.method == "POST":
         property_id = request.POST.get('property_id')
@@ -1886,7 +1888,7 @@ def add_deal(request):
 
         property_obj = Property.objects.get(id=property_id)
 
-        # 🔥 amount fix
+        # amount fix
         if amount:
             amount = amount.lower().replace("lakh", "00000").replace(",", "")
             amount = Decimal(amount)
@@ -1898,8 +1900,8 @@ def add_deal(request):
             client_name=client_name,
             amount=amount,
             status=status,
-            agent=request.user.agent,
-            builder=property_obj.builder  # IMPORTANT
+            agent=request.user,  # ✅ FIXED
+            builder=property_obj.builder
         )
 
         return redirect('agent_leads')
