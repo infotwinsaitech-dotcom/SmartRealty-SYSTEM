@@ -50,7 +50,7 @@
 
     <div class="bg-white p-5 rounded-xl shadow">
         <p class="text-gray-500 text-sm">Total Revenue</p>
-        <h2 class="text-xl md:text-2xl font-bold">₹{{ total_revenue|floatformat:0 }}</h2>
+        <h2 class="text-xl md:text-2xl font-bold">₹{{ total_revenue|default:0|floatformat:0 }}</h2>
     </div>
 
 </div>
@@ -85,6 +85,7 @@
                 </td>
 
                 <td>{{ agent.total_leads|default:0 }}</td>
+
                 <td class="text-green-600 font-semibold">
                     {{ agent.closed_deals|default:0 }}
                 </td>
@@ -104,6 +105,12 @@
                     </span>
                 </td>
 
+            </tr>
+        {% empty %}
+            <tr>
+                <td colspan="5" class="text-center py-4 text-gray-500">
+                    No data available
+                </td>
             </tr>
         {% endfor %}
         </tbody>
@@ -126,19 +133,24 @@
 const ctx = document.getElementById('agentChart');
 
 new Chart(ctx, {
-    type: 'bar',
-    data: {
-        labels: {{ chart_labels|default:"[]"|safe }},
-        datasets: [{
-            label: 'Revenue',
-            data: {{ chart_data|default:"[]"|safe }},
-            backgroundColor: '#6366F1'
-        }]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false
-    }
+type: 'bar',
+ data: {
+labels: {{ chart_labels|default:"[]"|safe }},
+ datasets: [{
+ label: 'Revenue',
+ data: {{ chart_data|default:"[]"|safe }},
+ backgroundColor: '#6366F1'
+ }]
+ },
+ options: {
+ responsive: true,
+ maintainAspectRatio: false,
+ scales: {
+ y: {
+ beginAtZero: true
+ }
+ }
+ }
 });
 </script>
 
