@@ -1880,15 +1880,27 @@ def add_deal(request):
         property_id = request.POST.get("property_id")
         client_name = request.POST.get("client_name")
         amount = request.POST.get("amount")
+        status = request.POST.get("status")
+
+        # ✅ FIX: empty handling
+        if not amount:
+            amount = 0
+        else:
+            amount = Decimal(amount)
+
+        if not client_name:
+            client_name = "Unknown"
 
         property_obj = Property.objects.get(id=property_id)
+        agent = request.user.agent_profile
 
         Deal.objects.create(
             property=property_obj,
             client_name=client_name,
             amount=amount,
-            status="NEW",  # default
-            agent=request.user.agent_profile,  # 👈 IMPORTANT
+            status=status,
+            agent=agent,
+            builder=request.user   # 👈 IMPORTANT (your model has builder)
         )
 
     return redirect("agent_leads")
