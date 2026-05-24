@@ -132,7 +132,14 @@
     </div>
 
 </div>
-
+{% if lead.properties.all %}
+<p class="text-xs text-gray-400 mt-1">
+    Interested in:
+    {% for p in lead.properties.all %}
+        {{ p.title }}{% if not forloop.last %}, {% endif %}
+    {% endfor %}
+</p>
+{% endif %}
 <script>
 function addNote(leadId) {
     let input = document.getElementById("note-input-" + leadId);

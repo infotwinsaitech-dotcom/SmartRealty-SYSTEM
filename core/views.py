@@ -1686,6 +1686,7 @@ def scheduler(request):
     leads = Lead.objects.filter(assigned_to=agent)
 
     visits = SiteVisit.objects.filter(agent=agent).order_by('-date')
+    property_id = request.POST.get('property')
 
     if request.method == "POST":
         lead_id = request.POST.get("lead")
@@ -1693,6 +1694,7 @@ def scheduler(request):
         time = request.POST.get("time")
 
         SiteVisit.objects.create(
+            property_id=property_id,
             lead_id=lead_id,
             agent=agent,
             date=date,
