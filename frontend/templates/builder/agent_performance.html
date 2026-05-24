@@ -5,110 +5,117 @@
 
 <!-- HEADER -->
 <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6">
-    <div>
-        <h2 class="text-2xl md:text-3xl font-bold">Agent Performance</h2>
-        <p class="text-gray-500 text-sm md:text-base">Track top agents & conversions</p>
-    </div>
+    <div>
+        <h2 class="text-2xl md:text-3xl font-bold">Agent Performance</h2>
+        <p class="text-gray-500 text-sm md:text-base">Track top agents & conversions</p>
+    </div>
 </div>
 
 <!-- FILTER -->
 <form method="GET" class="flex flex-col md:flex-row gap-3 mb-6">
 
-    <select name="agent" class="border px-3 py-2 rounded w-full md:w-auto">
-        <option value="">All Agents</option>
-        {% for a in all_agents %}
-        <option value="{{ a.id }}">{{ a.name }}</option>
-        {% endfor %}
-    </select>
+    <select name="agent" class="border px-3 py-2 rounded w-full md:w-auto">
+        <option value="">All Agents</option>
+        {% for a in all_agents %}
+        <option value="{{ a.id }}">{{ a.name }}</option>
+        {% endfor %}
+    </select>
 
-    <input type="date" name="start" class="border px-3 py-2 rounded w-full md:w-auto">
-    <input type="date" name="end" class="border px-3 py-2 rounded w-full md:w-auto">
+    <input type="date" name="start" class="border px-3 py-2 rounded w-full md:w-auto">
+    <input type="date" name="end" class="border px-3 py-2 rounded w-full md:w-auto">
 
-    <button class="bg-blue-600 text-white px-4 py-2 rounded w-full md:w-auto">
-        Apply
-    </button>
+    <button class="bg-blue-600 text-white px-4 py-2 rounded w-full md:w-auto">
+        Apply
+    </button>
 
-    <a href="/builder/export-agents/"
-       class="bg-green-600 text-white px-4 py-2 rounded text-center w-full md:w-auto">
-       Export CSV
-    </a>
+    <a href="/builder/export-agents/"
+       class="bg-green-600 text-white px-4 py-2 rounded text-center w-full md:w-auto">
+       Export CSV
+    </a>
 
 </form>
 
 <!-- STATS -->
 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 mb-6">
 
-    <div class="bg-white p-5 rounded-xl shadow">
-        <p class="text-gray-500 text-sm">Total Agents</p>
-        <h2 class="text-xl md:text-2xl font-bold">{{ total_agents }}</h2>
-    </div>
+    <div class="bg-white p-5 rounded-xl shadow">
+        <p class="text-gray-500 text-sm">Total Agents</p>
+        <h2 class="text-xl md:text-2xl font-bold">{{ total_agents }}</h2>
+    </div>
 
-    <div class="bg-white p-5 rounded-xl shadow">
-        <p class="text-gray-500 text-sm">Total Deals</p>
-        <h2 class="text-xl md:text-2xl font-bold">{{ total_deals }}</h2>
-    </div>
+    <div class="bg-white p-5 rounded-xl shadow">
+        <p class="text-gray-500 text-sm">Closed Deals</p>
+        <h2 class="text-xl md:text-2xl font-bold">{{ total_deals }}</h2>
+    </div>
 
-    <div class="bg-white p-5 rounded-xl shadow">
-        <p class="text-gray-500 text-sm">Total Revenue</p>
-        <h2 class="text-xl md:text-2xl font-bold">₹{{ total_revenue }}</h2>
-    </div>
+    <div class="bg-white p-5 rounded-xl shadow">
+        <p class="text-gray-500 text-sm">Total Revenue</p>
+        <h2 class="text-xl md:text-2xl font-bold">₹{{ total_revenue|floatformat:0 }}</h2>
+    </div>
 
 </div>
 
-<!-- TABLE (Responsive) -->
+<!-- TABLE -->
 <div class="bg-white rounded-xl shadow p-4 md:p-6 mb-6 overflow-x-auto">
-    <h3 class="text-lg md:text-xl font-bold mb-4">🏆 Top Agents</h3>
+    <h3 class="text-lg md:text-xl font-bold mb-4">🏆 Top Agents</h3>
 
-    <table class="w-full min-w-[600px] text-left text-sm md:text-base">
-        <thead>
-            <tr class="text-gray-500 border-b">
-                <th class="py-2">Name</th>
-                <th>Leads</th>
-                <th>Deals</th>
-                <th>Revenue</th>
-                <th>Conversion</th>
-            </tr>
-        </thead>
+    <table class="w-full min-w-[600px] text-left text-sm md:text-base">
+        <thead>
+            <tr class="text-gray-500 border-b">
+                <th class="py-2">Name</th>
+                <th>Leads</th>
+                <th>Closed</th>
+                <th>Revenue</th>
+                <th>Conversion</th>
+            </tr>
+        </thead>
 
-        <tbody>
-        {% for agent in agents %}
-            <tr onclick="window.location='/builder/agent/{{ agent.id }}/'"
-                class="cursor-pointer border-b hover:bg-gray-50">
+        <tbody>
+        {% for agent in agents %}
+            <tr onclick="window.location='/builder/agent/{{ agent.id }}/'"
+                class="cursor-pointer border-b hover:bg-gray-50">
 
-                <td class="py-3 font-semibold whitespace-nowrap">
-                    {{ agent.name }}
+                <td class="py-3 font-semibold whitespace-nowrap">
+                    {{ agent.name }}
 
-                    {% if forloop.counter == 1 %} 🥇
-                    {% elif forloop.counter == 2 %} 🥈
-                    {% elif forloop.counter == 3 %} 🥉
-                    {% endif %}
-                </td>
+                    {% if forloop.counter == 1 %} 🥇
+                    {% elif forloop.counter == 2 %} 🥈
+                    {% elif forloop.counter == 3 %} 🥉
+                    {% endif %}
+                </td>
 
-                <td>{{ agent.total_leads }}</td>
-                <td>{{ agent.closed_deals }}</td>
-                <td>₹{{ agent.revenue }}</td>
+                <td>{{ agent.total_leads|default:0 }}</td>
+                <td class="text-green-600 font-semibold">
+                    {{ agent.closed_deals|default:0 }}
+                </td>
 
-                <td>
-                    <div class="w-full bg-gray-200 h-2 rounded">
-                        <div class="bg-green-500 h-2 rounded"
-                             style="width: {{ agent.conversion }}%">
-                        </div>
-                    </div>
-                    <span class="text-xs">{{ agent.conversion }}%</span>
-                </td>
+                <td class="text-blue-600 font-bold">
+                    ₹{{ agent.revenue|default:0|floatformat:0 }}
+                </td>
 
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+                <td>
+                    <div class="w-full bg-gray-200 h-2 rounded">
+                        <div class="bg-green-500 h-2 rounded"
+                             style="width: {{ agent.conversion|default:0 }}%">
+                        </div>
+                    </div>
+                    <span class="text-xs">
+                        {{ agent.conversion|default:0|floatformat:1 }}%
+                    </span>
+                </td>
+
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
 </div>
 
 <!-- CHART -->
 <div class="bg-white p-4 md:p-6 rounded-xl shadow">
-    <h3 class="text-lg font-bold mb-4">Revenue by Agent</h3>
-    <div class="w-full overflow-x-auto">
-        <canvas id="agentChart"></canvas>
-    </div>
+    <h3 class="text-lg font-bold mb-4">Revenue by Agent</h3>
+    <div class="w-full overflow-x-auto">
+        <canvas id="agentChart"></canvas>
+    </div>
 </div>
 
 </div>
@@ -119,19 +126,19 @@
 const ctx = document.getElementById('agentChart');
 
 new Chart(ctx, {
-    type: 'bar',
-    data: {
-        labels: {{ chart_labels|safe }},
-        datasets: [{
-            label: 'Revenue',
-            data: {{ chart_data|safe }},
-            backgroundColor: '#6366F1'
-        }]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false
-    }
+    type: 'bar',
+    data: {
+        labels: {{ chart_labels|default:"[]"|safe }},
+        datasets: [{
+            label: 'Revenue',
+            data: {{ chart_data|default:"[]"|safe }},
+            backgroundColor: '#6366F1'
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false
+    }
 });
 </script>
 

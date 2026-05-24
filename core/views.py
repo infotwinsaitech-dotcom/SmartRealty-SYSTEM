@@ -1307,44 +1307,48 @@ def agent_performance(request):
     total_deals = 0
 
     for agent in agents:
-        # 🛠️ सुधार: 'agent=agent' को बदलकर 'assigned_to=agent' किया गया है
-        leads = Lead.objects.filter(assigned_to=agent)
-        
-        # ध्यान दें: अगर Deal मॉडल में भी ऐसी ही एरर आए, तो वहां भी 'agent' की जगह सही फ़ील्ड नाम (जैसे assigned_to) जांच लें।
-        # अभी के लिए एरर सिर्फ Lead पर थी, इसलिए इसे बदला गया है।
-        deals = Deal.objects.filter(agent=agent, status="closed")
 
-        # ✅ FILTER APPLY
+        # LEADS
+        leads = Lead.objects.filter(assigned_to=agent)
+
+        # DEALS (FIX: CLOSED)
+        deals = Deal.objects.filter(agent=agent, status="CLOSED")
+
+        # FILTER APPLY
         if start_date and end_date:
             leads = leads.filter(created_at__range=[start_date, end_date])
             deals = deals.filter(created_at__range=[start_date, end_date])
 
+        # SINGLE AGENT FILTER
         if selected_agent:
             if str(agent.id) != selected_agent:
                 continue
 
+        total_leads = leads.count()
+        closed_deals = deals.count()
+
         revenue = deals.aggregate(total=Sum('amount'))['total'] or 0
 
         total_revenue += revenue
-        total_deals += deals.count()
+        total_deals += closed_deals
 
-        conversion = 0
-        if leads.count() > 0:
-            conversion = (deals.count() / leads.count()) * 100
+        # CONVERSION SAFE
+        conversion = (closed_deals / total_leads * 100) if total_leads else 0
 
         data.append({
             "id": agent.id,
             "name": agent.name,
-            "total_leads": leads.count(),
-            "closed_deals": deals.count(),
+            "total_leads": total_leads,
+            "closed_deals": closed_deals,
             "revenue": revenue,
             "conversion": round(conversion, 1)
         })
 
+        # CHART (ONLY FILTERED AGENTS)
         chart_labels.append(agent.name)
-        chart_data.append(revenue)
+        chart_data.append(float(revenue))
 
-    # ✅ SORT BY REVENUE (LEADERBOARD)
+    # SORT BY REVENUE
     data = sorted(data, key=lambda x: x['revenue'], reverse=True)
 
     return render(request, "builder/agent_performance.html", {
