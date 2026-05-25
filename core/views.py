@@ -29,6 +29,7 @@ import random
 import os
 from decimal import Decimal
 from collections import defaultdict
+from core.models import FollowUp
 
 def home(request):
     properties = Property.objects.all()[:6]
