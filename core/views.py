@@ -29,6 +29,7 @@ import random
 import os
 from decimal import Decimal
 from collections import defaultdict
+
 def home(request):
     properties = Property.objects.all()[:6]
 
@@ -568,6 +569,25 @@ def lead_management(request):
 @login_required
 def builder_dashboard(request):
 
+    # ===== TODAY FOLLOWUPS (FIRST DEFINE) =====
+    today_followups = FollowUp.objects.filter(
+        lead__builder=request.user,
+        date=date.today(),
+        status="PENDING"
+    ).select_related('agent', 'lead')
+
+    grouped_followups = defaultdict(list)
+
+    for f in today_followups:
+        grouped_followups[f.agent.name].append(f)
+
+    # ===== MISSED LEADS =====
+    missed_leads = Lead.objects.filter(
+        builder=request.user,
+        created_at__lt=now() - timedelta(hours=24),
+        status="NEW"
+    )
+
     # ===== MONTHLY REVENUE CHART =====
     monthly_data = (
         Deal.objects.filter(builder=request.user, status="CLOSED")
@@ -582,7 +602,7 @@ def builder_dashboard(request):
 
     for item in monthly_data:
         chart_labels.append(calendar.month_abbr[item['month']])
-        chart_data.append(float(item['total'] or 0))  # ✅ FIX
+        chart_data.append(float(item['total'] or 0))
 
     # ===== BASIC STATS =====
     total_leads = Lead.objects.filter(builder=request.user).count()
@@ -595,34 +615,18 @@ def builder_dashboard(request):
     total_revenue = Deal.objects.filter(
         builder=request.user,
         status="CLOSED"
-    ).aggregate(total=Sum('amount'))['total'] or 0  # ✅ already correct
+    ).aggregate(total=Sum('amount'))['total'] or 0
 
     closed_deals = Deal.objects.filter(
         builder=request.user,
         status="CLOSED"
     ).count()
-    grouped_followups = defaultdict(list)
 
-    for f in today_followups:
-         grouped_followups[f.agent.name].append(f)
-    today_followups = FollowUp.objects.filter(
-    agent__builder=request.user,   # 🔥 key line
-    date=date.today(),
-    status="PENDING"
-)
-    missed_leads = Lead.objects.filter(
-    builder=request.user,
-    created_at__lt=now() - timedelta(hours=24),
-    status="NEW"
-)
-
-    # ===== CONVERSION RATE =====
-    conversion_rate = 0
-    if total_leads > 0:
-        conversion_rate = (closed_deals / total_leads) * 100
+    # ===== CONVERSION =====
+    conversion_rate = (closed_deals / total_leads * 100) if total_leads else 0
 
     # ===== ACTIVITY + TASK =====
-    activities = Activity.objects.order_by('-created_at')[:5]  # ✅ remove empty filter()
+    activities = Activity.objects.order_by('-created_at')[:5]
     tasks = Task.objects.order_by('-date', '-time')[:5]
 
     # ===== DATE CALC =====
@@ -643,7 +647,7 @@ def builder_dashboard(request):
         created_at__date__range=[last_month_start, last_month_end]
     ).count()
 
-    lead_growth = ((current_leads - last_leads) / last_leads * 100) if last_leads > 0 else 0
+    lead_growth = ((current_leads - last_leads) / last_leads * 100) if last_leads else 0
 
     # ===== DEALS GROWTH =====
     current_deals = Deal.objects.filter(
@@ -656,7 +660,7 @@ def builder_dashboard(request):
         created_at__date__range=[last_month_start, last_month_end]
     ).count()
 
-    deal_growth = ((current_deals - last_deals) / last_deals * 100) if last_deals > 0 else 0
+    deal_growth = ((current_deals - last_deals) / last_deals * 100) if last_deals else 0
 
     # ===== REVENUE GROWTH =====
     current_revenue = Deal.objects.filter(
@@ -671,7 +675,7 @@ def builder_dashboard(request):
         created_at__date__range=[last_month_start, last_month_end]
     ).aggregate(total=Sum('amount'))['total'] or 0
 
-    revenue_growth = ((current_revenue - last_revenue) / last_revenue * 100) if last_revenue > 0 else 0
+    revenue_growth = ((current_revenue - last_revenue) / last_revenue * 100) if last_revenue else 0
 
     # ===== LEAD SOURCES =====
     total = Lead.objects.filter(builder=request.user).count()
@@ -691,7 +695,7 @@ def builder_dashboard(request):
     # ===== DEAL LIST =====
     deals = Deal.objects.filter(builder=request.user).order_by('-created_at')
 
-    # ===== FINAL CONTEXT =====
+    # ===== CONTEXT =====
     context = {
         "total_leads": total_leads,
         "active_deals": active_deals,
@@ -709,14 +713,15 @@ def builder_dashboard(request):
 
         "chart_labels": json.dumps(chart_labels),
         "chart_data": json.dumps(chart_data),
+
         "grouped_followups": dict(grouped_followups),
+        "today_followups": today_followups,   # 👈 add this also
         "missed_leads": missed_leads,
 
         "deals": deals,
     }
 
     return render(request, "builder/dashboard.html", context)
-
 
 @require_POST
 def add_lead(request):
