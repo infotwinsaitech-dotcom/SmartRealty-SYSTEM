@@ -435,24 +435,27 @@ class SiteVisit(models.Model):
     
 
 class FollowUp(models.Model):
-    lead = models.ForeignKey(Lead, on_delete=models.CASCADE)
-    agent = models.ForeignKey(Agent, on_delete=models.CASCADE)
+    STATUS_CHOICES = (
+        ("PENDING", "Pending"),
+        ("DONE", "Done"),
+        ("MISSED", "Missed"),
+    )
 
+    lead = models.ForeignKey("Lead", on_delete=models.CASCADE)
+    agent = models.ForeignKey("Agent", on_delete=models.CASCADE)
+    
     date = models.DateField()
     time = models.TimeField()
 
-    note = models.TextField(blank=True)
+    note = models.TextField(blank=True, null=True)
 
-    status = models.CharField(
-        max_length=20,
-        choices=[("PENDING", "Pending"), ("DONE", "Done")],
-        default="PENDING"
-    )
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="PENDING")
 
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.lead} - {self.date}"
+        return f"{self.lead.name} - {self.date}"
+
     
 class LeadActivity(models.Model):
     lead = models.ForeignKey(Lead, on_delete=models.CASCADE)

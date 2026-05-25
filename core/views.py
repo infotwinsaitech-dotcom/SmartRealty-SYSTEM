@@ -578,6 +578,13 @@ def builder_dashboard(request):
     ).select_related('agent', 'lead')
 
     grouped_followups = defaultdict(list)
+    upcoming_followups = FollowUp.objects.filter(
+        agent=request.user.agent,
+        date=date.today(),
+        time__lte=(now() + timedelta(hours=1)).time(),
+        status="PENDING"
+    )
+
 
     for f in today_followups:
         grouped_followups[f.agent.name].append(f)
@@ -718,6 +725,7 @@ def builder_dashboard(request):
         "grouped_followups": dict(grouped_followups),
         "today_followups": today_followups,   # 👈 add this also
         "missed_leads": missed_leads,
+        "upcoming_followups": upcoming_followups,
 
         "deals": deals,
     }
@@ -1621,6 +1629,7 @@ def delete_lead(request, id):
 @login_required
 def agent_dashboard(request):
 
+
     agent, created = Agent.objects.get_or_create(
     user=request.user,
     defaults={
@@ -1969,3 +1978,39 @@ def update_deal(request, deal_id):
         deal.save()
 
     return redirect("agent_leads")
+
+
+def add_followup(request, lead_id):
+    lead = Lead.objects.get(id=lead_id)
+
+    if request.method == "POST":
+        date = request.POST.get("date")
+        time = request.POST.get("time")
+        note = request.POST.get("note")
+
+        FollowUp.objects.create(
+            lead=lead,
+            agent=request.user.agent,
+            date=date,
+            time=time,
+            note=note
+        )
+
+        return redirect("agent_dashboard")
+
+    return render(request, "agent/add_followup.html", {"lead": lead})
+
+def update_missed_followups():
+    followups = FollowUp.objects.filter(status="PENDING")
+
+    for f in followups:
+        followup_datetime = datetime.combine(f.date, f.time)
+
+        if followup_datetime < now():
+            f.status = "MISSED"
+            f.save()
+def mark_followup_done(request, id):
+    f = FollowUp.objects.get(id=id)
+    f.status = "DONE"
+    f.save()
+    return redirect(request.META.get('HTTP_REFERER'))

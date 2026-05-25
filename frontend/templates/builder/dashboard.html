@@ -3,6 +3,48 @@
 {% block content %}
 
 <main class="w-full min-h-screen">
+    <!-- 🔔 Reminder Alert -->
+{% if upcoming_followups %}
+<div class="bg-yellow-100 text-yellow-800 p-3 rounded mb-4">
+    ⏰ You have {{ upcoming_followups.count }} follow-ups in next 1 hour!
+</div>
+{% endif %}
+<h3 class="font-bold mb-3">Today's Follow-ups</h3>
+
+{% for f in today_followups %}
+<div class="bg-white p-3 rounded shadow mb-2">
+
+    <p class="font-semibold">{{ f.lead.name }}</p>
+
+    <p class="text-sm text-gray-500">
+        {{ f.date }} {{ f.time }}
+    </p>
+
+    {% if f.note %}
+    <p class="text-xs text-blue-600">
+        {{ f.note }}
+    </p>
+    {% endif %}
+
+    <span class="text-xs px-2 py-1 rounded
+        {% if f.status == 'PENDING' %} bg-yellow-200
+        {% elif f.status == 'DONE' %} bg-green-200
+        {% else %} bg-red-200
+        {% endif %}
+    ">
+        {{ f.status }}
+    </span>
+
+    <!-- ✅ DONE BUTTON -->
+    <form method="POST" action="{% url 'mark_followup_done' f.id %}">
+        {% csrf_token %}
+        <button class="text-green-600 text-xs mt-1">✔ Done</button>
+    </form>
+
+</div>
+{% empty %}
+<p>No follow-ups today</p>
+{% endfor %}
     <div class="p-4 md:p-8 max-w-[1600px] mx-auto">
         
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 md:mb-10">
