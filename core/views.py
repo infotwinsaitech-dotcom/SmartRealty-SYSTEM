@@ -30,7 +30,7 @@ import os
 from decimal import Decimal
 from collections import defaultdict
 from core.models import FollowUp
-
+from django.utils.timezone import now
 def home(request):
     properties = Property.objects.all()[:6]
 
