@@ -1,154 +1,88 @@
 {% extends 'builder/base.html' %}
-
 {% block content %}
 
 <main class="w-full min-h-screen">
-    <div class="p-4 md:p-8 max-w-[1600px] mx-auto">
-        
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 md:mb-10">
-            <div>
-                <h2 class="text-2xl md:text-3xl font-extrabold text-on-surface tracking-tight leading-tight">Dashboard Overview</h2>
-                <p class="text-on-surface-variant text-xs md:text-sm mt-1">Welcome back, here is what's happening with your agency today.</p>
-            </div>
-            <div class="flex flex-wrap items-center gap-3">
-                <div class="flex items-center bg-surface-container-low rounded-lg px-3 py-2 text-xs md:text-sm font-medium text-on-surface-variant">
-                    <span class="material-symbols-outlined text-sm mr-2">calendar_today</span>
-                    <span>{{ start_date|date:"M d, Y" }} - {{ end_date|date:"M d, Y" }}</span>
-                    <span class="material-symbols-outlined text-sm ml-2">expand_more</span>
-                </div>
-                <button class="w-full sm:w-auto bg-primary-container text-white px-5 py-2.5 rounded-lg text-xs md:text-sm font-bold flex items-center justify-center gap-2 hover:bg-secondary transition-all shadow-lg shadow-primary-container/20">
-                    <span class="material-symbols-outlined text-sm">download</span>
-                    Export Report
-                </button>
-            </div>
-        </div>
+<div class="p-4 md:p-8 max-w-[1600px] mx-auto">
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8 md:mb-10">
-            
-            <div class="bg-surface-container-lowest p-5 md:p-6 rounded-xl border border-outline-variant/10 shadow-sm transition-transform hover:-translate-y-1">
-                <div class="flex justify-between items-start mb-4">
-                    <div class="w-11 h-11 md:w-12 md:h-12 rounded-lg bg-primary-fixed flex items-center justify-center">
-                        <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">groups</span>
-                    </div>
-                    <span class="text-[#10B981] bg-[#10B981]/10 px-2 py-1 rounded text-xs font-bold flex items-center">
-                        <span class="material-symbols-outlined text-xs mr-1">trending_up</span>
-                        {{ lead_growth|floatformat:0 }}%
-                    </span>
-                </div>
-                <h3 class="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Total Leads</h3>
-                <div class="flex items-baseline gap-2">
-                    <span class="text-xl md:text-2xl font-extrabold text-on-surface">{{ total_leads }}</span>
-                </div>
-                <div class="mt-4 w-full bg-surface-container-low h-1 rounded-full overflow-hidden">
-                    <div class="bg-primary h-full" style="width: {{ lead_growth|floatformat:0 }}%; max-width:100%"></div>
-                </div>
-            </div>
+<!-- HEADER -->
+<div class="flex justify-between mb-8">
+    <div>
+        <h2 class="text-2xl font-bold">Dashboard Overview</h2>
+        <p class="text-gray-500 text-sm">Your CRM performance today</p>
+    </div>
+</div>
 
-            <div class="bg-surface-container-lowest p-5 md:p-6 rounded-xl border border-outline-variant/10 shadow-sm transition-transform hover:-translate-y-1">
-                <div class="flex justify-between items-start mb-4">
-                    <div class="w-11 h-11 md:w-12 md:h-12 rounded-lg bg-[#dae2fd] flex items-center justify-center">
-                        <span class="material-symbols-outlined text-[#1e3a8a]" style="font-variation-settings: 'FILL' 1;">handshake</span>
-                    </div>
-                    <span class="text-[#10B981] bg-[#10B981]/10 px-2 py-1 rounded text-xs font-bold flex items-center">
-                        <span class="material-symbols-outlined text-xs mr-1">trending_up</span>
-                        {{ deal_growth|floatformat:0 }}%
-                    </span>
-                </div>
-                <h3 class="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Active Deals</h3>
-                <div class="flex items-baseline gap-2">
-                    <span class="text-xl md:text-2xl font-extrabold text-on-surface">{{ active_deals }}</span>
-                </div>
-                <div class="mt-4 w-full bg-surface-container-low h-1 rounded-full overflow-hidden">
-                    <div class="bg-secondary h-full" style="width: {{ deal_growth }}%"></div>
-                </div>
-            </div>
+<!-- STATS -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
 
-            <div class="bg-surface-container-lowest p-5 md:p-6 rounded-xl border border-outline-variant/10 shadow-sm transition-transform hover:-translate-y-1">
-                <div class="flex justify-between items-start mb-4">
-                    <div class="w-11 h-11 md:w-12 md:h-12 rounded-lg bg-[#d8e2ff] flex items-center justify-center">
-                        <span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">monetization_on</span>
-                    </div>
-                    <span class="text-[#10B981] bg-[#10B981]/10 px-2 py-1 rounded text-xs font-bold flex items-center">
-                        <span class="material-symbols-outlined text-xs mr-1">trending_up</span>{{ revenue_growth|floatformat:0 }}%
-                    </span>
-                </div>
-                <h3 class="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Total Revenue</h3>
-                <div class="flex items-baseline gap-2">
-                    <span class="text-xl md:text-2xl font-extrabold text-on-surface">₹{{ total_revenue|floatformat:0 }}</span>
-                </div>
-                <div class="mt-4 w-full bg-surface-container-low h-1 rounded-full overflow-hidden">
-                    <div class="bg-secondary-container h-full" style="width: {{ revenue_growth }}%"></div>
-                </div>
-            </div>
+    <div class="bg-white p-5 rounded-xl shadow">
+        <p class="text-gray-500 text-sm">Total Leads</p>
+        <h2 class="text-xl font-bold">{{ total_leads }}</h2>
+        <p class="text-green-600 text-xs">{{ lead_growth|floatformat:0 }}%</p>
+    </div>
 
-            <div class="bg-surface-container-lowest p-5 md:p-6 rounded-xl border border-outline-variant/10 shadow-sm transition-transform hover:-translate-y-1">
-                <div class="flex justify-between items-start mb-4">
-                    <div class="w-11 h-11 md:w-12 md:h-12 rounded-lg bg-orange-100 flex items-center justify-center">
-                        <span class="material-symbols-outlined text-[#F59E0B]" style="font-variation-settings: 'FILL' 1;">insights</span>
-                    </div>
-                    <span class="text-slate-400 px-2 py-1 rounded text-xs font-bold">Target 7.5%</span>
-                </div>
-                <h3 class="text-slate-500 text-xs font-bold uppercase mb-1">Conversion Rate</h3>
-                <div class="flex items-baseline gap-2">
-                    <span class="text-xl md:text-2xl font-extrabold text-on-surface">{{ conversion_rate|floatformat:1 }}%</span>
-                </div>
-                <div class="mt-4 w-full bg-surface-container-low h-1 rounded-full overflow-hidden">
-                    <div class="bg-[#F59E0B] h-full" style="width: {{ conversion_rate|floatformat:0 }}%"></div>
-                </div>
-            </div>
-        </div>
-{% for deal in deals %}
-<div class="bg-white p-4 rounded shadow mb-3">
+    <div class="bg-white p-5 rounded-xl shadow">
+        <p class="text-gray-500 text-sm">Active Deals</p>
+        <h2 class="text-xl font-bold">{{ active_deals }}</h2>
+        <p class="text-green-600 text-xs">{{ deal_growth|floatformat:0 }}%</p>
+    </div>
 
-    <h3 class="font-bold">{{ deal.property.title }}</h3>
+    <div class="bg-white p-5 rounded-xl shadow">
+        <p class="text-gray-500 text-sm">Revenue</p>
+        <h2 class="text-xl font-bold">₹{{ total_revenue|floatformat:0 }}</h2>
+        <p class="text-green-600 text-xs">{{ revenue_growth|floatformat:0 }}%</p>
+    </div>
 
-    <p class="text-sm text-gray-500">
-        Client: {{ deal.client_name }}
-    </p>
-
-    <p class="text-blue-600 font-bold">
-        ₹{{ deal.amount }}
-    </p>
-
-    <span class="px-3 py-1 text-xs rounded text-white
-        {% if deal.status == 'NEW' %} bg-gray-500
-        {% elif deal.status == 'NEGOTIATION' %} bg-yellow-500
-        {% elif deal.status == 'BOOKED' %} bg-blue-500
-        {% elif deal.status == 'CLOSED' %} bg-green-600
-        {% else %} bg-red-500
-        {% endif %}
-    ">
-        {{ deal.status }}
-    </span>
+    <div class="bg-white p-5 rounded-xl shadow">
+        <p class="text-gray-500 text-sm">Conversion</p>
+        <h2 class="text-xl font-bold">{{ conversion_rate|floatformat:1 }}%</h2>
+    </div>
 
 </div>
-{% empty %}
-<p>No deals yet</p>
-{% endfor %}
-<!-- 🧾 DEALS SECTION -->
-<div class="bg-white p-5 md:p-6 rounded-xl shadow mb-8">
 
-    <h3 class="text-lg font-bold mb-4">Recent Deals</h3>
+<!-- MISSED LEADS -->
+{% if missed_leads %}
+<div class="bg-red-100 text-red-700 p-3 rounded mb-6">
+    ⚠️ {{ missed_leads.count }} leads not contacted
+</div>
+{% endif %}
+
+<!-- TODAY FOLLOWUPS (GROUPED) -->
+<div class="bg-white p-5 rounded-xl shadow mb-8">
+    <h3 class="font-bold mb-4">Today's Follow-ups (All Agents)</h3>
+
+    {% for agent, followups in grouped_followups.items %}
+    <div class="mb-4">
+        <h4 class="font-semibold text-blue-600 mb-2">{{ agent }}</h4>
+
+        {% for f in followups %}
+        <div class="p-3 bg-gray-50 rounded mb-2">
+            <p>{{ f.lead.name }}</p>
+            <p class="text-xs text-gray-500">{{ f.date }} {{ f.time }}</p>
+        </div>
+        {% endfor %}
+    </div>
+    {% empty %}
+    <p class="text-gray-400">No followups today</p>
+    {% endfor %}
+</div>
+
+<!-- DEALS -->
+<div class="bg-white p-5 rounded-xl shadow mb-8">
+    <h3 class="font-bold mb-4">Recent Deals</h3>
 
     {% for deal in deals %}
-    <div class="border-b py-3 flex justify-between items-center">
+    <div class="border-b py-3 flex justify-between">
 
         <div>
-            <h4 class="font-semibold text-sm md:text-base">
-                {{ deal.property.title }}
-            </h4>
-
-            <p class="text-xs text-gray-500">
-                Client: {{ deal.client_name }}
-            </p>
+            <p class="font-semibold">{{ deal.property.title }}</p>
+            <p class="text-xs text-gray-500">Client: {{ deal.client_name }}</p>
         </div>
 
         <div class="text-right">
-            <p class="text-blue-600 font-bold text-sm md:text-base">
-                ₹{{ deal.amount }}
-            </p>
+            <p class="text-blue-600 font-bold">₹{{ deal.amount }}</p>
 
-            <span class="px-3 py-1 text-xs rounded text-white
+            <span class="text-xs px-2 py-1 rounded text-white
                 {% if deal.status == 'NEW' %} bg-gray-500
                 {% elif deal.status == 'NEGOTIATION' %} bg-yellow-500
                 {% elif deal.status == 'BOOKED' %} bg-blue-500
@@ -164,211 +98,64 @@
     {% empty %}
     <p class="text-gray-400 text-sm text-center py-4">No deals yet</p>
     {% endfor %}
-<h3 class="font-bold mb-4">Today's Follow-ups (All Agents)</h3>
+</div>
 
-{% for agent, followups in grouped_followups.items %}
-<div class="mb-4">
+<!-- CHART -->
+<div class="bg-white p-5 rounded-xl shadow mb-8">
+    <h3 class="font-bold mb-4">Revenue Chart</h3>
+    <canvas id="salesChart"></canvas>
+</div>
 
-    <h4 class="font-semibold text-blue-600 mb-2">
-        {{ agent }}
-    </h4>
+<!-- ACTIVITY -->
+<div class="bg-white p-5 rounded-xl shadow mb-8">
+    <h3 class="font-bold mb-4">Recent Activity</h3>
 
-    {% for f in followups %}
-    <div class="bg-white p-3 rounded shadow mb-2">
-        <p>{{ f.lead.name }}</p>
-        <p class="text-sm text-gray-500">
-            {{ f.date }} {{ f.time }}
-        </p>
+    {% for activity in activities %}
+    <div class="flex justify-between border-b py-2">
+        <p class="text-sm">{{ activity.message }}</p>
+        <span class="text-xs text-gray-400">{{ activity.created_at|timesince }} ago</span>
     </div>
+    {% empty %}
+    <p class="text-gray-400 text-sm">No activity</p>
     {% endfor %}
-
 </div>
-{% empty %}
-<p>No followups today</p>
-{% endfor %}
-</div>
-{% if missed_leads %}
-<div class="bg-red-100 text-red-700 p-3 rounded mb-4">
-    ⚠️ {{ missed_leads.count }} leads not contacted
-</div>
-{% endif %}
-<h3 class="font-bold mb-3">Today's Follow-ups</h3>
 
-{% for f in today_followups %}
-<div class="bg-white p-3 rounded shadow mb-2">
-    <p class="font-semibold">{{ f.lead.name }}</p>
-    <p class="text-sm text-gray-500">
-        {{ f.date }} {{ f.time }}
-    </p>
-</div>
-{% empty %}
-<p>No follow-ups today</p>
-{% endfor %}
-        <div class="grid grid-cols-12 gap-4 md:gap-6 mb-8 md:mb-10">
-            
-            <div class="col-span-12 lg:col-span-8 bg-surface-container-lowest p-5 md:p-8 rounded-2xl border border-outline-variant/10 shadow-sm">
-                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6 md:mb-8">
-                    <div>
-                        <h3 class="text-base md:text-lg font-extrabold text-on-surface">Sales Performance</h3>
-                        <p class="text-xs md:text-sm text-on-surface-variant">Monthly revenue growth analytics</p>
-                    </div>
-                    <div class="flex flex-wrap gap-4">
-                        <div class="flex items-center gap-1.5">
-                            <span class="w-2.5 h-2.5 rounded-full bg-primary-container"></span>
-                            <span class="text-xs font-bold text-slate-500">Gross Sales</span>
-                        </div>
-                        <div class="flex items-center gap-1.5">
-                            <span class="w-2.5 h-2.5 rounded-full bg-secondary"></span>
-                            <span class="text-xs font-bold text-slate-500">Target</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="relative w-full h-[250px] md:h-[300px]">
-                    <canvas id="salesChart"></canvas>
-                </div>
-            </div>
+<!-- TASKS -->
+<div class="bg-white p-5 rounded-xl shadow">
+    <h3 class="font-bold mb-4">Tasks</h3>
 
-            <div class="col-span-12 lg:col-span-4 bg-surface-container-lowest p-5 md:p-8 rounded-2xl border border-outline-variant/10 shadow-sm flex flex-col">
-                <h3 class="text-base md:text-lg font-extrabold text-on-surface mb-1">Lead Sources</h3>
-                <p class="text-xs md:text-sm text-on-surface-variant mb-6 md:mb-8">Channel efficiency distribution</p>
-                <div class="relative flex-1 flex flex-col items-center justify-center">
-                    
-                    <div class="relative w-40 h-40 md:w-48 md:h-48 rounded-full border-[18px] border-surface-container-low flex items-center justify-center">
-                        <div class="absolute inset-0 rounded-full border-[18px] border-primary-container border-t-transparent border-r-transparent rotate-45"></div>
-                        <div class="absolute inset-0 rounded-full border-[18px] border-secondary border-b-transparent border-l-transparent -rotate-12"></div>
-                        <div class="text-center">
-                            <span class="block text-2xl md:text-3xl font-extrabold text-on-surface">{{ total_leads }}</span>
-                            <span class="text-[9px] md:text-[10px] text-slate-500 uppercase tracking-widest font-bold">Total Leads</span>
-                        </div>
-                    </div>
-
-                    <div class="mt-6 md:mt-10 grid grid-cols-2 gap-4 w-full">
-                        <div class="flex items-center gap-2">
-                            <span class="w-3 h-3 rounded-full bg-primary-container"></span>
-                            <div class="flex flex-col">
-                                <span class="text-xs font-bold text-on-surface">Search</span>
-                                <span class="text-[10px] text-slate-500">{{ lead_sources.search|floatformat:0 }}%</span>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <span class="w-3 h-3 rounded-full bg-secondary"></span>
-                            <div class="flex flex-col">
-                                <span class="text-xs font-bold text-on-surface">Referrals</span>
-                                <span class="text-[10px] text-slate-500">{{ lead_sources.referrals|floatformat:0 }}%</span>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <span class="w-3 h-3 rounded-full bg-[#10B981]"></span>
-                            <div class="flex flex-col">
-                                <span class="text-xs font-bold text-on-surface">Social</span>
-                                <span class="text-[10px] text-slate-500">{{ lead_sources.social|floatformat:0 }}%</span>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <span class="w-3 h-3 rounded-full bg-[#F59E0B]"></span>
-                            <div class="flex flex-col">
-                                <span class="text-xs font-bold text-on-surface">Direct</span>
-                                <span class="text-[10px] text-slate-500">{{ lead_sources.direct|floatformat:0 }}%</span>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
+    {% for task in tasks %}
+    <div class="flex gap-3 mb-2">
+        <input type="checkbox" {% if task.status == "DONE" %}checked{% endif %}>
+        <div>
+            <p class="text-sm font-semibold">{{ task.title }}</p>
+            <p class="text-xs text-gray-500">{{ task.date }} {{ task.time }}</p>
         </div>
+    </div>
+    {% empty %}
+    <p class="text-gray-400 text-sm">No tasks</p>
+    {% endfor %}
+</div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
-            
-            <div class="bg-surface-container-lowest rounded-2xl border border-outline-variant/10 shadow-sm overflow-hidden">
-                <div class="p-5 md:p-6 flex justify-between items-center bg-surface-container-low/30">
-                    <h3 class="text-base md:text-lg font-extrabold text-on-surface">Recent Activity</h3>
-                </div>
-                <div class="divide-y divide-outline-variant/10">
-                    {% for activity in activities %}
-                    <div class="p-5 md:p-6 flex items-start justify-between gap-4">
-                        <p class="text-xs md:text-sm text-on-surface flex-1">
-                            {{ activity.message }}
-                        </p>
-                        <p class="text-[10px] md:text-xs text-gray-400 whitespace-nowrap">
-                            {{ activity.created_at|timesince }} ago
-                        </p>
-                    </div>
-                    {% empty %}
-                    <p class="p-6 text-sm text-center text-gray-400">No activity yet</p>
-                    {% endfor %}
-                </div>
-            </div>
-
-            <div class="bg-surface-container-lowest rounded-2xl border border-outline-variant/10 shadow-sm overflow-hidden">
-                <div class="p-5 md:p-6 flex justify-between items-center bg-surface-container-low/30">
-                    <h3 class="text-base md:text-lg font-extrabold text-on-surface flex items-center gap-2">
-                        <span class="material-symbols-outlined text-secondary">task_alt</span>
-                        Upcoming Tasks
-                    </h3>
-                    <button class="w-8 h-8 rounded-full bg-primary-container text-white flex items-center justify-center hover:bg-secondary transition-all">
-                        <span class="material-symbols-outlined text-sm">add</span>
-                    </button>
-                </div>
-                <div class="p-5 md:p-6 space-y-4">
-                    {% for task in tasks %}
-                    <div class="flex items-start gap-4 group p-3 hover:bg-surface-container-low/50 rounded-xl">
-                        <input type="checkbox" class="mt-1" {% if task.status == "DONE" %}checked{% endif %} />
-                        <div class="flex-1">
-                            <p class="text-xs md:text-sm font-semibold text-on-surface">{{ task.title }}</p>
-                            <p class="text-[10px] md:text-xs text-gray-500 mt-0.5">{{ task.date }} {{ task.time }}</p>
-                        </div>
-                    </div>
-                    {% empty %}
-                    <p class="text-sm text-center text-gray-400 py-4">No tasks available</p>
-                    {% endfor %}
-                </div>
-                <div class="p-5 md:p-6 pt-0">
-                    <button class="w-full py-3 bg-surface-container-low text-on-surface-variant font-bold text-xs rounded-xl hover:bg-surface-container-high transition-colors">
-                        SHOW COMPLETED TASKS (14)
-                    </button>
-                </div>
-            </div>
-
-        </div> 
-
-        <div class="mt-8 md:mt-12 mb-6 bg-gradient-to-r from-primary-container to-secondary rounded-2xl md:rounded-3xl p-6 md:p-10 text-white flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative overflow-hidden">
-            <div class="absolute -right-10 -bottom-10 w-48 h-48 md:w-64 md:h-64 bg-white/10 rounded-full blur-3xl"></div>
-            <div class="absolute -left-10 -top-10 w-48 h-48 md:w-64 md:h-64 bg-white/5 rounded-full blur-2xl"></div>
-            
-            <div class="relative z-10 max-w-xl">
-                <h4 class="text-xl md:text-2xl font-extrabold leading-tight mb-2">AI Architect Insight:</h4>
-                <p class="text-white/80 italic text-sm md:text-lg leading-relaxed">"Based on current market trends and your lead volume, increasing follow-up frequency on luxury condos by 15% could result in an estimated $450k revenue boost this quarter."</p>
-            </div>
-            <button class="w-full md:w-auto relative z-10 bg-white text-primary px-6 py-3 rounded-full font-extrabold text-xs md:text-sm hover:bg-primary-fixed transition-all shadow-xl whitespace-nowrap">
-                Apply AI Strategy
-            </button>
-        </div>
-
-    </div> 
+</div>
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-    const ctx = document.getElementById('salesChart').getContext('2d');
+    const ctx = document.getElementById('salesChart');
 
     new Chart(ctx, {
         type: 'line',
         data: {
-            labels: {{ chart_labels|default:"[]"|safe }},
+            labels: {{ chart_labels|safe }},
             datasets: [{
                 label: 'Revenue',
-                data: {{ chart_data|default:"[]"|safe }},
+                data: {{ chart_data|safe }},
                 borderColor: '#6366F1',
                 backgroundColor: 'rgba(99,102,241,0.2)',
-                fill: true,
-                tension: 0.4
+                fill: true
             }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false // ताकि अलग-अलग स्क्रीन साइज पर चार्ट खुद को एडजस्ट कर सके
         }
     });
 });
