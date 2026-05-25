@@ -570,7 +570,9 @@ def lead_management(request):
 @login_required
 def builder_dashboard(request):
 
-    # ===== TODAY FOLLOWUPS (FIRST DEFINE) =====
+    agent = getattr(request.user, 'agent', None)
+
+    # ===== TODAY FOLLOWUPS =====
     today_followups = FollowUp.objects.filter(
         lead__builder=request.user,
         date=date.today(),
@@ -578,16 +580,21 @@ def builder_dashboard(request):
     ).select_related('agent', 'lead')
 
     grouped_followups = defaultdict(list)
-    upcoming_followups = FollowUp.objects.filter(
-        agent=request.user.agent,
-        date=date.today(),
-        time__lte=(now() + timedelta(hours=1)).time(),
-        status="PENDING"
-    )
-
 
     for f in today_followups:
-        grouped_followups[f.agent.name].append(f)
+        agent_name = f.agent.name if f.agent else "Unassigned"
+        grouped_followups[agent_name].append(f)
+
+    # ===== UPCOMING FOLLOWUPS (NEXT 1 HOUR) =====
+    if agent:
+        upcoming_followups = FollowUp.objects.filter(
+            agent=agent,
+            date=date.today(),
+            time__lte=(now() + timedelta(hours=1)).time(),
+            status="PENDING"
+        )
+    else:
+        upcoming_followups = FollowUp.objects.none()
 
     # ===== MISSED LEADS =====
     missed_leads = Lead.objects.filter(
@@ -723,7 +730,7 @@ def builder_dashboard(request):
         "chart_data": json.dumps(chart_data),
 
         "grouped_followups": dict(grouped_followups),
-        "today_followups": today_followups,   # 👈 add this also
+        "today_followups": today_followups,
         "missed_leads": missed_leads,
         "upcoming_followups": upcoming_followups,
 
@@ -731,6 +738,7 @@ def builder_dashboard(request):
     }
 
     return render(request, "builder/dashboard.html", context)
+
 
 @require_POST
 def add_lead(request):
@@ -1629,60 +1637,67 @@ def delete_lead(request, id):
 @login_required
 def agent_dashboard(request):
 
-
+    # ===== GET OR CREATE AGENT =====
     agent, created = Agent.objects.get_or_create(
-    user=request.user,
-    defaults={
-        "name": request.user.username,
-        "email": request.user.email,
-        "phone": request.user.phone or ""
-    }
-)
+        user=request.user,
+        defaults={
+            "name": request.user.username,
+            "email": request.user.email,
+            "phone": getattr(request.user, "phone", "")
+        }
+    )
 
-    leads = leads = Lead.objects.filter(
-    assigned_to=agent,
-    builder=agent.builder
-)
+    # ===== LEADS =====
+    leads = Lead.objects.filter(
+        assigned_to=agent,
+        builder=agent.builder
+    )
 
-    # lead stats
+    # ===== LEAD STATS =====
     total_leads = leads.count()
     hot = leads.filter(status="HOT").count()
     warm = leads.filter(status="WARM").count()
     cold = leads.filter(status="COLD").count()
 
-    # visits
-    from datetime import date
+    # ===== VISITS =====
     visits = SiteVisit.objects.filter(agent=agent)
     today_visits = visits.filter(date=date.today()).count()
 
-    # tasks
+    # ===== TASKS =====
     tasks = Task.objects.filter(
         lead__assigned_to=agent,
         status="PENDING"
     )
 
+    # ===== TODAY FOLLOWUPS =====
     today_followups = FollowUp.objects.filter(
-    agent__user=request.user,
-    date=date.today(),
-    status="PENDING"
-)
+        agent=agent,
+        date=date.today(),
+        status="PENDING"
+    )
 
-    # deals
+    # ===== DEALS =====
     deals = Deal.objects.filter(agent=agent)
     total_deals = deals.count()
 
-    return render(request, "agent/agent_dashboard.html", {
+    # ===== CONTEXT =====
+    context = {
         "leads": leads[:5],
         "total_leads": total_leads,
         "hot": hot,
         "warm": warm,
         "cold": cold,
+
         "visits": visits[:5],
         "today_visits": today_visits,
+
         "tasks": tasks[:5],
-        "today_followups":today_followups,
+        "today_followups": today_followups,
+
         "total_deals": total_deals,
-    })
+    }
+
+    return render(request, "agent/agent_dashboard.html", context)
 
 
 @login_required
