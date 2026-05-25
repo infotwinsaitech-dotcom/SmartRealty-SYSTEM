@@ -5,145 +5,137 @@
 <div class="p-4 md:p-8 max-w-[1600px] mx-auto">
 
 <!-- HEADER -->
-<div class="flex justify-between mb-8">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 md:mb-10">
     <div>
-        <h2 class="text-2xl font-bold">Dashboard Overview</h2>
-        <p class="text-gray-500 text-sm">Your CRM performance today</p>
+        <h2 class="text-2xl md:text-3xl font-extrabold text-on-surface tracking-tight leading-tight">Dashboard Overview</h2>
+        <p class="text-on-surface-variant text-xs md:text-sm mt-1">Welcome back, here is what's happening with your agency today.</p>
     </div>
 </div>
 
 <!-- STATS -->
-<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8 md:mb-10">
 
-    <div class="bg-white p-5 rounded-xl shadow">
-        <p class="text-gray-500 text-sm">Total Leads</p>
-        <h2 class="text-xl font-bold">{{ total_leads }}</h2>
-        <p class="text-green-600 text-xs">{{ lead_growth|floatformat:0 }}%</p>
+    <div class="bg-surface-container-lowest p-5 rounded-xl shadow-sm">
+        <h3>Total Leads</h3>
+        <h2>{{ total_leads }}</h2>
     </div>
 
-    <div class="bg-white p-5 rounded-xl shadow">
-        <p class="text-gray-500 text-sm">Active Deals</p>
-        <h2 class="text-xl font-bold">{{ active_deals }}</h2>
-        <p class="text-green-600 text-xs">{{ deal_growth|floatformat:0 }}%</p>
+    <div class="bg-surface-container-lowest p-5 rounded-xl shadow-sm">
+        <h3>Active Deals</h3>
+        <h2>{{ active_deals }}</h2>
     </div>
 
-    <div class="bg-white p-5 rounded-xl shadow">
-        <p class="text-gray-500 text-sm">Revenue</p>
-        <h2 class="text-xl font-bold">₹{{ total_revenue|floatformat:0 }}</h2>
-        <p class="text-green-600 text-xs">{{ revenue_growth|floatformat:0 }}%</p>
+    <div class="bg-surface-container-lowest p-5 rounded-xl shadow-sm">
+        <h3>Total Revenue</h3>
+        <h2>₹{{ total_revenue }}</h2>
     </div>
 
-    <div class="bg-white p-5 rounded-xl shadow">
-        <p class="text-gray-500 text-sm">Conversion</p>
-        <h2 class="text-xl font-bold">{{ conversion_rate|floatformat:1 }}%</h2>
+    <div class="bg-surface-container-lowest p-5 rounded-xl shadow-sm">
+        <h3>Conversion</h3>
+        <h2>{{ conversion_rate }}%</h2>
     </div>
 
+</div>
+
+<!-- ✅ DEALS (ONLY ONE LOOP NOW) -->
+<div class="bg-white p-5 rounded-xl shadow mb-8">
+<h3 class="text-lg font-bold mb-4">Recent Deals</h3>
+
+{% for deal in deals %}
+<div class="border-b py-3 flex justify-between">
+
+    <div>
+        <h4 class="font-semibold">{{ deal.property.title }}</h4>
+        <p class="text-xs text-gray-500">Client: {{ deal.client_name }}</p>
+    </div>
+
+    <div class="text-right">
+        <p class="text-blue-600 font-bold">₹{{ deal.amount }}</p>
+
+        <span class="px-3 py-1 text-xs rounded text-white
+            {% if deal.status == 'NEW' %} bg-gray-500
+            {% elif deal.status == 'NEGOTIATION' %} bg-yellow-500
+            {% elif deal.status == 'BOOKED' %} bg-blue-500
+            {% elif deal.status == 'CLOSED' %} bg-green-600
+            {% else %} bg-red-500
+            {% endif %}
+        ">
+            {{ deal.status }}
+        </span>
+    </div>
+
+</div>
+{% empty %}
+<p>No deals yet</p>
+{% endfor %}
+</div>
+
+<!-- ✅ GROUPED FOLLOWUPS -->
+<div class="bg-white p-5 rounded-xl shadow mb-8">
+<h3 class="font-bold mb-4">Today's Follow-ups (All Agents)</h3>
+
+{% for agent, followups in grouped_followups.items %}
+<div class="mb-4">
+
+    <h4 class="font-semibold text-blue-600 mb-2">{{ agent }}</h4>
+
+    {% for f in followups %}
+    <div class="bg-white p-3 rounded shadow mb-2">
+        <p>{{ f.lead.name }}</p>
+        <p class="text-sm text-gray-500">
+            {{ f.date }} {{ f.time }}
+        </p>
+    </div>
+    {% endfor %}
+
+</div>
+{% empty %}
+<p>No followups today</p>
+{% endfor %}
 </div>
 
 <!-- MISSED LEADS -->
 {% if missed_leads %}
-<div class="bg-red-100 text-red-700 p-3 rounded mb-6">
+<div class="bg-red-100 text-red-700 p-3 rounded mb-4">
     ⚠️ {{ missed_leads.count }} leads not contacted
 </div>
 {% endif %}
 
-<!-- TODAY FOLLOWUPS (GROUPED) -->
-<div class="bg-white p-5 rounded-xl shadow mb-8">
-    <h3 class="font-bold mb-4">Today's Follow-ups (All Agents)</h3>
-
-    {% for agent, followups in grouped_followups.items %}
-    <div class="mb-4">
-        <h4 class="font-semibold text-blue-600 mb-2">{{ agent }}</h4>
-
-        {% for f in followups %}
-        <div class="p-3 bg-gray-50 rounded mb-2">
-            <p>{{ f.lead.name }}</p>
-            <p class="text-xs text-gray-500">{{ f.date }} {{ f.time }}</p>
-        </div>
-        {% endfor %}
-    </div>
-    {% empty %}
-    <p class="text-gray-400">No followups today</p>
-    {% endfor %}
-</div>
-
-<!-- DEALS -->
-<div class="bg-white p-5 rounded-xl shadow mb-8">
-    <h3 class="font-bold mb-4">Recent Deals</h3>
-
-    {% for deal in deals %}
-    <div class="border-b py-3 flex justify-between">
-
-        <div>
-            <p class="font-semibold">{{ deal.property.title }}</p>
-            <p class="text-xs text-gray-500">Client: {{ deal.client_name }}</p>
-        </div>
-
-        <div class="text-right">
-            <p class="text-blue-600 font-bold">₹{{ deal.amount }}</p>
-
-            <span class="text-xs px-2 py-1 rounded text-white
-                {% if deal.status == 'NEW' %} bg-gray-500
-                {% elif deal.status == 'NEGOTIATION' %} bg-yellow-500
-                {% elif deal.status == 'BOOKED' %} bg-blue-500
-                {% elif deal.status == 'CLOSED' %} bg-green-600
-                {% else %} bg-red-500
-                {% endif %}
-            ">
-                {{ deal.status }}
-            </span>
-        </div>
-
-    </div>
-    {% empty %}
-    <p class="text-gray-400 text-sm text-center py-4">No deals yet</p>
-    {% endfor %}
-</div>
-
 <!-- CHART -->
 <div class="bg-white p-5 rounded-xl shadow mb-8">
-    <h3 class="font-bold mb-4">Revenue Chart</h3>
-    <canvas id="salesChart"></canvas>
+    <canvas id="salesChart" height="100"></canvas>
 </div>
 
 <!-- ACTIVITY -->
 <div class="bg-white p-5 rounded-xl shadow mb-8">
-    <h3 class="font-bold mb-4">Recent Activity</h3>
+<h3 class="font-bold mb-4">Recent Activity</h3>
 
-    {% for activity in activities %}
-    <div class="flex justify-between border-b py-2">
-        <p class="text-sm">{{ activity.message }}</p>
-        <span class="text-xs text-gray-400">{{ activity.created_at|timesince }} ago</span>
-    </div>
-    {% empty %}
-    <p class="text-gray-400 text-sm">No activity</p>
-    {% endfor %}
+{% for activity in activities %}
+<p>{{ activity.message }} - {{ activity.created_at|timesince }} ago</p>
+{% empty %}
+<p>No activity</p>
+{% endfor %}
 </div>
 
 <!-- TASKS -->
-<div class="bg-white p-5 rounded-xl shadow">
-    <h3 class="font-bold mb-4">Tasks</h3>
+<div class="bg-white p-5 rounded-xl shadow mb-8">
+<h3 class="font-bold mb-4">Tasks</h3>
 
-    {% for task in tasks %}
-    <div class="flex gap-3 mb-2">
-        <input type="checkbox" {% if task.status == "DONE" %}checked{% endif %}>
-        <div>
-            <p class="text-sm font-semibold">{{ task.title }}</p>
-            <p class="text-xs text-gray-500">{{ task.date }} {{ task.time }}</p>
-        </div>
-    </div>
-    {% empty %}
-    <p class="text-gray-400 text-sm">No tasks</p>
-    {% endfor %}
+{% for task in tasks %}
+<p>{{ task.title }} - {{ task.date }}</p>
+{% empty %}
+<p>No tasks</p>
+{% endfor %}
 </div>
 
 </div>
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-    const ctx = document.getElementById('salesChart');
+    const ctx = document.getElementById('salesChart').getContext('2d');
 
     new Chart(ctx, {
         type: 'line',
@@ -154,8 +146,13 @@ document.addEventListener("DOMContentLoaded", function() {
                 data: {{ chart_data|safe }},
                 borderColor: '#6366F1',
                 backgroundColor: 'rgba(99,102,241,0.2)',
-                fill: true
+                fill: true,
+                tension: 0.4
             }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
         }
     });
 });
