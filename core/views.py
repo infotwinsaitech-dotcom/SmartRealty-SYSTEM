@@ -28,6 +28,7 @@ from sendgrid.helpers.mail import Mail
 import random
 import os
 from decimal import Decimal
+from collections import defaultdict
 def home(request):
     properties = Property.objects.all()[:6]
 
@@ -600,6 +601,20 @@ def builder_dashboard(request):
         builder=request.user,
         status="CLOSED"
     ).count()
+    grouped_followups = defaultdict(list)
+
+    for f in today_followups:
+         grouped_followups[f.agent.name].append(f)
+    today_followups = FollowUp.objects.filter(
+    agent__builder=request.user,   # 🔥 key line
+    date=date.today(),
+    status="PENDING"
+)
+    missed_leads = Lead.objects.filter(
+    builder=request.user,
+    created_at__lt=now() - timedelta(hours=24),
+    status="NEW"
+)
 
     # ===== CONVERSION RATE =====
     conversion_rate = 0
@@ -694,6 +709,8 @@ def builder_dashboard(request):
 
         "chart_labels": json.dumps(chart_labels),
         "chart_data": json.dumps(chart_data),
+        "grouped_followups": dict(grouped_followups),
+        "missed_leads": missed_leads,
 
         "deals": deals,
     }
@@ -717,6 +734,12 @@ def add_lead(request):
         builder=request.user,
         notes=request.POST.get("message")
     )
+    # 🔥 activity log
+    LeadActivity.objects.create(
+        lead=lead,
+        message="Lead created"
+)
+
 
     property_id = request.POST.get("property_id")
     if property_id:
@@ -925,14 +948,26 @@ def update_lead_status(request):
 
         try:
             lead = Lead.objects.get(id=lead_id)
+
             lead.status = status
             lead.save()
+            LeadActivity.objects.create(
+                lead=lead,
+                message=f"{request.user.username} changed status to {lead.status}"
+            )
+
+            # 🔥 ADD THIS (IMPORTANT)
+            LeadActivity.objects.create(
+                lead=lead,
+                message=f"Status changed to {lead.status}"
+            )
+
             return JsonResponse({"success": True})
+
         except Lead.DoesNotExist:
             return JsonResponse({"success": False})
 
     return JsonResponse({"error": "Invalid request"})
-
 def lead_detail_api(request, id):
     lead = Lead.objects.get(id=id)
 
@@ -1611,6 +1646,12 @@ def agent_dashboard(request):
         status="PENDING"
     )
 
+    today_followups = FollowUp.objects.filter(
+    agent__user=request.user,
+    date=date.today(),
+    status="PENDING"
+)
+
     # deals
     deals = Deal.objects.filter(agent=agent)
     total_deals = deals.count()
@@ -1624,6 +1665,7 @@ def agent_dashboard(request):
         "visits": visits[:5],
         "today_visits": today_visits,
         "tasks": tasks[:5],
+        "today_followups":today_followups,
         "total_deals": total_deals,
     })
 

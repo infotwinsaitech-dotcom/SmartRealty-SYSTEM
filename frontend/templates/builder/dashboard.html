@@ -164,8 +164,46 @@
     {% empty %}
     <p class="text-gray-400 text-sm text-center py-4">No deals yet</p>
     {% endfor %}
+<h3 class="font-bold mb-4">Today's Follow-ups (All Agents)</h3>
+
+{% for agent, followups in grouped_followups.items %}
+<div class="mb-4">
+
+    <h4 class="font-semibold text-blue-600 mb-2">
+        {{ agent }}
+    </h4>
+
+    {% for f in followups %}
+    <div class="bg-white p-3 rounded shadow mb-2">
+        <p>{{ f.lead.name }}</p>
+        <p class="text-sm text-gray-500">
+            {{ f.date }} {{ f.time }}
+        </p>
+    </div>
+    {% endfor %}
 
 </div>
+{% empty %}
+<p>No followups today</p>
+{% endfor %}
+</div>
+{% if missed_leads %}
+<div class="bg-red-100 text-red-700 p-3 rounded mb-4">
+    ⚠️ {{ missed_leads.count }} leads not contacted
+</div>
+{% endif %}
+<h3 class="font-bold mb-3">Today's Follow-ups</h3>
+
+{% for f in today_followups %}
+<div class="bg-white p-3 rounded shadow mb-2">
+    <p class="font-semibold">{{ f.lead.name }}</p>
+    <p class="text-sm text-gray-500">
+        {{ f.date }} {{ f.time }}
+    </p>
+</div>
+{% empty %}
+<p>No follow-ups today</p>
+{% endfor %}
         <div class="grid grid-cols-12 gap-4 md:gap-6 mb-8 md:mb-10">
             
             <div class="col-span-12 lg:col-span-8 bg-surface-container-lowest p-5 md:p-8 rounded-2xl border border-outline-variant/10 shadow-sm">
