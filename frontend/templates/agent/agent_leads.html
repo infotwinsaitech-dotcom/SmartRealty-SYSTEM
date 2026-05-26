@@ -142,7 +142,7 @@
                 {% csrf_token %}
 
                 <input type="hidden" name="property_id" value="{{ lead.properties.first.id }}">
-
+<input type="hidden" name="lead_id" value="{{ lead.id }}">
                 <input name="client_name" placeholder="Client Name"
                 class="border p-2 rounded w-full mb-2 text-sm">
 
@@ -164,8 +164,8 @@
                 </form>
 
                 <!-- UPDATE DEAL -->
-                {% if lead.deal_set.all %}
-                {% for deal in lead.deal_set.all %}
+                {% if lead.deals.all %}
+                {% for deal in lead.deals.all %}
                 <form method="POST" action="{% url 'update_deal' deal.id %}" class="mt-2">
                 {% csrf_token %}
 
@@ -209,7 +209,7 @@
 
                 <div class="flex gap-2 items-center">
 
-                    {% for deal in lead.deal_set.all %}
+                    {% for deal in lead.deals.all %}
                     <span class="px-2 py-1 text-xs rounded
                         {% if deal.status == 'CLOSED' %} bg-green-500 text-white
                         {% elif deal.status == 'FAILED' %} bg-red-500 text-white

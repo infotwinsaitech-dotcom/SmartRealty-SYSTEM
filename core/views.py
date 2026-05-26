@@ -1728,14 +1728,10 @@ def agent_leads(request):
         leads = leads.order_by('-created_at')
 
     # ✅ ACTIVE leads
-    active_leads = leads.exclude(
-        deals__status__in=["CLOSED", "FAILED"]
-    ).distinct()
+    active_leads = leads.exclude(deals__status__in=["CLOSED", "FAILED"]).distinct()
 
     # ✅ SUCCESS leads
-    success_leads = leads.filter(
-        deals__status__in=["CLOSED", "FAILED"]
-    ).distinct()
+    success_leads = leads.filter(deals__status__in=["CLOSED", "FAILED"]).distinct()
 
     return render(request, "agent/agent_leads.html", {
         "leads": active_leads,
@@ -1973,11 +1969,17 @@ from decimal import Decimal
 def add_deal(request):
     if request.method == "POST":
         property_id = request.POST.get('property_id')
+        lead_id = request.POST.get('lead_id')   # 🔥 IMPORTANT ADD
         client_name = request.POST.get('client_name') or "Unknown"
         amount = request.POST.get('amount')
         status = request.POST.get('status')
 
         property_obj = get_object_or_404(Property, id=property_id)
+
+        # 🔥 GET LEAD (IMPORTANT)
+        lead = None
+        if lead_id:
+            lead = get_object_or_404(Lead, id=lead_id)
 
         # amount fix
         if amount:
@@ -1986,15 +1988,17 @@ def add_deal(request):
         else:
             amount = Decimal(0)
 
-        # ✅ GET AGENT INSTANCE SAFE WAY
+        # agent
         agent = get_object_or_404(Agent, user=request.user)
 
+        # ✅ CREATE DEAL (FINAL FIX)
         Deal.objects.create(
+            lead=lead,   # 🔥 MOST IMPORTANT LINE
             property=property_obj,
             client_name=client_name,
             amount=amount,
             status=status,
-            agent=agent,  # ✅ FIXED
+            agent=agent,
             builder=property_obj.builder
         )
 

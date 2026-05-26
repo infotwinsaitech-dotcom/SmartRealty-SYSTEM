@@ -234,18 +234,27 @@ class Deal(models.Model):
         ('FAILED', 'Failed'),
     ]
 
+    # 🔥 Lead connection (IMPORTANT)
     lead = models.ForeignKey(
-    Lead,
-    on_delete=models.CASCADE,
-    related_name="deals",
-    null=True,
-    blank=True
-)
+        'Lead',
+        on_delete=models.CASCADE,
+        related_name="deals",
+        null=True,
+        blank=True
+    )
 
-    property = models.ForeignKey(Property, on_delete=models.CASCADE)
+    # Property linked
+    property = models.ForeignKey(
+        'Property',
+        on_delete=models.CASCADE
+    )
+
     client_name = models.CharField(max_length=100)
 
-    amount = models.DecimalField(max_digits=12, decimal_places=2)
+    amount = models.DecimalField(
+        max_digits=12,
+        decimal_places=2
+    )
 
     status = models.CharField(
         max_length=20,
@@ -253,16 +262,24 @@ class Deal(models.Model):
         default='NEW'
     )
 
-    agent = models.ForeignKey(Agent, on_delete=models.CASCADE)
+    # Agent (who closed deal)
+    agent = models.ForeignKey(
+        'Agent',
+        on_delete=models.CASCADE
+    )
 
+    # Builder (for builder panel visibility)
     builder = models.ForeignKey(
-        User,
+        'auth.User',
         on_delete=models.CASCADE,
         null=True,
         blank=True
     )
 
     created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.client_name} - {self.status}"
 class Task(models.Model):
     lead = models.ForeignKey(Lead, on_delete=models.CASCADE, null=True, blank=True)
     title = models.CharField(max_length=200)
