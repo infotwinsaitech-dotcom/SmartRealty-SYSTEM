@@ -1,0 +1,41 @@
+{% extends "agent/base.html" %}
+{% block content %}
+
+<div class="max-w-lg mx-auto bg-white p-6 rounded-xl shadow">
+
+    <h2 class="text-xl font-bold mb-4">
+        Add Follow-up for {{ lead.name }}
+    </h2>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <div class="mb-3">
+            <label class="text-sm">Date</label>
+            <input type="date" name="date"
+                   class="w-full border px-3 py-2 rounded" required>
+        </div>
+
+        <div class="mb-3">
+            <label class="text-sm">Time</label>
+            <input type="time" name="time"
+                   class="w-full border px-3 py-2 rounded" required>
+        </div>
+
+        <div class="mb-3">
+            <label class="text-sm">Note</label>
+            <textarea name="note"
+                      class="w-full border px-3 py-2 rounded"
+                      placeholder="Call, meeting, etc..."></textarea>
+        </div>
+
+        <button type="submit"
+                class="bg-blue-600 text-white px-4 py-2 rounded w-full">
+            Save Follow-up
+        </button>
+
+    </form>
+
+</div>
+
+{% endblock %}
