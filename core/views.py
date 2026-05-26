@@ -561,8 +561,8 @@ def lead_management(request):
 @login_required
 def builder_dashboard(request):
 
-    # 🔐 STRONG SECURITY (FINAL CLEAN FIX)
-    if not hasattr(request.user, 'builder_profile'):
+    # 🔐 SECURITY (FINAL FIX)
+    if request.user.role != "builder":
         return redirect("login")
 
     agent = getattr(request.user, 'agent', None)
