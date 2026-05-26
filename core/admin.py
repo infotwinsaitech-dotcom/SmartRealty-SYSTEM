@@ -1,5 +1,6 @@
 from django.contrib import admin
 from .models import Property, PropertyImage,Inquiry,SiteSettings,User,Profile,Lead, Deal, Task, Activity,admin,Document,Notification,AIInsight,LeadScore,Campaign
+from .models import FollowUp
 
 class PropertyImageInline(admin.TabularInline):
     model = PropertyImage
@@ -34,3 +35,5 @@ from .models import Campaign
 @admin.register(Campaign)
 class CampaignAdmin(admin.ModelAdmin):
     list_display = ['name', 'type', 'status', 'sent']
+
+admin.site.register(FollowUp)
