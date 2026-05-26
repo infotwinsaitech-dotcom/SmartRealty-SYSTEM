@@ -44,7 +44,7 @@
 {% empty %}
 <p>No follow-ups today</p>
 {% endfor %}
-<a href="{% url 'add_followup' %}" 
+<a href="{% url 'add_followup' lead.id %}">
    class="bg-blue-600 text-white px-3 py-1 rounded text-xs">
    + Add Follow-up
 </a>
