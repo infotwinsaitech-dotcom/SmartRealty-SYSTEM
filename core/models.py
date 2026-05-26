@@ -234,6 +234,14 @@ class Deal(models.Model):
         ('FAILED', 'Failed'),
     ]
 
+    lead = models.ForeignKey(
+    Lead,
+    on_delete=models.CASCADE,
+    related_name="deals",
+    null=True,
+    blank=True
+)
+
     property = models.ForeignKey(Property, on_delete=models.CASCADE)
     client_name = models.CharField(max_length=100)
 
@@ -247,7 +255,6 @@ class Deal(models.Model):
 
     agent = models.ForeignKey(Agent, on_delete=models.CASCADE)
 
-    # 🔥 IMPORTANT (builder visibility)
     builder = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -256,7 +263,6 @@ class Deal(models.Model):
     )
 
     created_at = models.DateTimeField(auto_now_add=True)
-
 class Task(models.Model):
     lead = models.ForeignKey(Lead, on_delete=models.CASCADE, null=True, blank=True)
     title = models.CharField(max_length=200)
