@@ -561,9 +561,11 @@ def lead_management(request):
 @login_required
 def builder_dashboard(request):
 
-    # 🔐 ROLE SECURITY (VERY IMPORTANT FIX)
-    if request.user.role != "builder":
+    # 🔐 STRONG SECURITY (FINAL CLEAN FIX)
+    if not hasattr(request.user, 'builder_profile'):
         return redirect("login")
+
+    agent = getattr(request.user, 'agent', None)
 
     # ===== TODAY FOLLOWUPS =====
     today_followups = FollowUp.objects.filter(
@@ -1690,9 +1692,9 @@ def agent_dashboard(request):
 
 @login_required
 def agent_leads(request):
-
-    # 🔐 SECURITY FIX
-    if request.user.role != "agent":
+   
+    # 🔐 SECURITY (FINAL CLEAN FIX)
+    if not hasattr(request.user, 'agent_profile'):
         return redirect("login")
 
     agent = request.user.agent_profile
@@ -1720,17 +1722,16 @@ def agent_leads(request):
     else:
         leads = leads.order_by('-created_at')
 
-    # ✅ ACTIVE leads (jinme CLOSED/FAILED deal nahi hai)
+    # ✅ ACTIVE
     active_leads = leads.exclude(deals__status__in=["CLOSED", "FAILED"]).distinct()
 
-    # ✅ SUCCESS leads (jinme CLOSED/FAILED deal hai)
+    # ✅ SUCCESS
     success_leads = leads.filter(deals__status__in=["CLOSED", "FAILED"]).distinct()
 
     return render(request, "agent/agent_leads.html", {
         "leads": active_leads,
         "success_leads": success_leads,
     })
-
 def delete_lead(request, lead_id):
     lead = get_object_or_404(Lead, id=lead_id, agent=request.user)
     lead.delete()
