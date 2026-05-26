@@ -3,218 +3,221 @@
 
 <div class="p-4 md:p-6 bg-gray-50 min-h-screen">
 
-    <!-- HEADER -->
-    <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6">
+<div class="max-w-7xl mx-auto">
 
-        <h1 class="text-2xl md:text-3xl font-bold text-gray-800">My Leads</h1>
+    <!-- HEADER -->
+    <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6">
 
-        <form method="GET"
-              class="flex flex-col md:flex-row gap-2 w-full md:w-auto bg-white p-3 rounded-xl shadow">
+        <h1 class="text-2xl md:text-3xl font-bold text-gray-800">My Leads</h1>
 
-            <input type="text" name="q" value="{{ request.GET.q }}"
-                placeholder="Search name / phone..."
-                class="border px-3 py-2 rounded w-full md:w-64 text-sm focus:ring-2 focus:ring-blue-400">
+        <form method="GET"
+              class="flex flex-col md:flex-row gap-2 w-full md:w-auto bg-white p-3 rounded-xl shadow">
 
-            <select name="status" class="border px-2 py-2 rounded text-sm w-full md:w-auto">
-                <option value="">All</option>
-                <option value="HOT">HOT</option>
-                <option value="WARM">WARM</option>
-                <option value="COLD">COLD</option>
-            </select>
+            <input type="text" name="q" value="{{ request.GET.q }}"
+                placeholder="Search name / phone..."
+                class="border px-3 py-2 rounded w-full md:w-64 text-sm focus:ring-2 focus:ring-blue-400">
 
-            <select name="sort" class="border px-2 py-2 rounded text-sm w-full md:w-auto">
-                <option value="new">Newest</option>
-                <option value="old">Oldest</option>
-            </select>
+            <select name="status" class="border px-2 py-2 rounded text-sm w-full md:w-auto">
+                <option value="">All</option>
+                <option value="HOT">HOT</option>
+                <option value="WARM">WARM</option>
+                <option value="COLD">COLD</option>
+            </select>
 
-            <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm transition w-full md:w-auto">
-                Search
-            </button>
+            <select name="sort" class="border px-2 py-2 rounded text-sm w-full md:w-auto">
+                <option value="new">Newest</option>
+                <option value="old">Oldest</option>
+            </select>
 
-        </form>
-    </div>
+            <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm transition w-full md:w-auto">
+                Search
+            </button>
 
-    <!-- STATS -->
-    <div class="grid grid-cols-3 gap-3 mb-6 text-center text-sm">
+        </form>
+    </div>
 
-        <div class="bg-gradient-to-r from-red-500 to-red-600 text-white p-4 rounded-xl shadow">
-            HOT
-        </div>
+    <!-- STATS (FIXED) -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 text-center text-sm max-w-5xl mx-auto">
 
-        <div class="bg-gradient-to-r from-yellow-400 to-yellow-500 text-white p-4 rounded-xl shadow">
-            WARM
-        </div>
+        <div class="bg-gradient-to-r from-red-500 to-red-600 text-white p-4 rounded-xl shadow flex items-center justify-center font-semibold">
+            HOT
+        </div>
 
-        <div class="bg-gradient-to-r from-gray-500 to-gray-600 text-white p-4 rounded-xl shadow">
-            COLD
-        </div>
+        <div class="bg-gradient-to-r from-yellow-400 to-yellow-500 text-white p-4 rounded-xl shadow flex items-center justify-center font-semibold">
+            WARM
+        </div>
 
-    </div>
+        <div class="bg-gradient-to-r from-gray-500 to-gray-600 text-white p-4 rounded-xl shadow flex items-center justify-center font-semibold">
+            COLD
+        </div>
 
-    <!-- LEADS LIST -->
-    <div class="space-y-5">
+    </div>
 
-        {% for lead in leads %}
-        <div class="bg-white shadow-lg hover:shadow-xl transition rounded-2xl p-5 flex flex-col lg:flex-row lg:justify-between gap-5 border">
+    <!-- LEADS LIST -->
+    <div class="space-y-5">
 
-            <!-- LEFT -->
-            <div class="flex-1 min-w-0">
-                <h2 class="text-lg md:text-xl font-bold text-gray-800 break-words">{{ lead.name }}</h2>
-                <p class="text-sm text-gray-500 break-words">{{ lead.email }}</p>
-                <p class="text-sm font-medium text-gray-700">{{ lead.phone }}</p>
+        {% for lead in leads %}
+        <div class="bg-white shadow-lg hover:shadow-xl transition rounded-2xl p-5 flex flex-col lg:flex-row lg:justify-between gap-5 border">
 
-                {% if lead.last_contacted %}
-                <p class="text-xs text-gray-400 mt-1">
-                    Last: {{ lead.last_contacted }}
-                </p>
-                {% endif %}
+            <!-- LEFT -->
+            <div class="flex-1 min-w-0">
+                <h2 class="text-lg md:text-xl font-bold text-gray-800 break-words">{{ lead.name }}</h2>
+                <p class="text-sm text-gray-500 break-words">{{ lead.email }}</p>
+                <p class="text-sm font-medium text-gray-700">{{ lead.phone }}</p>
 
-                {% if lead.properties.all %}
-                <p class="text-xs text-gray-400 mt-2">
-                    Interested in:
-                    {% for p in lead.properties.all %}
-                        <span class="inline-block bg-gray-200 px-2 py-1 rounded mt-1 mr-1">
-                            {{ p.title }}
-                        </span>
-                    {% endfor %}
-                </p>
-                {% endif %}
-            </div>
+                {% if lead.last_contacted %}
+                <p class="text-xs text-gray-400 mt-1">
+                    Last: {{ lead.last_contacted }}
+                </p>
+                {% endif %}
 
-            <!-- RIGHT -->
-            <div class="w-full lg:w-96 flex-shrink-0">
+                {% if lead.properties.all %}
+                <p class="text-xs text-gray-400 mt-2">
+                    Interested in:
+                    {% for p in lead.properties.all %}
+                        <span class="inline-block bg-gray-200 px-2 py-1 rounded mt-1 mr-1">
+                            {{ p.title }}
+                        </span>
+                    {% endfor %}
+                </p>
+                {% endif %}
+            </div>
 
-                <!-- STATUS -->
-                <span class="inline-block px-3 py-1 text-xs rounded-full text-white mb-2
-                    {% if lead.status == 'HOT' %} bg-red-500
-                    {% elif lead.status == 'WARM' %} bg-yellow-500
-                    {% else %} bg-gray-500 {% endif %}">
-                    {{ lead.status }}
-                </span>
+            <!-- RIGHT -->
+            <div class="w-full lg:w-96 flex-shrink-0">
 
-                <!-- NOTES -->
-                <div class="mt-2 bg-gray-50 p-3 rounded-lg">
+                <!-- STATUS -->
+                <span class="inline-block px-3 py-1 text-xs rounded-full text-white mb-2
+                    {% if lead.status == 'HOT' %} bg-red-500
+                    {% elif lead.status == 'WARM' %} bg-yellow-500
+                    {% else %} bg-gray-500 {% endif %}">
+                    {{ lead.status }}
+                </span>
 
-                    <div id="notes-{{ lead.id }}" class="text-xs text-gray-600 mb-2 space-y-1 max-h-32 overflow-y-auto">
-                        {% for n in lead.leadnote_set.all %}
-                            <p>• {{ n.note }}</p>
-                        {% endfor %}
-                    </div>
+                <!-- NOTES -->
+                <div class="mt-2 bg-gray-50 p-3 rounded-lg">
 
-                    <div class="flex gap-2">
-                        <input type="text"
-                               id="note-input-{{ lead.id }}"
-                               placeholder="Add note..."
-                               class="border p-2 rounded text-xs w-full focus:ring-2 focus:ring-blue-400">
+                    <div id="notes-{{ lead.id }}" class="text-xs text-gray-600 mb-2 space-y-1 max-h-32 overflow-y-auto">
+                        {% for n in lead.leadnote_set.all %}
+                            <p>• {{ n.note }}</p>
+                        {% endfor %}
+                    </div>
 
-                        <button onclick="addNote({{ lead.id }})"
-                                class="bg-blue-500 hover:bg-blue-600 text-white px-3 rounded text-xs transition">
-                            Add
-                        </button>
-                    </div>
+                    <div class="flex gap-2">
+                        <input type="text"
+                               id="note-input-{{ lead.id }}"
+                               placeholder="Add note..."
+                               class="border p-2 rounded text-xs w-full focus:ring-2 focus:ring-blue-400">
 
-                </div>
+                        <button onclick="addNote({{ lead.id }})"
+                                class="bg-blue-500 hover:bg-blue-600 text-white px-3 rounded text-xs transition">
+                            Add
+                        </button>
+                    </div>
 
-                <!-- ACTIONS -->
-                <div class="mt-3 flex flex-wrap gap-2">
+                </div>
 
-                    <a href="tel:{{ lead.phone }}"
-                       class="bg-blue-100 hover:bg-blue-200 text-blue-700 px-3 py-1 rounded text-xs transition">
-                        Call
-                    </a>
+                <!-- ACTIONS -->
+                <div class="mt-3 flex flex-wrap gap-2">
 
-                    <a href="https://wa.me/{{ lead.phone }}"
-                       class="bg-green-100 hover:bg-green-200 text-green-700 px-3 py-1 rounded text-xs transition">
-                        WhatsApp
-                    </a>
+                    <a href="tel:{{ lead.phone }}"
+                       class="bg-blue-100 hover:bg-blue-200 text-blue-700 px-3 py-1 rounded text-xs transition">
+                        Call
+                    </a>
 
-                    <a href="#"
-                       class="bg-purple-100 hover:bg-purple-200 text-purple-700 px-3 py-1 rounded text-xs transition">
-                        Update
-                    </a>
+                    <a href="https://wa.me/{{ lead.phone }}"
+                       class="bg-green-100 hover:bg-green-200 text-green-700 px-3 py-1 rounded text-xs transition">
+                        WhatsApp
+                    </a>
 
-                </div>
+                    <a href="#"
+                       class="bg-purple-100 hover:bg-purple-200 text-purple-700 px-3 py-1 rounded text-xs transition">
+                        Update
+                    </a>
 
-                <!-- DEAL FORM -->
-                <form method="POST" action="{% url 'add_deal' %}" class="mt-3 bg-gray-50 p-3 rounded-lg">
-                {% csrf_token %}
+                </div>
 
-                <input type="hidden" name="property_id" value="{{ lead.properties.first.id }}">
+                <!-- DEAL FORM -->
+                <form method="POST" action="{% url 'add_deal' %}" class="mt-3 bg-gray-50 p-3 rounded-lg">
+                {% csrf_token %}
 
-                <input name="client_name" placeholder="Client Name"
-                class="border p-2 rounded w-full mb-2 text-sm">
+                <input type="hidden" name="property_id" value="{{ lead.properties.first.id }}">
 
-                <input name="amount" placeholder="Amount"
-                class="border p-2 rounded w-full mb-2 text-sm">
+                <input name="client_name" placeholder="Client Name"
+                class="border p-2 rounded w-full mb-2 text-sm">
 
-                <select name="status" class="border p-2 rounded w-full mb-2 text-sm">
-                    <option value="NEW">New</option>
-                    <option value="NEGOTIATION">Negotiation</option>
-                    <option value="BOOKED">Booked</option>
-                    <option value="CLOSED">Closed</option>
-                    <option value="FAILED">Failed</option>
-                </select>
+                <input name="amount" placeholder="Amount"
+                class="border p-2 rounded w-full mb-2 text-sm">
 
-                <button class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded w-full text-sm transition">
-                    Save Deal
-                </button>
+                <select name="status" class="border p-2 rounded w-full mb-2 text-sm">
+                    <option value="NEW">New</option>
+                    <option value="NEGOTIATION">Negotiation</option>
+                    <option value="BOOKED">Booked</option>
+                    <option value="CLOSED">Closed</option>
+                    <option value="FAILED">Failed</option>
+                </select>
 
-                </form>
+                <button class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded w-full text-sm transition">
+                    Save Deal
+                </button>
 
-                <!-- UPDATE DEAL -->
-                {% if lead.deal_set.all %}
-                {% for deal in lead.deal_set.all %}
-                <form method="POST" action="{% url 'update_deal' deal.id %}" class="mt-2">
-                {% csrf_token %}
+                </form>
 
-                <select name="status" onchange="this.form.submit()" class="border p-2 rounded w-full text-sm">
-                    <option value="NEW" {% if deal.status == "NEW" %}selected{% endif %}>New</option>
-                    <option value="NEGOTIATION" {% if deal.status == "NEGOTIATION" %}selected{% endif %}>Negotiation</option>
-                    <option value="BOOKED" {% if deal.status == "BOOKED" %}selected{% endif %}>Booked</option>
-                    <option value="CLOSED" {% if deal.status == "CLOSED" %}selected{% endif %}>Closed</option>
-                    <option value="FAILED" {% if deal.status == "FAILED" %}selected{% endif %}>Failed</option>
-                </select>
+                <!-- UPDATE DEAL -->
+                {% if lead.deal_set.all %}
+                {% for deal in lead.deal_set.all %}
+                <form method="POST" action="{% url 'update_deal' deal.id %}" class="mt-2">
+                {% csrf_token %}
 
-                </form>
-                {% endfor %}
-                {% endif %}
+                <select name="status" onchange="this.form.submit()" class="border p-2 rounded w-full text-sm">
+                    <option value="NEW" {% if deal.status == "NEW" %}selected{% endif %}>New</option>
+                    <option value="NEGOTIATION" {% if deal.status == "NEGOTIATION" %}selected{% endif %}>Negotiation</option>
+                    <option value="BOOKED" {% if deal.status == "BOOKED" %}selected{% endif %}>Booked</option>
+                    <option value="CLOSED" {% if deal.status == "CLOSED" %}selected{% endif %}>Closed</option>
+                    <option value="FAILED" {% if deal.status == "FAILED" %}selected{% endif %}>Failed</option>
+                </select>
 
-            </div>
+                </form>
+                {% endfor %}
+                {% endif %}
 
-        </div>
-        {% empty %}
-        <p class="text-gray-500 text-center">No leads found</p>
-        {% endfor %}
+            </div>
 
-    </div>
+        </div>
+        {% empty %}
+        <p class="text-gray-500 text-center">No leads found</p>
+        {% endfor %}
 
+    </div>
+
+</div>
 </div>
 
 <script>
 function addNote(leadId) {
-    let input = document.getElementById("note-input-" + leadId);
-    let note = input.value;
+    let input = document.getElementById("note-input-" + leadId);
+    let note = input.value;
 
-    if (!note) return;
+    if (!note) return;
 
-    fetch("/add-note/", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-            lead_id: leadId,
-            note: note
-        })
-    })
-    .then(res => res.json())
-    .then(data => {
-        if (data.success) {
-            let notesDiv = document.getElementById("notes-" + leadId);
-            notesDiv.innerHTML += `<p>• ${note}</p>`;
-            input.value = "";
-        }
-    });
+    fetch("/add-note/", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            lead_id: leadId,
+            note: note
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            let notesDiv = document.getElementById("notes-" + leadId);
+            notesDiv.innerHTML += `<p>• ${note}</p>`;
+            input.value = "";
+        }
+    });
 }
 </script>
 
