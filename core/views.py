@@ -247,15 +247,6 @@ def user_login(request):
 
     return render(request, "login.html")
     
-
-
-@login_required
-def builder_dashboard(request):
-    if request.user.role != "builder":
-        return redirect("login")
-
-    return render(request, "builder/dashboard.html")
-
 @login_required
 def agent_dashboard(request):
     if request.user.role != "agent":
@@ -570,7 +561,9 @@ def lead_management(request):
 @login_required
 def builder_dashboard(request):
 
-    agent = getattr(request.user, 'agent', None)
+    # 🔐 ROLE SECURITY (VERY IMPORTANT FIX)
+    if request.user.role != "builder":
+        return redirect("login")
 
     # ===== TODAY FOLLOWUPS =====
     today_followups = FollowUp.objects.filter(
@@ -586,15 +579,12 @@ def builder_dashboard(request):
         grouped_followups[agent_name].append(f)
 
     # ===== UPCOMING FOLLOWUPS (NEXT 1 HOUR) =====
-    if agent:
-        upcoming_followups = FollowUp.objects.filter(
-            agent=agent,
-            date=date.today(),
-            time__lte=(now() + timedelta(hours=1)).time(),
-            status="PENDING"
-        )
-    else:
-        upcoming_followups = FollowUp.objects.none()
+    upcoming_followups = FollowUp.objects.filter(
+        lead__builder=request.user,
+        date=date.today(),
+        time__lte=(now() + timedelta(hours=1)).time(),
+        status="PENDING"
+    )
 
     # ===== MISSED LEADS =====
     missed_leads = Lead.objects.filter(
@@ -738,7 +728,6 @@ def builder_dashboard(request):
     }
 
     return render(request, "builder/dashboard.html", context)
-
 
 @require_POST
 def add_lead(request):
@@ -1699,9 +1688,13 @@ def agent_dashboard(request):
 
     return render(request, "agent/agent_dashboard.html", context)
 
-
 @login_required
 def agent_leads(request):
+
+    # 🔐 SECURITY FIX
+    if request.user.role != "agent":
+        return redirect("login")
+
     agent = request.user.agent_profile
 
     leads = Lead.objects.filter(assigned_to=agent).order_by('-created_at')
@@ -1727,10 +1720,10 @@ def agent_leads(request):
     else:
         leads = leads.order_by('-created_at')
 
-    # ✅ ACTIVE leads
+    # ✅ ACTIVE leads (jinme CLOSED/FAILED deal nahi hai)
     active_leads = leads.exclude(deals__status__in=["CLOSED", "FAILED"]).distinct()
 
-    # ✅ SUCCESS leads
+    # ✅ SUCCESS leads (jinme CLOSED/FAILED deal hai)
     success_leads = leads.filter(deals__status__in=["CLOSED", "FAILED"]).distinct()
 
     return render(request, "agent/agent_leads.html", {
@@ -1969,37 +1962,37 @@ from decimal import Decimal
 def add_deal(request):
     if request.method == "POST":
         property_id = request.POST.get('property_id')
-        lead_id = request.POST.get('lead_id')   # 🔥 IMPORTANT ADD
+        lead_id = request.POST.get('lead_id')   # 🔥 IMPORTANT
         client_name = request.POST.get('client_name') or "Unknown"
         amount = request.POST.get('amount')
         status = request.POST.get('status')
 
         property_obj = get_object_or_404(Property, id=property_id)
 
-        # 🔥 GET LEAD (IMPORTANT)
+        # 🔥 GET LEAD (IMPORTANT FIX)
         lead = None
         if lead_id:
             lead = get_object_or_404(Lead, id=lead_id)
 
-        # amount fix
+        # 💰 amount fix
         if amount:
             amount = amount.lower().replace("lakh", "00000").replace(",", "")
             amount = Decimal(amount)
         else:
             amount = Decimal(0)
 
-        # agent
+        # 👤 agent
         agent = get_object_or_404(Agent, user=request.user)
 
-        # ✅ CREATE DEAL (FINAL FIX)
+        # 🔥 FINAL DEAL CREATE (MOST IMPORTANT)
         Deal.objects.create(
-            lead=lead,   # 🔥 MOST IMPORTANT LINE
+            lead=lead,                      # ✅ LINK WITH LEAD (CRITICAL)
             property=property_obj,
             client_name=client_name,
             amount=amount,
             status=status,
             agent=agent,
-            builder=property_obj.builder
+            builder=property_obj.builder   # ✅ BUILDER LINK (CRITICAL)
         )
 
         return redirect('agent_leads')
