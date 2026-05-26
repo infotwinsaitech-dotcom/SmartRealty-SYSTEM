@@ -1706,7 +1706,7 @@ def agent_leads(request):
 
     leads = Lead.objects.filter(assigned_to=agent).order_by('-created_at')
 
-    # 🔍 Smart search (name, email, phone)
+    # 🔍 Search
     q = request.GET.get('q')
     if q:
         leads = leads.filter(
@@ -1727,10 +1727,20 @@ def agent_leads(request):
     elif sort == "new":
         leads = leads.order_by('-created_at')
 
-    return render(request, "agent/agent_leads.html", {
-        "leads": leads
-    })
+    # ✅ ACTIVE leads
+    active_leads = leads.exclude(deal__status__in=["CLOSED", "FAILED"]).distinct()
 
+    # ✅ SUCCESS leads
+    success_leads = leads.filter(deal__status__in=["CLOSED", "FAILED"]).distinct()
+
+    return render(request, "agent/agent_leads.html", {
+        "leads": active_leads,
+        "success_leads": success_leads,
+    })
+def delete_lead(request, lead_id):
+    lead = get_object_or_404(Lead, id=lead_id, agent=request.user)
+    lead.delete()
+    return redirect("agent_leads")
 
 @login_required
 def agent_properties(request):

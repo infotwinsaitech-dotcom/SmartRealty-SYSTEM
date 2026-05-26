@@ -222,3 +222,49 @@ function addNote(leadId) {
 </script>
 
 {% endblock %}
+<!-- SUCCESS LEADS -->
+<div class="mt-10">
+
+    <h2 class="text-xl font-bold text-green-700 mb-4">
+        ✅ Closed / Failed Leads
+    </h2>
+
+    <div class="space-y-4">
+
+        {% for lead in success_leads %}
+        <div class="bg-green-50 border border-green-200 rounded-xl p-4 flex justify-between items-center">
+
+            <div>
+                <p class="font-semibold text-gray-800">{{ lead.name }}</p>
+                <p class="text-sm text-gray-500">{{ lead.phone }}</p>
+            </div>
+
+            <div class="flex gap-2 items-center">
+
+                <!-- STATUS -->
+                {% for deal in lead.deal_set.all %}
+                <span class="px-2 py-1 text-xs rounded
+                    {% if deal.status == 'CLOSED' %} bg-green-500 text-white
+                    {% elif deal.status == 'FAILED' %} bg-red-500 text-white
+                    {% endif %}
+                ">
+                    {{ deal.status }}
+                </span>
+                {% endfor %}
+
+                <!-- DELETE -->
+                <a href="{% url 'delete_lead' lead.id %}"
+                   class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-xs">
+                    Delete
+                </a>
+
+            </div>
+
+        </div>
+        {% empty %}
+        <p class="text-gray-400 text-sm">No closed leads</p>
+        {% endfor %}
+
+    </div>
+
+</div>
