@@ -86,7 +86,6 @@ path('delete-lead/<int:id>/', views.delete_lead, name='delete_lead'),
 path('builder/export-leads/', views.export_leads_csv, name='export_leads_csv'),
 path('add-deal/', views.add_deal, name='add_deal'),
 path('update-deal/<int:deal_id>/', views.update_deal, name='update_deal'),
-path('add-followup/', views.add_followup, name='add_followup'),
 path("followup/done/<int:id>/", views.mark_followup_done, name="mark_followup_done"),
 path('add-followup/<int:lead_id>/', views.add_followup, name='add_followup'),
 ]

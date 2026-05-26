@@ -44,10 +44,11 @@
 {% empty %}
 <p>No follow-ups today</p>
 {% endfor %}
-<a href="{% url 'add_followup' lead.id %}">
-   class="bg-blue-600 text-white px-3 py-1 rounded text-xs">
-   + Add Follow-up
-</a>
+{% for f in today_followups %}
+    <a href="{% url 'add_followup' f.lead.id %}">
+        + Add Follow-up
+    </a>
+{% endfor %}
 {% if missed_followups %}
 <div class="bg-red-100 text-red-700 p-3 rounded mb-4">
     ⚠️ {{ missed_followups.count }} follow-ups missed!
