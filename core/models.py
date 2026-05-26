@@ -3,6 +3,7 @@ from django.contrib.auth.models import AbstractUser
 from django.contrib import admin
 from cloudinary.models import CloudinaryField
 
+from django.conf import settings
 class Property(models.Model):
 
     PROPERTY_TYPE_CHOICES = [
@@ -270,11 +271,12 @@ class Deal(models.Model):
 
     # Builder (for builder panel visibility)
     builder = models.ForeignKey(
-        'auth.User',
+        settings.AUTH_USER_MODEL,   # ✅ FIXED
         on_delete=models.CASCADE,
         null=True,
         blank=True
     )
+
 
     created_at = models.DateTimeField(auto_now_add=True)
 
