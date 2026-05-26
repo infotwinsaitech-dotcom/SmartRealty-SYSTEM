@@ -34,7 +34,7 @@
         {{ f.status }}
     </span>
 
-    <!-- ✅ DONE BUTTON -->
+    <!-- DONE BUTTON -->
     <form method="POST" action="{% url 'mark_followup_done' f.id %}">
         {% csrf_token %}
         <button class="text-green-600 text-xs mt-1">✔ Done</button>
@@ -44,31 +44,35 @@
 {% empty %}
 <p>No follow-ups today</p>
 {% endfor %}
-{% for f in today_followups %}
-    <a href="{% url 'add_followup' f.lead.id %}">
-        + Add Follow-up
-    </a>
-{% endfor %}
+
+<!-- ✅ FIXED ADD FOLLOWUP BUTTON -->
+{% if leads %}
+<a href="{% url 'add_followup' leads.0.id %}">
+    + Add Follow-up
+</a>
+{% endif %}
+
 {% if missed_followups %}
 <div class="bg-red-100 text-red-700 p-3 rounded mb-4">
     ⚠️ {{ missed_followups.count }} follow-ups missed!
 </div>
 {% endif %}
-    <h1 class="text-xl md:text-3xl font-bold">
-        Welcome, {{ request.user.username }}
-    </h1>
 
-    <div class="flex gap-2">
-        <a href="{% url 'agent_leads' %}"
-           class="bg-blue-600 text-white px-4 py-2 rounded-lg w-full text-center">
-            + Add Lead
-        </a>
+<h1 class="text-xl md:text-3xl font-bold">
+    Welcome, {{ request.user.username }}
+</h1>
 
-        <a href="{% url 'site_visits' %}"
-           class="bg-gray-200 px-4 py-2 rounded-lg w-full text-center">
-            Visit
-        </a>
-    </div>
+<div class="flex gap-2">
+    <a href="{% url 'agent_leads' %}"
+       class="bg-blue-600 text-white px-4 py-2 rounded-lg w-full text-center">
+        + Add Lead
+    </a>
+
+    <a href="{% url 'site_visits' %}"
+       class="bg-gray-200 px-4 py-2 rounded-lg w-full text-center">
+        Visit
+    </a>
+</div>
 
 </div>
 
