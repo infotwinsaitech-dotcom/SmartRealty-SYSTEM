@@ -425,10 +425,30 @@ def my_inquiries(request):
     })
 
 
+from decimal import Decimal
+
+def convert_price(price):
+    price = price.lower().replace(",", "").strip()
+
+    if "lakh" in price:
+        num = price.replace("lakh", "").strip()
+        return Decimal(num) * 100000
+
+    elif "cr" in price or "crore" in price:
+        num = price.replace("crore", "").replace("cr", "").strip()
+        return Decimal(num) * 10000000
+
+    else:
+        return Decimal(price)
 
 
 @login_required
 def add_property(request):
+    if price:
+            price = convert_price(price)
+    else:
+            price = Decimal(0)
+
     if request.method == "POST":
 
         title = request.POST.get("title")
