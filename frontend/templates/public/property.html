@@ -135,7 +135,11 @@ Search
 <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-10">
 
 {% for property in properties %}
-<div class="bg-white/5 rounded-2xl overflow-hidden">
+
+<!-- 🔥 CLICKABLE CARD -->
+<a href="{% url 'property_detail' property.id %}" class="block">
+
+<div class="bg-white/5 rounded-2xl overflow-hidden hover:scale-105 transition">
 
 <img src="{{ property.thumbnail.url }}" class="w-full h-60 object-cover">
 
@@ -160,6 +164,9 @@ Search
 </div>
 
 </div>
+
+</a>
+
 {% endfor %}
 
 </div>
