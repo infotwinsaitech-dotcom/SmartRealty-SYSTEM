@@ -444,10 +444,6 @@ def convert_price(price):
 
 @login_required
 def add_property(request):
-    if price:
-            price = convert_price(price)
-    else:
-            price = Decimal(0)
 
     if request.method == "POST":
 
@@ -455,7 +451,22 @@ def add_property(request):
         location = request.POST.get("location")
         project_name = request.POST.get('project_name')
         status = request.POST.get("status")
-        price = request.POST.get("price")
+
+        # ✅ PRICE FIX (IMPORTANT)
+        price_input = request.POST.get("price", "").strip()
+        price = Decimal(0)
+
+        if price_input:
+            try:
+                if "Lakh" in price_input:
+                    price = Decimal(price_input.replace("Lakh", "").strip()) * 100000
+                elif "Cr" in price_input:
+                    price = Decimal(price_input.replace("Cr", "").strip()) * 10000000
+                else:
+                    price = Decimal(price_input)
+            except:
+                price = Decimal(0)
+
         beds = request.POST.get("beds")
         baths = request.POST.get("baths")
         sqft = request.POST.get("sqft")
@@ -466,14 +477,14 @@ def add_property(request):
         thumbnail = request.FILES.get("thumbnail")
         brochure = request.FILES.get("brochure")
 
-        # ✅ FIX HERE
         amenities = request.POST.getlist("amenities")
 
         highlights = request.POST.get("highlights")
-        rera_number = request.POST.get("rera_number")   # ✅ FIX name
-        possession_date = request.POST.get("possession_date")  # ✅ FIX name
-        map_link = request.POST.get("map_link")  # ✅ FIX name
+        rera_number = request.POST.get("rera_number")
+        possession_date = request.POST.get("possession_date")
+        map_link = request.POST.get("map_link")
         configuration = request.POST.get("configuration")
+
         import json
 
         nearby_names = request.POST.getlist("nearby_name")
@@ -483,17 +494,17 @@ def add_property(request):
         nearby_data = []
 
         for i in range(len(nearby_names)):
-          nearby_data.append({
-        "name": nearby_names[i],
-        "distance": nearby_distances[i],
-        "icon": nearby_icons[i]
-    })
+            nearby_data.append({
+                "name": nearby_names[i],
+                "distance": nearby_distances[i],
+                "icon": nearby_icons[i]
+            })
 
         property = Property.objects.create(
             title=title,
             location=location,
-            project_name=project_name,  # 🔥 ADD
-            price=price,
+            project_name=project_name,
+            price=price,  # ✅ cleaned price
             beds=beds,
             baths=baths,
             sqft=sqft,
@@ -502,7 +513,7 @@ def add_property(request):
             status=status,
             thumbnail=thumbnail,
             brochure=brochure,
-            amenities=amenities,   # ✅ NOW WORKING
+            amenities=amenities,
             highlights=highlights,
             rera_number=rera_number,
             possession_date=possession_date,
