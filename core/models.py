@@ -28,6 +28,8 @@ class Property(models.Model):
     title = models.CharField(max_length=255)
     location = models.CharField(max_length=255)
     price = models.DecimalField(max_digits=12, decimal_places=2)
+    project_name = models.CharField(max_length=200, blank=True, null=True)  # 🔥 NEW
+
 
     beds = models.IntegerField(null=True, blank=True)
     baths = models.FloatField()

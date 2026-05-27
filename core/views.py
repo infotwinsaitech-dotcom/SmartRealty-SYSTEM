@@ -118,6 +118,16 @@ def property_list(request):
     min_price = request.GET.get('min_price')
     max_price = request.GET.get('max_price')
     beds = request.GET.get('beds')
+    query = request.GET.get('q')   # 🔥 NEW SEARCH
+
+    # 🔍 GLOBAL SEARCH (AREA / PROJECT / BUILDER / TITLE)
+    if query:
+        properties = properties.filter(
+            Q(title__icontains=query) |
+            Q(location__icontains=query) |
+            Q(project_name__icontains=query) |
+            Q(builder__username__icontains=query)
+        )
 
     # LOCATION (smart match)
     if location:
@@ -125,14 +135,14 @@ def property_list(request):
 
     # TYPE (exact + similar)
     if property_type:
-       properties = properties.filter(
+        properties = properties.filter(
             Q(property_type__iexact=property_type) |
             Q(property_type__icontains=property_type)
         )
 
     # POSSESSION (important fix)
     if possession:
-      properties = properties.filter(
+        properties = properties.filter(
             Q(possession__iexact=possession) |
             Q(possession__icontains=possession)
         )
@@ -146,7 +156,7 @@ def property_list(request):
 
     # BEDS
     if beds:
-       properties = properties.filter(beds__gte=beds)
+        properties = properties.filter(beds__gte=beds)
 
     return render(request, "public/property.html", {
         "properties": properties
@@ -423,6 +433,7 @@ def add_property(request):
 
         title = request.POST.get("title")
         location = request.POST.get("location")
+        project_name = request.POST.get('project_name')
         status = request.POST.get("status")
         price = request.POST.get("price")
         beds = request.POST.get("beds")
@@ -461,6 +472,7 @@ def add_property(request):
         property = Property.objects.create(
             title=title,
             location=location,
+            project_name=project_name,  # 🔥 ADD
             price=price,
             beds=beds,
             baths=baths,

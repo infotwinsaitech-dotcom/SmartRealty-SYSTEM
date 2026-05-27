@@ -51,7 +51,7 @@ class="backdrop-blur-xl bg-white/5 border border-white/10 rounded-3xl p-4 shadow
 
 <div class="flex flex-wrap gap-3 items-center">
 
-<input type="text" name="location" placeholder="Search..."
+<input type="text" name="location" placeholder="Search by area, project, builder..."
 class="input flex-1 min-w-[180px]">
 
 <!-- RESIDENTIAL FILTER -->
@@ -222,4 +222,22 @@ select.input option {
     color: white;             /* visible text */
 }
 </style>
+<script>
+const searchInput = document.querySelector('input[name="q"]');
+
+searchInput.addEventListener('keyup', function () {
+    let query = this.value;
+
+    fetch(`/properties/?q=${query}`)
+    .then(response => response.text())
+    .then(data => {
+        let parser = new DOMParser();
+        let htmlDoc = parser.parseFromString(data, 'text/html');
+
+        let newResults = htmlDoc.querySelector('.grid').innerHTML;
+
+        document.querySelector('.grid').innerHTML = newResults;
+    });
+});
+</script>
 {% endblock %}
