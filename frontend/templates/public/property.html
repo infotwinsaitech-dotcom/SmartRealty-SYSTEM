@@ -211,5 +211,15 @@ function toggleDropdown(id) {
 document.getElementById(id).classList.toggle('hidden');
 }
 </script>
+<style>
+select.input {
+    background-color: rgba(255,255,255,0.1);
+    color: white;
+}
 
+select.input option {
+    background-color: #111;   /* dark dropdown */
+    color: white;             /* visible text */
+}
+</style>
 {% endblock %}
