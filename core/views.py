@@ -472,7 +472,7 @@ def add_property(request):
         sqft = request.POST.get("sqft")
         description = request.POST.get("description")
 
-        property_type = request.POST.get("type")
+        property_type = request.POST.get("property_type")  # ✅ FIXED
 
         thumbnail = request.FILES.get("thumbnail")
         brochure = request.FILES.get("brochure")
