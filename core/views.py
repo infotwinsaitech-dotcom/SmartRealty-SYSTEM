@@ -485,8 +485,6 @@ def add_property(request):
         map_link = request.POST.get("map_link")
         configuration = request.POST.get("configuration")
 
-        import json
-
         nearby_names = request.POST.getlist("nearby_name")
         nearby_distances = request.POST.getlist("nearby_distance")
         nearby_icons = request.POST.getlist("nearby_icon")
