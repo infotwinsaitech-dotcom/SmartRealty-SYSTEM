@@ -102,9 +102,9 @@
             <span class="text-lg">💬</span> Communication
         </a>
 
-        <a href="{% url 'scheduler' %}"
+        <a href="{% url 'builder_scheduler' %}"
            class="mx-3 px-4 py-3 rounded-lg flex items-center gap-3 text-white hover:bg-blue-700
-           {% if request.resolver_match.url_name == 'scheduler' %} bg-blue-700 {% endif %}">
+           {% if request.resolver_match.url_name == 'builder_scheduler' %} bg-blue-700 {% endif %}">
             <span class="material-symbols-outlined">event</span>
             Scheduler
         </a>

@@ -378,3 +378,18 @@ path(
     views.agent_delete_lead,
     name='agent_delete_lead'
 ),
+path(
+    'builder/scheduler/',
+    views.scheduler_overview,
+    name='scheduler'
+),
+path(
+    'scheduler/',
+    views.scheduler,
+    name='agent_scheduler'
+),
+path(
+    'builder/scheduler/',
+    views.scheduler_overview,
+    name='builder_scheduler'
+),
