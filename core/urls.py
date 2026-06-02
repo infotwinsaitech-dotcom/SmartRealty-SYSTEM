@@ -366,14 +366,7 @@ urlpatterns = [
         views.settings_view,
         name='settings'
     ),
-]
-
-if settings.DEBUG:
-    urlpatterns += static(
-        settings.MEDIA_URL,
-        document_root=settings.MEDIA_ROOT
-    )
-path(
+    path(
     'agent/delete-lead/<int:lead_id>/',
     views.agent_delete_lead,
     name='agent_delete_lead'
@@ -384,7 +377,7 @@ path(
     name='scheduler'
 ),
 path(
-    'scheduler/',
+    'agent/scheduler/',
     views.scheduler,
     name='agent_scheduler'
 ),
@@ -393,3 +386,10 @@ path(
     views.scheduler_overview,
     name='builder_scheduler'
 ),
+]
+
+if settings.DEBUG:
+    urlpatterns += static(
+        settings.MEDIA_URL,
+        document_root=settings.MEDIA_ROOT
+    )
