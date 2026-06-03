@@ -75,6 +75,61 @@ class Property(models.Model):
     map_link = models.TextField(blank=True, null=True)
     configuration = models.CharField(max_length=100, blank=True, null=True)
     brochure = models.FileField(upload_to='brochures/', null=True, blank=True)
+    starting_price = models.DecimalField(
+    max_digits=12,
+    decimal_places=2,
+    blank=True,
+    null=True
+)
+
+    max_price = models.DecimalField(
+    max_digits=12,
+    decimal_places=2,
+    blank=True,
+    null=True
+)
+
+    project_logo = CloudinaryField(
+    'image',
+    blank=True,
+    null=True
+)
+
+    project_video = models.FileField(
+    upload_to='project_videos/',
+    blank=True,
+    null=True
+)
+
+    project_status = models.CharField(
+    max_length=100,
+    blank=True,
+    null=True
+)
+
+    launch_date = models.CharField(
+    max_length=100,
+    blank=True,
+    null=True
+)
+
+    total_units = models.CharField(
+    max_length=100,
+    blank=True,
+    null=True
+)
+
+    total_towers = models.CharField(
+    max_length=100,
+    blank=True,
+    null=True
+)
+
+    land_parcel = models.CharField(
+    max_length=100,
+    blank=True,
+    null=True
+)
     nearby_places = models.JSONField(default=list, blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)

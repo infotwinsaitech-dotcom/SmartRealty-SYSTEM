@@ -654,6 +654,20 @@ def add_property(request):
         project_name = request.POST.get('project_name')
         status = request.POST.get("status")
         property.project_name = request.POST.get("project_name")
+        builder_name = request.POST.get("builder_name")
+
+        starting_price = request.POST.get("starting_price")
+        max_price = request.POST.get("max_price")
+
+        project_status = request.POST.get("project_status")
+        launch_date = request.POST.get("launch_date")
+
+        total_units = request.POST.get("total_units")
+        total_towers = request.POST.get("total_towers")
+        land_parcel = request.POST.get("land_parcel")
+
+        project_logo = request.FILES.get("project_logo")
+        project_video = request.FILES.get("project_video")
 
         # ✅ PRICE FIX (IMPORTANT)
         price_input = request.POST.get("price", "").strip()
@@ -720,6 +734,20 @@ def add_property(request):
             possession_date=possession_date,
             map_link=map_link,
             configuration=configuration,
+            builder_name=builder_name,
+
+            starting_price=starting_price or None,
+            max_price=max_price or None,
+
+            project_logo=project_logo,
+            project_video=project_video,
+
+            project_status=project_status,
+            launch_date=launch_date,
+
+            total_units=total_units,
+            total_towers=total_towers,
+            land_parcel=land_parcel,
             nearby_places=nearby_data,
             builder=request.user
         )
