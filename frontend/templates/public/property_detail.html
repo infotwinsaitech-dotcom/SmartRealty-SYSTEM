@@ -167,6 +167,7 @@ View Floor Plan
 <h2 class="text-3xl font-bold text-yellow-400 mb-4">Overview</h2>
 
 <div class="grid grid-cols-2 md:grid-cols-3 gap-4 text-gray-300">
+<div>Project: {{ property.project_name|default:"N/A" }}</div>
 <div>Type: {{ property.property_type }}</div>
 <div>Status: {{ property.status }}</div>
 <div>RERA: {{ property.rera_number|default:"N/A" }}</div>

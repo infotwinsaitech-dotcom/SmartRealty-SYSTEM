@@ -653,6 +653,7 @@ def add_property(request):
         location = request.POST.get("location")
         project_name = request.POST.get('project_name')
         status = request.POST.get("status")
+        property.project_name = request.POST.get("project_name")
 
         # ✅ PRICE FIX (IMPORTANT)
         price_input = request.POST.get("price", "").strip()
