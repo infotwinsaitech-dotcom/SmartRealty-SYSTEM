@@ -424,23 +424,46 @@
   }
 
   // ===== DROPDOWN =====
-  function toggleDropdown(id) {
-    document.getElementById(id).classList.toggle('hidden');
-  }
+function toggleDropdown(id) {
 
-  document.addEventListener('click', function(e) {
+    // Dusra dropdown band karo
+    if(id === 'commercialDropdown'){
+        document.getElementById('landDropdown').classList.add('hidden');
+    }
+
+    if(id === 'landDropdown'){
+        document.getElementById('commercialDropdown').classList.add('hidden');
+    }
+
+    document.getElementById(id).classList.toggle('hidden');
+}
+
+  // CLOSE DROPDOWN ON OUTSIDE CLICK
+document.addEventListener('click', function(e) {
+
+    const commercialFilter = document.getElementById('commercial-filter');
+    const landFilter = document.getElementById('land-filter');
+
     const commercialDropdown = document.getElementById('commercialDropdown');
     const landDropdown = document.getElementById('landDropdown');
-    const commercialBtn = document.querySelector('#commercial-filter button');
-    const landBtn = document.querySelector('#land-filter button');
 
-    if (commercialDropdown && !commercialDropdown.contains(e.target) && e.target !== commercialBtn && !commercialBtn.contains(e.target)) {
-      commercialDropdown.classList.add('hidden');
+    // Commercial
+    if (
+        commercialDropdown &&
+        !commercialFilter.contains(e.target)
+    ) {
+        commercialDropdown.classList.add('hidden');
     }
-    if (landDropdown && !landDropdown.contains(e.target) && e.target !== landBtn && !landBtn.contains(e.target)) {
-      landDropdown.classList.add('hidden');
+
+    // Land
+    if (
+        landDropdown &&
+        !landFilter.contains(e.target)
+    ) {
+        landDropdown.classList.add('hidden');
     }
-  });
+
+});
 
   // ===== WISHLIST =====
   function toggleWishlist(btn, propertyId) {
