@@ -137,66 +137,61 @@ Search
 
 {% for property in properties %}
 
-<a href="{% url 'property_detail' property.id %}" class="group block">
+<!-- PROPERTY CARD -->
+<a href="{% url 'property_detail' property.id %}" class="block group">
 
-<div class="bg-white rounded-3xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
+<div class="bg-white rounded-2xl overflow-hidden border border-gray-200 shadow hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
 
     <!-- IMAGE -->
-    <div class="relative overflow-hidden">
+    <div class="relative">
 
         {% if property.thumbnail %}
         <img
-            src="{% cloudinary_url property.thumbnail width=800 height=600 crop='fill' %}"
-            class="w-full h-64 object-cover group-hover:scale-110 transition duration-700">
+            src="{% cloudinary_url property.thumbnail width=700 height=450 crop='fill' %}"
+            class="w-full h-52 object-cover">
         {% endif %}
 
         <!-- VERIFIED -->
         <div class="absolute top-3 left-3">
-            <span class="bg-blue-600 text-white text-xs px-3 py-1 rounded-full font-semibold shadow">
+            <span class="bg-blue-600 text-white text-xs font-semibold px-3 py-1 rounded-full">
                 ✓ Verified
             </span>
         </div>
 
         <!-- HEART -->
-        <div class="absolute top-3 right-3 bg-white w-10 h-10 rounded-full flex items-center justify-center shadow">
-            ❤️
+        <div class="absolute top-3 right-3 bg-white w-10 h-10 rounded-xl shadow flex items-center justify-center">
+            ♡
         </div>
 
     </div>
 
     <!-- CONTENT -->
-    <div class="p-5">
+    <div class="p-4">
 
         <!-- PROJECT NAME -->
-        {% if property.project_name %}
-        <h3 class="text-xl font-bold text-gray-900">
-            {{ property.project_name }}
+        <h3 class="font-bold text-gray-900 text-xl">
+            {{ property.project_name|default:property.title }}
         </h3>
-        {% else %}
-        <h3 class="text-xl font-bold text-gray-900">
-            {{ property.title }}
-        </h3>
-        {% endif %}
 
         <!-- BUILDER -->
-        <p class="uppercase text-xs font-semibold text-gray-500 mt-1">
+        <p class="text-gray-500 text-xs uppercase font-semibold mt-1">
             {{ property.title }}
         </p>
 
         <!-- LOCATION -->
-        <div class="flex items-center gap-2 text-gray-500 text-sm mt-2">
+        <div class="flex items-center gap-1 text-gray-500 text-sm mt-2">
             📍 {{ property.location }}
         </div>
 
         <!-- PRICE + CONFIG -->
-        <div class="flex justify-between items-end mt-4">
+        <div class="flex justify-between mt-4">
 
             <div>
                 <p class="text-xs text-gray-400">
                     Starting Price
                 </p>
 
-                <h4 class="text-lg font-bold text-gray-900">
+                <h4 class="font-bold text-lg text-gray-900">
                     ₹{{ property.price|format_price }}
                 </h4>
             </div>
@@ -213,33 +208,42 @@ Search
 
         </div>
 
+        <!-- DIVIDER -->
+        <div class="border-t my-4"></div>
+
         <!-- FEATURES -->
-        <div class="flex gap-4 text-sm text-gray-600 mt-4 border-t pt-4">
+        <div class="flex justify-between text-sm text-gray-600">
 
-            {% if property.beds %}
-            <span>🛏 {{ property.beds }} Beds</span>
-            {% endif %}
+            <span>
+                🛏 {{ property.beds|default:"0" }} Beds
+            </span>
 
-            {% if property.sqft %}
-            <span>📐 {{ property.sqft }} Sq.ft</span>
-            {% endif %}
+            <span>
+                📐 {{ property.sqft|default:"0" }} Sq.ft
+            </span>
 
         </div>
 
         <!-- BUTTONS -->
-        <div class="grid grid-cols-2 gap-3 mt-5">
+        <div class="grid grid-cols-2 gap-2 mt-5">
 
-            <a href="tel:+919999999999"
-               onclick="event.stopPropagation()"
-               class="bg-blue-50 text-blue-600 text-center py-2 rounded-xl font-semibold hover:bg-blue-100">
+            <a
+                href="tel:+91XXXXXXXXXX"
+                onclick="event.stopPropagation();"
+                class="bg-blue-50 text-blue-600 text-center py-2 rounded-lg font-medium hover:bg-blue-100">
+
                 📞 Call
+
             </a>
 
-            <a href="https://wa.me/919999999999"
-               target="_blank"
-               onclick="event.stopPropagation()"
-               class="bg-green-50 text-green-600 text-center py-2 rounded-xl font-semibold hover:bg-green-100">
+            <a
+                href="https://wa.me/91XXXXXXXXXX"
+                target="_blank"
+                onclick="event.stopPropagation();"
+                class="bg-green-50 text-green-600 text-center py-2 rounded-lg font-medium hover:bg-green-100">
+
                 WhatsApp
+
             </a>
 
         </div>
@@ -249,7 +253,6 @@ Search
 </div>
 
 </a>
-
 {% empty %}
 
 <div class="col-span-full text-center py-20">
