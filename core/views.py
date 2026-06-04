@@ -116,56 +116,151 @@ def property_detail(request, id):
 
 
 def property_list(request):
+    """
+    Property listing with smart filtering.
+    Shows exact matches first, then nearest/similar results.
+    """
+    from django.db.models import Q, Value, IntegerField, Case, When
+
+    # Start with all properties
     properties = Property.objects.all().order_by('-created_at')
 
-    location = request.GET.get('location')
-    property_type = request.GET.get('type')
-    possession = request.GET.get('possession')
-    min_price = request.GET.get('min_price')
-    max_price = request.GET.get('max_price')
-    beds = request.GET.get('beds')
-    query = request.GET.get('q')   # 🔥 NEW SEARCH
+    # Get all filter parameters
+    location = request.GET.get('location', '').strip()
+    property_type = request.GET.get('type', '').strip()
+    possession = request.GET.get('possession', '').strip()
+    min_price = request.GET.get('min_price', '').strip()
+    max_price = request.GET.get('max_price', '').strip()
+    beds = request.GET.get('beds', '').strip()
+    query = request.GET.get('q', '').strip()  # Main search query
 
-    # 🔍 GLOBAL SEARCH (AREA / PROJECT / BUILDER / TITLE)
+    # ===== MAIN SEARCH (Area / Project / Builder / Title) =====
+    # This is the primary search - works with partial matches
     if query:
         properties = properties.filter(
             Q(title__icontains=query) |
             Q(location__icontains=query) |
             Q(project_name__icontains=query) |
-            Q(builder__username__icontains=query)
+            Q(builder__username__icontains=query) |
+            Q(builder__first_name__icontains=query) |
+            Q(builder__last_name__icontains=query) |
+            Q(description__icontains=query)
         )
 
-    # LOCATION (smart match)
+    # ===== LOCATION FILTER (Smart Match) =====
+    # If location is provided, filter by it
     if location:
-        properties = properties.filter(location__icontains=location)
-
-    # TYPE (exact + similar)
-    if property_type:
         properties = properties.filter(
-            Q(property_type__iexact=property_type) |
-            Q(property_type__icontains=property_type)
+            Q(location__icontains=location) |
+            Q(title__icontains=location) |
+            Q(project_name__icontains=location)
         )
 
-    # POSSESSION (important fix)
+    # ===== PROPERTY TYPE FILTER (Exact + Similar) =====
+    # Handles multiple types from checkboxes (commercial/land dropdowns)
+    if property_type:
+        # Split by comma if multiple types selected
+        types = [t.strip() for t in property_type.split(',') if t.strip()]
+        if types:
+            type_query = Q()
+            for t in types:
+                type_query |= Q(property_type__iexact=t) | Q(property_type__icontains=t)
+            properties = properties.filter(type_query)
+
+    # ===== POSSESSION FILTER =====
     if possession:
         properties = properties.filter(
             Q(possession__iexact=possession) |
             Q(possession__icontains=possession)
         )
 
-    # PRICE RANGE
+    # ===== PRICE RANGE FILTER =====
     if min_price:
-        properties = properties.filter(price__gte=min_price)
+        try:
+            properties = properties.filter(price__gte=float(min_price))
+        except ValueError:
+            pass  # Ignore invalid price
 
     if max_price:
-        properties = properties.filter(price__lte=max_price)
+        try:
+            properties = properties.filter(price__lte=float(max_price))
+        except ValueError:
+            pass  # Ignore invalid price
 
-    # BEDS
+    # ===== BEDS FILTER =====
     if beds:
-        properties = properties.filter(beds__gte=beds)
+        try:
+            properties = properties.filter(beds__gte=int(beds))
+        except ValueError:
+            pass  # Ignore invalid beds
+
+    # ===== SMART SORTING: Exact matches first, then similar =====
+    # If query exists, prioritize exact matches
+    if query:
+        properties = properties.annotate(
+            relevance_score=Case(
+                # Exact title match = highest priority
+                When(title__iexact=query, then=Value(100)),
+                # Exact location match
+                When(location__iexact=query, then=Value(90)),
+                # Exact project name match
+                When(project_name__iexact=query, then=Value(80)),
+                # Exact builder match
+                When(builder__username__iexact=query, then=Value(70)),
+                # Starts with title
+                When(title__istartswith=query, then=Value(60)),
+                # Starts with location
+                When(location__istartswith=query, then=Value(50)),
+                # Contains in title
+                When(title__icontains=query, then=Value(40)),
+                # Contains in location
+                When(location__icontains=query, then=Value(30)),
+                # Contains in project name
+                When(project_name__icontains=query, then=Value(20)),
+                # Contains in builder name
+                When(builder__username__icontains=query, then=Value(10)),
+                # Default (description match etc)
+                default=Value(1),
+                output_field=IntegerField(),
+            )
+        ).order_by('-relevance_score', '-created_at')
+
+    # ===== NEAREST/RELATED PROPERTIES LOGIC =====
+    # If no exact results found, show nearest properties
+    if not properties.exists():
+        # Get all properties as fallback (nearest by location similarity)
+        all_properties = Property.objects.all().order_by('-created_at')
+
+        # Try to find nearest by location if location provided
+        if location:
+            nearest = all_properties.filter(location__icontains=location[:3])  # First 3 chars
+            if nearest.exists():
+                properties = nearest
+            else:
+                properties = all_properties[:10]  # Show latest 10 as fallback
+        elif query:
+            # Try partial match on query
+            nearest = all_properties.filter(
+                Q(title__icontains=query[:3]) |
+                Q(location__icontains=query[:3]) |
+                Q(project_name__icontains=query[:3])
+            )
+            if nearest.exists():
+                properties = nearest
+            else:
+                properties = all_properties[:10]
+        else:
+            properties = all_properties[:10]
 
     return render(request, "public/property.html", {
-        "properties": properties
+        "properties": properties,
+        "search_query": query,
+        "location_filter": location,
+        "type_filter": property_type,
+        "possession_filter": possession,
+        "min_price_filter": min_price,
+        "max_price_filter": max_price,
+        "beds_filter": beds,
     })
 def contact(request):
     if request.method == "POST":
