@@ -27,7 +27,7 @@ class Property(models.Model):
 
     title = models.CharField(max_length=255)
     location = models.CharField(max_length=255)
-    price = models.DecimalField(max_digits=12, decimal_places=2)
+    price = models.CharField(max_length=50, blank=True, null=True)
     project_name = models.CharField(max_length=200, blank=True, null=True)  # 🔥 NEW
 
 
@@ -75,19 +75,9 @@ class Property(models.Model):
     map_link = models.TextField(blank=True, null=True)
     configuration = models.CharField(max_length=100, blank=True, null=True)
     brochure = models.FileField(upload_to='brochures/', null=True, blank=True)
-    starting_price = models.DecimalField(
-    max_digits=12,
-    decimal_places=2,
-    blank=True,
-    null=True
-)
+    starting_price = models.CharField(max_length=50, blank=True, null=True)
 
-    max_price = models.DecimalField(
-    max_digits=12,
-    decimal_places=2,
-    blank=True,
-    null=True
-)
+    max_price = models.CharField(max_length=50, blank=True, null=True)
 
     project_logo = CloudinaryField(
     'image',

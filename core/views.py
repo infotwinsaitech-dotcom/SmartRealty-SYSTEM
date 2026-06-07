@@ -736,22 +736,49 @@ def convert_price(price):
         return Decimal(price)
 
 
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+
 @login_required
 def add_property(request):
     if request.user.role != "builder":
         return redirect("login")
 
-
     if request.method == "POST":
 
         title = request.POST.get("title")
         location = request.POST.get("location")
-        project_name = request.POST.get('project_name')
+        project_name = request.POST.get("project_name")
+
         status = request.POST.get("status")
+        property_type = request.POST.get("property_type")
+
         builder_name = request.POST.get("builder_name")
 
+        price = request.POST.get("price")
         starting_price = request.POST.get("starting_price")
         max_price = request.POST.get("max_price")
+
+        beds = request.POST.get("beds")
+        baths = request.POST.get("baths")
+        sqft = request.POST.get("sqft")
+
+        description = request.POST.get("description")
+
+        thumbnail = request.FILES.get("thumbnail")
+        brochure = request.FILES.get("brochure")
+
+        project_logo = request.FILES.get("project_logo")
+        project_video = request.FILES.get("project_video")
+
+        amenities = request.POST.getlist("amenities")
+
+        highlights = request.POST.get("highlights")
+        rera_number = request.POST.get("rera_number")
+
+        possession_date = request.POST.get("possession_date")
+        map_link = request.POST.get("map_link")
+        configuration = request.POST.get("configuration")
 
         project_status = request.POST.get("project_status")
         launch_date = request.POST.get("launch_date")
@@ -759,42 +786,6 @@ def add_property(request):
         total_units = request.POST.get("total_units")
         total_towers = request.POST.get("total_towers")
         land_parcel = request.POST.get("land_parcel")
-
-        project_logo = request.FILES.get("project_logo")
-        project_video = request.FILES.get("project_video")
-
-        # ✅ PRICE FIX (IMPORTANT)
-        price_input = request.POST.get("price", "").strip()
-        price = Decimal(0)
-
-        if price_input:
-            try:
-                if "Lakh" in price_input:
-                    price = Decimal(price_input.replace("Lakh", "").strip()) * 100000
-                elif "Cr" in price_input:
-                    price = Decimal(price_input.replace("Cr", "").strip()) * 10000000
-                else:
-                    price = Decimal(price_input)
-            except:
-                price = Decimal(0)
-
-        beds = request.POST.get("beds")
-        baths = request.POST.get("baths")
-        sqft = request.POST.get("sqft")
-        description = request.POST.get("description")
-
-        property_type = request.POST.get("property_type")  # ✅ FIXED
-
-        thumbnail = request.FILES.get("thumbnail")
-        brochure = request.FILES.get("brochure")
-
-        amenities = request.POST.getlist("amenities")
-
-        highlights = request.POST.get("highlights")
-        rera_number = request.POST.get("rera_number")
-        possession_date = request.POST.get("possession_date")
-        map_link = request.POST.get("map_link")
-        configuration = request.POST.get("configuration")
 
         nearby_names = request.POST.getlist("nearby_name")
         nearby_distances = request.POST.getlist("nearby_distance")
@@ -809,30 +800,36 @@ def add_property(request):
                 "icon": nearby_icons[i]
             })
 
-        # ✅ CREATE PROPERTY OBJECT HERE
         property = Property.objects.create(
             title=title,
             location=location,
             project_name=project_name,
-            price=price,  # ✅ cleaned price
+            price=price,
+
             beds=beds,
             baths=baths,
             sqft=sqft,
+
             description=description,
             property_type=property_type,
             status=status,
+
             thumbnail=thumbnail,
             brochure=brochure,
+
             amenities=amenities,
             highlights=highlights,
+
             rera_number=rera_number,
             possession_date=possession_date,
+
             map_link=map_link,
             configuration=configuration,
+
             builder_name=builder_name,
 
-            starting_price=starting_price or None,
-            max_price=max_price or None,
+            starting_price=starting_price,
+            max_price=max_price,
 
             project_logo=project_logo,
             project_video=project_video,
@@ -843,13 +840,19 @@ def add_property(request):
             total_units=total_units,
             total_towers=total_towers,
             land_parcel=land_parcel,
+
             nearby_places=nearby_data,
+
             builder=request.user
         )
 
         images = request.FILES.getlist("images")
+
         for img in images:
-            PropertyImage.objects.create(property=property, image=img)
+            PropertyImage.objects.create(
+                property=property,
+                image=img
+            )
 
         return redirect("my_property")
 
