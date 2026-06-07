@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Property, PropertyImage,Inquiry,SiteSettings,User,Profile,Lead, Deal, Task, Activity,admin,Document,Notification,AIInsight,LeadScore,Campaign
+from .models import Property, PropertyImage, Inquiry, SiteSettings, User, Profile, Lead, Deal, Task, Activity, Document, Notification, AIInsight, LeadScore, Campaign
 from .models import FollowUp
 
 class PropertyImageInline(admin.TabularInline):
@@ -23,14 +23,15 @@ admin.site.register(Deal)
 admin.site.register(Task)
 admin.site.register(Activity)
 admin.site.register(Document)
+
 @admin.register(Notification)
 class NotificationAdmin(admin.ModelAdmin):
     list_display = ['title', 'type', 'is_read', 'created_at']
     list_filter = ['type', 'is_read']
     search_fields = ['title', 'message']
+
 admin.site.register(AIInsight)
 admin.site.register(LeadScore)
-from .models import Campaign
 
 @admin.register(Campaign)
 class CampaignAdmin(admin.ModelAdmin):

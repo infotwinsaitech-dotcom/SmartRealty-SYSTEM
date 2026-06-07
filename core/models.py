@@ -205,21 +205,19 @@ class Agent(models.Model):
     user = models.OneToOneField(
         User,
         on_delete=models.CASCADE,
-        related_name="agent_profile"   # 👈 add this
+        related_name="agent_profile"
     )
-    role = models.CharField(max_length=50, default='Agent')  # Admin / Agent
-    builder = models.ForeignKey(
+    role = models.CharField(max_length=50, default='Agent')
+    
+    # ✅ MANYTOMANY: Ek agent multiple builders ke saath kaam kar sakta hai
+    builders = models.ManyToManyField(
         User,
-        on_delete=models.CASCADE,
-        related_name="builder_agents",  # 👈 add this
-        null=True,
+        related_name="builder_agents",
         blank=True
-    ) # 🔥 IMPORTANT
+    )
 
     is_active = models.BooleanField(default=True)
-
     created_at = models.DateTimeField(auto_now_add=True)
-
 
     def __str__(self):
         return self.user.username
