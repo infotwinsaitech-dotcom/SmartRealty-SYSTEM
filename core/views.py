@@ -575,8 +575,33 @@ def builder_dashboard(request):
     if request.user.role != "builder":
         return redirect("login")
 
+    # ✅ DATE RANGE FILTER
+    start_date_str = request.GET.get('start_date')
+    end_date_str = request.GET.get('end_date')
+    
+    # Default: Today only
+    today = date.today()
+    
+    if start_date_str and end_date_str:
+        try:
+            start_date = datetime.strptime(start_date_str, '%Y-%m-%d').date()
+            end_date = datetime.strptime(end_date_str, '%Y-%m-%d').date()
+        except ValueError:
+            start_date = today
+            end_date = today
+    else:
+        # Default: Show only today's data
+        start_date = today
+        end_date = today
+
+    # ✅ ALL FILTERS BASED ON DATE RANGE
+    date_filter = {'created_at__date__range': [start_date, end_date]}
+    
+    # ===== TODAY FOLLOWUPS (Only for selected date range) =====
     today_followups = FollowUp.objects.filter(
-        lead__builder=request.user, date=date.today(), status="PENDING"
+        lead__builder=request.user,
+        date__range=[start_date, end_date],  # ✅ Date range filter
+        status="PENDING"
     ).select_related('agent', 'lead')
 
     grouped_followups = defaultdict(list)
@@ -584,19 +609,33 @@ def builder_dashboard(request):
         agent_name = f.agent.name if f.agent else "Unassigned"
         grouped_followups[agent_name].append(f)
 
+    # ===== UPCOMING FOLLOWUPS (Only for selected date range) =====
     upcoming_followups = FollowUp.objects.filter(
-        lead__builder=request.user, date=date.today(),
-        time__lte=(now() + timedelta(hours=1)).time(), status="PENDING"
+        lead__builder=request.user,
+        date__range=[start_date, end_date],
+        time__lte=(now() + timedelta(hours=1)).time(),
+        status="PENDING"
     )
 
+    # ===== MISSED LEADS (Only for selected date range) =====
     missed_leads = Lead.objects.filter(
-        builder=request.user, created_at__lt=now() - timedelta(hours=24), status="NEW"
+        builder=request.user,
+        created_at__date__range=[start_date, end_date],  # ✅ Date range
+        created_at__lt=now() - timedelta(hours=24),
+        status="NEW"
     )
 
+    # ===== MONTHLY REVENUE CHART (Only for selected date range) =====
     monthly_data = (
-        Deal.objects.filter(builder=request.user, status="CLOSED")
+        Deal.objects.filter(
+            builder=request.user, 
+            status="CLOSED",
+            created_at__date__range=[start_date, end_date]  # ✅ Date range
+        )
         .annotate(month=ExtractMonth('created_at'))
-        .values('month').annotate(total=Sum('amount')).order_by('month')
+        .values('month')
+        .annotate(total=Sum('amount'))
+        .order_by('month')
     )
 
     chart_labels, chart_data = [], []
@@ -604,34 +643,87 @@ def builder_dashboard(request):
         chart_labels.append(calendar.month_abbr[item['month']])
         chart_data.append(float(item['total'] or 0))
 
-    total_leads = Lead.objects.filter(builder=request.user).count()
-    active_deals = Deal.objects.filter(builder=request.user, status__in=["NEW", "NEGOTIATION", "BOOKED"]).count()
-    total_revenue = Deal.objects.filter(builder=request.user, status="CLOSED").aggregate(total=Sum('amount'))['total'] or 0
-    closed_deals = Deal.objects.filter(builder=request.user, status="CLOSED").count()
+    # ===== BASIC STATS (Only for selected date range) =====
+    total_leads = Lead.objects.filter(
+        builder=request_user,
+        created_at__date__range=[start_date, end_date]
+    ).count()
+
+    active_deals = Deal.objects.filter(
+        builder=request.user,
+        status__in=["NEW", "NEGOTIATION", "BOOKED"],
+        created_at__date__range=[start_date, end_date]
+    ).count()
+
+    total_revenue = Deal.objects.filter(
+        builder=request.user,
+        status="CLOSED",
+        created_at__date__range=[start_date, end_date]
+    ).aggregate(total=Sum('amount'))['total'] or 0
+
+    closed_deals = Deal.objects.filter(
+        builder=request.user,
+        status="CLOSED",
+        created_at__date__range=[start_date, end_date]
+    ).count()
+
     conversion_rate = (closed_deals / total_leads * 100) if total_leads else 0
 
-    activities = Activity.objects.none()
-    tasks = Task.objects.filter(user=request.user).order_by('-date', '-time')[:5]
+    # ===== ACTIVITY + TASK (Only for selected date range) =====
+    activities = Activity.objects.filter(
+        created_at__date__range=[start_date, end_date]
+    ).order_by('-created_at')[:5]
+    
+    tasks = Task.objects.filter(
+        user=request.user,
+        date__range=[start_date, end_date]  # ✅ Date range
+    ).order_by('-date', '-time')[:5]
 
-    today = date.today()
-    start_of_month = today.replace(day=1)
-    last_month_end = start_of_month - timedelta(days=1)
-    last_month_start = last_month_end.replace(day=1)
+    # ===== GROWTH CALCULATION (Compare with previous period) =====
+    days_diff = (end_date - start_date).days + 1
+    prev_start = start_date - timedelta(days=days_diff)
+    prev_end = start_date - timedelta(days=1)
 
-    current_leads = Lead.objects.filter(builder=request.user, created_at__date__gte=start_of_month).count()
-    last_leads = Lead.objects.filter(builder=request.user, created_at__date__range=[last_month_start, last_month_end]).count()
-    lead_growth = ((current_leads - last_leads) / last_leads * 100) if last_leads else 0
+    # Previous period leads
+    prev_leads = Lead.objects.filter(
+        builder=request.user,
+        created_at__date__range=[prev_start, prev_end]
+    ).count()
 
-    current_deals = Deal.objects.filter(builder=request.user, created_at__date__gte=start_of_month).count()
-    last_deals = Deal.objects.filter(builder=request.user, created_at__date__range=[last_month_start, last_month_end]).count()
-    deal_growth = ((current_deals - last_deals) / last_deals * 100) if last_deals else 0
+    current_leads = total_leads  # Already calculated above
 
-    current_revenue = Deal.objects.filter(builder=request.user, status="CLOSED", created_at__date__gte=start_of_month).aggregate(total=Sum('amount'))['total'] or 0
-    last_revenue = Deal.objects.filter(builder=request.user, status="CLOSED", created_at__date__range=[last_month_start, last_month_end]).aggregate(total=Sum('amount'))['total'] or 0
-    revenue_growth = ((current_revenue - last_revenue) / last_revenue * 100) if last_revenue else 0
+    # Previous period deals
+    prev_deals = Deal.objects.filter(
+        builder=request.user,
+        created_at__date__range=[prev_start, prev_end]
+    ).count()
 
-    total = Lead.objects.filter(builder=request.user).count()
-    builder_leads = Lead.objects.filter(builder=request.user)
+    current_deals = Deal.objects.filter(
+        builder=request.user,
+        created_at__date__range=[start_date, end_date]
+    ).count()
+
+    # Previous period revenue
+    prev_revenue = Deal.objects.filter(
+        builder=request.user,
+        status="CLOSED",
+        created_at__date__range=[prev_start, prev_end]
+    ).aggregate(total=Sum('amount'))['total'] or 0
+
+    current_revenue = total_revenue  # Already calculated
+
+    # Growth calculations
+    lead_growth = ((current_leads - prev_leads) / prev_leads * 100) if prev_leads else 0
+    deal_growth = ((current_deals - prev_deals) / prev_deals * 100) if prev_deals else 0
+    revenue_growth = ((current_revenue - prev_revenue) / prev_revenue * 100) if prev_revenue else 0
+
+    # ===== LEAD SOURCES (Only for selected date range) =====
+    total = total_leads  # Already calculated
+    builder_leads = Lead.objects.filter(
+        builder=request.user,
+        created_at__date__range=[start_date, end_date]
+    )
+    
     search = builder_leads.filter(source='search').count()
     referral = builder_leads.filter(source='referral').count()
     social = builder_leads.filter(source='social').count()
@@ -644,7 +736,11 @@ def builder_dashboard(request):
         "direct": (direct / total * 100) if total else 0,
     }
 
-    deals = Deal.objects.filter(builder=request.user).order_by('-created_at')
+    # ===== DEALS (Only for selected date range) =====
+    deals = Deal.objects.filter(
+        builder=request.user,
+        created_at__date__range=[start_date, end_date]
+    ).order_by('-created_at')
 
     return render(request, "builder/dashboard.html", {
         "total_leads": total_leads,
@@ -664,6 +760,10 @@ def builder_dashboard(request):
         "missed_leads": missed_leads,
         "upcoming_followups": upcoming_followups,
         "deals": deals,
+        # ✅ Date range for template
+        "start_date": start_date,
+        "end_date": end_date,
+        "today": today,
     })
 
 @login_required
