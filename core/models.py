@@ -130,6 +130,11 @@ class Property(models.Model):
     blank=True,
     null=True
 )
+    builder_name = models.CharField(
+    max_length=255,
+    blank=True,
+    null=True
+)
     nearby_places = models.JSONField(default=list, blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
