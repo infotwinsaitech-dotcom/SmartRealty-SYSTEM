@@ -748,7 +748,6 @@ def add_property(request):
         location = request.POST.get("location")
         project_name = request.POST.get('project_name')
         status = request.POST.get("status")
-        property.project_name = request.POST.get("project_name")
         builder_name = request.POST.get("builder_name")
 
         starting_price = request.POST.get("starting_price")
@@ -810,6 +809,7 @@ def add_property(request):
                 "icon": nearby_icons[i]
             })
 
+        # ✅ CREATE PROPERTY OBJECT HERE
         property = Property.objects.create(
             title=title,
             location=location,
