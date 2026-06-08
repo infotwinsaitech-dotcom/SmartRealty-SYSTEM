@@ -397,8 +397,9 @@ path(
 path('emi-calculator/', views.emi_calculator, name='emi_calculator'),
 path('roi-calculator/', views.roi_calculator, name='roi_calculator'),
 path('wishlist/', views.wishlist, name='wishlist'),
-path('wishlist/remove/<int:id>/', views.wishlist_remove, name='wishlist_remove'),
+path('wishlist/remove/<int:id>/', views.wishlist_remove, name='wishlist_remove'), path('wishlist/compare/', views.wishlist_compare, name='wishlist_compare'),
 path('wishlist/compare/', views.wishlist_compare, name='wishlist_compare'),
+path('wishlist/count/', views.wishlist_count, name='wishlist_count'),
 ]
 
 if settings.DEBUG:

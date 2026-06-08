@@ -1962,11 +1962,10 @@ def wishlist_remove(request, id):
     Wishlist.objects.filter(user=request.user, property_id=id).delete()
     return JsonResponse({'success': True})
 
-# views.py
-
+@login_required
 def wishlist_compare(request):
     ids = request.GET.get('ids', '').split(',')
-    ids = [int(id) for id in ids if id.isdigit()]
+    ids = [int(i) for i in ids if i.isdigit()]
     
     properties = Property.objects.filter(id__in=ids)
     
@@ -1986,3 +1985,17 @@ def wishlist_compare(request):
         })
     
     return JsonResponse({'properties': data})
+
+def wishlist_count(request):
+    if request.user.is_authenticated:
+        count = Wishlist.objects.filter(user=request.user).count()
+    else:
+        count = 0
+    return JsonResponse({'count': count})
+
+def emi_calculator(request):
+    return render(request, 'public/emi_calculator.html')
+
+# ===== ROI CALCULATOR =====
+def roi_calculator(request):
+    return render(request, 'public/roi_calculator.html')
