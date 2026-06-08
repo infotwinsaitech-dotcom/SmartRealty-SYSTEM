@@ -32,6 +32,7 @@ from collections import defaultdict
 from core.models import FollowUp
 from datetime import datetime
 from django.utils.timezone import now
+from .models import Wishlist
 
 def home(request):
     properties = Property.objects.all()[:6]
