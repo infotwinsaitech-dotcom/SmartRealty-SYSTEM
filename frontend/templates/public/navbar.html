@@ -1,48 +1,48 @@
-<nav class="bg-white shadow-md px-4 md:px-8 py-4 flex justify-between items-center sticky top-0 z-50">
+<nav class="bg-gray-900 shadow-lg shadow-gray-900/50 px-4 md:px-8 py-4 flex justify-between items-center sticky top-0 z-50 border-b border-gray-800">
 
     <!-- LOGO -->
-    <div class="text-2xl font-extrabold text-primary">
+    <div class="text-2xl font-extrabold text-yellow-400">
         {{ site.site_name|default:"Uma Realty" }}
     </div>
 
     <!-- DESKTOP MENU -->
-    <div class="hidden md:flex gap-6 font-medium text-gray-600 items-center">
+    <div class="hidden md:flex gap-6 font-medium text-gray-300 items-center">
 
-        <a href="/" class="hover:text-primary transition flex items-center gap-1.5">
+        <a href="/" class="hover:text-yellow-400 transition flex items-center gap-1.5">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
             Home
         </a>
 
-        <a href="/properties/" class="hover:text-primary transition flex items-center gap-1.5">
+        <a href="/properties/" class="hover:text-yellow-400 transition flex items-center gap-1.5">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
             Properties
         </a>
 
         <!-- CALCULATORS DROPDOWN -->
         <div class="relative group">
-            <button class="hover:text-primary transition flex items-center gap-1.5 py-2">
+            <button class="hover:text-yellow-400 transition flex items-center gap-1.5 py-2 text-gray-300">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
                 Calculators
                 <svg class="w-3 h-3 transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
             </button>
-            <div class="absolute top-full left-0 mt-1 bg-white shadow-xl rounded-xl border border-gray-100 py-2 min-w-[200px] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-                <a href="{% url 'emi_calculator' %}" class="flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-600 hover:text-primary hover:bg-gray-50 transition">
-                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+            <div class="absolute top-full left-0 mt-1 bg-gray-800 shadow-xl shadow-black/50 rounded-xl border border-gray-700 py-2 min-w-[200px] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                <a href="{% url 'emi_calculator' %}" class="flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-300 hover:text-yellow-400 hover:bg-gray-700/50 transition">
+                    <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
                     EMI Calculator
                 </a>
-                <a href="{% url 'roi_calculator' %}" class="flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-600 hover:text-primary hover:bg-gray-50 transition">
-                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+                <a href="{% url 'roi_calculator' %}" class="flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-300 hover:text-yellow-400 hover:bg-gray-700/50 transition">
+                    <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
                     ROI Calculator
                 </a>
             </div>
         </div>
 
-        <a href="/about/" class="hover:text-primary transition flex items-center gap-1.5">
+        <a href="/about/" class="hover:text-yellow-400 transition flex items-center gap-1.5">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
             About
         </a>
 
-        <a href="/contact/" class="hover:text-primary transition flex items-center gap-1.5">
+        <a href="/contact/" class="hover:text-yellow-400 transition flex items-center gap-1.5">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
             Contact
         </a>
@@ -53,25 +53,25 @@
     <div class="flex gap-3 items-center">
 
         <!-- WISHLIST -->
-        <a href="{% url 'wishlist' %}" class="relative p-2 text-gray-500 hover:text-red-500 transition">
+        <a href="{% url 'wishlist' %}" class="relative p-2 text-gray-400 hover:text-red-500 transition">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
             <span id="navWishlistCount" class="absolute -top-0.5 -right-0.5 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center hidden">0</span>
         </a>
 
-        <a href="/login/" class="hidden sm:block text-gray-600 hover:text-primary font-medium transition">
+        <a href="/login/" class="hidden sm:block text-gray-300 hover:text-yellow-400 font-medium transition">
             Login
         </a>
 
-        <a href="/register/" class="hidden sm:block bg-primary text-white px-5 py-2 rounded-lg font-semibold hover:bg-secondary transition">
+        <a href="/register/" class="hidden sm:block bg-yellow-500 text-gray-900 px-5 py-2 rounded-lg font-semibold hover:bg-yellow-400 transition">
             Register
         </a>
 
-        <a href="{% url 'logout' %}" class="hidden sm:block text-red-500 hover:text-red-600 font-medium transition">
+        <a href="{% url 'logout' %}" class="hidden sm:block text-red-400 hover:text-red-300 font-medium transition">
             Logout
         </a>
 
         <!-- MOBILE TOGGLE -->
-        <button id="mobileMenuBtn" class="md:hidden p-2 text-gray-600" onclick="toggleMobileMenu()">
+        <button id="mobileMenuBtn" class="md:hidden p-2 text-gray-300" onclick="toggleMobileMenu()">
             <svg id="menuIcon" class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
             <svg id="closeIcon" class="w-6 h-6 hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
         </button>
@@ -81,70 +81,70 @@
 </nav>
 
 <!-- MOBILE MENU -->
-<div id="mobileMenu" class="hidden md:hidden fixed inset-0 top-[65px] bg-white z-40 overflow-y-auto">
+<div id="mobileMenu" class="hidden md:hidden fixed inset-0 top-[65px] bg-gray-900 z-40 overflow-y-auto border-t border-gray-800">
     <div class="px-6 py-6 space-y-1">
 
-        <a href="/" class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 hover:bg-gray-50 hover:text-primary transition font-medium">
-            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+        <a href="/" class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-300 hover:bg-gray-800 hover:text-yellow-400 transition font-medium">
+            <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
             Home
         </a>
 
-        <a href="/properties/" class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 hover:bg-gray-50 hover:text-primary transition font-medium">
-            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+        <a href="/properties/" class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-300 hover:bg-gray-800 hover:text-yellow-400 transition font-medium">
+            <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
             Properties
         </a>
 
         <!-- MOBILE CALCULATORS -->
         <div>
-            <button onclick="toggleMobileCalc()" class="w-full flex items-center justify-between px-4 py-3 rounded-xl text-gray-700 hover:bg-gray-50 hover:text-primary transition font-medium">
+            <button onclick="toggleMobileCalc()" class="w-full flex items-center justify-between px-4 py-3 rounded-xl text-gray-300 hover:bg-gray-800 hover:text-yellow-400 transition font-medium">
                 <span class="flex items-center gap-3">
-                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+                    <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
                     Calculators
                 </span>
                 <svg id="calcArrow" class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
             </button>
             <div id="mobileCalcMenu" class="hidden pl-12 pr-4 pb-2 space-y-1">
-                <a href="{% url 'emi_calculator' %}" class="flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm text-gray-600 hover:text-primary hover:bg-gray-50 transition">
-                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+                <a href="{% url 'emi_calculator' %}" class="flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm text-gray-400 hover:text-yellow-400 hover:bg-gray-800/50 transition">
+                    <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
                     EMI Calculator
                 </a>
-                <a href="{% url 'roi_calculator' %}" class="flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm text-gray-600 hover:text-primary hover:bg-gray-50 transition">
-                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+                <a href="{% url 'roi_calculator' %}" class="flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm text-gray-400 hover:text-yellow-400 hover:bg-gray-800/50 transition">
+                    <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
                     ROI Calculator
                 </a>
             </div>
         </div>
 
-        <a href="/about/" class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 hover:bg-gray-50 hover:text-primary transition font-medium">
-            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <a href="/about/" class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-300 hover:bg-gray-800 hover:text-yellow-400 transition font-medium">
+            <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
             About
         </a>
 
-        <a href="/contact/" class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 hover:bg-gray-50 hover:text-primary transition font-medium">
-            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+        <a href="/contact/" class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-300 hover:bg-gray-800 hover:text-yellow-400 transition font-medium">
+            <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
             Contact
         </a>
 
-        <div class="border-t border-gray-100 my-3"></div>
+        <div class="border-t border-gray-800 my-3"></div>
 
-        <a href="{% url 'wishlist' %}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 hover:bg-gray-50 hover:text-red-500 transition font-medium">
-            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+        <a href="{% url 'wishlist' %}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-300 hover:bg-gray-800 hover:text-red-500 transition font-medium">
+            <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
             My Wishlist
         </a>
 
-        <div class="border-t border-gray-100 my-3"></div>
+        <div class="border-t border-gray-800 my-3"></div>
 
-        <a href="/login/" class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 hover:bg-gray-50 hover:text-primary transition font-medium">
-            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>
+        <a href="/login/" class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-300 hover:bg-gray-800 hover:text-yellow-400 transition font-medium">
+            <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>
             Login
         </a>
 
-        <a href="/register/" class="flex items-center gap-3 px-4 py-3 rounded-xl bg-primary text-white font-semibold hover:bg-secondary transition mx-4">
+        <a href="/register/" class="flex items-center gap-3 px-4 py-3 rounded-xl bg-yellow-500 text-gray-900 font-semibold hover:bg-yellow-400 transition mx-4">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
             Register
         </a>
 
-        <a href="{% url 'logout' %}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-red-500 hover:bg-red-50 transition font-medium">
+        <a href="{% url 'logout' %}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-red-400 hover:bg-gray-800 transition font-medium">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
             Logout
         </a>
