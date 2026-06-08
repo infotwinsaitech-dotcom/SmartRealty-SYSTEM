@@ -210,7 +210,7 @@ def login_view(request):
             return redirect("builder_dashboard")
         elif request.user.role == "agent":
             return redirect("agent_dashboard")
-        return redirect("user_home")
+        return redirect("public/index.html")
 
     if request.method == "POST":
         username = request.POST.get("username", "").strip()
@@ -223,7 +223,7 @@ def login_view(request):
                 return redirect("builder_dashboard")
             elif user.role == "agent":
                 return redirect("agent_dashboard")
-            return redirect("home")
+            return redirect("public/index.html")
 
         return render(request, "public/login.html", {"error": "Invalid credentials"})
 
@@ -264,7 +264,7 @@ def user_login(request):
             return redirect("builder_dashboard")
         elif request.user.role == "agent":
             return redirect("agent_dashboard")
-        return redirect("home")
+        return redirect("public/index.html")
 
     if request.method == "POST":
         username = request.POST.get("username", "").strip()
@@ -277,7 +277,7 @@ def user_login(request):
                 return redirect("builder_dashboard")
             elif user.role == "agent":
                 return redirect("agent_dashboard")
-            return redirect("home")
+            return redirect("public/index.html")
 
         return render(request, "login.html", {"error": "Invalid username or password"})
 
