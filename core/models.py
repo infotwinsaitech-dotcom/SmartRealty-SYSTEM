@@ -223,57 +223,32 @@ class Agent(models.Model):
         return self.user.username
 
 class Lead(models.Model):
-
     name = models.CharField(max_length=100)
     email = models.EmailField()
     phone = models.CharField(max_length=15)
-
     status = models.CharField(max_length=20, choices=[
         ('HOT', 'Hot'),
         ('WARM', 'Warm'),
         ('COLD', 'Cold'),
     ])
-
     created_at = models.DateTimeField(auto_now_add=True)
-
     source = models.CharField(max_length=20)
     interest = models.CharField(max_length=200, blank=True, null=True)
-
-    # ✅ THIS IS CORRECT (keep only this)
-    properties = models.ManyToManyField(
-        "Property",
-        blank=True,
-        related_name="interested_leads"
-    )
-
-    assigned_to = models.ForeignKey(
-        "Agent",
-        on_delete=models.CASCADE,
-        related_name="leads",
-        null=True,      # ✅ ADD THIS
-        blank=True      # ✅ ADD THIS
-)
-
-    builder = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True
-    )
-
+    properties = models.ManyToManyField("Property", blank=True, related_name="interested_leads")
+    assigned_to = models.ForeignKey("Agent", on_delete=models.CASCADE, related_name="leads", null=True, blank=True)
+    builder = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     last_contacted = models.DateTimeField(blank=True, null=True)
-
     notes = models.TextField(blank=True, null=True)
+    priority = models.CharField(max_length=10, choices=[('HOT','Hot'),('WARM','Warm'),('COLD','Cold')], default='WARM')
 
-    priority = models.CharField(
-        max_length=10,
-        choices=[('HOT','Hot'),('WARM','Warm'),('COLD','Cold')],
-        default='WARM'
-    )
+    # ✅ NEW FIELDS (Add these)
+    automation_enabled = models.BooleanField(default=True)
+    last_followup_date = models.DateTimeField(null=True, blank=True)
+    followup_count = models.IntegerField(default=0)
+    escalation_level = models.IntegerField(default=0)  # 0=none, 1=builder, 2=admin
 
     def __str__(self):
         return self.name
-
 
 class Deal(models.Model):
 
@@ -514,23 +489,84 @@ class FollowUp(models.Model):
         ("PENDING", "Pending"),
         ("DONE", "Done"),
         ("MISSED", "Missed"),
+        ("ESCALATED", "Escalated"),  # ✅ NEW STATUS
     )
 
     lead = models.ForeignKey("Lead", on_delete=models.CASCADE)
     agent = models.ForeignKey("Agent", on_delete=models.CASCADE)
-    
     date = models.DateField()
     time = models.TimeField()
-
     note = models.TextField(blank=True, null=True)
-
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="PENDING")
-
     created_at = models.DateTimeField(auto_now_add=True)
+
+    # ✅ NEW FIELDS (Add these)
+    is_auto_created = models.BooleanField(default=False)
+    sequence_step = models.IntegerField(default=0)  # 1,2,3,4 for drip sequence
+    completed_at = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return f"{self.lead.name} - {self.date}"
 
+# ✅ NEW MODEL 1: Drip Sequence (Builder ke automation rules)
+class DripSequence(models.Model):
+    CHANNEL_CHOICES = [
+        ('SMS', 'SMS'),
+        ('EMAIL', 'Email'),
+        ('WHATSAPP', 'WhatsApp'),
+    ]
+
+    builder = models.ForeignKey(User, on_delete=models.CASCADE, related_name='drip_sequences')
+    name = models.CharField(max_length=100)
+    step_number = models.IntegerField()
+    delay_days = models.IntegerField()  # Day 1, Day 3, Day 7, Day 14
+    channel = models.CharField(max_length=20, choices=CHANNEL_CHOICES)
+    template_message = models.TextField()
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ['step_number']
+        unique_together = ['builder', 'step_number']
+
+    def __str__(self):
+        return f"Step {self.step_number} - {self.channel} - {self.delay_days}days"
+
+
+# ✅ NEW MODEL 2: Escalation Rule
+class EscalationRule(models.Model):
+    builder = models.ForeignKey(User, on_delete=models.CASCADE, related_name='escalation_rules')
+    name = models.CharField(max_length=100)
+    missed_followups = models.IntegerField(default=2)  # Kitne missed pe escalate
+    escalate_to = models.ForeignKey(User, on_delete=models.CASCADE, related_name='escalated_leads')
+    auto_reassign = models.BooleanField(default=True)
+    notify_channels = models.CharField(max_length=100, default='EMAIL,WHATSAPP')
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return f"{self.name} - {self.builder.username}"
+
+
+# ✅ NEW MODEL 3: Automation Log (Audit trail)
+class AutomationLog(models.Model):
+    ACTION_CHOICES = [
+        ('SMS_SENT', 'SMS Sent'),
+        ('EMAIL_SENT', 'Email Sent'),
+        ('WHATSAPP_SENT', 'WhatsApp Sent'),
+        ('MISSED_FOLLOWUP', 'Missed Followup'),
+        ('ESCALATION', 'Escalation'),
+        ('AUTO_MESSAGE', 'Auto Message'),
+    ]
+
+    lead = models.ForeignKey(Lead, on_delete=models.CASCADE, related_name='automation_logs')
+    action_type = models.CharField(max_length=50, choices=ACTION_CHOICES)
+    channel = models.CharField(max_length=20, blank=True, null=True)
+    message = models.TextField()
+    sent_at = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=20, default='SENT')  # SENT, FAILED, DELIVERED
+    response = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.action_type} - {self.lead.name} - {self.sent_at}"
     
 class LeadActivity(models.Model):
     lead = models.ForeignKey(Lead, on_delete=models.CASCADE)

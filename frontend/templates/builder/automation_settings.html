@@ -1,0 +1,227 @@
+<!-- templates/builder/automation_settings.html -->
+{% extends 'builder/base.html' %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-primary">
+            <i class="fas fa-robot me-2"></i>Smart Automation
+        </h2>
+        <span class="badge bg-success fs-6">Active</span>
+    </div>
+
+    <!-- Drip Sequence Builder -->
+    <div class="card shadow-lg mb-4 border-0">
+        <div class="card-header bg-gradient-primary text-white py-3">
+            <h5 class="mb-0"><i class="fas fa-stream me-2"></i>Follow-up Drip Sequence</h5>
+        </div>
+        <div class="card-body p-4">
+            <p class="text-muted mb-4">Auto messages jo lead aane ke baad bheje jayenge</p>
+            
+            <div id="drip-container">
+                {% for seq in drip_sequences %}
+                <div class="drip-step-card mb-3 p-3 border rounded-3 bg-light" data-step="{{ seq.step_number }}">
+                    <div class="row align-items-center">
+                        <div class="col-md-1">
+                            <div class="step-badge bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width:40px;height:40px">
+                                {{ seq.step_number }}
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <span class="badge bg-{% if seq.channel == 'WHATSAPP' %}success{% elif seq.channel == 'SMS' %}info{% else %}warning{% endif %}">
+                                <i class="fas fa-{% if seq.channel == 'WHATSAPP' %}whatsapp{% elif seq.channel == 'SMS' %}sms{% else %}envelope{% endif %} me-1"></i>
+                                {{ seq.channel }}
+                            </span>
+                        </div>
+                        <div class="col-md-2">
+                            <small class="text-muted">Day {{ seq.delay_days }}</small>
+                        </div>
+                        <div class="col-md-5">
+                            <p class="mb-0 text-truncate">{{ seq.template_message }}</p>
+                        </div>
+                        <div class="col-md-2 text-end">
+                            <button class="btn btn-sm btn-outline-danger" onclick="deleteDrip({{ seq.id }})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="text-center py-5 text-muted">
+                    <i class="fas fa-robot fa-3x mb-3"></i>
+                    <p>Koi drip sequence nahi hai. Add karo!</p>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Add New Drip Step -->
+            <div class="mt-4 p-4 border border-dashed rounded-3 bg-white">
+                <h6 class="fw-bold mb-3">➕ New Drip Step</h6>
+                <form id="drip-form">
+                    <div class="row g-3">
+                        <div class="col-md-2">
+                            <label class="form-label">Step #</label>
+                            <input type="number" class="form-control" id="step_number" min="1" value="1">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Delay (Days)</label>
+                            <input type="number" class="form-control" id="delay_days" min="0" value="1">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Channel</label>
+                            <select class="form-select" id="channel">
+                                <option value="WHATSAPP">📱 WhatsApp</option>
+                                <option value="SMS">💬 SMS</option>
+                                <option value="EMAIL">📧 Email</option>
+                            </select>
+                        </div>
+                        <div class="col-md-5">
+                            <label class="form-label">Message Template</label>
+                            <textarea class="form-control" id="template_message" rows="2" placeholder="Hi {name}, interested in {property}?"></textarea>
+                            <small class="text-muted">Variables: {name}, {agent}, {property}</small>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-primary mt-3" onclick="saveDrip()">
+                        <i class="fas fa-plus me-2"></i>Add Step
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Escalation Rules -->
+    <div class="card shadow-lg border-0">
+        <div class="card-header bg-gradient-danger text-white py-3">
+            <h5 class="mb-0"><i class="fas fa-exclamation-triangle me-2"></i>Escalation Rules</h5>
+        </div>
+        <div class="card-body p-4">
+            <div class="row">
+                {% for rule in escalation_rules %}
+                <div class="col-md-6 mb-3">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h6 class="fw-bold">{{ rule.name }}</h6>
+                                    <p class="text-muted mb-2">Missed {{ rule.missed_followups }} followups → Escalate to {{ rule.escalate_to.username }}</p>
+                                    <span class="badge bg-{% if rule.auto_reassign %}success{% else %}secondary{% endif %}">
+                                        Auto-reassign: {{ rule.auto_reassign|yesno:"ON,OFF" }}
+                                    </span>
+                                </div>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" {% if rule.is_active %}checked{% endif %} onchange="toggleRule({{ rule.id }})">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-12 text-center py-4 text-muted">
+                    <p>Koi escalation rule nahi hai</p>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Add Escalation Rule -->
+            <div class="mt-4 p-4 border border-dashed rounded-3 bg-white">
+                <h6 class="fw-bold mb-3">➕ New Escalation Rule</h6>
+                <form id="escalation-form">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Rule Name</label>
+                            <input type="text" class="form-control" id="rule_name" placeholder="e.g. 2 Missed = Escalate">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Missed Followups</label>
+                            <input type="number" class="form-control" id="missed_count" min="1" value="2">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Escalate To</label>
+                            <select class="form-select" id="escalate_to">
+                                <option value="{{ request.user.id }}">Myself (Builder)</option>
+                                <!-- Add senior agents here -->
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Auto Reassign</label>
+                            <div class="form-check form-switch mt-2">
+                                <input class="form-check-input" type="checkbox" id="auto_reassign" checked>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-danger mt-3" onclick="saveEscalation()">
+                        <i class="fas fa-shield-alt me-2"></i>Create Rule
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function saveDrip() {
+    const data = {
+        name: 'Drip Step ' + document.getElementById('step_number').value,
+        step_number: parseInt(document.getElementById('step_number').value),
+        delay_days: parseInt(document.getElementById('delay_days').value),
+        channel: document.getElementById('channel').value,
+        template_message: document.getElementById('template_message').value
+    };
+    
+    fetch('/builder/automation/drip/create/', {
+        method: 'POST',
+        headers: {'X-CSRFToken': getCookie('csrftoken'), 'Content-Type': 'application/json'},
+        body: JSON.stringify(data)
+    })
+    .then(r => r.json())
+    .then(data => {
+        if(data.success) {
+            showToast('Drip step added!', 'success');
+            location.reload();
+        }
+    });
+}
+
+function saveEscalation() {
+    const data = {
+        name: document.getElementById('rule_name').value,
+        missed_followups: parseInt(document.getElementById('missed_count').value),
+        escalate_to: document.getElementById('escalate_to').value,
+        auto_reassign: document.getElementById('auto_reassign').checked
+    };
+    
+    fetch('/builder/automation/escalation/create/', {
+        method: 'POST',
+        headers: {'X-CSRFToken': getCookie('csrftoken'), 'Content-Type': 'application/json'},
+        body: JSON.stringify(data)
+    })
+    .then(r => r.json())
+    .then(data => {
+        if(data.success) {
+            showToast('Escalation rule created!', 'success');
+            location.reload();
+        }
+    });
+}
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function showToast(message, type) {
+    // Add your toast implementation
+    alert(message);
+}
+</script>
+{% endblock %}

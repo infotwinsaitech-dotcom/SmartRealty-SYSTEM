@@ -38,3 +38,8 @@ class CampaignAdmin(admin.ModelAdmin):
     list_display = ['name', 'type', 'status', 'sent']
 
 admin.site.register(FollowUp)
+from .models import DripSequence, EscalationRule, AutomationLog
+
+admin.site.register(DripSequence)
+admin.site.register(EscalationRule)
+admin.site.register(AutomationLog)

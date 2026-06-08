@@ -91,7 +91,18 @@ WSGI_APPLICATION = "realestate_crm.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+# settings.py (add this)
 
+CELERY_BEAT_SCHEDULE = {
+    'check-drip-sequences': {
+        'task': 'core.tasks.process_drip_sequences',
+        'schedule': 21600.0,  # Every 6 hours
+    },
+    'check-missed-followups': {
+        'task': 'core.tasks.check_missed_followups_task',
+        'schedule': 3600.0,  # Every 1 hour
+    },
+}
 
 
 # Password validation

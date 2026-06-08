@@ -9,7 +9,51 @@
 </div>
 {% endif %}
 <h3 class="font-bold mb-3">Today's Follow-ups</h3>
+<!-- templates/agent/agent_dashboard.html (add this section) -->
+{% if missed_followups %}
+<div class="alert alert-danger border-0 shadow-sm mb-4">
+    <div class="d-flex align-items-center">
+        <div class="flex-shrink-0">
+            <i class="fas fa-exclamation-circle fa-2x"></i>
+        </div>
+        <div class="flex-grow-1 ms-3">
+            <h6 class="alert-heading fw-bold">⚠️ Missed Followups!</h6>
+            <p class="mb-0">Aapke {{ missed_followups.count }} followups miss ho gaye hain. Please contact immediately!</p>
+        </div>
+        <div class="flex-shrink-0">
+            <a href="{% url 'agent_leads' %}?status=MISSED" class="btn btn-danger btn-sm">View All</a>
+        </div>
+    </div>
+</div>
+{% endif %}
 
+<!-- Today's Auto Followups -->
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-info text-white">
+        <h6 class="mb-0"><i class="fas fa-robot me-2"></i>Today's Auto Followups</h6>
+    </div>
+    <div class="card-body">
+        {% for followup in today_auto_followups %}
+        <div class="d-flex justify-content-between align-items-center p-2 border-bottom">
+            <div>
+                <span class="badge bg-primary me-2">Step {{ followup.sequence_step }}</span>
+                <strong>{{ followup.lead.name }}</strong>
+                <small class="text-muted d-block">{{ followup.note }}</small>
+            </div>
+            <div>
+                <button class="btn btn-sm btn-success" onclick="markDone({{ followup.id }})">
+                    <i class="fas fa-check"></i> Done
+                </button>
+                <button class="btn btn-sm btn-outline-danger" onclick="markMissed({{ followup.id }})">
+                    <i class="fas fa-times"></i> Miss
+                </button>
+            </div>
+        </div>
+        {% empty %}
+        <p class="text-muted text-center py-3">No auto followups today</p>
+        {% endfor %}
+    </div>
+</div>
 {% for f in today_followups %}
 <div class="bg-white p-3 rounded shadow mb-2">
 
