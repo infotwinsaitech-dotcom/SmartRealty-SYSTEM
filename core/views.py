@@ -223,7 +223,7 @@ def login_view(request):
                 return redirect("builder_dashboard")
             elif user.role == "agent":
                 return redirect("agent_dashboard")
-            return redirect("home")
+            return redirect("/")
 
         return render(request, "public/login.html", {"error": "Invalid credentials"})
 
