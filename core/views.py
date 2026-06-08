@@ -210,7 +210,7 @@ def login_view(request):
             return redirect("builder_dashboard")
         elif request.user.role == "agent":
             return redirect("agent_dashboard")
-        return redirect("home")
+        return redirect("user_home")
 
     if request.method == "POST":
         username = request.POST.get("username", "").strip()
