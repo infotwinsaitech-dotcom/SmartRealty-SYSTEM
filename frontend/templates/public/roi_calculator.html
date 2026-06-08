@@ -1,0 +1,801 @@
+{% extends "public/base.html" %}
+{% load static %}
+
+{% block title %}ROI Calculator | Luxury Properties{% endblock %}
+{% block content %}
+
+<!-- ====== HERO ====== -->
+<section class="relative py-16 md:py-24 text-center overflow-hidden">
+  <div class="absolute inset-0 luxury-bg"></div>
+  <div class="absolute inset-0 hero-overlay"></div>
+  <div class="relative z-10 px-4">
+    <h1 class="text-3xl md:text-5xl lg:text-6xl font-extrabold tracking-tight gold mb-4" style="font-family: 'Playfair Display', serif;">
+      ROI Calculator
+    </h1>
+    <p class="text-gray-400 max-w-xl mx-auto text-base md:text-lg font-light">
+      Calculate your property investment returns with precision analytics.
+    </p>
+  </div>
+</section>
+
+<!-- ====== CALCULATOR ====== -->
+<section class="max-w-6xl mx-auto px-4 md:px-6 pb-20">
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+    <!-- INPUT FORM -->
+    <div class="calc-card">
+      <div class="calc-header">
+        <div class="calc-icon">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+          </svg>
+        </div>
+        <h2 class="calc-title">Investment Details</h2>
+      </div>
+
+      <div class="calc-body">
+        <!-- Purchase Price -->
+        <div class="input-group">
+          <label class="input-label">Property Purchase Price (₹)</label>
+          <div class="input-wrapper">
+            <span class="input-prefix">₹</span>
+            <input type="number" id="purchasePrice" value="5000000" class="calc-input" oninput="calculateROI()">
+          </div>
+          <input type="range" id="purchasePriceRange" min="1000000" max="100000000" step="100000" value="5000000" class="range-slider" oninput="syncRange('purchasePrice', this.value); calculateROI()">
+        </div>
+
+        <!-- Additional Costs -->
+        <div class="input-group">
+          <label class="input-label">Additional Costs (Registration, Stamp Duty, etc.)</label>
+          <div class="input-wrapper">
+            <span class="input-prefix">₹</span>
+            <input type="number" id="additionalCosts" value="300000" class="calc-input" oninput="calculateROI()">
+          </div>
+          <div class="cost-tags">
+            <span class="cost-tag" onclick="setAdditionalCost(5)">5%</span>
+            <span class="cost-tag active" onclick="setAdditionalCost(6)">6%</span>
+            <span class="cost-tag" onclick="setAdditionalCost(7)">7%</span>
+            <span class="cost-tag" onclick="setAdditionalCost(10)">10%</span>
+          </div>
+        </div>
+
+        <!-- Monthly Rental -->
+        <div class="input-group">
+          <label class="input-label">Monthly Rental Income (₹)</label>
+          <div class="input-wrapper">
+            <span class="input-prefix">₹</span>
+            <input type="number" id="monthlyRental" value="25000" class="calc-input" oninput="calculateROI()">
+          </div>
+          <input type="range" id="monthlyRentalRange" min="5000" max="500000" step="1000" value="25000" class="range-slider" oninput="syncRange('monthlyRental', this.value); calculateROI()">
+        </div>
+
+        <!-- Annual Appreciation -->
+        <div class="input-group">
+          <label class="input-label">Annual Property Appreciation (%)</label>
+          <div class="input-wrapper">
+            <input type="number" id="appreciationRate" value="8" step="0.5" class="calc-input" oninput="calculateROI()">
+            <span class="input-suffix">%</span>
+          </div>
+          <div class="appreciation-tags">
+            <span class="app-tag" onclick="setAppreciation(5)">5%</span>
+            <span class="app-tag" onclick="setAppreciation(6)">6%</span>
+            <span class="app-tag active" onclick="setAppreciation(8)">8%</span>
+            <span class="app-tag" onclick="setAppreciation(10)">10%</span>
+            <span class="app-tag" onclick="setAppreciation(12)">12%</span>
+          </div>
+        </div>
+
+        <!-- Holding Period -->
+        <div class="input-group">
+          <label class="input-label">Holding Period</label>
+          <div class="input-wrapper">
+            <input type="number" id="holdingPeriod" value="10" class="calc-input" oninput="calculateROI()">
+            <span class="input-suffix">Years</span>
+          </div>
+          <div class="holding-tags">
+            <span class="hold-tag" onclick="setHolding(5)">5Y</span>
+            <span class="hold-tag" onclick="setHolding(7)">7Y</span>
+            <span class="hold-tag active" onclick="setHolding(10)">10Y</span>
+            <span class="hold-tag" onclick="setHolding(15)">15Y</span>
+            <span class="hold-tag" onclick="setHolding(20)">20Y</span>
+          </div>
+        </div>
+
+        <!-- Monthly Expenses -->
+        <div class="input-group">
+          <label class="input-label">Monthly Expenses (Maintenance, Tax, etc.)</label>
+          <div class="input-wrapper">
+            <span class="input-prefix">₹</span>
+            <input type="number" id="monthlyExpenses" value="3000" class="calc-input" oninput="calculateROI()">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RESULTS -->
+    <div class="calc-card">
+      <div class="calc-header">
+        <div class="calc-icon result-icon">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+          </svg>
+        </div>
+        <h2 class="calc-title">Investment Analysis</h2>
+      </div>
+
+      <div class="calc-body">
+        <!-- ROI Hero -->
+        <div class="roi-hero">
+          <div class="roi-circle">
+            <svg viewBox="0 0 100 100" class="roi-svg">
+              <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="8"/>
+              <circle id="roiCircle" cx="50" cy="50" r="42" fill="none" stroke="#fbbf24" stroke-width="8" 
+                stroke-dasharray="264" stroke-dashoffset="100" stroke-linecap="round" 
+                transform="rotate(-90 50 50)" style="transition: stroke-dashoffset 1s ease;"/>
+            </svg>
+            <div class="roi-center">
+              <p class="roi-percent" id="roiPercent">12.5%</p>
+              <p class="roi-label-small">Annual ROI</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chart -->
+        <div class="chart-wrapper">
+          <canvas id="roiChart" width="400" height="180"></canvas>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+          <div class="stat-box">
+            <p class="stat-label">Total Investment</p>
+            <p class="stat-value" id="totalInvestment">₹53,00,000</p>
+          </div>
+          <div class="stat-box">
+            <p class="stat-label">Future Value</p>
+            <p class="stat-value highlight" id="futureValue">₹1,07,94,625</p>
+          </div>
+          <div class="stat-box">
+            <p class="stat-label">Total Profit</p>
+            <p class="stat-value profit" id="totalProfit">₹54,94,625</p>
+          </div>
+          <div class="stat-box">
+            <p class="stat-label">Net Rental Yield</p>
+            <p class="stat-value yield" id="netRentalYield">4.98%</p>
+          </div>
+          <div class="stat-box">
+            <p class="stat-label">Break-even</p>
+            <p class="stat-value" id="breakEven">7.2 Years</p>
+          </div>
+          <div class="stat-box">
+            <p class="stat-label">Total Rental Income</p>
+            <p class="stat-value" id="totalRentalIncome">₹25,92,000</p>
+          </div>
+        </div>
+
+        <!-- CTA -->
+        <a href="{% url 'properties' %}" class="explore-btn">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+          </svg>
+          Find Properties with Best ROI
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Year-wise Projection Table -->
+  <div class="calc-card mt-8">
+    <div class="calc-header">
+      <div class="calc-icon">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"/>
+        </svg>
+      </div>
+      <h2 class="calc-title">Year-wise Projection</h2>
+    </div>
+    <div class="table-wrapper">
+      <table class="projection-table" id="projectionTable">
+        <thead>
+          <tr>
+            <th>Year</th>
+            <th>Property Value</th>
+            <th>Cumulative Rental</th>
+            <th>Net Profit</th>
+            <th>ROI %</th>
+            <th>Growth</th>
+          </tr>
+        </thead>
+        <tbody id="projectionBody">
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<style>
+/* ===== CALC CARD ===== */
+.calc-card {
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+.calc-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+.calc-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(251, 191, 36, 0.05));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fbbf24;
+  border: 1px solid rgba(251, 191, 36, 0.2);
+}
+.calc-icon.result-icon {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.2), rgba(34, 197, 94, 0.05));
+  color: #22c55e;
+  border-color: rgba(34, 197, 94, 0.2);
+}
+.calc-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: white;
+  margin: 0;
+}
+.calc-body {
+  padding: 24px;
+}
+
+/* ===== INPUT GROUP ===== */
+.input-group {
+  margin-bottom: 24px;
+}
+.input-group:last-child {
+  margin-bottom: 0;
+}
+.input-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.input-wrapper {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 12px 16px;
+  transition: all 0.3s ease;
+  gap: 8px;
+}
+.input-wrapper:focus-within {
+  border-color: rgba(251, 191, 36, 0.4);
+  background: rgba(255, 255, 255, 0.09);
+  box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.08);
+}
+.input-prefix, .input-suffix {
+  color: rgba(255, 255, 255, 0.4);
+  font-weight: 600;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+.calc-input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: white;
+  font-size: 16px;
+  font-weight: 700;
+  width: 100%;
+  font-family: inherit;
+}
+.calc-input::-webkit-outer-spin-button,
+.calc-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* ===== RANGE SLIDER ===== */
+.range-slider {
+  width: 100%;
+  margin-top: 10px;
+  -webkit-appearance: none;
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.1);
+  outline: none;
+}
+.range-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  cursor: pointer;
+  box-shadow: 0 2px 10px rgba(251, 191, 36, 0.4);
+  border: 2px solid #0f172a;
+}
+.range-slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  cursor: pointer;
+  border: 2px solid #0f172a;
+  box-shadow: 0 2px 10px rgba(251, 191, 36, 0.4);
+}
+
+/* ===== TAGS ===== */
+.cost-tags, .appreciation-tags, .holding-tags {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+.cost-tag, .app-tag, .hold-tag {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.5);
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  user-select: none;
+}
+.cost-tag:hover, .app-tag:hover, .hold-tag:hover {
+  background: rgba(251, 191, 36, 0.1);
+  border-color: rgba(251, 191, 36, 0.3);
+  color: #fbbf24;
+}
+.cost-tag.active, .app-tag.active, .hold-tag.active {
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(251, 191, 36, 0.1));
+  border-color: rgba(251, 191, 36, 0.4);
+  color: #fbbf24;
+}
+
+/* ===== ROI HERO ===== */
+.roi-hero {
+  display: flex;
+  justify-content: center;
+  padding: 20px 0 30px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  margin-bottom: 24px;
+}
+.roi-circle {
+  position: relative;
+  width: 160px;
+  height: 160px;
+}
+.roi-svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+.roi-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+.roi-percent {
+  font-size: 28px;
+  font-weight: 900;
+  color: #fbbf24;
+  margin: 0;
+  line-height: 1.2;
+}
+.roi-label-small {
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 4px 0 0;
+}
+
+/* ===== CHART ===== */
+.chart-wrapper {
+  margin-bottom: 24px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+#roiChart {
+  width: 100%;
+  height: 180px;
+}
+
+/* ===== STATS GRID ===== */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.stat-box {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 14px;
+  padding: 16px;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+.stat-box:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+.stat-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 6px;
+}
+.stat-value {
+  font-size: 16px;
+  font-weight: 800;
+  color: white;
+  margin: 0;
+}
+.stat-value.highlight {
+  color: #fbbf24;
+}
+.stat-value.profit {
+  color: #22c55e;
+}
+.stat-value.yield {
+  color: #3b82f6;
+}
+
+/* ===== EXPLORE BUTTON ===== */
+.explore-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  color: #0f172a;
+  padding: 14px 24px;
+  border-radius: 16px;
+  font-weight: 700;
+  font-size: 15px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(251, 191, 36, 0.3);
+  border: none;
+  cursor: pointer;
+}
+.explore-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(251, 191, 36, 0.4);
+}
+
+/* ===== TABLE ===== */
+.table-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.projection-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.projection-table th {
+  text-align: left;
+  padding: 14px 16px;
+  font-size: 12px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  white-space: nowrap;
+}
+.projection-table td {
+  padding: 14px 16px;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.7);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  white-space: nowrap;
+}
+.projection-table tr:hover td {
+  background: rgba(255, 255, 255, 0.03);
+}
+.projection-table td:first-child {
+  font-weight: 700;
+  color: #fbbf24;
+}
+.projection-table td:last-child {
+  font-weight: 700;
+}
+.positive {
+  color: #22c55e;
+}
+.growth-bar {
+  width: 100%;
+  min-width: 60px;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.growth-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #22c55e, #16a34a);
+  border-radius: 3px;
+  transition: width 0.5s ease;
+}
+
+/* ===== MOBILE ===== */
+@media (max-width: 768px) {
+  .calc-body {
+    padding: 16px;
+  }
+  .roi-circle {
+    width: 130px;
+    height: 130px;
+  }
+  .roi-percent {
+    font-size: 22px;
+  }
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+  .projection-table {
+    font-size: 12px;
+  }
+  .projection-table th,
+  .projection-table td {
+    padding: 10px 12px;
+  }
+}
+@media (max-width: 480px) {
+  .calc-card {
+    border-radius: 16px;
+  }
+  .calc-header {
+    padding: 16px;
+  }
+}
+</style>
+
+<script>
+// ===== ROI CALCULATION =====
+function calculateROI() {
+  const purchasePrice = parseFloat(document.getElementById('purchasePrice').value) || 0;
+  const additionalCosts = parseFloat(document.getElementById('additionalCosts').value) || 0;
+  const monthlyRental = parseFloat(document.getElementById('monthlyRental').value) || 0;
+  const appreciationRate = parseFloat(document.getElementById('appreciationRate').value) || 0;
+  const holdingPeriod = parseFloat(document.getElementById('holdingPeriod').value) || 0;
+  const monthlyExpenses = parseFloat(document.getElementById('monthlyExpenses').value) || 0;
+
+  const totalInvestment = purchasePrice + additionalCosts;
+  const netMonthlyRental = monthlyRental - monthlyExpenses;
+  const annualRental = netMonthlyRental * 12;
+
+  // Future property value with appreciation
+  const futureValue = purchasePrice * Math.pow(1 + appreciationRate / 100, holdingPeriod);
+
+  // Total rental income
+  const totalRentalIncome = annualRental * holdingPeriod;
+
+  // Total profit
+  const totalProfit = (futureValue - purchasePrice) + totalRentalIncome - additionalCosts;
+
+  // Annual ROI
+  const annualROI = (Math.pow((totalInvestment + totalProfit) / totalInvestment, 1 / holdingPeriod) - 1) * 100;
+
+  // Net rental yield
+  const netRentalYield = (annualRental / totalInvestment) * 100;
+
+  // Break-even (simple approximation)
+  const breakEven = totalInvestment / (annualRental + (futureValue - purchasePrice) / holdingPeriod);
+
+  // Update displays
+  document.getElementById('totalInvestment').textContent = '₹' + formatNumber(totalInvestment);
+  document.getElementById('futureValue').textContent = '₹' + formatNumber(futureValue);
+  document.getElementById('totalProfit').textContent = '₹' + formatNumber(totalProfit);
+  document.getElementById('netRentalYield').textContent = netRentalYield.toFixed(2) + '%';
+  document.getElementById('breakEven').textContent = breakEven.toFixed(1) + ' Years';
+  document.getElementById('totalRentalIncome').textContent = '₹' + formatNumber(totalRentalIncome);
+  document.getElementById('roiPercent').textContent = annualROI.toFixed(1) + '%';
+
+  // Update circle
+  const circle = document.getElementById('roiCircle');
+  const circumference = 2 * Math.PI * 42;
+  const offset = circumference - (Math.min(annualROI, 30) / 30) * circumference;
+  circle.style.strokeDashoffset = offset;
+
+  // Draw chart
+  drawROIChart(purchasePrice, appreciationRate, holdingPeriod, annualRental, totalInvestment);
+
+  // Update table
+  updateProjectionTable(purchasePrice, additionalCosts, appreciationRate, holdingPeriod, netMonthlyRental, totalInvestment);
+}
+
+function formatNumber(num) {
+  return Math.round(num).toLocaleString('en-IN');
+}
+
+function syncRange(inputId, value) {
+  document.getElementById(inputId).value = value;
+}
+
+function setAdditionalCost(percent) {
+  const price = parseFloat(document.getElementById('purchasePrice').value) || 0;
+  document.getElementById('additionalCosts').value = Math.round(price * percent / 100);
+  document.querySelectorAll('.cost-tag').forEach(t => t.classList.remove('active'));
+  event.target.classList.add('active');
+  calculateROI();
+}
+
+function setAppreciation(rate) {
+  document.getElementById('appreciationRate').value = rate;
+  document.querySelectorAll('.app-tag').forEach(t => t.classList.remove('active'));
+  event.target.classList.add('active');
+  calculateROI();
+}
+
+function setHolding(years) {
+  document.getElementById('holdingPeriod').value = years;
+  document.querySelectorAll('.hold-tag').forEach(t => t.classList.remove('active'));
+  event.target.classList.add('active');
+  calculateROI();
+}
+
+// ===== ROI CHART =====
+function drawROIChart(purchasePrice, appreciationRate, years, annualRental, totalInvestment) {
+  const canvas = document.getElementById('roiChart');
+  const ctx = canvas.getContext('2d');
+  const width = canvas.width;
+  const height = canvas.height;
+  const padding = 30;
+  const chartWidth = width - padding * 2;
+  const chartHeight = height - padding * 2;
+
+  ctx.clearRect(0, 0, width, height);
+
+  // Calculate data points
+  const dataPoints = [];
+  for (let i = 0; i <= years; i++) {
+    const propertyValue = purchasePrice * Math.pow(1 + appreciationRate / 100, i);
+    const rentalIncome = annualRental * i;
+    const totalValue = propertyValue + rentalIncome;
+    dataPoints.push({ year: i, value: totalValue });
+  }
+
+  const maxValue = Math.max(...dataPoints.map(d => d.value));
+  const minValue = totalInvestment;
+
+  // Draw grid lines
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+  ctx.lineWidth = 1;
+  for (let i = 0; i <= 5; i++) {
+    const y = padding + (chartHeight / 5) * i;
+    ctx.beginPath();
+    ctx.moveTo(padding, y);
+    ctx.lineTo(width - padding, y);
+    ctx.stroke();
+  }
+
+  // Draw investment line (baseline)
+  const baselineY = padding + chartHeight - ((totalInvestment - minValue) / (maxValue - minValue)) * chartHeight;
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+  ctx.setLineDash([5, 5]);
+  ctx.beginPath();
+  ctx.moveTo(padding, baselineY);
+  ctx.lineTo(width - padding, baselineY);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Draw area under curve
+  ctx.beginPath();
+  ctx.moveTo(padding, padding + chartHeight);
+  dataPoints.forEach((point, index) => {
+    const x = padding + (index / (dataPoints.length - 1)) * chartWidth;
+    const y = padding + chartHeight - ((point.value - minValue) / (maxValue - minValue)) * chartHeight;
+    if (index === 0) ctx.lineTo(x, padding + chartHeight);
+    ctx.lineTo(x, y);
+  });
+  ctx.lineTo(width - padding, padding + chartHeight);
+  ctx.closePath();
+
+  const gradient = ctx.createLinearGradient(0, padding, 0, height - padding);
+  gradient.addColorStop(0, 'rgba(251, 191, 36, 0.3)');
+  gradient.addColorStop(1, 'rgba(251, 191, 36, 0.0)');
+  ctx.fillStyle = gradient;
+  ctx.fill();
+
+  // Draw line
+  ctx.beginPath();
+  ctx.strokeStyle = '#fbbf24';
+  ctx.lineWidth = 3;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  dataPoints.forEach((point, index) => {
+    const x = padding + (index / (dataPoints.length - 1)) * chartWidth;
+    const y = padding + chartHeight - ((point.value - minValue) / (maxValue - minValue)) * chartHeight;
+    if (index === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+
+  // Draw points
+  dataPoints.forEach((point, index) => {
+    const x = padding + (index / (dataPoints.length - 1)) * chartWidth;
+    const y = padding + chartHeight - ((point.value - minValue) / (maxValue - minValue)) * chartHeight;
+    ctx.beginPath();
+    ctx.arc(x, y, 4, 0, 2 * Math.PI);
+    ctx.fillStyle = '#fbbf24';
+    ctx.fill();
+    ctx.strokeStyle = '#0f172a';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  });
+
+  // Labels
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+  ctx.font = '11px sans-serif';
+  ctx.textAlign = 'center';
+  for (let i = 0; i < dataPoints.length; i += Math.ceil(dataPoints.length / 6)) {
+    const x = padding + (i / (dataPoints.length - 1)) * chartWidth;
+    ctx.fillText('Y' + dataPoints[i].year, x, height - 8);
+  }
+}
+
+// ===== PROJECTION TABLE =====
+function updateProjectionTable(purchasePrice, additionalCosts, appreciationRate, years, netMonthlyRental, totalInvestment) {
+  const tbody = document.getElementById('projectionBody');
+  tbody.innerHTML = '';
+
+  let cumulativeRental = 0;
+
+  for (let year = 1; year <= years; year++) {
+    const propertyValue = purchasePrice * Math.pow(1 + appreciationRate / 100, year);
+    const yearlyRental = netMonthlyRental * 12;
+    cumulativeRental += yearlyRental;
+    const netProfit = (propertyValue - purchasePrice) + cumulativeRental - additionalCosts;
+    const roi = ((totalInvestment + netProfit) / totalInvestment - 1) * 100;
+    const growth = ((propertyValue / purchasePrice - 1) * 100).toFixed(1);
+
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>Year ${year}</td>
+      <td>₹${formatNumber(propertyValue)}</td>
+      <td>₹${formatNumber(cumulativeRental)}</td>
+      <td class="positive">₹${formatNumber(netProfit)}</td>
+      <td class="positive">${roi.toFixed(1)}%</td>
+      <td>
+        <div class="growth-bar">
+          <div class="growth-fill" style="width: ${Math.min(growth, 100)}%"></div>
+        </div>
+      </td>
+    `;
+    tbody.appendChild(row);
+  }
+}
+
+// Initialize
+calculateROI();
+</script>
+
+{% endblock %}

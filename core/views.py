@@ -1949,3 +1949,22 @@ def mark_followup_done(request, id):
     f.status = "DONE"
     f.save()
     return redirect(request.META.get('HTTP_REFERER'))
+# views.py
+@login_required
+def wishlist(request):
+    wishlist_items = Wishlist.objects.filter(user=request.user).select_related('property')
+    return render(request, 'public/wishlist.html', {
+        'wishlist_properties': [item.property for item in wishlist_items]
+    })
+
+@login_required
+def wishlist_remove(request, id):
+    Wishlist.objects.filter(user=request.user, property_id=id).delete()
+    return JsonResponse({'success': True})
+
+@login_required
+def wishlist_compare(request):
+    ids = request.GET.get('ids', '').split(',')
+    properties = Property.objects.filter(id__in=ids)
+    data = [{'id': p.id, 'project_name': p.project_name, 'price': p.price, ...} for p in properties]
+    return JsonResponse({'properties': data})

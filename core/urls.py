@@ -393,7 +393,12 @@ path(
     path('builder/automation/escalation/create/', views_automation.create_escalation_rule, name='create_escalation'),
     path('builder/automation/logs/', views_automation.automation_logs, name='automation_logs'),
     path('builder/lead/<int:lead_id>/toggle-automation/', views_automation.toggle_lead_automation, name='toggle_automation'),
-
+# urls.py
+path('emi-calculator/', views.emi_calculator, name='emi_calculator'),
+path('roi-calculator/', views.roi_calculator, name='roi_calculator'),
+path('wishlist/', views.wishlist, name='wishlist'),
+path('wishlist/remove/<int:id>/', views.wishlist_remove, name='wishlist_remove'),
+path('wishlist/compare/', views.wishlist_compare, name='wishlist_compare'),
 ]
 
 if settings.DEBUG:
