@@ -575,8 +575,11 @@ class LeadActivity(models.Model):
 # models.py
 class Wishlist(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    property = models.ForeignKey(Property, on_delete=models.CASCADE)
+    property = models.ForeignKey('Property', on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     
     class Meta:
-        unique_together = ['user', 'property']
+        unique_together = ['user', 'property']  # No duplicates
+    
+    def __str__(self):
+        return f"{self.user.username} - {self.property.title}"

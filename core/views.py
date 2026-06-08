@@ -2000,3 +2000,42 @@ def emi_calculator(request):
 # ===== ROI CALCULATOR =====
 def roi_calculator(request):
     return render(request, 'public/roi_calculator.html')
+# core/views.py
+
+from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
+from .models import Property, Wishlist
+
+@login_required
+def wishlist_add(request, property_id):
+    """Add property to wishlist"""
+    property_obj = Property.objects.get(id=property_id)
+    
+    # Create or get (avoid duplicates)
+    wishlist_item, created = Wishlist.objects.get_or_create(
+        user=request.user,
+        property=property_obj
+    )
+    
+    count = Wishlist.objects.filter(user=request.user).count()
+    
+    return JsonResponse({
+        'success': True,
+        'wishlist_count': count,
+        'created': created
+    })
+
+@login_required
+def wishlist_remove(request, property_id):
+    """Remove property from wishlist"""
+    Wishlist.objects.filter(
+        user=request.user,
+        property_id=property_id
+    ).delete()
+    
+    count = Wishlist.objects.filter(user=request.user).count()
+    
+    return JsonResponse({
+        'success': True,
+        'wishlist_count': count
+    })

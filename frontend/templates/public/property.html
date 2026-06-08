@@ -854,9 +854,57 @@ function setFilter(value) {
 function toggleWishlist(btn, propertyId) {
     event.preventDefault();
     event.stopPropagation();
-    btn.classList.toggle('heart-active');
+    
+    const isActive = btn.classList.contains('heart-active');
+    const url = isActive ? `/wishlist/remove/${propertyId}/` : `/wishlist/add/${propertyId}/`;
+    
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken'),
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            btn.classList.toggle('heart-active');
+            // Nav badge update
+            updateNavWishlistCount(data.wishlist_count);
+        } else {
+            alert(data.message || 'Please login to add to wishlist');
+        }
+    })
+    .catch(err => {
+        console.error('Wishlist error:', err);
+        alert('Error adding to wishlist');
+    });
 }
 
+// CSRF token helper
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+// Update nav badge
+function updateNavWishlistCount(count) {
+    const badge = document.getElementById('navWishlistCount');
+    if (badge) {
+        badge.textContent = count;
+        badge.classList.toggle('hidden', !count || count === 0);
+    }
+}
 // =========================
 // LIVE SEARCH
 // =========================
