@@ -1962,9 +1962,27 @@ def wishlist_remove(request, id):
     Wishlist.objects.filter(user=request.user, property_id=id).delete()
     return JsonResponse({'success': True})
 
-@login_required
+# views.py
+
 def wishlist_compare(request):
     ids = request.GET.get('ids', '').split(',')
+    ids = [int(id) for id in ids if id.isdigit()]
+    
     properties = Property.objects.filter(id__in=ids)
-    data = [{'id': p.id, 'project_name': p.project_name, 'price': p.price, ...} for p in properties]
+    
+    data = []
+    for p in properties:
+        data.append({
+            'id': p.id,
+            'project_name': p.project_name or p.title,
+            'price': p.price,
+            'location': p.location,
+            'configuration': p.configuration,
+            'beds': p.beds,
+            'baths': p.baths,
+            'sqft': p.sqft,
+            'possession': p.possession,
+            'property_type': p.property_type
+        })
+    
     return JsonResponse({'properties': data})
