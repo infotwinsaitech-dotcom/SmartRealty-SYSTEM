@@ -401,7 +401,7 @@ path('wishlist/remove/<int:id>/', views.wishlist_remove, name='wishlist_remove')
 path('wishlist/compare/', views.wishlist_compare, name='wishlist_compare'),
 path('wishlist/count/', views.wishlist_count, name='wishlist_count'),
 # core/urls.py
-path('properties/', views.properties_list, name='properties'),  # ya jo bhi view hai
+path('properties/', views.properties_view, name='properties'),  # ya jo bhi view hai
 ]
 
 if settings.DEBUG:
