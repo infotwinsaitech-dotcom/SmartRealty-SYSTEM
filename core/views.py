@@ -786,9 +786,22 @@ def add_lead(request):
     if property_id:
         property_obj = get_object_or_404(Property, id=property_id, builder=request.user)
         lead.properties.add(property_obj)
-
-    messages.success(request, f"Lead '{lead.name}' assigned to {agent.name if agent else 'No Agent'}")
+    from datetime import datetime, timedelta
+    from django.utils.timezone import now
+    
+    FollowUp.objects.create(
+        lead=lead,
+        agent=agent,
+        date=now().date() + timedelta(days=1),  # Kal ka followup
+        time=datetime.strptime("10:00", "%H:%M").time(),
+        note="First followup - auto created",
+        status='PENDING'
+    )
+    
+    messages.success(request, f"Lead '{lead.name}' assigned + followup scheduled!")
     return redirect("lead_management")
+
+
 
 @login_required
 @require_POST
@@ -1485,7 +1498,7 @@ def agent_dashboard(request):
     leads = Lead.objects.filter(
         assigned_to=agent,
         builder__in=agent_builders
-    )
+    ).order_by("-created_at")
 
     total_leads = leads.count()
     hot = leads.filter(status="HOT").count()
@@ -1496,7 +1509,7 @@ def agent_dashboard(request):
     visits = SiteVisit.objects.filter(
         agent=agent,
         builder__in=agent_builders
-    )
+    ).order_by("-date", "-time")
     today_visits = visits.filter(date=date.today()).count()
 
     # ✅ TASKS: Sirf apne builders ke
@@ -1504,7 +1517,7 @@ def agent_dashboard(request):
         lead__assigned_to=agent,
         lead__builder__in=agent_builders,
         status="PENDING"
-    )
+    ).order_by("date", "time")
 
     # ✅ TODAY FOLLOWUPS: Sirf apne builders ke
     today_followups = FollowUp.objects.filter(
@@ -1512,7 +1525,49 @@ def agent_dashboard(request):
         lead__builder__in=agent_builders,
         date=date.today(),
         status="PENDING"
+    ).order_by("time")
+
+    # ✅ UPCOMING FOLLOWUPS (Next 1 hour)
+    from django.utils.timezone import now
+    from datetime import timedelta
+    upcoming_followups = FollowUp.objects.filter(
+        agent=agent,
+        lead__builder__in=agent_builders,
+        date=date.today(),
+        time__lte=(now() + timedelta(hours=1)).time(),
+        status="PENDING"
     )
+
+    # ✅ MISSED FOLLOWUPS
+    missed_followups = FollowUp.objects.filter(
+        agent=agent,
+        lead__builder__in=agent_builders,
+        date__lt=date.today(),
+        status="PENDING"
+    ) | FollowUp.objects.filter(
+        agent=agent,
+        lead__builder__in=agent_builders,
+        date=date.today(),
+        time__lt=now().time(),
+        status="PENDING"
+    )
+
+    # ✅ AUTO FOLLOWUPS (Today)
+    today_auto_followups = FollowUp.objects.filter(
+        agent=agent,
+        lead__builder__in=agent_builders,
+        date=date.today(),
+        status="PENDING",
+        is_auto_created=True
+    ).order_by("time")
+
+    # ✅ UPCOMING VISITS
+    upcoming_visits = SiteVisit.objects.filter(
+        agent=agent,
+        builder__in=agent_builders,
+        date__gte=date.today(),
+        status="SCHEDULED"
+    ).order_by("date", "time")[:5]
 
     # ✅ DEALS: Sirf apne builders ke
     deals = Deal.objects.filter(
@@ -1520,6 +1575,26 @@ def agent_dashboard(request):
         builder__in=agent_builders
     )
     total_deals = deals.count()
+
+    # ✅ PERFORMANCE CHART DATA
+    from django.db.models import Count
+    from django.db.models.functions import ExtractMonth
+    import calendar
+
+    monthly_deals = deals.filter(
+        status="CLOSED",
+        created_at__year=date.today().year
+    ).annotate(
+        month=ExtractMonth("created_at")
+    ).values("month").annotate(count=Count("id")).order_by("month")
+
+    chart_labels = [calendar.month_abbr[m["month"]] for m in monthly_deals]
+    chart_data = [m["count"] for m in monthly_deals]
+
+    # If no data, show empty arrays
+    if not chart_labels:
+        chart_labels = []
+        chart_data = []
 
     return render(request, "agent/agent_dashboard.html", {
         "leads": leads[:5],
@@ -1531,9 +1606,14 @@ def agent_dashboard(request):
         "today_visits": today_visits,
         "tasks": tasks[:5],
         "today_followups": today_followups,
+        "upcoming_followups": upcoming_followups,
+        "missed_followups": missed_followups,
+        "today_auto_followups": today_auto_followups,
+        "upcoming_visits": upcoming_visits,
         "total_deals": total_deals,
+        "chart_labels": chart_labels,
+        "chart_data": chart_data,
     })
-
 @login_required
 def agent_leads(request):
     agent = get_object_or_404(Agent, user=request.user)

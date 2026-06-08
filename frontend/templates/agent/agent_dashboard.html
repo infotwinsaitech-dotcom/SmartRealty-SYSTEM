@@ -3,311 +3,277 @@
 
 <!-- TOP BAR -->
 <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6">
+
+    <h1 class="text-xl md:text-3xl font-bold">
+        Welcome, {{ request.user.username }}
+    </h1>
+
+    <div class="flex gap-2">
+        <a href="{% url 'agent_leads' %}"
+           class="bg-blue-600 text-white px-4 py-2 rounded-lg text-center text-sm">
+            + Add Lead
+        </a>
+
+        <a href="{% url 'site_visits' %}"
+           class="bg-gray-200 px-4 py-2 rounded-lg text-center text-sm">
+            Visit
+        </a>
+    </div>
+
+</div>
+
+<!-- ⚠️ UPCOMING FOLLOWUPS ALERT -->
 {% if upcoming_followups %}
-<div class="bg-yellow-100 text-yellow-800 p-3 rounded mb-4">
-    ⏰ You have {{ upcoming_followups.count }} follow-ups in next 1 hour!
-</div>
-{% endif %}
-<h3 class="font-bold mb-3">Today's Follow-ups</h3>
-<!-- templates/agent/agent_dashboard.html (add this section) -->
-{% if missed_followups %}
-<div class="alert alert-danger border-0 shadow-sm mb-4">
-    <div class="d-flex align-items-center">
-        <div class="flex-shrink-0">
-            <i class="fas fa-exclamation-circle fa-2x"></i>
-        </div>
-        <div class="flex-grow-1 ms-3">
-            <h6 class="alert-heading fw-bold">⚠️ Missed Followups!</h6>
-            <p class="mb-0">Aapke {{ missed_followups.count }} followups miss ho gaye hain. Please contact immediately!</p>
-        </div>
-        <div class="flex-shrink-0">
-            <a href="{% url 'agent_leads' %}?status=MISSED" class="btn btn-danger btn-sm">View All</a>
-        </div>
-    </div>
+<div class="bg-yellow-100 text-yellow-800 p-3 rounded mb-4 flex items-center gap-2">
+    <span class="text-lg">⏰</span>
+    <span class="font-semibold">You have {{ upcoming_followups.count }} follow-up(s) in next 1 hour!</span>
 </div>
 {% endif %}
 
-<!-- Today's Auto Followups -->
-<div class="card shadow-sm mb-4">
-    <div class="card-header bg-info text-white">
-        <h6 class="mb-0"><i class="fas fa-robot me-2"></i>Today's Auto Followups</h6>
+<!-- ⚠️ MISSED FOLLOWUPS ALERT -->
+{% if missed_followups %}
+<div class="bg-red-100 text-red-700 p-3 rounded mb-4 flex items-center justify-between">
+    <div class="flex items-center gap-2">
+        <span class="text-lg">⚠️</span>
+        <span class="font-semibold">{{ missed_followups.count }} follow-up(s) missed! Please contact immediately.</span>
     </div>
-    <div class="card-body">
-        {% for followup in today_auto_followups %}
-        <div class="d-flex justify-content-between align-items-center p-2 border-bottom">
+    <a href="{% url 'agent_leads' %}?status=MISSED" class="text-red-600 text-sm underline">View All</a>
+</div>
+{% endif %}
+
+<!-- 🤖 AUTO FOLLOWUPS SECTION -->
+{% if today_auto_followups %}
+<div class="bg-white p-4 rounded-xl shadow mb-4 border-l-4 border-blue-500">
+    <h3 class="font-bold text-blue-600 mb-3 flex items-center gap-2">
+        <span>🤖</span> Today's Auto Follow-ups
+    </h3>
+
+    {% for followup in today_auto_followups %}
+    <div class="flex items-center justify-between p-3 border-b last:border-b-0 hover:bg-gray-50 rounded">
+        <div class="flex items-center gap-3">
+            <span class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs font-bold">
+                Step {{ followup.sequence_step }}
+            </span>
             <div>
-                <span class="badge bg-primary me-2">Step {{ followup.sequence_step }}</span>
-                <strong>{{ followup.lead.name }}</strong>
-                <small class="text-muted d-block">{{ followup.note }}</small>
-            </div>
-            <div>
-                <button class="btn btn-sm btn-success" onclick="markDone({{ followup.id }})">
-                    <i class="fas fa-check"></i> Done
-                </button>
-                <button class="btn btn-sm btn-outline-danger" onclick="markMissed({{ followup.id }})">
-                    <i class="fas fa-times"></i> Miss
-                </button>
+                <p class="font-semibold text-sm">{{ followup.lead.name }}</p>
+                <p class="text-xs text-gray-500">{{ followup.note|truncatechars:40 }}</p>
             </div>
         </div>
-        {% empty %}
-        <p class="text-muted text-center py-3">No auto followups today</p>
-        {% endfor %}
+        <div class="flex items-center gap-2">
+            <span class="text-xs text-gray-500">{{ followup.time|time:"H:i" }}</span>
+            <form method="POST" action="{% url 'mark_followup_done' followup.id %}" class="inline">
+                {% csrf_token %}
+                <button type="submit" class="bg-green-500 text-white px-2 py-1 rounded text-xs hover:bg-green-600">
+                    ✔ Done
+                </button>
+            </form>
+        </div>
     </div>
-</div>
-{% for f in today_followups %}
-<div class="bg-white p-3 rounded shadow mb-2">
-
-    <p class="font-semibold">{{ f.lead.name }}</p>
-
-    <p class="text-sm text-gray-500">
-        {{ f.date }} {{ f.time }}
-    </p>
-
-    {% if f.note %}
-    <p class="text-xs text-blue-600">
-        {{ f.note }}
-    </p>
-    {% endif %}
-
-    <span class="text-xs px-2 py-1 rounded
-        {% if f.status == 'PENDING' %} bg-yellow-200
-        {% elif f.status == 'DONE' %} bg-green-200
-        {% else %} bg-red-200
-        {% endif %}
-    ">
-        {{ f.status }}
-    </span>
-
-    <!-- DONE BUTTON -->
-    <form method="POST" action="{% url 'mark_followup_done' f.id %}">
-        {% csrf_token %}
-        <button class="text-green-600 text-xs mt-1">✔ Done</button>
-    </form>
-
-</div>
-{% empty %}
-<p>No follow-ups today</p>
-{% endfor %}
-
-<!-- ✅ FIXED ADD FOLLOWUP BUTTON -->
-{% if leads %}
-<a href="{% url 'add_followup' leads.0.id %}">
-    + Add Follow-up
-</a>
-{% endif %}
-
-{% if missed_followups %}
-<div class="bg-red-100 text-red-700 p-3 rounded mb-4">
-    ⚠️ {{ missed_followups.count }} follow-ups missed!
+    {% endfor %}
 </div>
 {% endif %}
 
-<h1 class="text-xl md:text-3xl font-bold">
-    Welcome, {{ request.user.username }}
-</h1>
+<!-- 📅 TODAY'S FOLLOWUPS -->
+<div class="mb-6">
+    <h3 class="font-bold mb-3 text-gray-700">📅 Today's Follow-ups</h3>
 
-<div class="flex gap-2">
-    <a href="{% url 'agent_leads' %}"
-       class="bg-blue-600 text-white px-4 py-2 rounded-lg w-full text-center">
-        + Add Lead
-    </a>
-
-    <a href="{% url 'site_visits' %}"
-       class="bg-gray-200 px-4 py-2 rounded-lg w-full text-center">
-        Visit
-    </a>
+    {% for f in today_followups %}
+    <div class="bg-white p-3 rounded shadow mb-2 flex items-center justify-between">
+        <div>
+            <p class="font-semibold text-sm">{{ f.lead.name }}</p>
+            <p class="text-xs text-gray-500">
+                {{ f.date|date:"d M Y" }} {{ f.time|time:"H:i" }}
+            </p>
+            {% if f.note %}
+            <p class="text-xs text-blue-600 mt-1">{{ f.note }}</p>
+            {% endif %}
+        </div>
+        <div class="flex items-center gap-2">
+            <span class="text-xs px-2 py-1 rounded
+                {% if f.status == 'PENDING' %} bg-yellow-200 text-yellow-800
+                {% elif f.status == 'DONE' %} bg-green-200 text-green-800
+                {% else %} bg-red-200 text-red-800
+                {% endif %}">
+                {{ f.status }}
+            </span>
+            <form method="POST" action="{% url 'mark_followup_done' f.id %}" class="inline">
+                {% csrf_token %}
+                <button type="submit" class="text-green-600 text-xs hover:underline">✔ Done</button>
+            </form>
+        </div>
+    </div>
+    {% empty %}
+    <p class="text-gray-400 text-sm">No follow-ups today</p>
+    {% endfor %}
 </div>
 
-</div>
+<!-- STATS CARDS -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
 
-<!-- STATS -->
-<div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-6 md:mb-10">
-
-    <div class="bg-white p-4 md:p-6 rounded-xl shadow text-center">
-        <p class="text-xs md:text-sm text-gray-500">Leads</p>
-        <h2 class="text-xl md:text-3xl font-bold">{{ total_leads }}</h2>
+    <div class="bg-white p-4 rounded-xl shadow text-center">
+        <p class="text-xs text-gray-500">Leads</p>
+        <h2 class="text-2xl font-bold">{{ total_leads }}</h2>
     </div>
 
-    <div class="bg-white p-4 md:p-6 rounded-xl shadow text-center">
-        <p class="text-xs md:text-sm text-gray-500">Hot</p>
-        <h2 class="text-xl md:text-3xl font-bold text-red-500">{{ hot }}</h2>
+    <div class="bg-white p-4 rounded-xl shadow text-center">
+        <p class="text-xs text-gray-500">Hot</p>
+        <h2 class="text-2xl font-bold text-red-500">{{ hot }}</h2>
     </div>
 
-    <div class="bg-white p-4 md:p-6 rounded-xl shadow text-center">
-        <p class="text-xs md:text-sm text-gray-500">Visits</p>
-        <h2 class="text-xl md:text-3xl font-bold">{{ today_visits }}</h2>
+    <div class="bg-white p-4 rounded-xl shadow text-center">
+        <p class="text-xs text-gray-500">Visits</p>
+        <h2 class="text-2xl font-bold">{{ today_visits }}</h2>
     </div>
 
-    <div class="bg-white p-4 md:p-6 rounded-xl shadow text-center">
-        <p class="text-xs md:text-sm text-gray-500">Deals</p>
-        <h2 class="text-xl md:text-3xl font-bold">{{ total_deals }}</h2>
+    <div class="bg-white p-4 rounded-xl shadow text-center">
+        <p class="text-xs text-gray-500">Deals</p>
+        <h2 class="text-2xl font-bold">{{ total_deals }}</h2>
     </div>
 
 </div>
 
 <!-- MAIN GRID -->
-<div class="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
-    <!-- LEFT SIDE -->
+    <!-- LEFT SIDE (8 cols) -->
     <div class="lg:col-span-8 space-y-6">
 
-        <!-- LEADS -->
-        <div class="bg-white p-4 md:p-6 rounded-xl shadow">
-
-            <div class="flex flex-col md:flex-row md:justify-between gap-3 mb-4">
+        <!-- MY LEADS -->
+        <div class="bg-white p-4 rounded-xl shadow">
+            <div class="flex justify-between items-center mb-4">
                 <h3 class="font-bold text-lg">My Leads</h3>
-
                 <form method="GET" class="flex gap-2">
-                    <input name="q"
-                           value="{{ request.GET.q }}"
+                    <input name="q" value="{{ request.GET.q }}"
                            placeholder="Search..."
-                           class="border px-3 py-2 rounded w-full md:w-48 text-sm">
+                           class="border px-3 py-2 rounded text-sm w-40">
                 </form>
             </div>
 
             {% if leads %}
             <div class="overflow-x-auto">
-            <table class="w-full text-left text-sm">
-
-                <thead>
-                <tr class="text-gray-400">
-                    <th>Name</th>
-                    <th>Status</th>
-                    <th>Phone</th>
-                    <th>Actions</th>
-                </tr>
-                </thead>
-
-                <tbody>
-
-                {% for lead in leads %}
-                <tr class="border-t hover:bg-gray-50">
-
-                    <td class="py-3 font-semibold">
-                        {{ lead.name }}
-                    </td>
-
-                    <td>
-                        <span class="px-2 py-1 rounded text-xs
-                        {% if lead.status == 'HOT' %} bg-red-500 text-white
-                        {% elif lead.status == 'WARM' %} bg-yellow-500 text-white
-                        {% else %} bg-blue-500 text-white
-                        {% endif %}">
-                            {{ lead.status }}
-                        </span>
-                    </td>
-
-                    <td>{{ lead.phone }}</td>
-
-                    <td class="flex gap-2 text-xs">
-
-                        <a href="https://wa.me/{{ lead.phone }}"
-                           target="_blank"
-                           class="text-green-600">
-                            WhatsApp
-                        </a>
-
-                        <a href="{% url 'delete_lead' lead.id %}"
-                           class="text-red-600">
-                            Delete
-                        </a>
-
-                    </td>
-
-                </tr>
-                {% endfor %}
-
-                </tbody>
-
-            </table>
+                <table class="w-full text-left text-sm">
+                    <thead>
+                        <tr class="text-gray-400 border-b">
+                            <th class="pb-2">Name</th>
+                            <th class="pb-2">Status</th>
+                            <th class="pb-2">Phone</th>
+                            <th class="pb-2">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for lead in leads %}
+                        <tr class="border-b hover:bg-gray-50">
+                            <td class="py-3 font-semibold">{{ lead.name }}</td>
+                            <td>
+                                <span class="px-2 py-1 rounded text-xs
+                                    {% if lead.status == 'HOT' %} bg-red-500 text-white
+                                    {% elif lead.status == 'WARM' %} bg-yellow-500 text-white
+                                    {% else %} bg-blue-500 text-white
+                                    {% endif %}">
+                                    {{ lead.status }}
+                                </span>
+                            </td>
+                            <td class="text-gray-600">{{ lead.phone }}</td>
+                            <td class="flex gap-2 text-xs">
+                                <a href="https://wa.me/{{ lead.phone }}" target="_blank" class="text-green-600 hover:underline">
+                                    WhatsApp
+                                </a>
+                                <a href="{% url 'delete_lead' lead.id %}" class="text-red-600 hover:underline">
+                                    Delete
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
             {% else %}
-                <p class="text-center text-gray-400 py-6">
-                    No Leads Found
-                </p>
+            <p class="text-center text-gray-400 py-6">No Leads Found</p>
             {% endif %}
-
         </div>
 
-        <!-- TASKS -->
-        <div class="bg-white p-4 md:p-6 rounded-xl shadow">
-
+        <!-- MY TASKS -->
+        <div class="bg-white p-4 rounded-xl shadow">
             <h3 class="font-bold mb-4">My Tasks</h3>
 
             {% if tasks %}
                 {% for task in tasks %}
                 <div class="flex justify-between items-center border-b py-3 text-sm">
-
                     <div>
                         <p class="font-semibold">{{ task.title }}</p>
                         <p class="text-xs text-gray-500">
-                            {{ task.description }}
+                            {{ task.date|date:"d M Y" }} {{ task.time|time:"H:i" }}
+                            {% if task.lead %} | {{ task.lead.name }}{% endif %}
                         </p>
                     </div>
-
-                    <form method="POST" action="{% url 'complete_task' task.id %}">
-                        {% csrf_token %}
-                        <button class="text-green-600 text-xs">
-                            Done
-                        </button>
-                    </form>
-
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs px-2 py-1 rounded
+                            {% if task.priority == 'HIGH' %} bg-red-100 text-red-700
+                            {% elif task.priority == 'MEDIUM' %} bg-yellow-100 text-yellow-700
+                            {% else %} bg-blue-100 text-blue-700
+                            {% endif %}">
+                            {{ task.priority }}
+                        </span>
+                        <form method="POST" action="{% url 'task_done' task.id %}" class="inline">
+                            {% csrf_token %}
+                            <button type="submit" class="text-green-600 text-xs hover:underline">Done</button>
+                        </form>
+                    </div>
                 </div>
                 {% endfor %}
             {% else %}
                 <p class="text-gray-400 text-sm">No tasks available</p>
             {% endif %}
-
         </div>
 
     </div>
 
-    <!-- RIGHT SIDE -->
+    <!-- RIGHT SIDE (4 cols) -->
     <div class="lg:col-span-4 space-y-6">
 
-        <!-- SITE VISITS -->
-        <div class="bg-white p-4 md:p-6 rounded-xl shadow">
+        <!-- UPCOMING VISITS -->
+        <div class="bg-white p-4 rounded-xl shadow">
+            <h3 class="font-bold mb-4">📍 Upcoming Visits</h3>
 
-            <h3 class="font-bold mb-4">Upcoming Visits</h3>
-
-            {% if visits %}
-                {% for visit in visits %}
+            {% if upcoming_visits %}
+                {% for visit in upcoming_visits %}
                 <div class="border-b py-3 text-sm">
-
-                    <p class="font-semibold">
-                        {{ visit.property.title }}
+                    <p class="font-semibold">{{ visit.property.title|default:"N/A" }}</p>
+                    <p class="text-gray-500 text-xs">
+                        {{ visit.date|date:"d M Y" }} | {{ visit.time|time:"H:i" }}
                     </p>
-
-                    <p class="text-gray-500">
-                        {{ visit.date }} | {{ visit.time }}
+                    <p class="text-xs text-gray-400">
+                        Lead: {{ visit.lead.name|default:"N/A" }}
                     </p>
-
+                    <span class="text-xs px-2 py-1 rounded bg-green-100 text-green-700">
+                        {{ visit.status }}
+                    </span>
                 </div>
                 {% endfor %}
             {% else %}
                 <p class="text-gray-400 text-sm">No visits scheduled</p>
             {% endif %}
-
         </div>
 
-        <!-- PERFORMANCE -->
-        <div class="bg-white p-4 md:p-6 rounded-xl shadow">
-
-            <h3 class="font-bold mb-4">Performance</h3>
+        <!-- PERFORMANCE CHART -->
+        <div class="bg-white p-4 rounded-xl shadow">
+            <h3 class="font-bold mb-4">📊 Performance</h3>
 
             <div class="h-40">
                 <canvas id="chart"></canvas>
             </div>
 
+            {% if not chart_data %}
+            <p class="text-gray-400 text-xs text-center mt-2">No deal data yet</p>
+            {% endif %}
         </div>
 
     </div>
 
 </div>
 
-<!-- CHART -->
+<!-- CHART SCRIPT -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 <script>
 const ctx = document.getElementById('chart');
 
@@ -316,16 +282,43 @@ new Chart(ctx, {
     data: {
         labels: {{ chart_labels|default:"[]"|safe }},
         datasets: [{
-            label: 'Deals',
+            label: 'Deals Closed',
             data: {{ chart_data|default:"[]"|safe }},
             borderColor: '#3B82F6',
-            fill: false,
-            tension: 0.3
+            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+            fill: true,
+            tension: 0.3,
+            pointRadius: 4,
+            pointBackgroundColor: '#3B82F6'
         }]
     },
     options: {
         responsive: true,
-        maintainAspectRatio: false
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                display: true,
+                position: 'bottom',
+                labels: {
+                    boxWidth: 10,
+                    font: { size: 10 }
+                }
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    stepSize: 1,
+                    font: { size: 10 }
+                }
+            },
+            x: {
+                ticks: {
+                    font: { size: 10 }
+                }
+            }
+        }
     }
 });
 </script>
