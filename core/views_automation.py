@@ -3,15 +3,17 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
+from django.contrib.auth import get_user_model
 from .models import Lead, FollowUp, DripSequence, EscalationRule, AutomationLog
-from .tasks import trigger_new_lead_automation
+from .automation_engine import SmartAutomationEngine
+# ❌ from .tasks import trigger_new_lead_automation  # HATAO
 import json
+
+User = get_user_model()
 
 @login_required
 def automation_settings(request):
-    """Builder ka automation settings page"""
     if request.user.role != 'builder':
         return redirect('login')
     
@@ -26,7 +28,6 @@ def automation_settings(request):
 @login_required
 @require_POST
 def create_drip_sequence(request):
-    """Builder drip sequence create kare"""
     if request.user.role != 'builder':
         return JsonResponse({'success': False, 'error': 'Unauthorized'})
     
@@ -46,7 +47,6 @@ def create_drip_sequence(request):
 @login_required
 @require_POST
 def create_escalation_rule(request):
-    """Builder escalation rule create kare"""
     if request.user.role != 'builder':
         return JsonResponse({'success': False, 'error': 'Unauthorized'})
     
@@ -68,7 +68,6 @@ def create_escalation_rule(request):
 
 @login_required
 def automation_logs(request):
-    """Builder automation logs dekhe"""
     if request.user.role != 'builder':
         return redirect('login')
     
@@ -80,7 +79,6 @@ def automation_logs(request):
 
 @login_required
 def toggle_lead_automation(request, lead_id):
-    """Lead ka automation on/off kare"""
     lead = get_object_or_404(Lead, id=lead_id, builder=request.user)
     lead.automation_enabled = not lead.automation_enabled
     lead.save()
@@ -96,10 +94,31 @@ def toggle_lead_automation(request, lead_id):
 def add_lead(request):
     if request.user.role != 'builder':
         return redirect('login')
-    
-    # ... existing lead creation code ...
-    
-    # Trigger automation
-    trigger_new_lead_automation.delay(lead.id)
-    
-    return redirect('lead_management')
+
+    agent = auto_assign_agent(request.user)
+
+    lead = Lead.objects.create(
+        name=request.POST.get("name"),
+        email=request.POST.get("email"),
+        phone=request.POST.get("phone"),
+        source=request.POST.get("source"),
+        status=request.POST.get("status"),
+        assigned_to=agent,
+        interest=request.POST.get("interest"),
+        builder=request.user,
+        notes=request.POST.get("message")
+    )
+
+    LeadActivity.objects.create(lead=lead, message="Lead created")
+
+    property_id = request.POST.get("property_id")
+    if property_id:
+        property_obj = get_object_or_404(Property, id=property_id, builder=request.user)
+        lead.properties.add(property_obj)
+
+    # ✅ DIRECT CALL — NO CELERY
+    engine = SmartAutomationEngine(lead.builder)
+    engine.process_new_lead(lead)
+
+    messages.success(request, f"Lead '{lead.name}' assigned to {agent.name if agent else 'No Agent'}")
+    return redirect("lead_management")

@@ -5,8 +5,7 @@ from datetime import datetime, timedelta
 from django.core.mail import send_mail
 from django.conf import settings
 from .models import Lead, FollowUp, AutomationLog, DripSequence, EscalationRule
-import requests
-import json
+import os
 
 class SmartAutomationEngine:
     
@@ -40,17 +39,17 @@ class SmartAutomationEngine:
             )
         
         # Day 0 - Immediate welcome
-        self.send_message(lead, 'WHATSAPP', f"Hi {lead.name}, thanks for your interest! Our agent will contact you shortly.")
+        self.send_message(lead, 'WHATSAPP', 
+            f"Hi {lead.name}, thanks for your interest! Our agent will contact you shortly.")
         
         lead.last_followup_date = now()
         lead.save()
     
     def check_missed_followups(self):
-        """Har hour run karo - missed followups check"""
+        """Missed followups check"""
         today = now().date()
         current_time = now().time()
         
-        # Find all pending followups that are past due
         missed = FollowUp.objects.filter(
             lead__builder=self.builder,
             status='PENDING',
@@ -58,22 +57,20 @@ class SmartAutomationEngine:
             time__lte=current_time
         ).exclude(
             date=today, 
-            time__gt=current_time  # Aaj ka time abhi nahi aaya
+            time__gt=current_time
         )
         
         for followup in missed:
             self.handle_missed_followup(followup)
     
     def handle_missed_followup(self, followup):
-        """Missed followup ko handle karo"""
+        """Missed followup handle"""
         lead = followup.lead
         agent = followup.agent
         
-        # Mark as missed
         followup.status = 'MISSED'
         followup.save()
         
-        # Log it
         AutomationLog.objects.create(
             lead=lead,
             action_type='MISSED_FOLLOWUP',
@@ -81,11 +78,7 @@ class SmartAutomationEngine:
             message=f"Followup missed by {agent.name if agent else 'Unassigned'}"
         )
         
-        # Check escalation rules
-        missed_count = FollowUp.objects.filter(
-            lead=lead, 
-            status='MISSED'
-        ).count()
+        missed_count = FollowUp.objects.filter(lead=lead, status='MISSED').count()
         
         rule = EscalationRule.objects.filter(
             builder=self.builder,
@@ -95,61 +88,50 @@ class SmartAutomationEngine:
         if rule and missed_count >= rule.missed_followups:
             self.escalate_lead(lead, rule, missed_count)
         else:
-            # Create urgent followup for next day
             FollowUp.objects.create(
                 lead=lead,
                 agent=agent,
                 date=now().date() + timedelta(days=1),
                 time=datetime.strptime("09:00", "%H:%M").time(),
-                note=f"URGENT: Missed followup #{missed_count}. Please contact immediately!",
+                note=f"URGENT: Missed followup #{missed_count}. Contact immediately!",
                 is_auto_created=True,
                 status='PENDING'
             )
             
-            # Notify agent
             self.send_message(lead, 'WHATSAPP', 
-                f"⚠️ URGENT: You missed a followup with {lead.name}. Next followup scheduled for tomorrow 9 AM.")
+                f"⚠️ URGENT: You missed followup with {lead.name}. Next: tomorrow 9 AM.")
     
     def escalate_lead(self, lead, rule, missed_count):
-        """Lead ko escalate karo builder/admin ko"""
+        """Lead escalate"""
         lead.escalation_level = 1
         lead.save()
         
-        # Create escalation followup
         FollowUp.objects.create(
             lead=lead,
-            agent=None,  # Builder will handle
+            agent=None,
             date=now().date(),
             time=now().time(),
-            note=f"ESCALATED: {missed_count} missed followups. Auto-reassigned to {rule.escalate_to.username}",
+            note=f"ESCALATED: {missed_count} missed. Reassigned to {rule.escalate_to.username}",
             is_auto_created=True,
             status='ESCALATED'
         )
         
-        # Auto reassign if enabled
         if rule.auto_reassign and lead.assigned_to:
-            old_agent = lead.assigned_to
-            lead.assigned_to = None  # Or assign to senior agent
+            lead.assigned_to = None
             lead.save()
-            
-            # Notify old agent
-            self.send_message(lead, 'WHATSAPP',
-                f"Lead {lead.name} has been escalated to {rule.escalate_to.username} due to {missed_count} missed followups.")
         
-        # Notify builder/admin
         self.send_message(lead, 'EMAIL',
-            f"ESCALATION ALERT: Lead '{lead.name}' has {missed_count} missed followups. Immediate action required!")
+            f"ESCALATION: Lead '{lead.name}' has {missed_count} missed followups!")
         
-        # Log escalation
         AutomationLog.objects.create(
             lead=lead,
             action_type='ESCALATION',
             channel='SYSTEM',
-            message=f"Escalated to {rule.escalate_to.username} after {missed_count} missed followups"
+            message=f"Escalated to {rule.escalate_to.username}"
         )
     
     def send_message(self, lead, channel, message):
-        """Multi-channel message sender"""
+        """Multi-channel sender"""
         log = AutomationLog.objects.create(
             lead=lead,
             action_type='AUTO_MESSAGE',
@@ -174,24 +156,26 @@ class SmartAutomationEngine:
             log.save()
     
     def _send_sms(self, phone, message):
-        # Integrate with Twilio/SMS provider
         print(f"SMS to {phone}: {message}")
     
     def _send_email(self, email, message):
-        send_mail(
-            'Smart Realty - Follow-up',
-            message,
-            settings.DEFAULT_FROM_EMAIL,
-            [email],
-            fail_silently=False
-        )
+        if email:
+            send_mail(
+                'Smart Realty - Follow-up',
+                message,
+                settings.DEFAULT_FROM_EMAIL,
+                [email],
+                fail_silently=False
+            )
     
     def _send_whatsapp(self, phone, message):
-        # Twilio WhatsApp API
-        from twilio.rest import Client
-        client = Client(settings.TWILIO_SID, settings.TWILIO_TOKEN)
-        client.messages.create(
-            from_='whatsapp:+14155238886',
-            body=message,
-            to=f'whatsapp:+91{phone}'
-        )
+        try:
+            from twilio.rest import Client
+            client = Client(settings.TWILIO_SID, settings.TWILIO_TOKEN)
+            client.messages.create(
+                from_='whatsapp:+14155238886',
+                body=message,
+                to=f'whatsapp:+91{phone}'
+            )
+        except Exception as e:
+            print(f"WhatsApp failed: {e}")

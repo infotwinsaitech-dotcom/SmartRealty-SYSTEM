@@ -388,11 +388,12 @@ path(
     name='builder_scheduler'
 ),
  # Automation
-    path('builder/automation/', views_automation.automation_settings, name='automation_settings'),
+   path('builder/automation/', views_automation.automation_settings, name='automation_settings'),
     path('builder/automation/drip/create/', views_automation.create_drip_sequence, name='create_drip'),
     path('builder/automation/escalation/create/', views_automation.create_escalation_rule, name='create_escalation'),
     path('builder/automation/logs/', views_automation.automation_logs, name='automation_logs'),
     path('builder/lead/<int:lead_id>/toggle-automation/', views_automation.toggle_lead_automation, name='toggle_automation'),
+
 ]
 
 if settings.DEBUG:

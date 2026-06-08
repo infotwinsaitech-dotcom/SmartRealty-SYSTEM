@@ -1,17 +1,14 @@
-# core/tasks.py
+# core/tasks.py — NO CELERY VERSION
 
-from celery import shared_task
 from django.utils.timezone import now
 from .models import Lead, FollowUp, DripSequence
 from .automation_engine import SmartAutomationEngine
 
-@shared_task
 def process_drip_sequences():
-    """Har 6 hours mein run - drip sequences check"""
+    """Drip sequences check — call from management command or cron"""
     today = now().date()
     current_time = now().time()
     
-    # Find followups scheduled for today
     todays_followups = FollowUp.objects.filter(
         date=today,
         time__hour=current_time.hour,
@@ -23,7 +20,6 @@ def process_drip_sequences():
         lead = followup.lead
         builder = lead.builder
         
-        # Get drip sequence for this step
         sequence = DripSequence.objects.filter(
             builder=builder,
             step_number=followup.sequence_step,
@@ -32,17 +28,13 @@ def process_drip_sequences():
         
         if sequence:
             engine = SmartAutomationEngine(builder)
-            
-            # Personalize message
             message = sequence.template_message.format(
                 name=lead.name,
                 agent=followup.agent.name if followup.agent else 'Our Team',
                 property=lead.interest or 'this property'
             )
-            
             engine.send_message(lead, sequence.channel, message)
             
-            # Mark followup done
             followup.status = 'DONE'
             followup.completed_at = now()
             followup.save()
@@ -51,9 +43,9 @@ def process_drip_sequences():
             lead.followup_count += 1
             lead.save()
 
-@shared_task
+
 def check_missed_followups_task():
-    """Har hour mein run - missed followups check"""
+    """Missed followups check"""
     from django.contrib.auth import get_user_model
     User = get_user_model()
     
@@ -63,9 +55,9 @@ def check_missed_followups_task():
         engine = SmartAutomationEngine(builder)
         engine.check_missed_followups()
 
-@shared_task
+
 def trigger_new_lead_automation(lead_id):
-    """Jab naya lead create ho → Ye task run karo"""
+    """New lead automation trigger"""
     from .models import Lead
     lead = Lead.objects.get(id=lead_id)
     engine = SmartAutomationEngine(lead.builder)
