@@ -175,6 +175,7 @@ urlpatterns = [
     path('builder/automation/escalation/create/', views_automation.create_escalation_rule, name='create_escalation'),
     path('builder/automation/logs/', views_automation.automation_logs, name='automation_logs'),
     path('builder/lead/<int:lead_id>/toggle-automation/', views_automation.toggle_lead_automation, name='toggle_automation'),
+    path('properties/', views.property_list, name='properties'),
 ]
 
 if settings.DEBUG:
