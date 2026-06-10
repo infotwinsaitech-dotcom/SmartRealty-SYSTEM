@@ -180,6 +180,12 @@ def property_list(request):
             properties = nearest if nearest.exists() else all_properties[:10]
         else:
             properties = all_properties[:10]
+    user_wishlist_ids = []
+    if request.user.is_authenticated:
+        user_wishlist_ids = list(
+            Wishlist.objects.filter(user=request.user)
+            .values_list('property_id', flat=True)
+        )
 
     return render(request, "public/property.html", {
         "properties": properties,
@@ -189,6 +195,7 @@ def property_list(request):
         "possession_filter": possession,
         "min_price_filter": min_price,
         "max_price_filter": max_price,
+        'user_wishlist_ids': user_wishlist_ids,
         "beds_filter": beds,
     })
 

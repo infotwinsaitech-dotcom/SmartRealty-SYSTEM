@@ -219,6 +219,7 @@
 
             <!-- HEART -->
             <button onclick="event.preventDefault(); toggleWishlist(this, {{ property.id }})"
+             class="{% if property.id in user_wishlist_ids %}heart-active{% endif %}"
               style="position: absolute; top: 12px; right: 12px; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(4px); width: 40px; height: 40px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2); display: flex; align-items: center; justify-content: center; border: none; cursor: pointer; transition: all 0.2s; z-index: 5; padding: 0;">
               <svg class="w-5 h-5 text-gray-400 transition-colors heart-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
