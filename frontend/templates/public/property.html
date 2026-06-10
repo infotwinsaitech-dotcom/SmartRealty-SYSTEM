@@ -849,21 +849,16 @@ function setFilter(value) {
 }
 
 // =========================
-// WISHLIST
-// =========================
-// =========================
-// WISHLIST - WITH LOGIN CHECK
+// WISHLIST - FIXED LOGIN CHECK
 // =========================
 function toggleWishlist(btn, propertyId) {
     event.preventDefault();
     event.stopPropagation();
 
-    // Check if user is logged in (check for session cookie or auth status)
-    const isLoggedIn = document.body.dataset.userAuthenticated === 'true' || 
-                       document.cookie.includes('sessionid');
+    // FIXED: Reliable login check using meta tag (no base.html changes needed)
+    const isLoggedIn = document.querySelector('meta[name="user-authenticated"]')?.content === 'true';
 
     if (!isLoggedIn) {
-        // Show login required popup
         showLoginPopup();
         return;
     }
@@ -880,18 +875,18 @@ function toggleWishlist(btn, propertyId) {
     })
     .then(r => {
         if (r.status === 403 || r.status === 401) {
-            // Not authenticated
             showLoginPopup();
             return null;
         }
         return r.json();
     })
     .then(data => {
-        if (!data) return; // Login popup already shown
+        if (!data) return;
 
         if (data.success) {
             btn.classList.toggle('heart-active');
             updateNavWishlistCount(data.wishlist_count);
+            showToast(isActive ? 'Removed from wishlist' : 'Added to wishlist', 'success');
         } else {
             showToast(data.message || 'Something went wrong', 'error');
         }
@@ -906,11 +901,9 @@ function toggleWishlist(btn, propertyId) {
 // LOGIN POPUP
 // =========================
 function showLoginPopup() {
-    // Remove existing popup if any
     const existingPopup = document.getElementById('loginPopup');
     if (existingPopup) existingPopup.remove();
 
-    // Create popup overlay
     const overlay = document.createElement('div');
     overlay.id = 'loginPopup';
     overlay.style.cssText = `
@@ -937,7 +930,6 @@ function showLoginPopup() {
             box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
             animation: slideUp 0.3s ease;
         ">
-            <!-- Icon -->
             <div style="
                 width: 70px;
                 height: 70px;
@@ -954,7 +946,6 @@ function showLoginPopup() {
                 </svg>
             </div>
 
-            <!-- Title -->
             <h3 style="
                 font-size: 22px;
                 font-weight: 800;
@@ -962,7 +953,6 @@ function showLoginPopup() {
                 margin-bottom: 10px;
             ">Login Required</h3>
 
-            <!-- Message -->
             <p style="
                 font-size: 15px;
                 color: rgba(255, 255, 255, 0.6);
@@ -970,7 +960,6 @@ function showLoginPopup() {
                 line-height: 1.6;
             ">Please login to your account to add properties to your wishlist.</p>
 
-            <!-- Buttons -->
             <div style="display: flex; gap: 12px;">
                 <button onclick="closeLoginPopup()" style="
                     flex: 1;
@@ -1011,12 +1000,10 @@ function showLoginPopup() {
         </div>
     `;
 
-    // Close on overlay click
     overlay.addEventListener('click', function(e) {
         if (e.target === overlay) closeLoginPopup();
     });
 
-    // Close on Escape key
     document.addEventListener('keydown', function escHandler(e) {
         if (e.key === 'Escape') {
             closeLoginPopup();
@@ -1071,7 +1058,7 @@ function showToast(message, type = 'info') {
 }
 
 // =========================
-// ANIMATIONS CSS (add to style tag)
+// ANIMATIONS CSS
 // =========================
 const popupStyles = document.createElement('style');
 popupStyles.textContent = `
@@ -1097,6 +1084,7 @@ popupStyles.textContent = `
     }
 `;
 document.head.appendChild(popupStyles);
+
 // CSRF token helper
 function getCookie(name) {
     let cookieValue = null;
@@ -1121,6 +1109,7 @@ function updateNavWishlistCount(count) {
         badge.classList.toggle('hidden', !count || count === 0);
     }
 }
+
 // =========================
 // LIVE SEARCH
 // =========================

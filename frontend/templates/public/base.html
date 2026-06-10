@@ -18,6 +18,8 @@
 <!-- Fonts -->
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Manrope:wght@300;400;600&display=swap" rel="stylesheet">
 
+<meta name="user-authenticated" content="{% if user.is_authenticated %}true{% else %}false{% endif %}">
+
 <style>
 body {
     font-family: 'Manrope', sans-serif;
