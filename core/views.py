@@ -494,6 +494,7 @@ def add_property(request):
         total_units = request.POST.get("total_units")
         total_towers = request.POST.get("total_towers")
         land_parcel = request.POST.get("land_parcel")
+        sales_head_number = request.POST.get("sales_head_number")
 
         nearby_names = request.POST.getlist("nearby_name")
         nearby_distances = request.POST.getlist("nearby_distance")
@@ -514,6 +515,7 @@ def add_property(request):
             project_status=project_status, launch_date=launch_date,
             total_units=total_units, total_towers=total_towers,
             land_parcel=land_parcel, nearby_places=nearby_data,
+            sales_head_number=sales_head_number,
             builder=request.user
         )
 

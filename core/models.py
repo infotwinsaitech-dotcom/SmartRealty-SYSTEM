@@ -37,6 +37,7 @@ class Property(models.Model):
 
     description = models.TextField(blank=True)
     status = models.CharField(max_length=50)
+    sales_head_number = models.CharField(max_length=20, blank=True, null=True)
 
     builder = models.ForeignKey(
         'User',
