@@ -732,10 +732,9 @@ def builder_dashboard(request):
     lead_growth = ((current_leads - prev_leads) / prev_leads * 100) if prev_leads else 0
     deal_growth = ((current_deals - prev_deals) / prev_deals * 100) if prev_deals else 0
     try:
-        revenue_growth = ((float(current_revenue) - float(prev_revenue)) / float(prev_revenue) * 100)
-    except (TypeError, ValueError):
+        revenue_growth = ((float(current_revenue) - float(prev_revenue)) / float(prev_revenue) * 100) if prev_revenue else 0
+    except (TypeError, ValueError, ZeroDivisionError):
         revenue_growth = 0
-
     # ===== LEAD SOURCES =====
     total = total_leads
     builder_leads = Lead.objects.filter(
