@@ -2225,10 +2225,176 @@ def wishlist_remove(request, property_id):
 
 @login_required
 def export_dashboard_csv(request):
+    if request.user.role != "builder":
+        return redirect("login")
+
     # Date range from dashboard filter
-    start_date = request.GET.get('start_date')  # "2026-06-01"
-    end_date = request.GET.get('end_date')      # "2026-06-12"
-    
-    # CSV file name: dashboard_report_2026-06-01_to_2026-06-12.csv
+    start_date_str = request.GET.get('start_date')
+    end_date_str = request.GET.get('end_date')
+    today = date.today()
+
+    if start_date_str and end_date_str:
+        try:
+            start_date = datetime.strptime(start_date_str, '%Y-%m-%d').date()
+            end_date = datetime.strptime(end_date_str, '%Y-%m-%d').date()
+        except ValueError:
+            start_date = today
+            end_date = today
+    else:
+        start_date = today
+        end_date = today
+
+    # ✅ FIX: Pehle response create karo, phir writer banao
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = f'attachment; filename="dashboard_report_{start_date}_to_{end_date}.csv"'
+    writer = csv.writer(response)
+
+    # ===== SECTION 1: SUMMARY STATS =====
+    writer.writerow(['DASHBOARD REPORT'])
+    writer.writerow(['Date Range', f'{start_date} to {end_date}'])
+    writer.writerow([])
+
+    total_leads = Lead.objects.filter(
+        builder=request.user,
+        created_at__date__range=[start_date, end_date]
+    ).count()
+
+    active_deals = Deal.objects.filter(
+        builder=request.user,
+        status__in=["NEW", "NEGOTIATION", "BOOKED"],
+        created_at__date__range=[start_date, end_date]
+    ).count()
+
+    total_revenue = Deal.objects.filter(
+        builder=request.user,
+        status="CLOSED",
+        created_at__date__range=[start_date, end_date]
+    ).aggregate(total=Sum('amount'))['total'] or 0
+
+    closed_deals = Deal.objects.filter(
+        builder=request.user,
+        status="CLOSED",
+        created_at__date__range=[start_date, end_date]
+    ).count()
+
+    conversion_rate = (closed_deals / total_leads * 100) if total_leads else 0
+
+    writer.writerow(['SUMMARY STATS'])
+    writer.writerow(['Total Leads', total_leads])
+    writer.writerow(['Active Deals', active_deals])
+    writer.writerow(['Closed Deals', closed_deals])
+    writer.writerow(['Total Revenue', f'Rs. {total_revenue}'])
+    writer.writerow(['Conversion Rate', f'{round(conversion_rate, 2)}%'])
+    writer.writerow([])
+
+    # ===== SECTION 2: LEADS DETAIL =====
+    writer.writerow(['LEADS DETAILS'])
+    writer.writerow(['Name', 'Email', 'Phone', 'Source', 'Status', 'Assigned Agent', 'Created Date'])
+
+    leads = Lead.objects.filter(
+        builder=request.user,
+        created_at__date__range=[start_date, end_date]
+    ).select_related('assigned_to')
+
+    for lead in leads:
+        agent_name = lead.assigned_to.name if lead.assigned_to else "Unassigned"
+        writer.writerow([
+            lead.name,
+            lead.email,
+            lead.phone,
+            lead.source,
+            lead.status,
+            agent_name,
+            lead.created_at.strftime('%Y-%m-%d %H:%M')
+        ])
+    writer.writerow([])
+
+    # ===== SECTION 3: DEALS DETAIL =====
+    writer.writerow(['DEALS DETAILS'])
+    writer.writerow(['Client Name', 'Property', 'Amount', 'Status', 'Agent', 'Created Date'])
+
+    deals = Deal.objects.filter(
+        builder=request.user,
+        created_at__date__range=[start_date, end_date]
+    ).select_related('property', 'agent')
+
+    for deal in deals:
+        writer.writerow([
+            deal.client_name,
+            deal.property.title if deal.property else "N/A",
+            f'Rs. {deal.amount}',
+            deal.status,
+            deal.agent.name if deal.agent else "N/A",
+            deal.created_at.strftime('%Y-%m-%d %H:%M')
+        ])
+    writer.writerow([])
+
+    # ===== SECTION 4: FOLLOW-UPS =====
+    writer.writerow(['FOLLOW-UPS'])
+    writer.writerow(['Lead Name', 'Agent', 'Date', 'Time', 'Status', 'Note'])
+
+    followups = FollowUp.objects.filter(
+        lead__builder=request.user,
+        date__range=[start_date, end_date]
+    ).select_related('lead', 'agent')
+
+    for f in followups:
+        writer.writerow([
+            f.lead.name if f.lead else "N/A",
+            f.agent.name if f.agent else "Unassigned",
+            f.date,
+            f.time,
+            f.status,
+            f.note or ""
+        ])
+    writer.writerow([])
+
+    # ===== SECTION 5: TASKS =====
+    writer.writerow(['TASKS'])
+    writer.writerow(['Title', 'Date', 'Time', 'Priority', 'Status'])
+
+    tasks = Task.objects.filter(
+        user=request.user,
+        date__range=[start_date, end_date]
+    )
+
+    for task in tasks:
+        writer.writerow([
+            task.title,
+            task.date,
+            task.time,
+            task.priority,
+            task.status
+        ])
+    writer.writerow([])
+
+    # ===== SECTION 6: AGENT PERFORMANCE =====
+    writer.writerow(['AGENT PERFORMANCE'])
+    writer.writerow(['Agent Name', 'Total Leads', 'Closed Deals', 'Revenue'])
+
+    agents = Agent.objects.filter(builders=request.user)
+    for agent in agents:
+        agent_leads = Lead.objects.filter(
+            assigned_to=agent,
+            builder=request.user,
+            created_at__date__range=[start_date, end_date]
+        ).count()
+
+        agent_deals = Deal.objects.filter(
+            agent=agent,
+            builder=request.user,
+            status="CLOSED",
+            created_at__date__range=[start_date, end_date]
+        )
+
+        closed_count = agent_deals.count()
+        revenue = agent_deals.aggregate(total=Sum('amount'))['total'] or 0
+
+        writer.writerow([
+            agent.name,
+            agent_leads,
+            closed_count,
+            f'Rs. {revenue}'
+        ])
+
+    return response
