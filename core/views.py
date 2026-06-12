@@ -38,18 +38,38 @@ def home(request):
     properties = Property.objects.all()[:6]
     return render(request, "public/index.html", {"properties": properties})
 def convert_price(price):
-    # Already number hai toh direct convert
     if isinstance(price, (int, float, Decimal)):
         return Decimal(str(price))
     
     price = str(price).lower().replace(",", "").strip()
     
+    if not price or price in ['', 'none', 'null']:
+        return Decimal("0")
+    
     if "crore" in price or "cr" in price:
-        return Decimal(num_part) * Decimal("10000000")
+        num_part = price.replace("crore", "").replace("cr", "").strip()
+        try:
+            return Decimal(num_part) * Decimal("10000000")
+        except:
+            return Decimal("0")
+    
     elif "lakh" in price or "lac" in price or "l" in price:
-        return Decimal(num_part) * Decimal("100000")
+        if "lakh" in price:
+            num_part = price.replace("lakh", "").strip()
+        elif "lac" in price:
+            num_part = price.replace("lac", "").strip()
+        else:
+            num_part = price.replace("l", "").strip()
+        try:
+            return Decimal(num_part) * Decimal("100000")
+        except:
+            return Decimal("0")
+    
     else:
-        return Decimal(price)  # Pure numeric
+        try:
+            return Decimal(price)
+        except:
+            return Decimal("0")
 def properties_view(request):
     properties = Property.objects.all().order_by('-created_at')
     return render(request, "public/properties.html", {"properties": properties})
@@ -1972,7 +1992,7 @@ def add_deal(request):
         property_obj = get_object_or_404(Property, id=property_id)
         agent = get_object_or_404(Agent, user=request.user)
         
-        # ✅ Security: Check agent has access to this property's builder
+        # Security check
         if property_obj.builder not in agent.builders.all():
             return redirect('agent_leads')
 
@@ -1980,8 +2000,12 @@ def add_deal(request):
         if lead_id:
             lead = get_object_or_404(Lead, id=lead_id, assigned_to=agent)
 
+        # ✅ FIX: Use convert_price() to handle "80lakh", "1.5cr", "10000000" etc.
         if amount:
-            amount = Decimal(str(amount).replace(",", "").strip())
+            try:
+                amount = convert_price(amount)
+            except:
+                amount = Decimal("0")
         else:
             amount = Decimal("0")
 
@@ -1996,7 +2020,6 @@ def add_deal(request):
         )
 
         return redirect('agent_leads')
-
 def update_deal(request, deal_id):
     if request.method == "POST":
         deal = Deal.objects.get(id=deal_id)
