@@ -60,10 +60,11 @@
                 </p>
             </div>
             <div class="flex flex-wrap items-center gap-3">
-                <button class="w-full sm:w-auto bg-primary-container text-white px-5 py-2.5 rounded-lg text-xs md:text-sm font-bold flex items-center justify-center gap-2 hover:bg-secondary transition-all shadow-lg shadow-primary-container/20">
-                    <span class="material-symbols-outlined text-sm">download</span>
-                    Export Report
-                </button>
+                <a href="{% url 'export_dashboard_csv' %}?start_date={{ start_date|date:'Y-m-d' }}&end_date={{ end_date|date:'Y-m-d' }}"
+   class="...">
+    <span>download</span>
+    Export Report
+</a>
             </div>
         </div>
 

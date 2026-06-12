@@ -2222,3 +2222,13 @@ def wishlist_remove(request, property_id):
         'success': True,
         'wishlist_count': count
     })
+
+@login_required
+def export_dashboard_csv(request):
+    # Date range from dashboard filter
+    start_date = request.GET.get('start_date')  # "2026-06-01"
+    end_date = request.GET.get('end_date')      # "2026-06-12"
+    
+    # CSV file name: dashboard_report_2026-06-01_to_2026-06-12.csv
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = f'attachment; filename="dashboard_report_{start_date}_to_{end_date}.csv"'
