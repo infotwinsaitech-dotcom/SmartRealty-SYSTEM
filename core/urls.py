@@ -176,6 +176,8 @@ urlpatterns = [
     path('builder/automation/logs/', views_automation.automation_logs, name='automation_logs'),
     path('builder/lead/<int:lead_id>/toggle-automation/', views_automation.toggle_lead_automation, name='toggle_automation'),
     path('properties/', views.property_list, name='properties'),
+    path('add-existing-agent/', views.add_existing_agent, name='add_existing_agent'),
+path('remove-agent/<int:agent_id>/', views.remove_agent_from_builder, name='remove_agent_from_builder'),
 ]
 
 if settings.DEBUG:

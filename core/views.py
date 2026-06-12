@@ -1025,7 +1025,14 @@ User = get_user_model()
 
 @login_required
 def create_agent(request):
-    if request.method == "POST":
+    """Create new agent + show existing agents of this builder"""
+    if request.user.role != "builder":
+        return redirect("login")
+
+    search_results = None
+
+    if request.method == "POST" and not request.POST.get("search_query") and not request.POST.get("agent_id"):
+        # === CREATE NEW AGENT ===
         name = request.POST.get("name")
         username = request.POST.get("username")
         password = request.POST.get("password")
@@ -1037,13 +1044,12 @@ def create_agent(request):
         else:
             user = User.objects.create_user(username=username, password=password, role="agent")
 
-        # ✅ builders ManyToMany support
         agent, created = Agent.objects.get_or_create(
             user=user,
             defaults={"name": name, "email": email, "phone": phone}
         )
 
-        # ✅ ADD CURRENT BUILDER TO MANYTOMANY
+        # Add current builder to agent's builders
         agent.builders.add(request.user)
 
         if not created:
@@ -1053,13 +1059,76 @@ def create_agent(request):
             agent.save()
             agent.builders.add(request.user)
 
+        messages.success(request, f"Agent '{name}' created and added to your team!")
         return redirect('create_agent')
 
-    # ✅ FILTER: Sirf current builder ke agents dikhao
+    # === GET REQUEST or SEARCH RESULTS ===
+    # Show only agents linked to this builder
     agents = Agent.objects.filter(builders=request.user)
 
-    return render(request, "builder/create_agent.html", {"agents": agents})
+    return render(request, "builder/create_agent.html", {
+        "agents": agents,
+        "search_results": search_results
+    })
 
+
+@login_required
+def add_existing_agent(request):
+    """Search and add existing agent to current builder's team"""
+    if request.user.role != "builder":
+        return redirect("login")
+
+    if request.method == "POST":
+        # Case 1: Search by username/phone
+        search_query = request.POST.get("search_query")
+        if search_query:
+            # Search in Agent model by username or phone
+            from django.db.models import Q
+            results = Agent.objects.filter(
+                Q(user__username__iexact=search_query) |
+                Q(phone__icontains=search_query)
+            ).exclude(builders=request.user)  # Exclude already added agents
+
+            agents = Agent.objects.filter(builders=request.user)
+            return render(request, "builder/create_agent.html", {
+                "agents": agents,
+                "search_results": results
+            })
+
+        # Case 2: Add specific agent by ID
+        agent_id = request.POST.get("agent_id")
+        if agent_id:
+            try:
+                agent = Agent.objects.get(id=agent_id)
+                # Check if already in team
+                if request.user in agent.builders.all():
+                    messages.warning(request, "This agent is already in your team!")
+                else:
+                    agent.builders.add(request.user)
+                    messages.success(request, f"Agent '{agent.name}' added to your team!")
+            except Agent.DoesNotExist:
+                messages.error(request, "Agent not found!")
+            return redirect('create_agent')
+
+    return redirect('create_agent')
+
+
+@login_required
+def remove_agent_from_builder(request, agent_id):
+    """Remove agent from current builder's team (not delete agent)"""
+    if request.user.role != "builder":
+        return redirect("login")
+
+    if request.method == "POST":
+        try:
+            agent = Agent.objects.get(id=agent_id)
+            # Remove only this builder from agent's builders
+            agent.builders.remove(request.user)
+            messages.success(request, f"Agent '{agent.name}' removed from your team.")
+        except Agent.DoesNotExist:
+            messages.error(request, "Agent not found!")
+
+    return redirect('create_agent')
 def pipeline(request):
     if request.method == "POST":
         lead_id = request.POST.get("lead_id")

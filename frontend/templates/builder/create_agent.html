@@ -15,7 +15,7 @@
 
 <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8">
 
-    <!-- FORM -->
+    <!-- FORM: Create New Agent -->
     <div class="lg:col-span-5 bg-white p-5 md:p-8 rounded-2xl shadow">
 
         <h3 class="text-lg md:text-xl font-bold mb-4 md:mb-6">
@@ -48,41 +48,117 @@
         </form>
     </div>
 
-    <!-- AGENT LIST -->
-    <div class="lg:col-span-7 bg-white p-5 md:p-8 rounded-2xl shadow">
+    <!-- ADD EXISTING AGENT SECTION -->
+    <div class="lg:col-span-7 space-y-6">
 
-        <h3 class="text-lg md:text-xl font-bold mb-4 md:mb-6">
-            Agent List
-        </h3>
+        <!-- SEARCH EXISTING AGENT -->
+        <div class="bg-white p-5 md:p-8 rounded-2xl shadow">
+            <h3 class="text-lg md:text-xl font-bold mb-4 md:mb-6">
+                ➕ Add Existing Agent to Your Team
+            </h3>
+            <p class="text-sm text-gray-500 mb-4">
+                Search by username or phone number to add an already registered agent to your list.
+            </p>
 
-        <div class="space-y-3 md:space-y-4 max-h-[60vh] overflow-y-auto">
-
-            {% for agent in agents %}
-            <div class="p-3 md:p-4 border rounded-lg md:rounded-xl flex justify-between items-center">
-
-                <div class="min-w-0">
-                    <p class="font-bold text-sm md:text-base truncate">
-                        {{ agent.name }}
-                    </p>
-                    <p class="text-xs md:text-sm text-gray-500 truncate">
-                        {{ agent.email }}
-                    </p>
-                    <p class="text-[11px] md:text-xs text-gray-400">
-                        {{ agent.phone }}
-                    </p>
+            <form method="POST" action="{% url 'add_existing_agent' %}" class="space-y-3">
+                {% csrf_token %}
+                <div class="flex gap-2">
+                    <input name="search_query" placeholder="Enter username or phone..."
+                        class="flex-1 p-2.5 md:p-3 border rounded-lg md:rounded-xl text-sm md:text-base"
+                        required>
+                    <button type="submit"
+                        class="bg-green-600 text-white px-4 md:px-6 py-2.5 md:py-3 rounded-lg md:rounded-xl font-bold text-sm md:text-base hover:bg-green-700 transition">
+                        🔍 Search & Add
+                    </button>
                 </div>
+            </form>
 
-                <span class="bg-green-100 text-green-700 px-2 md:px-3 py-1 rounded-full text-[10px] md:text-xs whitespace-nowrap">
-                    Active
-                </span>
-
+            <!-- Search Results -->
+            {% if search_results %}
+            <div class="mt-4 space-y-2">
+                <p class="text-sm font-semibold text-gray-600">Search Results:</p>
+                {% for agent in search_results %}
+                <div class="flex justify-between items-center p-3 border rounded-lg bg-gray-50">
+                    <div>
+                        <p class="font-bold text-sm">{{ agent.name }}</p>
+                        <p class="text-xs text-gray-500">@{{ agent.user.username }} | {{ agent.phone }}</p>
+                    </div>
+                    <form method="POST" action="{% url 'add_existing_agent' %}" class="inline">
+                        {% csrf_token %}
+                        <input type="hidden" name="agent_id" value="{{ agent.id }}">
+                        <button type="submit"
+                            class="bg-blue-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-blue-700 transition">
+                            ➕ Add to My Team
+                        </button>
+                    </form>
+                </div>
+                {% empty %}
+                <p class="text-sm text-red-500">No agent found with this username/phone.</p>
+                {% endfor %}
             </div>
-            {% empty %}
-            <p class="text-gray-400 text-sm">No agents yet</p>
-            {% endfor %}
+            {% endif %}
 
+            <!-- Messages -->
+            {% if messages %}
+            <div class="mt-4">
+                {% for message in messages %}
+                <p class="text-sm {% if message.tags == 'success' %}text-green-600{% else %}text-red-500{% endif %}">
+                    {{ message }}
+                </p>
+                {% endfor %}
+            </div>
+            {% endif %}
         </div>
 
+        <!-- AGENT LIST -->
+        <div class="bg-white p-5 md:p-8 rounded-2xl shadow">
+
+            <h3 class="text-lg md:text-xl font-bold mb-4 md:mb-6">
+                Your Agent List ({{ agents|length }})
+            </h3>
+
+            <div class="space-y-3 md:space-y-4 max-h-[50vh] overflow-y-auto">
+
+                {% for agent in agents %}
+                <div class="p-3 md:p-4 border rounded-lg md:rounded-xl flex justify-between items-center">
+
+                    <div class="min-w-0">
+                        <p class="font-bold text-sm md:text-base truncate">
+                            {{ agent.name }}
+                        </p>
+                        <p class="text-xs md:text-sm text-gray-500 truncate">
+                            {{ agent.email }}
+                        </p>
+                        <p class="text-[11px] md:text-xs text-gray-400">
+                            {{ agent.phone }}
+                        </p>
+                        <p class="text-[10px] text-blue-500 mt-1">
+                            @{{ agent.user.username }}
+                        </p>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <span class="bg-green-100 text-green-700 px-2 md:px-3 py-1 rounded-full text-[10px] md:text-xs whitespace-nowrap">
+                            Active
+                        </span>
+                        <!-- Remove from my team button -->
+                        <form method="POST" action="{% url 'remove_agent_from_builder' agent.id %}" class="inline"
+                              onsubmit="return confirm('Remove this agent from your team?')">
+                            {% csrf_token %}
+                            <button type="submit" class="text-red-500 hover:text-red-700 text-xs px-2">
+                                ✕
+                            </button>
+                        </form>
+                    </div>
+
+                </div>
+                {% empty %}
+                <p class="text-gray-400 text-sm text-center py-4">No agents in your team yet</p>
+                {% endfor %}
+
+            </div>
+
+        </div>
     </div>
 
 </div>
