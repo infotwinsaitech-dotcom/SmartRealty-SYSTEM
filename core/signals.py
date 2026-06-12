@@ -5,12 +5,11 @@ from .models import User, Agent
 @receiver(post_save, sender=User)
 def auto_create_agent(sender, instance, created, **kwargs):
     if created and instance.role == "agent":
-        builder = User.objects.filter(role="builder").first()
-
-        Agent.objects.create(
+        agent, _ = Agent.objects.get_or_create(
             user=instance,
-            name=instance.username,
-            email=instance.email,
-            phone=instance.phone,
-            builder=builder
+            defaults={
+                "name": instance.username,
+                "email": instance.email,
+                "phone": getattr(instance, "phone", ""),
+            }
         )

@@ -1050,7 +1050,7 @@ def create_agent(request):
         )
 
         # Add current builder to agent's builders
-        agent.builders.add(request.user)
+        agent.builders.add(request.user) 
 
         if not created:
             agent.name = name
