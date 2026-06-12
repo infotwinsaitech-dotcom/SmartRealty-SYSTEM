@@ -37,7 +37,19 @@ from .models import Wishlist
 def home(request):
     properties = Property.objects.all()[:6]
     return render(request, "public/index.html", {"properties": properties})
-
+def convert_price(price):
+    # Already number hai toh direct convert
+    if isinstance(price, (int, float, Decimal)):
+        return Decimal(str(price))
+    
+    price = str(price).lower().replace(",", "").strip()
+    
+    if "crore" in price or "cr" in price:
+        return Decimal(num_part) * Decimal("10000000")
+    elif "lakh" in price or "lac" in price or "l" in price:
+        return Decimal(num_part) * Decimal("100000")
+    else:
+        return Decimal(price)  # Pure numeric
 def properties_view(request):
     properties = Property.objects.all().order_by('-created_at')
     return render(request, "public/properties.html", {"properties": properties})
@@ -719,7 +731,10 @@ def builder_dashboard(request):
 
     lead_growth = ((current_leads - prev_leads) / prev_leads * 100) if prev_leads else 0
     deal_growth = ((current_deals - prev_deals) / prev_deals * 100) if prev_deals else 0
-    revenue_growth = ((current_revenue - prev_revenue) / prev_revenue * 100) if prev_revenue else 0
+    try:
+        revenue_growth = ((float(current_revenue) - float(prev_revenue)) / float(prev_revenue) * 100)
+    except (TypeError, ValueError):
+        revenue_growth = 0
 
     # ===== LEAD SOURCES =====
     total = total_leads
@@ -861,18 +876,83 @@ def builder_property_detail(request, id):
     property = get_object_or_404(Property, id=id, builder=request.user)
     leads = Lead.objects.filter(properties=property, builder=request.user)
 
+    # ===== DELETE HANDLING =====
+    if request.method == "POST" and request.POST.get("action") == "delete":
+        property_title = property.title
+        property.delete()
+        messages.success(request, f"Property '{property_title}' deleted successfully!")
+        return redirect("property_management")
+
     if request.method == "POST":
-        property.title = request.POST.get('title')
-        property.location = request.POST.get('location')
-        property.price = request.POST.get('price')
-        property.description = request.POST.get('description')
-        property.status = request.POST.get('status')
+        # Update all fields
+        property.title = request.POST.get('title', property.title)
+        property.location = request.POST.get('location', property.location)
+        property.project_name = request.POST.get('project_name', property.project_name)
+        property.price = request.POST.get('price', property.price)
+        property.property_type = request.POST.get('property_type', property.property_type)
+        property.beds = request.POST.get('beds') or None
+        property.baths = request.POST.get('baths') or None
+        property.sqft = request.POST.get('sqft') or None
+        property.description = request.POST.get('description', property.description)
+        property.status = request.POST.get('status', property.status)
+        property.configuration = request.POST.get('configuration', property.configuration)
+        property.builder_name = request.POST.get('builder_name', property.builder_name)
+        property.starting_price = request.POST.get('starting_price', property.starting_price)
+        property.max_price = request.POST.get('max_price', property.max_price)
+        property.project_status = request.POST.get('project_status', property.project_status)
+        property.launch_date = request.POST.get('launch_date', property.launch_date)
+        property.total_units = request.POST.get('total_units', property.total_units)
+        property.total_towers = request.POST.get('total_towers', property.total_towers)
+        property.land_parcel = request.POST.get('land_parcel', property.land_parcel)
+        property.rera_number = request.POST.get('rera_number', property.rera_number)
+        property.possession = request.POST.get('possession', property.possession)
+        property.highlights = request.POST.get('highlights', property.highlights)
+        property.map_link = request.POST.get('map_link', property.map_link)
+        property.sales_head_number = request.POST.get('sales_head_number', property.sales_head_number)
+
+        # Handle amenities (JSONField)
+        amenities = request.POST.getlist("amenities")
+        property.amenities = amenities
+
+        # Handle nearby places (JSONField)
+        nearby_names = request.POST.getlist("nearby_name")
+        nearby_distances = request.POST.getlist("nearby_distance")
+        nearby_icons = request.POST.getlist("nearby_icon")
+        nearby_data = []
+        for i in range(len(nearby_names)):
+            if nearby_names[i].strip():
+                nearby_data.append({
+                    "name": nearby_names[i], 
+                    "distance": nearby_distances[i] if i < len(nearby_distances) else "", 
+                    "icon": nearby_icons[i] if i < len(nearby_icons) else ""
+                })
+        property.nearby_places = nearby_data
+
+        # Handle file uploads
         if request.FILES.get('thumbnail'):
             property.thumbnail = request.FILES.get('thumbnail')
+        if request.FILES.get('project_logo'):
+            property.project_logo = request.FILES.get('project_logo')
+        if request.FILES.get('project_video'):
+            property.project_video = request.FILES.get('project_video')
+        if request.FILES.get('brochure'):
+            property.brochure = request.FILES.get('brochure')
+
         property.save()
 
-    return render(request, "builder/property_detail.html", {"property": property, "leads": leads})
+        # Handle new gallery images
+        images = request.FILES.getlist("images")
+        for img in images:
+            if img:
+                PropertyImage.objects.create(property=property, image=img)
 
+        messages.success(request, "Property updated successfully!")
+        return redirect('builder_property_detail', id=property.id)
+
+    return render(request, "builder/property_detail.html", {
+        "property": property, 
+        "leads": leads
+    })
 @login_required
 def delete_property(request, id):
     if request.user.role != "builder":
@@ -1366,7 +1446,10 @@ def ai_insights(request):
         scored_leads.append({"lead": lead, "score": score, "intent": intent})
 
     total_revenue = Deal.objects.aggregate(total=Sum('amount'))['total'] or 0
-    forecast = int(total_revenue * 1.3)
+    try:
+        forecast = int(float(total_revenue) * 1.3)
+    except (TypeError, ValueError):
+        forecast = 0
 
     insights = [
         {"title": "Market Shift", "desc": "Luxury demand increased"},
