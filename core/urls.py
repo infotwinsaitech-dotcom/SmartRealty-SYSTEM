@@ -180,6 +180,7 @@ urlpatterns = [
 path('remove-agent/<int:agent_id>/', views.remove_agent_from_builder, name='remove_agent_from_builder'),
 path('export-dashboard-csv/', views.export_dashboard_csv, name='export_dashboard_csv'),
 path('agent/property-leads/<int:property_id>/', views.property_leads, name='property_leads'),
+path('agent/property-leads/<int:property_id>/', views.property_leads, name='property_leads'),
 ]
 
 if settings.DEBUG:

@@ -2706,3 +2706,27 @@ def export_dashboard_csv(request):
         ])
 
     return response
+
+@login_required
+def property_leads(request, property_id):
+    """Agent ke liye property-specific leads page with sidebar"""
+    agent = get_object_or_404(Agent, user=request.user)
+    agent_builders = agent.builders.all()
+
+    # Property verify karo
+    property_obj = get_object_or_404(Property, id=property_id, builder__in=agent_builders)
+
+    # LEADS: CLOSED aur FAILED exclude karo (status + deals dono check)
+    leads = Lead.objects.filter(
+        properties__id=property_id,
+        builder__in=agent_builders
+    ).exclude(
+        status__in=["CLOSED", "FAILED"]
+    ).exclude(
+        deals__status__in=["CLOSED", "FAILED"]
+    ).distinct().order_by("-created_at")
+
+    return render(request, "agent/agent_propertieswithleads.html", {
+        "property": property_obj,
+        "leads": leads,
+    })
