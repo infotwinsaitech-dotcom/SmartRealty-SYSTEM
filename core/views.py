@@ -1898,18 +1898,23 @@ def scheduler(request):
     agent_builders = agent.builders.all()
 
     # ✅ LEADS: Sirf un leads jo CLOSED ya FAILED nahi hain
+    # AND jinke deals bhi CLOSED ya FAILED nahi hain
     leads = Lead.objects.filter(
         assigned_to=agent,
         builder__in=agent_builders
     ).exclude(
-        status__in=["CLOSED", "FAILED"]  # ❌ Exclude closed and failed leads
-    )
+        status__in=["CLOSED", "FAILED"]  # Exclude leads with closed/failed status
+    ).exclude(
+        deals__status__in=["CLOSED", "FAILED"]  # ❌ NEW: Exclude leads whose deals are closed/failed
+    ).distinct()
 
     # ✅ VISITS: Sirf active leads ke visits dikhao
     visits = SiteVisit.objects.filter(
         agent=agent,
         builder__in=agent_builders,
-        lead__status__in=["NEW", "HOT", "WARM", "COLD", "CONTACTED", "VISIT", "NEGOTIATION"]  # Only active leads
+        lead__status__in=["NEW", "HOT", "WARM", "COLD", "CONTACTED", "VISIT", "NEGOTIATION"]
+    ).exclude(
+        lead__deals__status__in=["CLOSED", "FAILED"]  # ❌ NEW: Exclude visits of closed/failed deal leads
     ).order_by("-date")
 
     if request.method == "POST":
@@ -1926,9 +1931,14 @@ def scheduler(request):
             builder__in=agent_builders
         )
 
-        # Double check lead is not closed/failed
+        # Double check lead is not closed/failed (both status and deals)
         if lead.status in ["CLOSED", "FAILED"]:
             messages.error(request, "Cannot schedule visit for a closed or failed lead!")
+            return redirect("scheduler")
+
+        # ❌ NEW: Check if lead has any closed/failed deals
+        if lead.deals.filter(status__in=["CLOSED", "FAILED"]).exists():
+            messages.error(request, "Cannot schedule visit - this lead already has a closed/failed deal!")
             return redirect("scheduler")
 
         SiteVisit.objects.create(
