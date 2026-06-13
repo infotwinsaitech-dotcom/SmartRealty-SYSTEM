@@ -182,6 +182,7 @@ path('export-dashboard-csv/', views.export_dashboard_csv, name='export_dashboard
 path('agent/property-leads/<int:property_id>/', views.property_leads, name='property_leads'),
 path('agent/property-leads/<int:property_id>/', views.property_leads, name='property_leads'),
 path('accounts/', include('allauth.urls')),  # Allauth URLs
+path('auth/redirect/', views.google_login_redirect, name='google_redirect'),
 ]
 
 if settings.DEBUG:

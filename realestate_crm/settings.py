@@ -64,11 +64,12 @@ ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
 # Google OAuth settings
+# Google OAuth settings
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
         'APP': {
-            'client_id': 'YOUR_GOOGLE_CLIENT_ID',
-            'secret': 'YOUR_GOOGLE_CLIENT_SECRET',
+            'client_id': os.getenv('GOOGLE_CLIENT_ID', ''),
+            'secret': os.getenv('GOOGLE_CLIENT_SECRET', ''),
             'key': ''
         },
         'SCOPE': [
@@ -80,8 +81,9 @@ SOCIALACCOUNT_PROVIDERS = {
         }
     }
 }
+
 # Login redirect
-LOGIN_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = '/auth/redirect/'  # ✅ Custom redirect view
 LOGOUT_REDIRECT_URL = '/login/'
 SOCIALACCOUNT_ADAPTER = 'core.adapters.CustomSocialAccountAdapter'
 ASGI_APPLICATION = 'realestate_crm.asgi.application'
@@ -95,6 +97,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    'allauth.account.middleware.AccountMiddleware',
 ]
 
 ROOT_URLCONF = "realestate_crm.urls"
