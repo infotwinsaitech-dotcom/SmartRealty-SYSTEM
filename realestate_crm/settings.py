@@ -42,13 +42,48 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    'django.contrib.sites',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
     'rest_framework',
     'core',
     'channels',
     'cloudinary',
     'cloudinary_storage',
 ]
-
+SITE_ID = 1
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
+# Allauth settings
+ACCOUNT_EMAIL_VERIFICATION = 'none'
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+# Google OAuth settings
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'APP': {
+            'client_id': 'YOUR_GOOGLE_CLIENT_ID',
+            'secret': 'YOUR_GOOGLE_CLIENT_SECRET',
+            'key': ''
+        },
+        'SCOPE': [
+            'profile',
+            'email',
+        ],
+        'AUTH_PARAMS': {
+            'access_type': 'online',
+        }
+    }
+}
+# Login redirect
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/login/'
+SOCIALACCOUNT_ADAPTER = 'core.adapters.CustomSocialAccountAdapter'
 ASGI_APPLICATION = 'realestate_crm.asgi.application'
 
 MIDDLEWARE = [

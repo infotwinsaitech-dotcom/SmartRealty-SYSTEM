@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 from . import views
 from django.conf import settings
 from django.conf.urls.static import static
@@ -181,6 +181,7 @@ path('remove-agent/<int:agent_id>/', views.remove_agent_from_builder, name='remo
 path('export-dashboard-csv/', views.export_dashboard_csv, name='export_dashboard_csv'),
 path('agent/property-leads/<int:property_id>/', views.property_leads, name='property_leads'),
 path('agent/property-leads/<int:property_id>/', views.property_leads, name='property_leads'),
+path('accounts/', include('allauth.urls')),  # Allauth URLs
 ]
 
 if settings.DEBUG:
