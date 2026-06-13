@@ -20,6 +20,8 @@ urlpatterns = [
         views.agent_performance,
         name='agent_performance'
     ),
+    path('auth/redirect/', views.google_login_redirect, name='google_redirect'),
+     path('accounts/', include('allauth.urls')),
 ]
 
 if settings.DEBUG:

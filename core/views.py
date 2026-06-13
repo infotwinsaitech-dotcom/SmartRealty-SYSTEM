@@ -2730,3 +2730,21 @@ def property_leads(request, property_id):
         "property": property_obj,
         "leads": leads,
     })
+@login_required
+def google_login_redirect(request):
+    """Google login ke baad user ko sahi page pe redirect karo"""
+    
+    # Agar user ka role 'user' hai = normal user = home page
+    if request.user.role == 'user':
+        return redirect('home')
+    
+    # Agar builder hai = builder dashboard
+    elif request.user.role == 'builder':
+        return redirect('builder_dashboard')
+    
+    # Agar agent hai = agent dashboard
+    elif request.user.role == 'agent':
+        return redirect('agent_dashboard')
+    
+    # Default fallback
+    return redirect('home')
