@@ -1893,18 +1893,23 @@ def agent_profile(request):
 @login_required
 def scheduler(request):
     agent = get_object_or_404(Agent, user=request.user)
-    
+
     # ✅ GET ALL BUILDERS FOR THIS AGENT
     agent_builders = agent.builders.all()
 
+    # ✅ LEADS: Sirf un leads jo CLOSED ya FAILED nahi hain
     leads = Lead.objects.filter(
         assigned_to=agent,
         builder__in=agent_builders
+    ).exclude(
+        status__in=["CLOSED", "FAILED"]  # ❌ Exclude closed and failed leads
     )
 
+    # ✅ VISITS: Sirf active leads ke visits dikhao
     visits = SiteVisit.objects.filter(
         agent=agent,
-        builder__in=agent_builders
+        builder__in=agent_builders,
+        lead__status__in=["NEW", "HOT", "WARM", "COLD", "CONTACTED", "VISIT", "NEGOTIATION"]  # Only active leads
     ).order_by("-date")
 
     if request.method == "POST":
@@ -1913,8 +1918,18 @@ def scheduler(request):
         visit_date = request.POST.get("date")
         visit_time = request.POST.get("time")
 
-        # ✅ Security: Check lead belongs to agent's builders
-        lead = get_object_or_404(Lead, id=lead_id, assigned_to=agent, builder__in=agent_builders)
+        # ✅ Security: Check lead belongs to agent's builders AND is not closed/failed
+        lead = get_object_or_404(
+            Lead, 
+            id=lead_id, 
+            assigned_to=agent, 
+            builder__in=agent_builders
+        )
+
+        # Double check lead is not closed/failed
+        if lead.status in ["CLOSED", "FAILED"]:
+            messages.error(request, "Cannot schedule visit for a closed or failed lead!")
+            return redirect("scheduler")
 
         SiteVisit.objects.create(
             property_id=property_id,
@@ -1922,9 +1937,10 @@ def scheduler(request):
             agent=agent,
             date=visit_date,
             time=visit_time,
-            builder=lead.builder  # ✅ Auto-set builder from lead
+            builder=lead.builder
         )
 
+        messages.success(request, "Visit scheduled successfully!")
         return redirect("scheduler")
 
     return render(request, "agent/scheduler.html", {"leads": leads, "visits": visits})
