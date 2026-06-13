@@ -2118,19 +2118,16 @@ def delete_lead(request, lead_id):
 @login_required
 def agent_properties(request):
     agent = get_object_or_404(Agent, user=request.user)
-    
-    # GET ALL BUILDERS FOR THIS AGENT
     agent_builders = agent.builders.all()
 
     properties = Property.objects.filter(
         interested_leads__assigned_to=agent,
-        builder__in=agent_builders  # Privacy fix
+        builder__in=agent_builders
     ).annotate(
-        demand=Count("interested_leads")
+        demand=Count("interested_leads", distinct=True)
     ).distinct().order_by("-demand")
 
     return render(request, "agent/agent_properties.html", {"properties": properties})
-
 @login_required
 def agent_profile(request):
     agent = get_object_or_404(Agent, user=request.user)
