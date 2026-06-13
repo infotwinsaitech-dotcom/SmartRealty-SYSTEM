@@ -190,8 +190,6 @@ def property_detail(request, id):
     })
 
 
-with open('/mnt/agents/output/views_secured_part1.py', 'w') as f:
-    f.write(part1)
 
 print("Part 1 written successfully")
 
@@ -418,9 +416,6 @@ def agent_dashboard(request):
     return render(request, "agent/agent_dashboard.html")
 
 
-with open('/mnt/agents/output/views_secured_part2.py', 'w') as f:
-    f.write(part2)
-
 print("Part 2 written successfully")
 
 
@@ -585,8 +580,7 @@ def my_inquiries(request):
     return render(request, "user/my_inquiries.html", {"inquiries": inquiries})
 
 
-with open('/mnt/agents/output/views_secured_part3.py', 'w') as f:
-    f.write(part3)
+
 
 print("Part 3 written successfully")
 
@@ -746,9 +740,6 @@ def lead_management(request):
         "properties": properties,
     })
 
-
-with open('/mnt/agents/output/views_secured_part4.py', 'w') as f:
-    f.write(part4)
 
 print("Part 4 written successfully")
 
@@ -1010,8 +1001,6 @@ def edit_lead(request, id):
     return redirect(f"/builder/leads/?lead={id}")
 
 
-with open('/mnt/agents/output/views_secured_part5.py', 'w') as f:
-    f.write(part5)
 
 print("Part 5 written successfully")
 
@@ -1244,9 +1233,6 @@ def create_agent(request):
         "search_results": search_results
     })
 
-
-with open('/mnt/agents/output/views_secured_part6.py', 'w') as f:
-    f.write(part6)
 
 print("Part 6 written successfully")
 
@@ -1509,8 +1495,6 @@ def communication(request):
     })
 
 
-with open('/mnt/agents/output/views_secured_part7.py', 'w') as f:
-    f.write(part7)
 
 print("Part 7 written successfully")
 
@@ -1702,8 +1686,6 @@ def mark_notification_read(request, id):
     return JsonResponse({"status": "ok"})
 
 
-with open('/mnt/agents/output/views_secured_part8.py', 'w') as f:
-    f.write(part8)
 
 print("Part 8 written successfully")
 
@@ -1957,9 +1939,6 @@ def agent_delete_lead(request, lead_id):
     return redirect("agent_leads")
 
 
-with open('/mnt/agents/output/views_secured_part9.py', 'w') as f:
-    f.write(part9)
-
 print("Part 9 written successfully")
 
 # AGENT VIEWS - FIXED FOR MULTIPLE BUILDERS
@@ -2192,8 +2171,6 @@ def agent_profile(request):
     })
 
 
-with open('/mnt/agents/output/views_secured_part10.py', 'w') as f:
-    f.write(part10)
 
 print("Part 10 written successfully")
 
