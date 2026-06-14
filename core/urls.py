@@ -183,6 +183,7 @@ path('agent/property-leads/<int:property_id>/', views.property_leads, name='prop
 path('agent/property-leads/<int:property_id>/', views.property_leads, name='property_leads'),
 path('accounts/', include('allauth.urls')),  # Allauth URLs
 path('auth/redirect/', views.google_login_redirect, name='google_redirect'),
+path('api/check-username/', views.check_username, name='check_username'),
 ]
 
 if settings.DEBUG:

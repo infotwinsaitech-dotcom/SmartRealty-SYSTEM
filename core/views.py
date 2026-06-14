@@ -2748,3 +2748,17 @@ def google_login_redirect(request):
     
     # Default fallback
     return redirect('home')
+from django.http import JsonResponse
+from django.views.decorators.http import require_GET
+
+@require_GET
+def check_username(request):
+    username = request.GET.get('username', '').strip()
+    if not username:
+        return JsonResponse({'available': False, 'message': 'Username required'})
+    
+    exists = User.objects.filter(username__iexact=username).exists()
+    return JsonResponse({
+        'available': not exists,
+        'message': 'Username already taken' if exists else 'Username available'
+    })
