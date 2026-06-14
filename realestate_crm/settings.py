@@ -61,8 +61,9 @@ AUTHENTICATION_BACKENDS = [
 # Allauth settings
 ACCOUNT_EMAIL_VERIFICATION = 'none'
 ACCOUNT_EMAIL_REQUIRED = True
-ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_USERNAME_REQUIRED = True
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_USER_MODEL_USERNAME_FIELD = 'username'
 # Google OAuth settings
 # Google OAuth settings
 SOCIALACCOUNT_PROVIDERS = {
@@ -87,6 +88,12 @@ LOGIN_REDIRECT_URL = '/auth/redirect/'  # ✅ Custom redirect view
 LOGOUT_REDIRECT_URL = '/login/'
 SOCIALACCOUNT_ADAPTER = 'core.adapters.CustomSocialAccountAdapter'
 ASGI_APPLICATION = 'realestate_crm.asgi.application'
+SOCIALACCOUNT_AUTO_SIGNUP = True
+ACCOUNT_LOGOUT_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = 'google_login_redirect' 
+SOCIALACCOUNT_FORMS = {
+    'signup': 'core.forms.CustomSocialSignupForm'
+}
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
