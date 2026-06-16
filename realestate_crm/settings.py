@@ -24,8 +24,11 @@ if not SECRET_KEY:
 
 DEBUG = os.getenv("DEBUG", "False").lower() in ("true", "1", "yes")
 
-ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
-
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1",'smartrealty-system.onrender.com',
+    '*.onrender.com',).split(",")
+CSRF_TRUSTED_ORIGINS = [
+    'https://smartrealty-system.onrender.com',
+]
 # Security headers
 SECURE_SSL_REDIRECT = not DEBUG
 SECURE_HSTS_SECONDS = 31536000 if not DEBUG else 0
@@ -416,7 +419,7 @@ CACHALOT_ENABLED = False
 # =============================================================================
 # REMOVE DEBUG PRINTS IN PRODUCTION
 # =============================================================================
-
+DEBUG = False
 if DEBUG:
     print("SECRET_KEY loaded:", bool(SECRET_KEY))
     print("SENDGRID loaded:", bool(os.getenv("SENDGRID_API_KEY")))
