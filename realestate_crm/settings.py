@@ -24,8 +24,12 @@ if not SECRET_KEY:
 
 DEBUG = os.getenv("DEBUG", "False").lower() in ("true", "1", "yes")
 
-ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1",'smartrealty-system.onrender.com',
-    '*.onrender.com',).split(",")
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+    'smartrealty-system.onrender.com',
+    '*.onrender.com',
+]
 CSRF_TRUSTED_ORIGINS = [
     'https://smartrealty-system.onrender.com',
 ]
