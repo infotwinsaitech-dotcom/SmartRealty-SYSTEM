@@ -1,8 +1,8 @@
 from django.urls import path, include
-from . import views
 from django.conf import settings
 from django.conf.urls.static import static
 from django.shortcuts import render
+from . import views
 from . import views_automation
 
 urlpatterns = [
@@ -121,6 +121,9 @@ urlpatterns = [
 
     path('builder/campaign/delete/<int:id>/', views.delete_campaign, name='delete_campaign'),
 
+    # ================= SCALE LAUNCH CHECKLIST (NEW) =================
+    path('builder/scale-launch-checklist/', views.scale_launch_checklist, name='scale_launch_checklist'),
+
     # ================= AGENT =================
 
     path('agent/dashboard/', views.agent_dashboard, name='agent_dashboard'),
@@ -177,13 +180,14 @@ urlpatterns = [
     path('builder/lead/<int:lead_id>/toggle-automation/', views_automation.toggle_lead_automation, name='toggle_automation'),
     path('properties/', views.property_list, name='properties'),
     path('add-existing-agent/', views.add_existing_agent, name='add_existing_agent'),
-path('remove-agent/<int:agent_id>/', views.remove_agent_from_builder, name='remove_agent_from_builder'),
-path('export-dashboard-csv/', views.export_dashboard_csv, name='export_dashboard_csv'),
-path('agent/property-leads/<int:property_id>/', views.property_leads, name='property_leads'),
-path('agent/property-leads/<int:property_id>/', views.property_leads, name='property_leads'),
-path('accounts/', include('allauth.urls')),  # Allauth URLs
-path('auth/redirect/', views.google_login_redirect, name='google_redirect'),
-path('api/check-username/', views.check_username, name='check_username'),
+    path('remove-agent/<int:agent_id>/', views.remove_agent_from_builder, name='remove_agent_from_builder'),
+    path('export-dashboard-csv/', views.export_dashboard_csv, name='export_dashboard_csv'),
+    path('agent/property-leads/<int:property_id>/', views.property_leads, name='property_leads'),
+    path('accounts/', include('allauth.urls')),  # Allauth URLs
+    path('auth/redirect/', views.google_login_redirect, name='google_redirect'),
+    path('api/check-username/', views.check_username, name='check_username'),
+    # urls.py
+    path('health/', lambda r: JsonResponse({"status": "ok"}), name='health'),
 ]
 
 if settings.DEBUG:
@@ -191,3 +195,11 @@ if settings.DEBUG:
         settings.MEDIA_URL,
         document_root=settings.MEDIA_ROOT
     )
+
+
+
+
+print("✅ urls.py CREATED SUCCESSFULLY!")
+print("="*60)
+print("Key addition: builder/scale-launch-checklist/")
+print("="*60)
