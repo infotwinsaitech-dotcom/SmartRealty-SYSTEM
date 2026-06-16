@@ -509,7 +509,7 @@ def redirect_by_role(user):
         return redirect("builder_dashboard")
     elif user.role == "agent":
         return redirect("agent_dashboard")
-    return redirect("home")
+    return redirect("/")
 
 
 def login_view(request):
