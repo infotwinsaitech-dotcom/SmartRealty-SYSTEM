@@ -1328,7 +1328,7 @@ def scale_launch_checklist(request):
             'id': 'property_setup',
             'title': 'Property Setup & Configuration',
             'description': 'Add all properties with complete details, images, and pricing',
-            'icon': 'fa-building',
+            'icon': 'apartment',
             'category': 'pre_launch',
             'weight': 15,
             'tasks': [
@@ -1343,7 +1343,7 @@ def scale_launch_checklist(request):
             'id': 'agent_setup',
             'title': 'Agent Team Setup',
             'description': 'Configure your sales team with proper assignments',
-            'icon': 'fa-users',
+            'icon': 'group',
             'category': 'pre_launch',
             'weight': 15,
             'tasks': [
@@ -1357,7 +1357,7 @@ def scale_launch_checklist(request):
             'id': 'lead_system',
             'title': 'Lead Management System',
             'description': 'Set up lead capture, assignment, and follow-up workflows',
-            'icon': 'fa-user-plus',
+            'icon': 'person_add',
             'category': 'pre_launch',
             'weight': 20,
             'tasks': [
@@ -1372,7 +1372,7 @@ def scale_launch_checklist(request):
             'id': 'automation',
             'title': 'Automation & Drip Campaigns',
             'description': 'Configure automated follow-ups and marketing sequences',
-            'icon': 'fa-robot',
+            'icon': 'smart_toy',
             'category': 'pre_launch',
             'weight': 10,
             'tasks': [
@@ -1386,7 +1386,7 @@ def scale_launch_checklist(request):
             'id': 'analytics',
             'title': 'Analytics & Reporting',
             'description': 'Set up dashboards and reporting for performance tracking',
-            'icon': 'fa-chart-line',
+            'icon': 'analytics',
             'category': 'pre_launch',
             'weight': 10,
             'tasks': [
@@ -1400,7 +1400,7 @@ def scale_launch_checklist(request):
             'id': 'communication',
             'title': 'Communication Channels',
             'description': 'Set up chat, email, and notification systems',
-            'icon': 'fa-comments',
+            'icon': 'chat',
             'category': 'pre_launch',
             'weight': 10,
             'tasks': [
@@ -1414,7 +1414,7 @@ def scale_launch_checklist(request):
             'id': 'security',
             'title': 'Security & Compliance',
             'description': 'Ensure data security and regulatory compliance',
-            'icon': 'fa-shield-alt',
+            'icon': 'shield',
             'category': 'pre_launch',
             'weight': 10,
             'tasks': [
@@ -1428,7 +1428,7 @@ def scale_launch_checklist(request):
             'id': 'launch_prep',
             'title': 'Launch Preparation',
             'description': 'Final checks before going live',
-            'icon': 'fa-rocket',
+            'icon': 'rocket_launch',
             'category': 'launch',
             'weight': 10,
             'tasks': [

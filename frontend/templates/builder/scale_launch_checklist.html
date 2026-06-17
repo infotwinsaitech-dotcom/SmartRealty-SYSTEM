@@ -4,788 +4,319 @@
 {% block title %}Scale Launch Checklist | SmartRealty{% endblock %}
 
 {% block content %}
-<style>
-  /* Scale Launch Checklist Styles */
-  .scale-container {
-    display: flex;
-    min-height: calc(100vh - 60px);
-    background: #f8f9fa;
-  }
+<div class="flex flex-col lg:flex-row gap-6 h-full">
 
-  /* Sidebar */
-  .leads-sidebar {
-    width: 320px;
-    background: #fff;
-    border-right: 1px solid #e9ecef;
-    padding: 20px;
-    overflow-y: auto;
-    max-height: calc(100vh - 60px);
-    position: sticky;
-    top: 60px;
-  }
-
-  .sidebar-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 20px;
-    padding-bottom: 15px;
-    border-bottom: 2px solid #e9ecef;
-  }
-
-  .sidebar-title {
-    font-size: 18px;
-    font-weight: 700;
-    color: #2c3e50;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .lead-count-badge {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 13px;
-    font-weight: 600;
-  }
-
-  /* Lead Stats */
-  .lead-stats-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-    margin-bottom: 20px;
-  }
-
-  .stat-card {
-    background: #f8f9fa;
-    border-radius: 10px;
-    padding: 12px;
-    text-align: center;
-    border: 1px solid #e9ecef;
-    transition: all 0.2s ease;
-  }
-
-  .stat-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-  }
-
-  .stat-value {
-    font-size: 22px;
-    font-weight: 700;
-    margin-bottom: 4px;
-  }
-
-  .stat-label {
-    font-size: 11px;
-    color: #6c757d;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-
-  .stat-hot { color: #e74c3c; }
-  .stat-warm { color: #f39c12; }
-  .stat-cold { color: #3498db; }
-  .stat-new { color: #2ecc71; }
-  .stat-contacted { color: #9b59b6; }
-  .stat-closed { color: #1abc9c; }
-
-  /* Recent Leads */
-  .recent-leads-title {
-    font-size: 14px;
-    font-weight: 600;
-    color: #495057;
-    margin-bottom: 12px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-
-  .lead-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px;
-    border-radius: 8px;
-    margin-bottom: 6px;
-    background: #fff;
-    border: 1px solid #e9ecef;
-    transition: all 0.2s ease;
-    cursor: pointer;
-  }
-
-  .lead-item:hover {
-    background: #f1f3f5;
-    border-color: #dee2e6;
-  }
-
-  .lead-avatar {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 600;
-    font-size: 14px;
-    flex-shrink: 0;
-  }
-
-  .lead-info {
-    flex: 1;
-    min-width: 0;
-  }
-
-  .lead-name {
-    font-size: 13px;
-    font-weight: 600;
-    color: #2c3e50;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .lead-meta {
-    font-size: 11px;
-    color: #6c757d;
-    margin-top: 2px;
-  }
-
-  .lead-status-badge {
-    padding: 3px 8px;
-    border-radius: 12px;
-    font-size: 10px;
-    font-weight: 600;
-    text-transform: uppercase;
-  }
-
-  .status-hot { background: #fde8e8; color: #c0392b; }
-  .status-warm { background: #fef5e7; color: #d68910; }
-  .status-cold { background: #ebf5fb; color: #2980b9; }
-  .status-new { background: #e8f8f5; color: #27ae60; }
-  .status-contacted { background: #f4ecf7; color: #8e44ad; }
-  .status-closed { background: #e8f6f3; color: #16a085; }
-
-  /* Main Content */
-  .checklist-main {
-    flex: 1;
-    padding: 30px;
-    overflow-y: auto;
-  }
-
-  .page-header {
-    margin-bottom: 30px;
-  }
-
-  .page-title {
-    font-size: 28px;
-    font-weight: 700;
-    color: #2c3e50;
-    margin-bottom: 8px;
-  }
-
-  .page-subtitle {
-    color: #6c757d;
-    font-size: 15px;
-  }
-
-  /* Progress Overview */
-  .progress-overview {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
-    margin-bottom: 30px;
-  }
-
-  .progress-card {
-    background: #fff;
-    border-radius: 12px;
-    padding: 24px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-    border: 1px solid #e9ecef;
-    text-align: center;
-  }
-
-  .progress-circle {
-    width: 100px;
-    height: 100px;
-    margin: 0 auto 16px;
-    position: relative;
-  }
-
-  .progress-circle svg {
-    transform: rotate(-90deg);
-  }
-
-  .progress-circle-bg {
-    fill: none;
-    stroke: #e9ecef;
-    stroke-width: 8;
-  }
-
-  .progress-circle-fill {
-    fill: none;
-    stroke-width: 8;
-    stroke-linecap: round;
-    transition: stroke-dashoffset 1s ease;
-  }
-
-  .progress-text {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 24px;
-    font-weight: 700;
-  }
-
-  .progress-label {
-    font-size: 14px;
-    font-weight: 600;
-    color: #495057;
-  }
-
-  .progress-card.overall .progress-circle-fill { stroke: url(#gradient1); }
-  .progress-card.prelaunch .progress-circle-fill { stroke: url(#gradient2); }
-  .progress-card.launch .progress-circle-fill { stroke: url(#gradient3); }
-
-  /* Ready Banner */
-  .ready-banner {
-    background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
-    color: white;
-    padding: 20px 24px;
-    border-radius: 12px;
-    margin-bottom: 30px;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3);
-  }
-
-  .ready-banner.not-ready {
-    background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
-    box-shadow: 0 4px 15px rgba(243, 156, 18, 0.3);
-  }
-
-  .ready-icon {
-    font-size: 32px;
-  }
-
-  .ready-text {
-    font-size: 16px;
-    font-weight: 600;
-  }
-
-  .ready-subtext {
-    font-size: 13px;
-    opacity: 0.9;
-    margin-top: 4px;
-  }
-
-  /* Checklist Sections */
-  .section-title {
-    font-size: 20px;
-    font-weight: 700;
-    color: #2c3e50;
-    margin-bottom: 20px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .section-title i {
-    color: #667eea;
-  }
-
-  .checklist-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
-    gap: 20px;
-    margin-bottom: 40px;
-  }
-
-  .checklist-card {
-    background: #fff;
-    border-radius: 12px;
-    padding: 24px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-    border: 1px solid #e9ecef;
-    transition: all 0.3s ease;
-  }
-
-  .checklist-card:hover {
-    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-    transform: translateY(-2px);
-  }
-
-  .checklist-card.complete {
-    border-color: #2ecc71;
-    background: #f8fff9;
-  }
-
-  .card-header {
-    display: flex;
-    align-items: flex-start;
-    gap: 14px;
-    margin-bottom: 16px;
-  }
-
-  .card-icon {
-    width: 44px;
-    height: 44px;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 18px;
-    color: white;
-    flex-shrink: 0;
-  }
-
-  .card-icon.blue { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-  .card-icon.green { background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%); }
-  .card-icon.orange { background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%); }
-  .card-icon.red { background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); }
-  .card-icon.purple { background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%); }
-  .card-icon.teal { background: linear-gradient(135deg, #1abc9c 0%, #16a085 100%); }
-
-  .card-title-wrap {
-    flex: 1;
-  }
-
-  .card-title {
-    font-size: 16px;
-    font-weight: 700;
-    color: #2c3e50;
-    margin-bottom: 4px;
-  }
-
-  .card-desc {
-    font-size: 13px;
-    color: #6c757d;
-    line-height: 1.4;
-  }
-
-  .card-progress {
-    margin-bottom: 16px;
-  }
-
-  .progress-bar-wrap {
-    height: 8px;
-    background: #e9ecef;
-    border-radius: 4px;
-    overflow: hidden;
-    margin-bottom: 8px;
-  }
-
-  .progress-bar-fill {
-    height: 100%;
-    border-radius: 4px;
-    transition: width 1s ease;
-    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-  }
-
-  .progress-bar-fill.complete {
-    background: linear-gradient(90deg, #2ecc71 0%, #27ae60 100%);
-  }
-
-  .progress-meta {
-    display: flex;
-    justify-content: space-between;
-    font-size: 12px;
-    color: #6c757d;
-  }
-
-  /* Task List */
-  .task-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
-
-  .task-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 0;
-    border-bottom: 1px solid #f1f3f5;
-    font-size: 13px;
-    color: #495057;
-  }
-
-  .task-item:last-child {
-    border-bottom: none;
-  }
-
-  .task-check {
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 11px;
-    flex-shrink: 0;
-  }
-
-  .task-check.done {
-    background: #2ecc71;
-    color: white;
-  }
-
-  .task-check.pending {
-    background: #e9ecef;
-    color: #adb5bd;
-    border: 2px solid #dee2e6;
-  }
-
-  .task-text {
-    flex: 1;
-  }
-
-  .task-text.done {
-    text-decoration: line-through;
-    color: #adb5bd;
-  }
-
-  /* Activities */
-  .activities-list {
-    margin-top: 20px;
-  }
-
-  .activity-item {
-    display: flex;
-    gap: 10px;
-    padding: 10px 0;
-    border-bottom: 1px solid #f1f3f5;
-    font-size: 12px;
-  }
-
-  .activity-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: #667eea;
-    margin-top: 4px;
-    flex-shrink: 0;
-  }
-
-  .activity-text {
-    color: #495057;
-    line-height: 1.4;
-  }
-
-  .activity-time {
-    color: #adb5bd;
-    font-size: 11px;
-    margin-top: 2px;
-  }
-
-  /* Responsive */
-  @media (max-width: 1024px) {
-    .scale-container {
-      flex-direction: column;
-    }
-    .leads-sidebar {
-      width: 100%;
-      max-height: none;
-      position: relative;
-      top: 0;
-    }
-    .checklist-main {
-      padding: 20px;
-    }
-    .progress-overview {
-      grid-template-columns: 1fr;
-    }
-    .checklist-grid {
-      grid-template-columns: 1fr;
-    }
-  }
-
-  @media (max-width: 768px) {
-    .lead-stats-grid {
-      grid-template-columns: repeat(3, 1fr);
-    }
-  }
-</style>
-
-<!-- SVG Gradients -->
-<svg width="0" height="0" style="position:absolute;">
-  <defs>
-    <linearGradient id="gradient1" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#667eea"/>
-      <stop offset="100%" style="stop-color:#764ba2"/>
-    </linearGradient>
-    <linearGradient id="gradient2" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#f39c12"/>
-      <stop offset="100%" style="stop-color:#e67e22"/>
-    </linearGradient>
-    <linearGradient id="gradient3" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#2ecc71"/>
-      <stop offset="100%" style="stop-color:#27ae60"/>
-    </linearGradient>
-  </defs>
-</svg>
-
-<div class="scale-container">
   <!-- Leads Sidebar -->
-  <aside class="leads-sidebar">
-    <div class="sidebar-header">
-      <div class="sidebar-title">
-        <i class="fas fa-users"></i>
-        Recent Leads
-      </div>
-      <span class="lead-count-badge">{{ total_leads }}</span>
-    </div>
+  <aside class="w-full lg:w-80 flex-shrink-0 space-y-6">
 
-    <!-- Lead Stats -->
-    <div class="lead-stats-grid">
-      <div class="stat-card">
-        <div class="stat-value stat-hot">{{ lead_stats.hot }}</div>
-        <div class="stat-label">Hot</div>
+    <!-- Sidebar Header -->
+    <div class="bg-surface-container rounded-xl p-5 border border-outline-variant">
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center gap-2 text-on-surface">
+          <span class="material-symbols-outlined">groups</span>
+          <span class="font-headline font-bold text-lg">Recent Leads</span>
+        </div>
+        <span class="bg-primary-container text-on-primary text-xs font-bold px-3 py-1 rounded-full">
+          {{ total_leads }}
+        </span>
       </div>
-      <div class="stat-card">
-        <div class="stat-value stat-warm">{{ lead_stats.warm }}</div>
-        <div class="stat-label">Warm</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-value stat-cold">{{ lead_stats.cold }}</div>
-        <div class="stat-label">Cold</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-value stat-new">{{ lead_stats.new }}</div>
-        <div class="stat-label">New</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-value stat-contacted">{{ lead_stats.contacted }}</div>
-        <div class="stat-label">Contacted</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-value stat-closed">{{ lead_stats.closed }}</div>
-        <div class="stat-label">Closed</div>
+
+      <!-- Lead Stats Grid -->
+      <div class="grid grid-cols-3 gap-2">
+        <div class="bg-surface rounded-lg p-3 text-center border border-outline-variant">
+          <div class="text-xl font-bold text-error">{{ lead_stats.hot }}</div>
+          <div class="text-[10px] text-on-surface-variant uppercase tracking-wide">Hot</div>
+        </div>
+        <div class="bg-surface rounded-lg p-3 text-center border border-outline-variant">
+          <div class="text-xl font-bold text-secondary">{{ lead_stats.warm }}</div>
+          <div class="text-[10px] text-on-surface-variant uppercase tracking-wide">Warm</div>
+        </div>
+        <div class="bg-surface rounded-lg p-3 text-center border border-outline-variant">
+          <div class="text-xl font-bold text-tertiary">{{ lead_stats.cold }}</div>
+          <div class="text-[10px] text-on-surface-variant uppercase tracking-wide">Cold</div>
+        </div>
+        <div class="bg-surface rounded-lg p-3 text-center border border-outline-variant">
+          <div class="text-xl font-bold text-primary">{{ lead_stats.new }}</div>
+          <div class="text-[10px] text-on-surface-variant uppercase tracking-wide">New</div>
+        </div>
+        <div class="bg-surface rounded-lg p-3 text-center border border-outline-variant">
+          <div class="text-xl font-bold text-primary-container">{{ lead_stats.contacted }}</div>
+          <div class="text-[10px] text-on-surface-variant uppercase tracking-wide">Contacted</div>
+        </div>
+        <div class="bg-surface rounded-lg p-3 text-center border border-outline-variant">
+          <div class="text-xl font-bold text-on-tertiary-container">{{ lead_stats.closed }}</div>
+          <div class="text-[10px] text-on-surface-variant uppercase tracking-wide">Closed</div>
+        </div>
       </div>
     </div>
 
     <!-- Recent Leads List -->
-    <div class="recent-leads-title">
-      <i class="fas fa-clock"></i>
-      Latest Leads
-    </div>
-    {% for lead in leads %}
-    <div class="lead-item">
-      <div class="lead-avatar">{{ lead.name|first|upper }}</div>
-      <div class="lead-info">
-        <div class="lead-name">{{ lead.name }}</div>
-        <div class="lead-meta">{{ lead.phone }} &bull; {{ lead.source }}</div>
+    <div class="bg-surface-container rounded-xl p-5 border border-outline-variant">
+      <div class="flex items-center gap-2 text-on-surface mb-4">
+        <span class="material-symbols-outlined text-sm">schedule</span>
+        <span class="font-semibold text-sm">Latest Leads</span>
       </div>
-      <span class="lead-status-badge status-{{ lead.status|lower }}">{{ lead.status }}</span>
+
+      <div class="space-y-3">
+        {% for lead in leads %}
+        <div class="flex items-center gap-3 p-3 rounded-lg bg-surface border border-outline-variant hover:bg-surface-variant transition-colors cursor-pointer">
+          <div class="w-9 h-9 rounded-full bg-primary-container flex items-center justify-center text-on-primary font-bold text-sm flex-shrink-0">
+            {{ lead.name|first|upper }}
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="font-semibold text-sm text-on-surface truncate">{{ lead.name }}</div>
+            <div class="text-xs text-on-surface-variant">{{ lead.phone }} &bull; {{ lead.source }}</div>
+          </div>
+          <span class="text-[10px] font-bold px-2 py-1 rounded-full flex-shrink-0
+            {% if lead.status == 'HOT' %}bg-error-container text-error{% endif %}
+            {% if lead.status == 'WARM' %}bg-secondary-fixed text-secondary{% endif %}
+            {% if lead.status == 'COLD' %}bg-tertiary-fixed text-tertiary{% endif %}
+            {% if lead.status == 'NEW' %}bg-primary-fixed text-primary{% endif %}
+            {% if lead.status == 'CONTACTED' %}bg-surface-variant text-primary-container{% endif %}
+            {% if lead.status == 'CLOSED' %}bg-tertiary-fixed-dim text-on-tertiary-fixed-variant{% endif %}">
+            {{ lead.status }}
+          </span>
+        </div>
+        {% empty %}
+        <div class="text-center py-8 text-on-surface-variant">
+          <span class="material-symbols-outlined text-4xl mb-2">inbox</span>
+          <p class="text-sm">No leads yet</p>
+        </div>
+        {% endfor %}
+      </div>
     </div>
-    {% empty %}
-    <div style="text-align:center; padding:20px; color:#adb5bd; font-size:13px;">
-      <i class="fas fa-inbox" style="font-size:24px; margin-bottom:8px; display:block;"></i>
-      No leads yet
-    </div>
-    {% endfor %}
 
     <!-- Recent Activities -->
     {% if recent_activities %}
-    <div class="recent-leads-title" style="margin-top:20px;">
-      <i class="fas fa-history"></i>
-      Recent Activity
-    </div>
-    <div class="activities-list">
-      {% for activity in recent_activities %}
-      <div class="activity-item">
-        <div class="activity-dot"></div>
-        <div>
-          <div class="activity-text">{{ activity.message|truncatechars:60 }}</div>
-          <div class="activity-time">{{ activity.created_at|timesince }} ago</div>
-        </div>
+    <div class="bg-surface-container rounded-xl p-5 border border-outline-variant">
+      <div class="flex items-center gap-2 text-on-surface mb-4">
+        <span class="material-symbols-outlined text-sm">history</span>
+        <span class="font-semibold text-sm">Recent Activity</span>
       </div>
-      {% endfor %}
+      <div class="space-y-3">
+        {% for activity in recent_activities %}
+        <div class="flex gap-3">
+          <div class="w-2 h-2 rounded-full bg-primary mt-1.5 flex-shrink-0"></div>
+          <div>
+            <p class="text-xs text-on-surface leading-relaxed">{{ activity.message|truncatechars:60 }}</p>
+            <p class="text-[10px] text-on-surface-variant mt-0.5">{{ activity.created_at|timesince }} ago</p>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
     </div>
     {% endif %}
   </aside>
 
   <!-- Main Checklist Content -->
-  <main class="checklist-main">
-    <div class="page-header">
-      <h1 class="page-title"><i class="fas fa-rocket"></i> Scale Launch Checklist</h1>
-      <p class="page-subtitle">Complete these tasks to prepare your real estate business for scale launch</p>
+  <main class="flex-1 min-w-0 space-y-6">
+
+    <!-- Page Header -->
+    <div>
+      <h1 class="font-headline font-bold text-2xl text-on-surface flex items-center gap-3">
+        <span class="material-symbols-outlined text-primary">rocket_launch</span>
+        Scale Launch Checklist
+      </h1>
+      <p class="text-on-surface-variant mt-1 text-sm">Complete these tasks to prepare your real estate business for scale launch</p>
     </div>
 
-    <!-- Progress Overview -->
-    <div class="progress-overview">
-      <div class="progress-card overall">
-        <div class="progress-circle">
-          <svg width="100" height="100" viewBox="0 0 100 100">
-            <circle class="progress-circle-bg" cx="50" cy="50" r="42"/>
-            <circle class="progress-circle-fill" cx="50" cy="50" r="42"
-              stroke-dasharray="264"
-              stroke-dashoffset="{{ overall_progress|yesno:'0,264' }}"
-              data-progress="{{ overall_progress }}"/>
+    <!-- Progress Overview Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <!-- Overall Progress -->
+      <div class="bg-surface-container rounded-xl p-6 border border-outline-variant text-center">
+        <div class="relative w-24 h-24 mx-auto mb-4">
+          <svg class="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="42" fill="none" stroke="currentColor" stroke-width="8" class="text-outline-variant"/>
+            <circle cx="50" cy="50" r="42" fill="none" stroke="url(#gradientOverall)" stroke-width="8" stroke-linecap="round"
+              stroke-dasharray="264" stroke-dashoffset="264" data-progress="{{ overall_progress }}" class="progress-ring"/>
           </svg>
-          <div class="progress-text">{{ overall_progress }}%</div>
+          <div class="absolute inset-0 flex items-center justify-center">
+            <span class="text-2xl font-bold text-on-surface">{{ overall_progress }}%</span>
+          </div>
         </div>
-        <div class="progress-label">Overall Progress</div>
+        <div class="font-semibold text-sm text-on-surface">Overall Progress</div>
       </div>
-      <div class="progress-card prelaunch">
-        <div class="progress-circle">
-          <svg width="100" height="100" viewBox="0 0 100 100">
-            <circle class="progress-circle-bg" cx="50" cy="50" r="42"/>
-            <circle class="progress-circle-fill" cx="50" cy="50" r="42"
-              stroke-dasharray="264"
-              stroke-dashoffset="{{ pre_launch_progress|yesno:'0,264' }}"
-              data-progress="{{ pre_launch_progress }}"/>
+
+      <!-- Pre-Launch Progress -->
+      <div class="bg-surface-container rounded-xl p-6 border border-outline-variant text-center">
+        <div class="relative w-24 h-24 mx-auto mb-4">
+          <svg class="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="42" fill="none" stroke="currentColor" stroke-width="8" class="text-outline-variant"/>
+            <circle cx="50" cy="50" r="42" fill="none" stroke="url(#gradientPrelaunch)" stroke-width="8" stroke-linecap="round"
+              stroke-dasharray="264" stroke-dashoffset="264" data-progress="{{ pre_launch_progress }}" class="progress-ring"/>
           </svg>
-          <div class="progress-text">{{ pre_launch_progress }}%</div>
+          <div class="absolute inset-0 flex items-center justify-center">
+            <span class="text-2xl font-bold text-on-surface">{{ pre_launch_progress }}%</span>
+          </div>
         </div>
-        <div class="progress-label">Pre-Launch</div>
+        <div class="font-semibold text-sm text-on-surface">Pre-Launch</div>
       </div>
-      <div class="progress-card launch">
-        <div class="progress-circle">
-          <svg width="100" height="100" viewBox="0 0 100 100">
-            <circle class="progress-circle-bg" cx="50" cy="50" r="42"/>
-            <circle class="progress-circle-fill" cx="50" cy="50" r="42"
-              stroke-dasharray="264"
-              stroke-dashoffset="{{ launch_progress|yesno:'0,264' }}"
-              data-progress="{{ launch_progress }}"/>
+
+      <!-- Launch Progress -->
+      <div class="bg-surface-container rounded-xl p-6 border border-outline-variant text-center">
+        <div class="relative w-24 h-24 mx-auto mb-4">
+          <svg class="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="42" fill="none" stroke="currentColor" stroke-width="8" class="text-outline-variant"/>
+            <circle cx="50" cy="50" r="42" fill="none" stroke="url(#gradientLaunch)" stroke-width="8" stroke-linecap="round"
+              stroke-dasharray="264" stroke-dashoffset="264" data-progress="{{ launch_progress }}" class="progress-ring"/>
           </svg>
-          <div class="progress-text">{{ launch_progress }}%</div>
+          <div class="absolute inset-0 flex items-center justify-center">
+            <span class="text-2xl font-bold text-on-surface">{{ launch_progress }}%</span>
+          </div>
         </div>
-        <div class="progress-label">Launch Prep</div>
+        <div class="font-semibold text-sm text-on-surface">Launch Prep</div>
       </div>
     </div>
+
+    <!-- SVG Gradients -->
+    <svg width="0" height="0" class="absolute">
+      <defs>
+        <linearGradient id="gradientOverall" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#667eea"/>
+          <stop offset="100%" stop-color="#764ba2"/>
+        </linearGradient>
+        <linearGradient id="gradientPrelaunch" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#f39c12"/>
+          <stop offset="100%" stop-color="#e67e22"/>
+        </linearGradient>
+        <linearGradient id="gradientLaunch" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#2ecc71"/>
+          <stop offset="100%" stop-color="#27ae60"/>
+        </linearGradient>
+      </defs>
+    </svg>
 
     <!-- Ready Banner -->
     {% if is_ready_to_launch %}
-    <div class="ready-banner">
-      <div class="ready-icon">🚀</div>
+    <div class="bg-gradient-to-r from-green-500 to-green-600 rounded-xl p-5 flex items-center gap-4 text-white shadow-lg">
+      <span class="material-symbols-outlined text-4xl">rocket_launch</span>
       <div>
-        <div class="ready-text">Ready for Scale Launch!</div>
-        <div class="ready-subtext">You have completed {{ overall_progress }}% of the checklist. Your CRM is ready to handle scaled operations.</div>
+        <div class="font-bold text-lg">Ready for Scale Launch!</div>
+        <div class="text-sm opacity-90">You have completed {{ overall_progress }}% of the checklist. Your CRM is ready to handle scaled operations.</div>
       </div>
     </div>
     {% else %}
-    <div class="ready-banner not-ready">
-      <div class="ready-icon">⚡</div>
+    <div class="bg-gradient-to-r from-orange-400 to-orange-500 rounded-xl p-5 flex items-center gap-4 text-white shadow-lg">
+      <span class="material-symbols-outlined text-4xl">bolt</span>
       <div>
-        <div class="ready-text">Keep Going!</div>
-        <div class="ready-subtext">Complete more tasks to reach 80% readiness for scale launch. Current progress: {{ overall_progress }}%</div>
+        <div class="font-bold text-lg">Keep Going!</div>
+        <div class="text-sm opacity-90">Complete more tasks to reach 80% readiness for scale launch. Current progress: {{ overall_progress }}%</div>
       </div>
     </div>
     {% endif %}
 
     <!-- Pre-Launch Section -->
-    <div class="section-title">
-      <i class="fas fa-tasks"></i>
-      Pre-Launch Checklist
-    </div>
-    <div class="checklist-grid">
-      {% for item in pre_launch_items %}
-      <div class="checklist-card {% if item.is_complete %}complete{% endif %}">
-        <div class="card-header">
-          <div class="card-icon
-            {% if item.id == 'property_setup' %}blue{% endif %}
-            {% if item.id == 'agent_setup' %}green{% endif %}
-            {% if item.id == 'lead_system' %}orange{% endif %}
-            {% if item.id == 'automation' %}purple{% endif %}
-            {% if item.id == 'analytics' %}teal{% endif %}
-            {% if item.id == 'communication' %}blue{% endif %}
-            {% if item.id == 'security' %}red{% endif %}">
-            <i class="fas {{ item.icon }}"></i>
-          </div>
-          <div class="card-title-wrap">
-            <div class="card-title">{{ item.title }}</div>
-            <div class="card-desc">{{ item.description }}</div>
-          </div>
-        </div>
-        <div class="card-progress">
-          <div class="progress-bar-wrap">
-            <div class="progress-bar-fill {% if item.is_complete %}complete{% endif %}" style="width: {{ item.progress }}%"></div>
-          </div>
-          <div class="progress-meta">
-            <span>{{ item.completed_tasks }}/{{ item.total_tasks }} tasks</span>
-            <span>{{ item.progress }}%</span>
-          </div>
-        </div>
-        <ul class="task-list">
-          {% for task in item.tasks %}
-          <li class="task-item">
-            <div class="task-check {% if task.check %}done{% else %}pending{% endif %}">
-              {% if task.check %}<i class="fas fa-check"></i>{% endif %}
+    <div>
+      <h2 class="font-headline font-bold text-lg text-on-surface flex items-center gap-2 mb-4">
+        <span class="material-symbols-outlined text-primary">task_alt</span>
+        Pre-Launch Checklist
+      </h2>
+      <div class="grid grid-cols-1 xl:grid-cols-2 gap-4">
+        {% for item in pre_launch_items %}
+        <div class="bg-surface-container rounded-xl p-5 border {% if item.is_complete %}border-green-400 bg-green-50/50{% else %}border-outline-variant{% endif %} hover:shadow-md transition-all">
+          <div class="flex items-start gap-4 mb-4">
+            <div class="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 text-white
+              {% if item.id == 'property_setup' %}bg-gradient-to-br from-blue-500 to-purple-600{% endif %}
+              {% if item.id == 'agent_setup' %}bg-gradient-to-br from-green-500 to-emerald-600{% endif %}
+              {% if item.id == 'lead_system' %}bg-gradient-to-br from-orange-500 to-red-500{% endif %}
+              {% if item.id == 'automation' %}bg-gradient-to-br from-purple-500 to-pink-600{% endif %}
+              {% if item.id == 'analytics' %}bg-gradient-to-br from-teal-500 to-cyan-600{% endif %}
+              {% if item.id == 'communication' %}bg-gradient-to-br from-blue-500 to-indigo-600{% endif %}
+              {% if item.id == 'security' %}bg-gradient-to-br from-red-500 to-rose-600{% endif %}">
+              <span class="material-symbols-outlined">{{ item.icon|cut:'fa-'|cut:'fas ' }}</span>
             </div>
-            <span class="task-text {% if task.check %}done{% endif %}">{{ task.text }}</span>
-          </li>
-          {% endfor %}
-        </ul>
+            <div class="flex-1 min-w-0">
+              <h3 class="font-bold text-on-surface">{{ item.title }}</h3>
+              <p class="text-xs text-on-surface-variant mt-0.5">{{ item.description }}</p>
+            </div>
+          </div>
+
+          <!-- Progress Bar -->
+          <div class="mb-4">
+            <div class="h-2 bg-outline-variant rounded-full overflow-hidden">
+              <div class="h-full rounded-full transition-all duration-700 {% if item.is_complete %}bg-green-500{% else %}bg-gradient-to-r from-blue-500 to-purple-600{% endif %}" style="width: {{ item.progress }}%"></div>
+            </div>
+            <div class="flex justify-between text-xs text-on-surface-variant mt-1">
+              <span>{{ item.completed_tasks }}/{{ item.total_tasks }} tasks</span>
+              <span class="font-semibold">{{ item.progress }}%</span>
+            </div>
+          </div>
+
+          <!-- Task List -->
+          <ul class="space-y-2">
+            {% for task in item.tasks %}
+            <li class="flex items-center gap-3 text-sm">
+              <span class="material-symbols-outlined text-lg {% if task.check %}text-green-500 active-icon{% else %}text-outline-variant{% endif %}">
+                {% if task.check %}check_circle{% else %}radio_button_unchecked{% endif %}
+              </span>
+              <span class="{% if task.check %}line-through text-on-surface-variant{% else %}text-on-surface{% endif %}">{{ task.text }}</span>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+        {% endfor %}
       </div>
-      {% endfor %}
     </div>
 
     <!-- Launch Section -->
-    <div class="section-title">
-      <i class="fas fa-flag-checkered"></i>
-      Launch Preparation
-    </div>
-    <div class="checklist-grid">
-      {% for item in launch_items %}
-      <div class="checklist-card {% if item.is_complete %}complete{% endif %}">
-        <div class="card-header">
-          <div class="card-icon blue">
-            <i class="fas {{ item.icon }}"></i>
-          </div>
-          <div class="card-title-wrap">
-            <div class="card-title">{{ item.title }}</div>
-            <div class="card-desc">{{ item.description }}</div>
-          </div>
-        </div>
-        <div class="card-progress">
-          <div class="progress-bar-wrap">
-            <div class="progress-bar-fill {% if item.is_complete %}complete{% endif %}" style="width: {{ item.progress }}%"></div>
-          </div>
-          <div class="progress-meta">
-            <span>{{ item.completed_tasks }}/{{ item.total_tasks }} tasks</span>
-            <span>{{ item.progress }}%</span>
-          </div>
-        </div>
-        <ul class="task-list">
-          {% for task in item.tasks %}
-          <li class="task-item">
-            <div class="task-check {% if task.check %}done{% else %}pending{% endif %}">
-              {% if task.check %}<i class="fas fa-check"></i>{% endif %}
+    <div>
+      <h2 class="font-headline font-bold text-lg text-on-surface flex items-center gap-2 mb-4">
+        <span class="material-symbols-outlined text-primary">flag</span>
+        Launch Preparation
+      </h2>
+      <div class="grid grid-cols-1 xl:grid-cols-2 gap-4">
+        {% for item in launch_items %}
+        <div class="bg-surface-container rounded-xl p-5 border {% if item.is_complete %}border-green-400 bg-green-50/50{% else %}border-outline-variant{% endif %} hover:shadow-md transition-all">
+          <div class="flex items-start gap-4 mb-4">
+            <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center flex-shrink-0 text-white">
+              <span class="material-symbols-outlined">{{ item.icon|cut:'fa-'|cut:'fas ' }}</span>
             </div>
-            <span class="task-text {% if task.check %}done{% endif %}">{{ task.text }}</span>
-          </li>
-          {% endfor %}
-        </ul>
+            <div class="flex-1 min-w-0">
+              <h3 class="font-bold text-on-surface">{{ item.title }}</h3>
+              <p class="text-xs text-on-surface-variant mt-0.5">{{ item.description }}</p>
+            </div>
+          </div>
+
+          <!-- Progress Bar -->
+          <div class="mb-4">
+            <div class="h-2 bg-outline-variant rounded-full overflow-hidden">
+              <div class="h-full rounded-full transition-all duration-700 {% if item.is_complete %}bg-green-500{% else %}bg-gradient-to-r from-blue-500 to-purple-600{% endif %}" style="width: {{ item.progress }}%"></div>
+            </div>
+            <div class="flex justify-between text-xs text-on-surface-variant mt-1">
+              <span>{{ item.completed_tasks }}/{{ item.total_tasks }} tasks</span>
+              <span class="font-semibold">{{ item.progress }}%</span>
+            </div>
+          </div>
+
+          <!-- Task List -->
+          <ul class="space-y-2">
+            {% for task in item.tasks %}
+            <li class="flex items-center gap-3 text-sm">
+              <span class="material-symbols-outlined text-lg {% if task.check %}text-green-500 active-icon{% else %}text-outline-variant{% endif %}">
+                {% if task.check %}check_circle{% else %}radio_button_unchecked{% endif %}
+              </span>
+              <span class="{% if task.check %}line-through text-on-surface-variant{% else %}text-on-surface{% endif %}">{{ task.text }}</span>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+        {% endfor %}
       </div>
-      {% endfor %}
     </div>
   </main>
 </div>
 
 <script>
   document.addEventListener('DOMContentLoaded', function() {
-    // Animate progress bars
-    setTimeout(() => {
-      document.querySelectorAll('.progress-bar-fill').forEach(bar => {
-        bar.style.width = bar.style.width;
-      });
-    }, 100);
-
-    // Animate SVG circles - calculate stroke-dashoffset based on data-progress
-    document.querySelectorAll('.progress-circle-fill[data-progress]').forEach(circle => {
-      const progress = parseInt(circle.getAttribute('data-progress')) || 0;
+    // Animate progress rings
+    document.querySelectorAll('.progress-ring').forEach(ring => {
+      const progress = parseInt(ring.getAttribute('data-progress')) || 0;
       const circumference = 264; // 2 * PI * 42
       const offset = circumference - (progress / 100) * circumference;
-      circle.style.strokeDashoffset = offset;
+      setTimeout(() => {
+        ring.style.transition = 'stroke-dashoffset 1s ease';
+        ring.style.strokeDashoffset = offset;
+      }, 200);
     });
   });
 </script>
