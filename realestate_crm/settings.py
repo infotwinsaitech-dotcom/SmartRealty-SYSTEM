@@ -25,19 +25,22 @@ if not SECRET_KEY:
 DEBUG = os.getenv("DEBUG", "False").lower() in ("true", "1", "yes")
 
 ALLOWED_HOSTS = [
-    'localhost',
-    '127.0.0.1',
-    'smartrealty-system.onrender.com',
-    '*.onrender.com',
-]
-CSRF_TRUSTED_ORIGINS = [
-    'https://smartrealty-system.onrender.com',
+    "localhost",
+    "127.0.0.1",
+    "smartrealty-system.onrender.com",
+    "*.onrender.com",
 ]
 
-SECURE_SSL_REDIRECT = False
-SESSION_COOKIE_SECURE = False
-CSRF_COOKIE_SECURE = False
-# Security headers
+# Dynamic ALLOWED_HOSTS from env (for Render/custom domains)
+_env_hosts = os.getenv("ALLOWED_HOSTS", "")
+if _env_hosts:
+    ALLOWED_HOSTS.extend([h.strip() for h in _env_hosts.split(",") if h.strip()])
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://smartrealty-system.onrender.com",
+]
+
+# Security headers (conditional based on DEBUG)
 SECURE_SSL_REDIRECT = not DEBUG
 SECURE_HSTS_SECONDS = 31536000 if not DEBUG else 0
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
@@ -65,7 +68,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "django.contrib.sites",
     "django.contrib.humanize",
-    
+
     # Third party
     "allauth",
     "allauth.account",
@@ -77,8 +80,7 @@ INSTALLED_APPS = [
     "cloudinary_storage",
     "django_celery_beat",
     "django_celery_results",
-    #"cachalot",
-    
+
     # Local
     "core",
 ]
@@ -232,23 +234,23 @@ cloudinary.config(
 )
 
 # =============================================================================
-# REDIS & CACHING
+# REDIS & CACHING (FIXED - UNCOMMENTED)
 # =============================================================================
 
 REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
 
-#CACHES #= {
-  #  "default": {
-    #    "BACKEND": "django_redis.cache.RedisCache",
-    #    "LOCATION": REDIS_URL,
-    #    "OPTIONS": {
-     #       "CLIENT_CLASS": "django_redis.client.DefaultClient",
-    #        "SOCKET_CONNECT_TIMEOUT": 5,
-    #        "SOCKET_TIMEOUT": 5,
-    #        "RETRY_ON_TIMEOUT": True,
-    #    },
-    #}
-#}
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": REDIS_URL,
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            "SOCKET_CONNECT_TIMEOUT": 5,
+            "SOCKET_TIMEOUT": 5,
+            "RETRY_ON_TIMEOUT": True,
+        },
+    }
+}
 
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 SESSION_CACHE_ALIAS = "default"
@@ -276,7 +278,6 @@ CELERY_BEAT_SCHEDULE = {
         "task": "core.tasks.check_missed_followups_task",
         "schedule": 3600.0,  # Every 1 hour
     },
-    # 👇 YE NEW ENTRY ADD KAREIN
     "send-daily-summaries": {
         "task": "core.tasks.send_daily_summaries",
         "schedule": 86400.0,  # Every 24 hours (1 day)
@@ -311,7 +312,7 @@ REST_FRAMEWORK = {
 }
 
 # =============================================================================
-# LOGGING
+# LOGGING (MERGED - SINGLE CONFIG)
 # =============================================================================
 
 LOGS_DIR = BASE_DIR / "logs"
@@ -339,6 +340,14 @@ LOGGING = {
             "backupCount": 5,
             "formatter": "verbose",
         },
+        "task_file": {
+            "level": "INFO",
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": str(LOGS_DIR / "tasks.log"),
+            "maxBytes": 1024 * 1024 * 10,  # 10 MB
+            "backupCount": 10,
+            "formatter": "verbose",
+        },
         "console": {
             "level": "DEBUG",
             "class": "logging.StreamHandler",
@@ -362,6 +371,11 @@ LOGGING = {
         "core": {
             "handlers": ["file", "console"],
             "level": "DEBUG",
+            "propagate": False,
+        },
+        "core.tasks": {
+            "handlers": ["task_file", "console"],
+            "level": "INFO",
             "propagate": False,
         },
     },
@@ -392,43 +406,23 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # =============================================================================
 
 AUTH_USER_MODEL = "core.User"
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'verbose': {
-            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
-            'style': '{',
-        },
-    },
-    'handlers': {
-        'task_file': {
-            'level': 'INFO',
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': BASE_DIR / 'logs' / 'tasks.log',
-            'maxBytes': 1024 * 1024 * 10,  # 10 MB
-            'backupCount': 10,
-            'formatter': 'verbose',
-        },
-        'console': {
-            'level': 'INFO',
-            'class': 'logging.StreamHandler',
-        },
-    },
-    'loggers': {
-        'core.tasks': {
-            'handlers': ['task_file', 'console'],
-            'level': 'INFO',
-            'propagate': False,
-        },
-    },
-}
+
+# =============================================================================
+# CACHALOT (DISABLED - optional caching layer)
+# =============================================================================
+
 CACHALOT_ENABLED = False
+
 # =============================================================================
-# REMOVE DEBUG PRINTS IN PRODUCTION
+# DEBUG OUTPUT (ONLY IN DEBUG MODE)
 # =============================================================================
-DEBUG = False
+
 if DEBUG:
-    print("SECRET_KEY loaded:", bool(SECRET_KEY))
-    print("SENDGRID loaded:", bool(os.getenv("SENDGRID_API_KEY")))
-    print("DB URL loaded:", bool(os.getenv("DATABASE_URL")))
+    print("=" * 60)
+    print("⚠️  DEBUG MODE IS ENABLED - NOT FOR PRODUCTION")
+    print("=" * 60)
+    print(f"SECRET_KEY loaded: {bool(SECRET_KEY)}")
+    print(f"SENDGRID loaded: {bool(os.getenv('SENDGRID_API_KEY'))}")
+    print(f"DB URL loaded: {bool(os.getenv('DATABASE_URL'))}")
+    print(f"REDIS loaded: {bool(REDIS_URL)}")
+    print("=" * 60)

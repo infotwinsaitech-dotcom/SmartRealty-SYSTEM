@@ -1296,12 +1296,12 @@ def scale_launch_checklist(request):
     Shows checklist items with progress tracking + Leads sidebar
     """
     builder = request.user
-    
+
     # ---- LEADS SIDEBAR DATA ----
     leads = Lead.objects.filter(
         builder=builder
     ).select_related('assigned_to').prefetch_related('properties').order_by('-created_at')[:20]
-    
+
     # Lead stats for sidebar
     lead_stats = {
         'total': Lead.objects.filter(builder=builder).count(),
@@ -1312,12 +1312,15 @@ def scale_launch_checklist(request):
         'contacted': Lead.objects.filter(builder=builder, status='CONTACTED').count(),
         'closed': Lead.objects.filter(builder=builder, status='CLOSED').count(),
     }
-    
-    # Recent activities for sidebar
-    recent_activities = LeadActivity.objects.filter(
-        lead__builder=builder
-    ).select_related('lead', 'created_by').order_by('-created_at')[:10]
-    
+
+    # Recent activities for sidebar (with fallback)
+    try:
+        recent_activities = LeadActivity.objects.filter(
+            lead__builder=builder
+        ).select_related('lead', 'created_by').order_by('-created_at')[:10]
+    except Exception:
+        recent_activities = []
+
     # ---- CHECKLIST DATA ----
     # Pre-launch checklist items
     checklist_items = [
@@ -1360,8 +1363,8 @@ def scale_launch_checklist(request):
             'tasks': [
                 {'text': 'Configure lead capture forms', 'check': True},
                 {'text': 'Set up auto-assignment rules', 'check': Agent.objects.filter(builders=builder).exists()},
-                {'text': 'Create follow-up sequences', 'check': DripSequence.objects.filter(builder=builder).exists()},
-                {'text': 'Configure escalation rules', 'check': EscalationRule.objects.filter(builder=builder).exists()},
+                {'text': 'Create follow-up sequences', 'check': _safe_model_check('DripSequence', builder)},
+                {'text': 'Configure escalation rules', 'check': _safe_model_check('EscalationRule', builder)},
                 {'text': 'Test lead pipeline workflow', 'check': Lead.objects.filter(builder=builder).exclude(status='NEW').exists()},
             ]
         },
@@ -1373,10 +1376,10 @@ def scale_launch_checklist(request):
             'category': 'pre_launch',
             'weight': 10,
             'tasks': [
-                {'text': 'Create welcome email sequence', 'check': DripSequence.objects.filter(builder=builder, step_number=1).exists()},
-                {'text': 'Set up SMS/WhatsApp templates', 'check': DripSequence.objects.filter(builder=builder, channel__in=['SMS', 'WHATSAPP']).exists()},
-                {'text': 'Configure missed follow-up alerts', 'check': EscalationRule.objects.filter(builder=builder, is_active=True).exists()},
-                {'text': 'Test automation triggers', 'check': AutomationLog.objects.filter(lead__builder=builder).exists()},
+                {'text': 'Create welcome email sequence', 'check': _safe_model_check('DripSequence', builder, step_number=1)},
+                {'text': 'Set up SMS/WhatsApp templates', 'check': _safe_model_check('DripSequence', builder, channel__in=['SMS', 'WHATSAPP'])},
+                {'text': 'Configure missed follow-up alerts', 'check': _safe_model_check('EscalationRule', builder, is_active=True)},
+                {'text': 'Test automation triggers', 'check': _safe_model_check('AutomationLog', builder)},
             ]
         },
         {
@@ -1437,11 +1440,11 @@ def scale_launch_checklist(request):
             ]
         },
     ]
-    
+
     # Calculate progress for each category
     total_progress = 0
     total_weight = 0
-    
+
     for item in checklist_items:
         completed = sum(1 for task in item['tasks'] if task['check'])
         total = len(item['tasks'])
@@ -1449,20 +1452,20 @@ def scale_launch_checklist(request):
         item['completed_tasks'] = completed
         item['total_tasks'] = total
         item['is_complete'] = completed == total
-        
+
         total_progress += item['progress'] * item['weight']
         total_weight += item['weight']
-    
+
     overall_progress = round(total_progress / total_weight) if total_weight > 0 else 0
-    
+
     # Categorize items
     pre_launch_items = [item for item in checklist_items if item['category'] == 'pre_launch']
     launch_items = [item for item in checklist_items if item['category'] == 'launch']
-    
+
     # Calculate category progress
     pre_launch_progress = round(sum(item['progress'] * item['weight'] for item in pre_launch_items) / sum(item['weight'] for item in pre_launch_items)) if pre_launch_items else 0
     launch_progress = round(sum(item['progress'] * item['weight'] for item in launch_items) / sum(item['weight'] for item in launch_items)) if launch_items else 0
-    
+
     context = {
         'checklist_items': checklist_items,
         'pre_launch_items': pre_launch_items,
@@ -1476,8 +1479,27 @@ def scale_launch_checklist(request):
         'total_leads': lead_stats['total'],
         'is_ready_to_launch': overall_progress >= 80,
     }
-    
+
     return render(request, "builder/scale_launch_checklist.html", context)
+
+
+def _safe_model_check(model_name, builder, **filters):
+    """
+    Safely check if model exists and has records for builder.
+    Returns False if model doesn't exist (not migrated yet).
+    """
+    try:
+        from django.apps import apps
+        model = apps.get_model('core', model_name)
+        queryset = model.objects.filter(builder=builder)
+        if filters:
+            queryset = queryset.filter(**filters)
+        return queryset.exists()
+    except LookupError:
+        # Model doesn't exist (not migrated)
+        return False
+    except Exception:
+        return False
 
 @login_required
 @require_POST
