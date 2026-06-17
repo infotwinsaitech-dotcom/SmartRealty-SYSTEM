@@ -234,37 +234,54 @@ cloudinary.config(
 )
 
 # =============================================================================
-# REDIS & CACHING (PRODUCTION-READY WITH FALLBACK)
+# REDIS & CACHING (RENDER-OPTIMIZED)
 # =============================================================================
-# Priority:
-#   1. Redis Cache (requires: pip install django-redis)
-#   2. Database Cache (built-in, no extra packages)
-#   3. LocMem Cache (in-memory, dev only)
+# NOTE: For Render deployment without Redis instance, use DatabaseCache.
+# To switch to Redis later:
+#   1. Add Redis instance on Render (or use Redis Cloud)
+#   2. Set REDIS_URL environment variable
+#   3. Change backend to "django_redis.cache.RedisCache"
 # =============================================================================
 
-REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
+REDIS_URL = os.getenv("REDIS_URL", "")
 
-# Try Redis first, fallback to DatabaseCache if django-redis not installed
-try:
-    import django_redis
-    CACHES = {
-        "default": {
-            "BACKEND": "django_redis.cache.RedisCache",
-            "LOCATION": REDIS_URL,
-            "OPTIONS": {
-                "CLIENT_CLASS": "django_redis.client.DefaultClient",
-                "SOCKET_CONNECT_TIMEOUT": 5,
-                "SOCKET_TIMEOUT": 5,
-                "RETRY_ON_TIMEOUT": True,
-                "CONNECTION_POOL_KWARGS": {"max_connections": 20},
-            },
+# Use Redis if REDIS_URL is set and django-redis is installed
+# Otherwise fallback to DatabaseCache (works on Render free tier)
+if REDIS_URL:
+    try:
+        import django_redis
+        CACHES = {
+            "default": {
+                "BACKEND": "django_redis.cache.RedisCache",
+                "LOCATION": REDIS_URL,
+                "OPTIONS": {
+                    "CLIENT_CLASS": "django_redis.client.DefaultClient",
+                    "SOCKET_CONNECT_TIMEOUT": 5,
+                    "SOCKET_TIMEOUT": 5,
+                    "RETRY_ON_TIMEOUT": True,
+                    "CONNECTION_POOL_KWARGS": {"max_connections": 20},
+                },
+            }
         }
-    }
-    SESSION_ENGINE = "django.contrib.sessions.backends.cache"
-    SESSION_CACHE_ALIAS = "default"
-    _cache_backend = "redis"
-except ImportError:
-    # Fallback: Database Cache (no pip install needed)
+        SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+        SESSION_CACHE_ALIAS = "default"
+        _cache_backend = "redis"
+    except ImportError:
+        CACHES = {
+            "default": {
+                "BACKEND": "django.core.cache.backends.db.DatabaseCache",
+                "LOCATION": "django_cache_table",
+                "TIMEOUT": 300,
+                "OPTIONS": {
+                    "MAX_ENTRIES": 10000,
+                    "CULL_FREQUENCY": 3,
+                }
+            }
+        }
+        SESSION_ENGINE = "django.contrib.sessions.backends.db"
+        _cache_backend = "database"
+else:
+    # No REDIS_URL set - use DatabaseCache (Render free tier compatible)
     CACHES = {
         "default": {
             "BACKEND": "django.core.cache.backends.db.DatabaseCache",
@@ -286,8 +303,14 @@ SESSION_SAVE_EVERY_REQUEST = True
 # CELERY CONFIGURATION
 # =============================================================================
 
-CELERY_BROKER_URL = REDIS_URL
-CELERY_RESULT_BACKEND = REDIS_URL
+# Use Redis if available, otherwise use Django DB backend (for Render free tier)
+if REDIS_URL:
+    CELERY_BROKER_URL = REDIS_URL
+    CELERY_RESULT_BACKEND = REDIS_URL
+else:
+    CELERY_BROKER_URL = "django-db://"
+    CELERY_RESULT_BACKEND = "django-db"
+    # Install: pip install celery[redis] django-celery-results
 CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_SERIALIZER = "json"
