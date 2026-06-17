@@ -5,7 +5,7 @@ from django.shortcuts import render
 from django.http import JsonResponse
 from . import views
 from . import views_automation
-
+from core.views_health import health_check, cache_status
 
 # =============================================================================
 # HEALTH CHECK ENDPOINT
@@ -225,6 +225,8 @@ urlpatterns = [
     path("auth/redirect/", views.google_login_redirect, name="google_redirect"),
     path("api/check-username/", views.check_username, name="check_username"),
     path("get-messages-ajax/", views.get_messages_ajax, name="get_messages_ajax"),
+    path('health/', health_check, name='health'),
+    path('health/cache/', cache_status, name='cache_status'),
 ]
 
 if settings.DEBUG:
