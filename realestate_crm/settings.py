@@ -335,16 +335,22 @@ if not IS_TEST:
     CELERY_TASK_ACKS_LATE = True
     CELERY_WORKER_PREFETCH_MULTIPLIER = 1
     
-    CELERY_BEAT_SCHEDULE = {}
-    try:
-        import core.tasks
-        CELERY_BEAT_SCHEDULE = {
-            "check-drip-sequences": {"task": "core.tasks.process_drip_sequences", "schedule": 21600.0},
-            "check-missed-followups": {"task": "core.tasks.check_missed_followups_task", "schedule": 3600.0},
-            "send-daily-summaries": {"task": "core.tasks.send_daily_summaries", "schedule": 86400.0},
-        }
-    except ImportError:
-        pass
+    # ✅ FIXED: String task names only — NO import at module level
+    # Celery resolves these at runtime when apps are fully loaded
+    CELERY_BEAT_SCHEDULE = {
+        "check-drip-sequences": {
+            "task": "core.tasks.process_drip_sequences",
+            "schedule": 21600.0,
+        },
+        "check-missed-followups": {
+            "task": "core.tasks.check_missed_followups_task",
+            "schedule": 3600.0,
+        },
+        "send-daily-summaries": {
+            "task": "core.tasks.send_daily_summaries",
+            "schedule": 86400.0,
+        },
+    }
 
 # =============================================================================
 # CHANNELS — CONDITIONAL
