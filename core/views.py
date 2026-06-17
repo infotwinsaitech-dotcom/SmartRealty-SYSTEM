@@ -147,6 +147,33 @@ def clear_rate_limit(request, prefix):
     key = f"ratelimit:{prefix}:{client_ip}"
     cache.delete(key)
 
+from django.core.cache import cache
+
+def get_cached_stats(builder, start_date, end_date):
+    """5 minute cache ke saath stats lao"""
+    cache_key = f"stats:{builder.id}:{start_date}:{end_date}"
+    stats = cache.get(cache_key)
+    
+    if stats is None:
+        stats = {
+            'total_leads': Lead.objects.filter(
+                builder=builder, 
+                created_at__date__range=[start_date, end_date]
+            ).count(),
+            'active_deals': Deal.objects.filter(
+                builder=builder,
+                status__in=["NEW", "NEGOTIATION", "BOOKED"],
+                created_at__date__range=[start_date, end_date]
+            ).count(),
+            'total_revenue': Deal.objects.filter(
+                builder=builder,
+                status="CLOSED",
+                created_at__date__range=[start_date, end_date]
+            ).aggregate(total=Sum('amount'))['total'] or 0,
+        }
+        cache.set(cache_key, stats, 300)  # 5 minutes cache
+    
+    return stats
 
 def get_paginated_queryset(queryset, request, page_size=PAGE_SIZE):
     """Helper for consistent pagination"""
@@ -1094,15 +1121,16 @@ def lead_management(request):
 # BUILDER DASHBOARD
 # =============================================================================
 
+
 @builder_required
 def builder_dashboard(request):
-    """Builder dashboard with date range filtering"""
+    """Builder dashboard - OPTIMIZED for production"""
     today = date.today()
-    
+
     # Date range filter
     start_date_str = sanitize_input(request.GET.get('start_date', ''))
     end_date_str = sanitize_input(request.GET.get('end_date', ''))
-    
+
     if start_date_str and end_date_str:
         try:
             start_date = datetime.strptime(start_date_str, '%Y-%m-%d').date()
@@ -1114,48 +1142,98 @@ def builder_dashboard(request):
         start_date = today
         end_date = today
 
-    # Cache key for dashboard data
-    cache_key = f"dashboard:{request.user.id}:{start_date}:{end_date}"
+    # Cache key
+    cache_key = f"dashboard_v2:{request.user.id}:{start_date}:{end_date}"
     cached_data = cache.get(cache_key)
-    
+
     if cached_data:
         return render(request, "builder/dashboard.html", cached_data)
 
-    # Today's followups
+    # =================================================================
+    # FIX 1: Single base queryset for leads - REUSE
+    # =================================================================
+    base_leads_qs = Lead.objects.filter(
+        builder=request.user,
+        created_at__date__range=[start_date, end_date]
+    )
+
+    # =================================================================
+    # FIX 2: Single base queryset for deals - REUSE
+    # =================================================================
+    base_deals_qs = Deal.objects.filter(
+        builder=request.user,
+        created_at__date__range=[start_date, end_date]
+    )
+
+    # =================================================================
+    # FIX 3: Source counts in ONE query using annotation
+    # =================================================================
+    from django.db.models import Count, Case, When, Value, IntegerField
+
+    source_counts = base_leads_qs.aggregate(
+        search_count=Count(Case(When(source='search', then=1), output_field=IntegerField())),
+        referral_count=Count(Case(When(source='referral', then=1), output_field=IntegerField())),
+        social_count=Count(Case(When(source='social', then=1), output_field=IntegerField())),
+        direct_count=Count(Case(When(source='direct', then=1), output_field=IntegerField())),
+    )
+
+    total_leads = base_leads_qs.count()
+    total = total_leads or 1
+
+    lead_sources = {
+        "search": round((source_counts['search_count'] or 0) / total * 100, 2),
+        "referrals": round((source_counts['referral_count'] or 0) / total * 100, 2),
+        "social": round((source_counts['social_count'] or 0) / total * 100, 2),
+        "direct": round((source_counts['direct_count'] or 0) / total * 100, 2),
+    }
+
+    # =================================================================
+    # FIX 4: Followups with only() - lightweight fields
+    # =================================================================
     today_followups = FollowUp.objects.filter(
         lead__builder=request.user,
         date__range=[start_date, end_date],
         status="PENDING"
-    ).select_related('agent', 'lead')
+    ).select_related('agent', 'lead').only(
+        'id', 'date', 'time', 'status', 'note',
+        'agent__name', 'agent__id',
+        'lead__id', 'lead__name'
+    )
 
     grouped_followups = defaultdict(list)
     for f in today_followups:
         agent_name = f.agent.name if f.agent else "Unassigned"
         grouped_followups[agent_name].append(f)
 
-    # Upcoming followups
+    # =================================================================
+    # FIX 5: Upcoming followups - only needed fields
+    # =================================================================
+    upcoming_time = (now() + timedelta(hours=1)).time()
     upcoming_followups = FollowUp.objects.filter(
         lead__builder=request.user,
         date__range=[start_date, end_date],
-        time__lte=(now() + timedelta(hours=1)).time(),
+        time__lte=upcoming_time,
         status="PENDING"
-    ).select_related('lead')
+    ).select_related('lead').only(
+        'id', 'date', 'time', 'note',
+        'lead__id', 'lead__name'
+    )
 
-    # Missed leads
+    # =================================================================
+    # FIX 6: Missed leads - only needed fields
+    # =================================================================
     missed_leads = Lead.objects.filter(
         builder=request.user,
         created_at__date__range=[start_date, end_date],
         created_at__lt=now() - timedelta(hours=24),
         status="NEW"
-    )
+    ).only('id', 'name', 'phone', 'created_at')
 
-    # Monthly revenue chart
+    # =================================================================
+    # FIX 7: Monthly revenue - single query
+    # =================================================================
     monthly_data = (
-        Deal.objects.filter(
-            builder=request.user,
-            status="CLOSED",
-            created_at__date__range=[start_date, end_date]
-        )
+        base_deals_qs.filter(status="CLOSED")
         .annotate(month=ExtractMonth('created_at'))
         .values('month')
         .annotate(total=Sum('amount'))
@@ -1165,98 +1243,97 @@ def builder_dashboard(request):
     chart_labels = [calendar.month_abbr[item['month']] for item in monthly_data]
     chart_data = [float(item['total'] or 0) for item in monthly_data]
 
-    # Stats
-    total_leads = Lead.objects.filter(
-        builder=request.user,
-        created_at__date__range=[start_date, end_date]
+    # =================================================================
+    # FIX 8: Stats - reuse base querysets
+    # =================================================================
+    active_deals = base_deals_qs.filter(
+        status__in=["NEW", "NEGOTIATION", "BOOKED"]
     ).count()
 
-    active_deals = Deal.objects.filter(
-        builder=request.user,
-        status__in=["NEW", "NEGOTIATION", "BOOKED"],
-        created_at__date__range=[start_date, end_date]
-    ).count()
-
-    total_revenue = Deal.objects.filter(
-        builder=request.user,
-        status="CLOSED",
-        created_at__date__range=[start_date, end_date]
+    total_revenue = base_deals_qs.filter(
+        status="CLOSED"
     ).aggregate(total=Sum('amount'))['total'] or 0
 
-    closed_deals = Deal.objects.filter(
-        builder=request.user,
-        status="CLOSED",
-        created_at__date__range=[start_date, end_date]
-    ).count()
-
+    closed_deals = base_deals_qs.filter(status="CLOSED").count()
     conversion_rate = (closed_deals / total_leads * 100) if total_leads else 0
 
-    # Activities and tasks
+    # =================================================================
+    # FIX 9: Activities - only needed fields
+    # =================================================================
     activities = Activity.objects.filter(
         created_at__date__range=[start_date, end_date]
+    ).select_related('user').only(
+        'message', 'created_at', 'user__username'
     ).order_by('-created_at')[:5]
-    
+
+    # =================================================================
+    # FIX 10: Tasks - only needed fields
+    # =================================================================
     tasks = Task.objects.filter(
         user=request.user,
         date__range=[start_date, end_date]
+    ).only(
+        'title', 'date', 'time', 'priority', 'status'
     ).order_by('-date', '-time')[:5]
 
-    # Growth calculation
+    # =================================================================
+    # FIX 11: Growth calculation - cached
+    # =================================================================
     days_diff = (end_date - start_date).days + 1
     prev_start = start_date - timedelta(days=days_diff)
     prev_end = start_date - timedelta(days=1)
 
-    prev_leads = Lead.objects.filter(
-        builder=request.user,
-        created_at__date__range=[prev_start, prev_end]
-    ).count()
+    growth_cache_key = f"growth:{request.user.id}:{prev_start}:{prev_end}"
+    growth_data = cache.get(growth_cache_key)
 
-    current_leads = total_leads
+    if growth_data is None:
+        prev_leads = Lead.objects.filter(
+            builder=request.user,
+            created_at__date__range=[prev_start, prev_end]
+        ).count()
 
-    prev_deals = Deal.objects.filter(
-        builder=request.user,
-        created_at__date__range=[prev_start, prev_end]
-    ).count()
+        prev_deals = Deal.objects.filter(
+            builder=request.user,
+            created_at__date__range=[prev_start, prev_end]
+        ).count()
 
-    current_deals = Deal.objects.filter(
-        builder=request.user,
-        created_at__date__range=[start_date, end_date]
-    ).count()
+        prev_revenue = Deal.objects.filter(
+            builder=request.user,
+            status="CLOSED",
+            created_at__date__range=[prev_start, prev_end]
+        ).aggregate(total=Sum('amount'))['total'] or 0
 
-    prev_revenue = Deal.objects.filter(
-        builder=request.user,
-        status="CLOSED",
-        created_at__date__range=[prev_start, prev_end]
-    ).aggregate(total=Sum('amount'))['total'] or 0
+        growth_data = {
+            'prev_leads': prev_leads,
+            'prev_deals': prev_deals,
+            'prev_revenue': prev_revenue
+        }
+        cache.set(growth_cache_key, growth_data, 3600)
 
-    lead_growth = ((current_leads - prev_leads) / prev_leads * 100) if prev_leads else 0
-    deal_growth = ((current_deals - prev_deals) / prev_deals * 100) if prev_deals else 0
-    
+    prev_leads = growth_data['prev_leads']
+    prev_deals = growth_data['prev_deals']
+    prev_revenue = growth_data['prev_revenue']
+
+    lead_growth = ((total_leads - prev_leads) / prev_leads * 100) if prev_leads else 0
+    deal_growth = ((active_deals - prev_deals) / prev_deals * 100) if prev_deals else 0
+
     try:
         revenue_growth = ((float(total_revenue) - float(prev_revenue)) / float(prev_revenue) * 100) if prev_revenue else 0
     except (TypeError, ValueError, ZeroDivisionError):
         revenue_growth = 0
 
-    # Lead sources
-    builder_leads = Lead.objects.filter(
-        builder=request.user,
-        created_at__date__range=[start_date, end_date]
-    )
-    
-    total = total_leads or 1  # Avoid division by zero
-    lead_sources = {
-        "search": round((builder_leads.filter(source='search').count() / total * 100), 2),
-        "referrals": round((builder_leads.filter(source='referral').count() / total * 100), 2),
-        "social": round((builder_leads.filter(source='social').count() / total * 100), 2),
-        "direct": round((builder_leads.filter(source='direct').count() / total * 100), 2),
-    }
+    # =================================================================
+    # FIX 12: Deals list - only needed fields
+    # =================================================================
+    deals = base_deals_qs.select_related('property', 'agent').only(
+        'id', 'client_name', 'amount', 'status', 'created_at',
+        'property__title', 'property__id',
+        'agent__name', 'agent__id'
+    ).order_by('-created_at')
 
-    # Deals
-    deals = Deal.objects.filter(
-        builder=request.user,
-        created_at__date__range=[start_date, end_date]
-    ).select_related('property', 'agent').order_by('-created_at')
-
+    # =================================================================
+    # Build context - FIX 13: json.dumps hatao
+    # =================================================================
     context = {
         "total_leads": total_leads,
         "active_deals": active_deals,
@@ -1268,8 +1345,8 @@ def builder_dashboard(request):
         "deal_growth": round(deal_growth, 2),
         "revenue_growth": round(revenue_growth, 2),
         "lead_sources": lead_sources,
-        "chart_labels": json.dumps(chart_labels),
-        "chart_data": json.dumps(chart_data),
+        "chart_labels": chart_labels,  # List bhejo
+        "chart_data": chart_data,      # List bhejo
         "grouped_followups": dict(grouped_followups),
         "today_followups": today_followups,
         "missed_leads": missed_leads,
@@ -1281,11 +1358,9 @@ def builder_dashboard(request):
     }
 
     # Cache dashboard data
-    cache.set(cache_key, context, 300)  # 5 minutes
-    
-    return render(request, "builder/dashboard.html", context)
+    cache.set(cache_key, context, 300)
 
-# =============================================================================
+    return render(request, "builder/dashboard.html", context)# =============================================================================
 # SCALE LAUNCH CHECKLIST
 # =============================================================================
 
@@ -3977,3 +4052,29 @@ def agent_delete_lead(request, lead_id):
 # =============================================================================
 
 logger.info("views.py loaded successfully")
+@login_required
+def get_messages_ajax(request):
+    """AJAX polling for chat — WebSocket ke jagah"""
+    convo_id = request.GET.get("conversation_id")
+    last_id = request.GET.get("last_id", 0)
+    
+    if not convo_id:
+        return JsonResponse({"messages": []})
+    
+    convo = Conversation.objects.filter(id=int(convo_id)).first()
+    if not convo:
+        return JsonResponse({"messages": []})
+    
+    msgs = convo.messages.filter(id__gt=int(last_id)).select_related('sender').order_by('created_at')
+    data = [{
+        "id": m.id,
+        "text": m.text, 
+        "is_agent": m.is_agent, 
+        "sender": m.sender.username,
+        "created_at": m.created_at.strftime('%H:%M')
+    } for m in msgs]
+    
+    return JsonResponse({
+        "messages": data, 
+        "last_id": msgs.last().id if msgs else last_id
+    })

@@ -373,10 +373,10 @@ document.addEventListener("DOMContentLoaded", function() {
     new Chart(ctx, {
         type: 'line',
         data: {
-            labels: {{ chart_labels|default:"[]"|safe }},
+            labels: {{ chart_labels|json_script:"chart-labels" }},
             datasets: [{
                 label: 'Revenue (₹)',
-                data: {{ chart_data|default:"[]"|safe }},
+                data: {{ chart_data|json_script:"chart-data" }},
                 borderColor: '#6366F1',
                 backgroundColor: 'rgba(99,102,241,0.2)',
                 fill: true,
@@ -395,6 +395,23 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 });
+const chartLabels = JSON.parse(document.getElementById('chart-labels').textContent);
+    const chartData = JSON.parse(document.getElementById('chart-data').textContent);
+    
+    // Chart.js mein use karo
+    const ctx = document.getElementById('revenueChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: chartLabels,
+            datasets: [{
+                label: 'Revenue',
+                data: chartData,
+                borderColor: 'rgb(75, 192, 192)',
+                tension: 0.1
+            }]
+        }
+    });
 </script>
 
 {% endblock %}

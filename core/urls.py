@@ -224,6 +224,7 @@ urlpatterns = [
     path("accounts/", include("allauth.urls")),  # Allauth URLs
     path("auth/redirect/", views.google_login_redirect, name="google_redirect"),
     path("api/check-username/", views.check_username, name="check_username"),
+    path("get-messages-ajax/", views.get_messages_ajax, name="get_messages_ajax"),
 ]
 
 if settings.DEBUG:

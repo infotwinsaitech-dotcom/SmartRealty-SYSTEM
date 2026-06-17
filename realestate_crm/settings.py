@@ -1,6 +1,6 @@
 """
 Django settings for realestate_crm project.
-Production-ready configuration.
+Production-ready configuration — FREE TIER OPTIMIZED.
 """
 
 import os
@@ -31,7 +31,7 @@ ALLOWED_HOSTS = [
     "*.onrender.com",
 ]
 
-# Dynamic ALLOWED_HOSTS from env (for Render/custom domains)
+# Dynamic ALLOWED_HOSTS from env
 _env_hosts = os.getenv("ALLOWED_HOSTS", "")
 if _env_hosts:
     ALLOWED_HOSTS.extend([h.strip() for h in _env_hosts.split(",") if h.strip()])
@@ -40,7 +40,7 @@ CSRF_TRUSTED_ORIGINS = [
     "https://smartrealty-system.onrender.com",
 ]
 
-# Security headers (conditional based on DEBUG)
+# Security headers
 SECURE_SSL_REDIRECT = not DEBUG
 SECURE_HSTS_SECONDS = 31536000 if not DEBUG else 0
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
@@ -168,14 +168,21 @@ TEMPLATES = [
 ]
 
 # =============================================================================
-# DATABASE
+# DATABASE — POSTGRESQL (✅ Already Working)
 # =============================================================================
 
 DATABASES = {
     "default": dj_database_url.config(
-        default=os.getenv("DATABASE_URL", "sqlite:///db.sqlite3"),
+        default=os.getenv("DATABASE_URL"),
         conn_max_age=600,
+        conn_health_checks=True,
     )
+}
+
+# Query timeout — slow queries ko kill karega
+DATABASES["default"]["OPTIONS"] = {
+    "connect_timeout": 10,
+    "options": "-c statement_timeout=30000",  # 30 seconds max
 }
 
 # =============================================================================
@@ -234,84 +241,42 @@ cloudinary.config(
 )
 
 # =============================================================================
-# CACHING (RENDER FREE TIER - ZERO SETUP)
-# =============================================================================
-# Priority:
-#   1. Redis Cache (if REDIS_URL env var is set + django-redis installed)
-#   2. LocMemCache (in-memory, no database table needed, works immediately)
+# CACHING — DATABASE CACHE (FREE, RELIABLE)
 # =============================================================================
 
-REDIS_URL = os.getenv("REDIS_URL", "")
-
-if REDIS_URL:
-    try:
-        import django_redis
-        CACHES = {
-            "default": {
-                "BACKEND": "django_redis.cache.RedisCache",
-                "LOCATION": REDIS_URL,
-                "OPTIONS": {
-                    "CLIENT_CLASS": "django_redis.client.DefaultClient",
-                    "SOCKET_CONNECT_TIMEOUT": 5,
-                    "SOCKET_TIMEOUT": 5,
-                    "RETRY_ON_TIMEOUT": True,
-                    "CONNECTION_POOL_KWARGS": {"max_connections": 20},
-                },
-            }
-        }
-        SESSION_ENGINE = "django.contrib.sessions.backends.cache"
-        SESSION_CACHE_ALIAS = "default"
-        _cache_backend = "redis"
-    except ImportError:
-        # Fallback to in-memory cache (no setup needed)
-        CACHES = {
-            "default": {
-                "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
-                "LOCATION": "smartrealty-cache",
-                "TIMEOUT": 300,
-                "OPTIONS": {
-                    "MAX_ENTRIES": 10000,
-                    "CULL_FREQUENCY": 3,
-                }
-            }
-        }
-        SESSION_ENGINE = "django.contrib.sessions.backends.cache"
-        SESSION_CACHE_ALIAS = "default"
-        _cache_backend = "locmem"
-else:
-    # No REDIS_URL - use in-memory cache (Render free tier, zero setup)
-    CACHES = {
-        "default": {
-            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
-            "LOCATION": "smartrealty-cache",
-            "TIMEOUT": 300,
-            "OPTIONS": {
-                "MAX_ENTRIES": 10000,
-                "CULL_FREQUENCY": 3,
-            }
+# PostgreSQL ke saath DatabaseCache use karo — shared, reliable, free
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.db.DatabaseCache",
+        "LOCATION": "django_cache_table",
+        "TIMEOUT": 300,
+        "OPTIONS": {
+            "MAX_ENTRIES": 10000,
+            "CULL_FREQUENCY": 3,
         }
     }
-    SESSION_ENGINE = "django.contrib.sessions.backends.cache"
-    SESSION_CACHE_ALIAS = "default"
-    _cache_backend = "locmem"
+}
 
-SESSION_COOKIE_AGE = 1209600
+# =============================================================================
+# SESSIONS — DATABASE BACKED (RELIABLE)
+# =============================================================================
+
+SESSION_ENGINE = "django.contrib.sessions.backends.db"
+SESSION_COOKIE_AGE = 1209600  # 2 weeks
 SESSION_SAVE_EVERY_REQUEST = True
+SESSION_COOKIE_SECURE = not DEBUG
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = "Lax"
+
 # =============================================================================
-# CELERY CONFIGURATION
+# CELERY — SYNCHRONOUS MODE (FREE TIER)
 # =============================================================================
 
-# Use Redis if available, otherwise run tasks synchronously (Render free tier)
-if REDIS_URL:
-    CELERY_BROKER_URL = REDIS_URL
-    CELERY_RESULT_BACKEND = REDIS_URL
-else:
-    # No Redis - run Celery tasks synchronously in-process
-    CELERY_BROKER_URL = "memory://"
-    CELERY_RESULT_BACKEND = "cache"
-    CELERY_CACHE_BACKEND = "default"
-    CELERY_TASK_ALWAYS_EAGER = True
-
+CELERY_BROKER_URL = "memory://"
+CELERY_RESULT_BACKEND = "cache"
+CELERY_CACHE_BACKEND = "default"
+CELERY_TASK_ALWAYS_EAGER = True  # Tasks immediately run honge
+CELERY_TASK_EAGER_PROPAGATES = True
 CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_SERIALIZER = "json"
@@ -321,16 +286,26 @@ CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
 CELERY_BEAT_SCHEDULE = {
     "check-drip-sequences": {
         "task": "core.tasks.process_drip_sequences",
-        "schedule": 21600.0,  # Every 6 hours
+        "schedule": 21600.0,
     },
     "check-missed-followups": {
         "task": "core.tasks.check_missed_followups_task",
-        "schedule": 3600.0,  # Every 1 hour
+        "schedule": 3600.0,
     },
     "send-daily-summaries": {
         "task": "core.tasks.send_daily_summaries",
-        "schedule": 86400.0,  # Every 24 hours (1 day)
+        "schedule": 86400.0,
     },
+}
+
+# =============================================================================
+# CHANNELS — IN-MEMORY (SINGLE WORKER KE LIYE)
+# =============================================================================
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer"
+    }
 }
 
 # =============================================================================
@@ -361,7 +336,7 @@ REST_FRAMEWORK = {
 }
 
 # =============================================================================
-# LOGGING (MERGED - SINGLE CONFIG)
+# LOGGING
 # =============================================================================
 
 LOGS_DIR = BASE_DIR / "logs"
@@ -385,7 +360,7 @@ LOGGING = {
             "level": "INFO",
             "class": "logging.handlers.RotatingFileHandler",
             "filename": str(LOGS_DIR / "django.log"),
-            "maxBytes": 1024 * 1024 * 5,  # 5 MB
+            "maxBytes": 1024 * 1024 * 5,
             "backupCount": 5,
             "formatter": "verbose",
         },
@@ -393,7 +368,7 @@ LOGGING = {
             "level": "INFO",
             "class": "logging.handlers.RotatingFileHandler",
             "filename": str(LOGS_DIR / "tasks.log"),
-            "maxBytes": 1024 * 1024 * 10,  # 10 MB
+            "maxBytes": 1024 * 1024 * 10,
             "backupCount": 10,
             "formatter": "verbose",
         },
@@ -431,11 +406,35 @@ LOGGING = {
 }
 
 # =============================================================================
+# SENTRY ERROR TRACKING (FREE TIER)
+# =============================================================================
+
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
+
+if not DEBUG and os.getenv("SENTRY_DSN"):
+    sentry_sdk.init(
+        dsn=os.getenv("SENTRY_DSN"),
+        integrations=[DjangoIntegration()],
+        traces_sample_rate=0.05,
+        profiles_sample_rate=0.05,
+        environment="production",
+        send_default_pii=True,
+    )
+
+# =============================================================================
 # RATE LIMITING
 # =============================================================================
 
 RATELIMIT_ENABLE = True
 RATELIMIT_USE_CACHE = "default"
+
+# =============================================================================
+# FILE UPLOAD LIMITS
+# =============================================================================
+
+DATA_UPLOAD_MAX_MEMORY_SIZE = 5242880  # 5MB
+FILE_UPLOAD_MAX_MEMORY_SIZE = 5242880  # 5MB
 
 # =============================================================================
 # ADMINS
@@ -457,7 +456,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 AUTH_USER_MODEL = "core.User"
 
 # =============================================================================
-# CACHALOT (DISABLED - optional caching layer)
+# CACHALOT (DISABLED)
 # =============================================================================
 
 CACHALOT_ENABLED = False
@@ -473,6 +472,4 @@ if DEBUG:
     print(f"SECRET_KEY loaded: {bool(SECRET_KEY)}")
     print(f"SENDGRID loaded: {bool(os.getenv('SENDGRID_API_KEY'))}")
     print(f"DB URL loaded: {bool(os.getenv('DATABASE_URL'))}")
-    print(f"REDIS URL loaded: {bool(REDIS_URL)}")
-    print(f"CACHE BACKEND: {_cache_backend}")
     print("=" * 60)

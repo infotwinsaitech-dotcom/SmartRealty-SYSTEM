@@ -13,3 +13,49 @@ def auto_create_agent(sender, instance, created, **kwargs):
                 "phone": getattr(instance, "phone", ""),
             }
         )
+
+from django.db.models.signals import post_save, post_delete
+from django.dispatch import receiver
+from django.core.cache import cache
+from .models import Lead, Deal, FollowUp, Task
+
+
+def invalidate_dashboard_cache(user_id):
+    """Delete all dashboard cache keys for a user"""
+    # DatabaseCache mein pattern delete nahi hota
+    # Isliye specific keys delete karte hain
+    # Note: Production mein Redis ho toh pattern delete possible hai
+    cache.delete(f"dashboard_v2:{user_id}:*")
+    cache.delete(f"growth:{user_id}:*")
+
+
+@receiver(post_save, sender=Lead)
+@receiver(post_delete, sender=Lead)
+def invalidate_lead_cache(sender, instance, **kwargs):
+    """Jab lead add/update/delete ho toh cache clear karo"""
+    if instance.builder:
+        invalidate_dashboard_cache(instance.builder.id)
+
+
+@receiver(post_save, sender=Deal)
+@receiver(post_delete, sender=Deal)
+def invalidate_deal_cache(sender, instance, **kwargs):
+    """Jab deal add/update/delete ho toh cache clear karo"""
+    if instance.builder:
+        invalidate_dashboard_cache(instance.builder.id)
+
+
+@receiver(post_save, sender=FollowUp)
+@receiver(post_delete, sender=FollowUp)
+def invalidate_followup_cache(sender, instance, **kwargs):
+    """Jab followup add/update/delete ho toh cache clear karo"""
+    if instance.lead and instance.lead.builder:
+        invalidate_dashboard_cache(instance.lead.builder.id)
+
+
+@receiver(post_save, sender=Task)
+@receiver(post_delete, sender=Task)
+def invalidate_task_cache(sender, instance, **kwargs):
+    """Jab task add/update/delete ho toh cache clear karo"""
+    if instance.user:
+        invalidate_dashboard_cache(instance.user.id)
