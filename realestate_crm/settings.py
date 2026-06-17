@@ -234,19 +234,15 @@ cloudinary.config(
 )
 
 # =============================================================================
-# REDIS & CACHING (RENDER-OPTIMIZED)
+# CACHING (RENDER FREE TIER - ZERO SETUP)
 # =============================================================================
-# NOTE: For Render deployment without Redis instance, use DatabaseCache.
-# To switch to Redis later:
-#   1. Add Redis instance on Render (or use Redis Cloud)
-#   2. Set REDIS_URL environment variable
-#   3. Change backend to "django_redis.cache.RedisCache"
+# Priority:
+#   1. Redis Cache (if REDIS_URL env var is set + django-redis installed)
+#   2. LocMemCache (in-memory, no database table needed, works immediately)
 # =============================================================================
 
 REDIS_URL = os.getenv("REDIS_URL", "")
 
-# Use Redis if REDIS_URL is set and django-redis is installed
-# Otherwise fallback to DatabaseCache (works on Render free tier)
 if REDIS_URL:
     try:
         import django_redis
@@ -267,10 +263,11 @@ if REDIS_URL:
         SESSION_CACHE_ALIAS = "default"
         _cache_backend = "redis"
     except ImportError:
+        # Fallback to in-memory cache (no setup needed)
         CACHES = {
             "default": {
-                "BACKEND": "django.core.cache.backends.db.DatabaseCache",
-                "LOCATION": "django_cache_table",
+                "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+                "LOCATION": "smartrealty-cache",
                 "TIMEOUT": 300,
                 "OPTIONS": {
                     "MAX_ENTRIES": 10000,
@@ -278,14 +275,15 @@ if REDIS_URL:
                 }
             }
         }
-        SESSION_ENGINE = "django.contrib.sessions.backends.db"
-        _cache_backend = "database"
+        SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+        SESSION_CACHE_ALIAS = "default"
+        _cache_backend = "locmem"
 else:
-    # No REDIS_URL set - use DatabaseCache (Render free tier compatible)
+    # No REDIS_URL - use in-memory cache (Render free tier, zero setup)
     CACHES = {
         "default": {
-            "BACKEND": "django.core.cache.backends.db.DatabaseCache",
-            "LOCATION": "django_cache_table",
+            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+            "LOCATION": "smartrealty-cache",
             "TIMEOUT": 300,
             "OPTIONS": {
                 "MAX_ENTRIES": 10000,
@@ -293,24 +291,27 @@ else:
             }
         }
     }
-    SESSION_ENGINE = "django.contrib.sessions.backends.db"
-    _cache_backend = "database"
+    SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+    SESSION_CACHE_ALIAS = "default"
+    _cache_backend = "locmem"
 
 SESSION_COOKIE_AGE = 1209600
 SESSION_SAVE_EVERY_REQUEST = True
-
 # =============================================================================
 # CELERY CONFIGURATION
 # =============================================================================
 
-# Use Redis if available, otherwise use Django DB backend (for Render free tier)
+# Use Redis if available, otherwise run tasks synchronously (Render free tier)
 if REDIS_URL:
     CELERY_BROKER_URL = REDIS_URL
     CELERY_RESULT_BACKEND = REDIS_URL
 else:
-    CELERY_BROKER_URL = "django-db://"
-    CELERY_RESULT_BACKEND = "django-db"
-    # Install: pip install celery[redis] django-celery-results
+    # No Redis - run Celery tasks synchronously in-process
+    CELERY_BROKER_URL = "memory://"
+    CELERY_RESULT_BACKEND = "cache"
+    CELERY_CACHE_BACKEND = "default"
+    CELERY_TASK_ALWAYS_EAGER = True
+
 CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_SERIALIZER = "json"
