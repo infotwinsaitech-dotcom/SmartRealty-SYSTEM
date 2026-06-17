@@ -234,26 +234,51 @@ cloudinary.config(
 )
 
 # =============================================================================
-# REDIS & CACHING (FIXED - UNCOMMENTED)
+# REDIS & CACHING (PRODUCTION-READY WITH FALLBACK)
+# =============================================================================
+# Priority:
+#   1. Redis Cache (requires: pip install django-redis)
+#   2. Database Cache (built-in, no extra packages)
+#   3. LocMem Cache (in-memory, dev only)
 # =============================================================================
 
 REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
 
-CACHES = {
-    "default": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": REDIS_URL,
-        "OPTIONS": {
-            "CLIENT_CLASS": "django_redis.client.DefaultClient",
-            "SOCKET_CONNECT_TIMEOUT": 5,
-            "SOCKET_TIMEOUT": 5,
-            "RETRY_ON_TIMEOUT": True,
-        },
+# Try Redis first, fallback to DatabaseCache if django-redis not installed
+try:
+    import django_redis
+    CACHES = {
+        "default": {
+            "BACKEND": "django_redis.cache.RedisCache",
+            "LOCATION": REDIS_URL,
+            "OPTIONS": {
+                "CLIENT_CLASS": "django_redis.client.DefaultClient",
+                "SOCKET_CONNECT_TIMEOUT": 5,
+                "SOCKET_TIMEOUT": 5,
+                "RETRY_ON_TIMEOUT": True,
+                "CONNECTION_POOL_KWARGS": {"max_connections": 20},
+            },
+        }
     }
-}
+    SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+    SESSION_CACHE_ALIAS = "default"
+    _cache_backend = "redis"
+except ImportError:
+    # Fallback: Database Cache (no pip install needed)
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.db.DatabaseCache",
+            "LOCATION": "django_cache_table",
+            "TIMEOUT": 300,
+            "OPTIONS": {
+                "MAX_ENTRIES": 10000,
+                "CULL_FREQUENCY": 3,
+            }
+        }
+    }
+    SESSION_ENGINE = "django.contrib.sessions.backends.db"
+    _cache_backend = "database"
 
-SESSION_ENGINE = "django.contrib.sessions.backends.cache"
-SESSION_CACHE_ALIAS = "default"
 SESSION_COOKIE_AGE = 1209600
 SESSION_SAVE_EVERY_REQUEST = True
 
@@ -424,5 +449,6 @@ if DEBUG:
     print(f"SECRET_KEY loaded: {bool(SECRET_KEY)}")
     print(f"SENDGRID loaded: {bool(os.getenv('SENDGRID_API_KEY'))}")
     print(f"DB URL loaded: {bool(os.getenv('DATABASE_URL'))}")
-    print(f"REDIS loaded: {bool(REDIS_URL)}")
+    print(f"REDIS URL loaded: {bool(REDIS_URL)}")
+    print(f"CACHE BACKEND: {_cache_backend}")
     print("=" * 60)
