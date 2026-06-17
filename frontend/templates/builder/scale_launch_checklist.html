@@ -628,7 +628,8 @@
             <circle class="progress-circle-bg" cx="50" cy="50" r="42"/>
             <circle class="progress-circle-fill" cx="50" cy="50" r="42"
               stroke-dasharray="264"
-              stroke-dashoffset="{{ 264|add:-overall_progress|div:100|mul:264 }}"/>
+              stroke-dashoffset="{{ overall_progress|yesno:'0,264' }}"
+              data-progress="{{ overall_progress }}"/>
           </svg>
           <div class="progress-text">{{ overall_progress }}%</div>
         </div>
@@ -640,7 +641,8 @@
             <circle class="progress-circle-bg" cx="50" cy="50" r="42"/>
             <circle class="progress-circle-fill" cx="50" cy="50" r="42"
               stroke-dasharray="264"
-              stroke-dashoffset="{{ 264|add:-pre_launch_progress|div:100|mul:264 }}"/>
+              stroke-dashoffset="{{ pre_launch_progress|yesno:'0,264' }}"
+              data-progress="{{ pre_launch_progress }}"/>
           </svg>
           <div class="progress-text">{{ pre_launch_progress }}%</div>
         </div>
@@ -652,7 +654,8 @@
             <circle class="progress-circle-bg" cx="50" cy="50" r="42"/>
             <circle class="progress-circle-fill" cx="50" cy="50" r="42"
               stroke-dasharray="264"
-              stroke-dashoffset="{{ 264|add:-launch_progress|div:100|mul:264 }}"/>
+              stroke-dashoffset="{{ launch_progress|yesno:'0,264' }}"
+              data-progress="{{ launch_progress }}"/>
           </svg>
           <div class="progress-text">{{ launch_progress }}%</div>
         </div>
@@ -769,13 +772,21 @@
 </div>
 
 <script>
-  // Animate progress bars on load
   document.addEventListener('DOMContentLoaded', function() {
+    // Animate progress bars
     setTimeout(() => {
       document.querySelectorAll('.progress-bar-fill').forEach(bar => {
         bar.style.width = bar.style.width;
       });
     }, 100);
+
+    // Animate SVG circles - calculate stroke-dashoffset based on data-progress
+    document.querySelectorAll('.progress-circle-fill[data-progress]').forEach(circle => {
+      const progress = parseInt(circle.getAttribute('data-progress')) || 0;
+      const circumference = 264; // 2 * PI * 42
+      const offset = circumference - (progress / 100) * circumference;
+      circle.style.strokeDashoffset = offset;
+    });
   });
 </script>
 {% endblock %}
