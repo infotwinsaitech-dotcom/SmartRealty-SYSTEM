@@ -59,3 +59,26 @@ def invalidate_task_cache(sender, instance, **kwargs):
     """Jab task add/update/delete ho toh cache clear karo"""
     if instance.user:
         invalidate_dashboard_cache(instance.user.id)
+
+from allauth.socialaccount.models import SocialApp
+from django.contrib.sites.models import Site
+
+def create_social_app():
+    """Auto-create Google SocialApp if credentials exist"""
+    from django.conf import settings
+    client_id = getattr(settings, 'GOOGLE_CLIENT_ID', '')
+    secret = getattr(settings, 'GOOGLE_SECRET', '')
+    
+    if not client_id or not secret:
+        return
+    
+    site = Site.objects.get_or_create(pk=1, defaults={'domain': 'smartrealty-system.onrender.com', 'name': 'SmartRealty'})[0]
+    
+    SocialApp.objects.get_or_create(
+        provider='google',
+        defaults={
+            'name': 'Google',
+            'client_id': client_id,
+            'secret': secret,
+        }
+    ).sites.add(site)
