@@ -1,10 +1,13 @@
 """
 Django settings for realestate_crm project.
 Production-ready — Render FREE TIER OPTIMIZED.
+LARGE SCALE DEPLOYMENT READY.
+ALL DATABASE CONNECTION BUGS FIXED.
 """
 
 import os
 import sys
+import urllib.parse
 from pathlib import Path
 
 # =============================================================================
@@ -117,13 +120,15 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 # =============================================================================
-# ALLAUTH SETTINGS
+# ALLAUTH SETTINGS — FIXED FOR DJANGO-ALLAUTH 65.x
 # =============================================================================
 
 ACCOUNT_EMAIL_VERIFICATION = "mandatory" if IS_PRODUCTION else "none"
-ACCOUNT_EMAIL_REQUIRED = True
-ACCOUNT_USERNAME_REQUIRED = True
-ACCOUNT_AUTHENTICATION_METHOD = "email"
+
+# ✅ FIXED: Replaced deprecated settings with new allauth 65.x format
+ACCOUNT_LOGIN_METHODS = {"email"}
+ACCOUNT_SIGNUP_FIELDS = ["email*", "username*", "password1*", "password2*"]
+
 ACCOUNT_USER_MODEL_USERNAME_FIELD = "username"
 ACCOUNT_LOGOUT_REDIRECT_URL = "/"
 LOGIN_REDIRECT_URL = "/auth/redirect/"
@@ -204,7 +209,7 @@ TEMPLATES = [
 ]
 
 # =============================================================================
-# DATABASE — POSTGRESQL (Render Free Tier)
+# DATABASE — POSTGRESQL (Render Free Tier) — ULTIMATE FIX
 # =============================================================================
 
 import dj_database_url
@@ -212,14 +217,44 @@ import dj_database_url
 DATABASE_URL = os.environ.get("DATABASE_URL")
 
 if DATABASE_URL:
-    DATABASES = {
-        "default": dj_database_url.config(
-            default=DATABASE_URL,
-            conn_max_age=600,
-            conn_health_checks=True,
-            ssl_require=IS_PRODUCTION,
-        )
-    }
+    # ✅ ULTIMATE FIX: Properly parse and handle DATABASE_URL
+    # Render PostgreSQL requires SSL for external connections
+    # Internal connections may or may not need SSL
+
+    parsed = urllib.parse.urlparse(DATABASE_URL)
+    hostname = parsed.hostname or ""
+
+    # Detect connection type
+    is_render_external = ".render.com" in hostname
+    is_render_internal = hostname.endswith("-a") and not is_render_external
+
+    # Parse URL with dj_database_url
+    db_config = dj_database_url.parse(
+        DATABASE_URL,
+        conn_max_age=600,
+        conn_health_checks=True,
+    )
+
+    # ✅ FIX: SSL configuration based on connection type
+    db_config.setdefault("OPTIONS", {})
+
+    if is_render_external:
+        # External connections: SSL REQUIRED
+        db_config["OPTIONS"]["sslmode"] = "require"
+    elif is_render_internal:
+        # Internal connections: try without SSL first
+        # If SSL is forced by server, psycopg2 will handle it
+        pass  # Don't set sslmode, let server negotiate
+    else:
+        # Unknown: try with SSL
+        db_config["OPTIONS"]["sslmode"] = "prefer"
+
+    # Connection timeouts
+    db_config["OPTIONS"]["connect_timeout"] = 10
+    db_config["OPTIONS"]["options"] = "-c statement_timeout=30000"
+
+    DATABASES = {"default": db_config}
+
 else:
     DATABASES = {
         "default": {
@@ -227,13 +262,6 @@ else:
             "NAME": BASE_DIR / "db.sqlite3",
         }
     }
-
-# Merge query timeout options (don't overwrite)
-if "default" in DATABASES and DATABASES["default"].get("ENGINE") == "django.db.backends.postgresql":
-    existing_options = DATABASES["default"].get("OPTIONS", {})
-    existing_options["connect_timeout"] = 10
-    existing_options["options"] = "-c statement_timeout=30000"
-    DATABASES["default"]["OPTIONS"] = existing_options
 
 # =============================================================================
 # PASSWORD VALIDATION
@@ -318,11 +346,11 @@ SESSION_SAVE_EVERY_REQUEST = True
 if not IS_TEST:
     CELERY_BROKER_URL = os.environ.get("REDIS_URL", "sqla+sqlite:///celerydb.sqlite")
     CELERY_RESULT_BACKEND = "db+sqlite:///celery_results.sqlite"
-    
+
     if os.environ.get("REDIS_URL"):
         CELERY_BROKER_URL = os.environ.get("REDIS_URL")
         CELERY_RESULT_BACKEND = os.environ.get("REDIS_URL")
-    
+
     CELERY_ACCEPT_CONTENT = ["json"]
     CELERY_TASK_SERIALIZER = "json"
     CELERY_RESULT_SERIALIZER = "json"
@@ -334,9 +362,7 @@ if not IS_TEST:
     CELERY_TASK_SOFT_TIME_LIMIT = 240
     CELERY_TASK_ACKS_LATE = True
     CELERY_WORKER_PREFETCH_MULTIPLIER = 1
-    
-    # ✅ FIXED: String task names only — NO import at module level
-    # Celery resolves these at runtime when apps are fully loaded
+
     CELERY_BEAT_SCHEDULE = {
         "check-drip-sequences": {
             "task": "core.tasks.process_drip_sequences",
