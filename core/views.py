@@ -34,9 +34,19 @@ from django.utils.timezone import now
 from django.core.cache import cache
 from django.views.decorators.cache import cache_page
 
-from sendgrid import SendGridAPIClient
-from sendgrid.helpers.mail import Mail
-from twilio.twiml.messaging_response import MessagingResponse
+# BUG FIX: Hard import band karo — agar package nahi to server crash hoga
+try:
+    from sendgrid import SendGridAPIClient
+    from sendgrid.helpers.mail import Mail
+    HAS_SENDGRID = True
+except ImportError:
+    HAS_SENDGRID = False
+
+try:
+    from twilio.twiml.messaging_response import MessagingResponse
+    HAS_TWILIO = True
+except ImportError:
+    HAS_TWILIO = False
 
 from .models import (
     Property, PropertyImage, User, Profile, Lead, Deal, Task, 

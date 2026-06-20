@@ -5,40 +5,9 @@ from django.shortcuts import render
 from django.http import JsonResponse
 from . import views
 from . import views_automation
+
+# BUG FIX: views_health se import karo — duplicate local def hataya
 from core.views_health import health_check, cache_status
-
-# =============================================================================
-# HEALTH CHECK ENDPOINT
-# =============================================================================
-
-def health_check(request):
-    """System health check endpoint for monitoring"""
-    from django.db import connection
-    from django.core.cache import cache
-
-    status = {"status": "ok", "checks": {}}
-    status_code = 200
-
-    # Database check
-    try:
-        with connection.cursor() as cursor:
-            cursor.execute("SELECT 1")
-        status["checks"]["database"] = "ok"
-    except Exception as e:
-        status["checks"]["database"] = f"error: {str(e)}"
-        status["status"] = "error"
-        status_code = 503
-
-    # Cache check
-    try:
-        cache.set("health_check", "ok", 5)
-        cache_result = cache.get("health_check")
-        status["checks"]["cache"] = "ok" if cache_result == "ok" else "degraded"
-    except Exception as e:
-        status["checks"]["cache"] = f"error: {str(e)}"
-
-    return JsonResponse(status, status=status_code)
-
 
 urlpatterns = [
 
@@ -70,14 +39,15 @@ urlpatterns = [
     path("privacy/", views.privacy, name="privacy"),
 
     # ================= HEALTH CHECK =================
+    # BUG FIX: Sirf ek health path — pehle 2 jagah tha (line 73 aur 228)
     path("health/", health_check, name="health"),
+    path("health/cache/", cache_status, name="cache_status"),
 
     # ================= CALCULATORS & WISHLIST =================
 
     path("emi-calculator/", views.emi_calculator, name="emi_calculator"),
     path("roi-calculator/", views.roi_calculator, name="roi_calculator"),
 
-    # Wishlist URLs - FIXED (no duplicates)
     path("wishlist/", views.wishlist, name="wishlist"),
     path("wishlist/count/", views.wishlist_count, name="wishlist_count"),
     path("wishlist/add/<int:property_id>/", views.wishlist_add, name="wishlist_add"),
@@ -87,126 +57,70 @@ urlpatterns = [
     # ================= BUILDER =================
 
     path("builder/", views.builder_root),
-
     path("builder/dashboard/", views.builder_dashboard, name="builder_dashboard"),
-
     path("builder/properties/", views.property_management, name="property_management"),
-
     path("builder/property/<int:id>/", views.builder_property_detail, name="builder_property_detail"),
-
     path("builder/property/delete/<int:id>/", views.delete_property, name="delete_property"),
-
     path("builder/leads/", views.lead_management, name="lead_management"),
-
     path("builder/leads/add/", views.add_lead, name="add_lead"),
-
     path("builder/leads/edit/<int:id>/", views.edit_lead, name="edit_lead"),
-
     path("builder/lead/<int:id>/", views.lead_detail_api, name="lead_detail_api"),
-
     path("builder/lead/delete/<int:id>/", views.delete_lead, name="delete_lead"),
-
     path("builder/export-leads/", views.export_leads_csv, name="export_leads_csv"),
-
     path("builder/pipeline/", views.pipeline, name="pipeline"),
-
     path("builder/update-lead-status/", views.update_lead_status, name="update_lead_status"),
-
     path("builder/analytics/", views.analytics, name="analytics"),
-
     path("builder/documents/", views.document_management, name="document_management"),
-
     path("delete-document/<int:doc_id>/", views.delete_document, name="delete_document"),
-
     path("builder/communication/", views.communication, name="communication"),
-
     path("builder/create-task/", views.create_task, name="create_task"),
-
     path("builder/task-done/<int:id>/", views.task_done, name="task_done"),
-
-    # Scheduler - FIXED (only one)
     path("builder/scheduler/", views.scheduler_overview, name="builder_scheduler"),
-
     path("builder/reorder-task/", views.reorder_task, name="reorder_task"),
-
     path("builder/check-reminders/", views.check_reminders, name="check_reminders"),
-
     path("builder/notifications/", views.notifications_page, name="notifications"),
-
     path("mark-notification/<int:id>/", views.mark_notification_read, name="mark_notification_read"),
-
     path("builder/create-agent/", views.create_agent, name="create_agent"),
-
     path("builder/users/", views.manage_users, name="manage_users"),
-
     path("builder/users/delete/<int:id>/", views.delete_agent, name="delete_agent"),
-
     path("builder/users/toggle/<int:id>/", views.toggle_agent, name="toggle_agent"),
-
     path("builder/agent/<int:id>/", views.agent_detail, name="agent_detail"),
-
     path("builder/export-agents/", views.export_agents, name="export_agents"),
-
     path("builder/agents-performance/", views.agent_performance, name="agent_performance"),
-
     path("builder/ai-insights/", views.ai_insights, name="ai_insights"),
-
     path("builder/marketing/", views.marketing_automation, name="marketing_automation"),
-
     path("builder/campaign/create/", views.create_campaign, name="create_campaign"),
-
     path("builder/campaign/run/<int:id>/", views.run_campaign, name="run_campaign"),
-
     path("builder/campaign/delete/<int:id>/", views.delete_campaign, name="delete_campaign"),
-
-    # ================= SCALE LAUNCH CHECKLIST (NEW) =================
     path("builder/scale-launch-checklist/", views.scale_launch_checklist, name="scale_launch_checklist"),
 
     # ================= AGENT =================
 
     path("agent/dashboard/", views.agent_dashboard, name="agent_dashboard"),
-
     path("agent/leads/", views.agent_leads, name="agent_leads"),
-
     path("agent/properties/", views.agent_properties, name="agent_properties"),
-
     path("agent/profile/", views.agent_profile, name="agent_profile"),
-
-    # Agent Scheduler - FIXED (only one)
     path("agent/scheduler/", views.scheduler, name="agent_scheduler"),
-
     path("agent/site-visits/", views.site_visits, name="site_visits"),
-
     path("add-followup/<int:lead_id>/", views.add_followup, name="add_followup"),
-
     path("followup/done/<int:id>/", views.mark_followup_done, name="mark_followup_done"),
-
     path("add-deal/", views.add_deal, name="add_deal"),
-
     path("update-deal/<int:deal_id>/", views.update_deal, name="update_deal"),
 
     # ================= CHAT =================
 
     path("send-message/", views.send_message, name="send_message"),
-
     path("client/send-message/", views.client_send_message, name="client_send_message"),
-
     path("agent/send-message/", views.agent_send_message, name="agent_send_message"),
-
     path("get-messages/", views.get_messages, name="get_messages"),
-
     path("chatbot/", lambda request: render(request, "chatbot.html"), name="chatbot"),
 
     # ================= OTHER =================
 
     path("assign-property/", views.assign_property, name="assign_property"),
-
     path("export-leads/", views.export_leads, name="export_leads"),
-
     path("add-to-cart/<int:id>/", views.add_to_cart, name="add_to_cart"),
-
     path("settings/", views.settings_view, name="settings"),
-
     path("agent/delete-lead/<int:lead_id>/", views.agent_delete_lead, name="agent_delete_lead"),
 
     # ================= AUTOMATION =================
@@ -216,17 +130,16 @@ urlpatterns = [
     path("builder/automation/escalation/create/", views_automation.create_escalation_rule, name="create_escalation"),
     path("builder/automation/logs/", views_automation.automation_logs, name="automation_logs"),
     path("builder/lead/<int:lead_id>/toggle-automation/", views_automation.toggle_lead_automation, name="toggle_automation"),
+
     path("properties-alt/", views.property_list, name="properties"),
     path("add-existing-agent/", views.add_existing_agent, name="add_existing_agent"),
     path("remove-agent/<int:agent_id>/", views.remove_agent_from_builder, name="remove_agent_from_builder"),
     path("export-dashboard-csv/", views.export_dashboard_csv, name="export_dashboard_csv"),
     path("agent/property-leads/<int:property_id>/", views.property_leads, name="property_leads"),
-    path("accounts/", include("allauth.urls")),  # Allauth URLs
+    path("accounts/", include("allauth.urls")),
     path("auth/redirect/", views.google_login_redirect, name="google_redirect"),
     path("api/check-username/", views.check_username, name="check_username"),
     path("get-messages-ajax/", views.get_messages_ajax, name="get_messages_ajax"),
-    path('health/', health_check, name='health'),
-    path('health/cache/', cache_status, name='cache_status'),
 ]
 
 if settings.DEBUG:
