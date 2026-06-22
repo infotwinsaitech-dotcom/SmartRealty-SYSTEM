@@ -644,6 +644,11 @@ class Deal(models.Model):
         ('L', 'Lakh'),
         ('Cr', 'Crore'),
     ]
+    amount_unit = models.CharField(max_length=2, choices=AMOUNT_UNIT_CHOICES, default='L')
+    AMOUNT_UNIT_CHOICES = [
+        ('L', 'Lakh'),
+        ('Cr', 'Crore'),
+    ]
     # Stores which unit the agent originally picked, purely for display.
     # `amount` itself always stores the full rupee value so Sum('amount')
     # on the builder dashboard stays mathematically correct.
