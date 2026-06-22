@@ -924,46 +924,80 @@ def my_inquiries(request):
 # PROPERTY MANAGEMENT (BUILDER)
 # =============================================================================
 
+logger = logging.getLogger(__name__)
+
+from decimal import Decimal, InvalidOperation
+from django.db import transaction
+from django.contrib import messages
+from django.shortcuts import redirect, render
+import logging
+
+logger = logging.getLogger(__name__)
+
 @builder_required
 def add_property(request):
-    """Add new property"""
+    """Add new property with proper validation and error handling"""
     if request.method == "POST":
-        # Collect and validate data
+        # Collect data
         data = {
-            'title': sanitize_input(request.POST.get("title")),
-            'location': sanitize_input(request.POST.get("location")),
-            'project_name': sanitize_input(request.POST.get("project_name")),
-            'status': sanitize_input(request.POST.get("status")),
-            'property_type': sanitize_input(request.POST.get("property_type")),
-            'builder_name': sanitize_input(request.POST.get("builder_name")),
-            'price': sanitize_input(request.POST.get("price")),
-            'price_unit': sanitize_input(request.POST.get("price_unit")) or 'L',
-            'starting_price': sanitize_input(request.POST.get("starting_price")),
-            'max_price': sanitize_input(request.POST.get("max_price")),
-            'beds': request.POST.get("beds"),
-            'baths': request.POST.get("baths"),
-            'sqft': request.POST.get("sqft"),
-            'description': sanitize_input(request.POST.get("description")),
-            'highlights': sanitize_input(request.POST.get("highlights")),
-            'rera_number': sanitize_input(request.POST.get("rera_number")),
-            'possession_date': sanitize_input(request.POST.get("possession_date")),
-            'map_link': sanitize_input(request.POST.get("map_link")),
-            'configuration': sanitize_input(request.POST.get("configuration")),
-            'project_status': sanitize_input(request.POST.get("project_status")),
-            'launch_date': sanitize_input(request.POST.get("launch_date")),
-            'total_units': sanitize_input(request.POST.get("total_units")),
-            'total_towers': sanitize_input(request.POST.get("total_towers")),
-            'land_parcel': sanitize_input(request.POST.get("land_parcel")),
-            'sales_head_number': sanitize_input(request.POST.get("sales_head_number")),
+            'title': sanitize_input(request.POST.get("title", "")),
+            'location': sanitize_input(request.POST.get("location", "")),
+            'project_name': sanitize_input(request.POST.get("project_name", "")),
+            'status': sanitize_input(request.POST.get("status", "Available")),
+            'property_type': sanitize_input(request.POST.get("property_type", "")),
+            'builder_name': sanitize_input(request.POST.get("builder_name", "")),
+            'price': request.POST.get("price", ""),
+            'price_unit': sanitize_input(request.POST.get("price_unit", "L")),
+            'starting_price': sanitize_input(request.POST.get("starting_price", "")),
+            'max_price': sanitize_input(request.POST.get("max_price", "")),
+            'beds': request.POST.get("beds", ""),
+            'baths': request.POST.get("baths", ""),
+            'sqft': request.POST.get("sqft", ""),
+            'description': sanitize_input(request.POST.get("description", "")),
+            'highlights': sanitize_input(request.POST.get("highlights", "")),
+            'rera_number': sanitize_input(request.POST.get("rera_number", "")),
+            'possession': sanitize_input(request.POST.get("possession", "")),
+            'map_link': sanitize_input(request.POST.get("map_link", "")),
+            'configuration': sanitize_input(request.POST.get("configuration", "")),
+            'project_status': sanitize_input(request.POST.get("project_status", "")),
+            'launch_date': sanitize_input(request.POST.get("launch_date", "")),
+            'total_units': sanitize_input(request.POST.get("total_units", "")),
+            'total_towers': sanitize_input(request.POST.get("total_towers", "")),
+            'land_parcel': sanitize_input(request.POST.get("land_parcel", "")),
+            'sales_head_number': sanitize_input(request.POST.get("sales_head_number", "")),
         }
+
+        # ===== VALIDATION =====
+        errors = []
+        
+        if not data['title'].strip():
+            errors.append("Title is required")
+        if not data['location'].strip():
+            errors.append("Location is required")
+        if not data['price'].strip():
+            errors.append("Price is required")
+        else:
+            try:
+                float(data['price'])
+                data['price'] = str(data['price']).strip()
+            except (ValueError, TypeError):
+                errors.append("Price must be a valid number")
+        
+        if not data['property_type']:
+            errors.append("Property type is required")
+
+        if errors:
+            for error in errors:
+                messages.error(request, error)
+            return redirect("add_property")
 
         # File validations
         files = {}
         file_fields = {
-            'thumbnail': (['.jpg', '.jpeg', '.png', '.gif'], 10),
-            'brochure': (['.pdf', '.doc', '.docx'], 10),
-            'project_logo': (['.jpg', '.jpeg', '.png', '.gif'], 10),
-            'project_video': (['.mp4', '.mov', '.avi'], 50),
+            'thumbnail': (['.jpg', '.jpeg', '.png', '.gif', '.webp'], 10),
+            'brochure': (['.pdf'], 10),
+            'project_logo': (['.jpg', '.jpeg', '.png', '.gif', '.webp'], 10),
+            'project_video': (['.mp4', '.mov', '.avi', '.mkv'], 50),
         }
 
         for field, (exts, max_size) in file_fields.items():
@@ -977,9 +1011,9 @@ def add_property(request):
 
         # Parse numeric fields
         try:
-            data['beds'] = int(data['beds']) if data['beds'] else None
-            data['baths'] = float(data['baths']) if data['baths'] else 0
-            data['sqft'] = int(data['sqft']) if data['sqft'] else 0
+            beds_val = int(data['beds']) if data['beds'] else None
+            baths_val = float(data['baths']) if data['baths'] else 0.0
+            sqft_val = int(data['sqft']) if data['sqft'] else 0
         except ValueError:
             messages.error(request, "Invalid numeric values for beds, baths, or sqft")
             return redirect("add_property")
@@ -993,31 +1027,35 @@ def add_property(request):
         nearby_icons = request.POST.getlist("nearby_icon")
         nearby_data = []
         for i in range(len(nearby_names)):
-            if nearby_names[i].strip():
+            name = nearby_names[i].strip()
+            if name:
                 nearby_data.append({
-                    "name": sanitize_input(nearby_names[i]),
+                    "name": sanitize_input(name),
                     "distance": sanitize_input(nearby_distances[i]) if i < len(nearby_distances) else "",
                     "icon": sanitize_input(nearby_icons[i]) if i < len(nearby_icons) else ""
                 })
 
         try:
             with transaction.atomic():
-                property = Property.objects.create(
+                # FIXED: 'prop' instead of 'property' (reserved keyword)
+                # FIXED: Both possession and possession_date fields
+                prop = Property.objects.create(
                     title=data['title'],
                     location=data['location'],
                     project_name=data['project_name'],
                     price=data['price'],
                     price_unit=data['price_unit'],
-                    beds=data['beds'],
-                    baths=data['baths'],
-                    sqft=data['sqft'],
+                    beds=beds_val,
+                    baths=baths_val,
+                    sqft=sqft_val,
                     description=data['description'],
                     property_type=data['property_type'],
                     status=data['status'],
                     amenities=amenities,
                     highlights=data['highlights'],
                     rera_number=data['rera_number'],
-                    possession_date=data['possession_date'],
+                    possession=data['possession'],
+                    possession_date=data['possession'],  # FIXED
                     map_link=data['map_link'],
                     configuration=data['configuration'],
                     builder_name=data['builder_name'],
@@ -1037,22 +1075,22 @@ def add_property(request):
                 # Handle gallery images
                 images = request.FILES.getlist("images")
                 for img in images:
-                    valid, msg = validate_file_upload(img, ['.jpg', '.jpeg', '.png', '.gif'])
+                    valid, msg = validate_file_upload(img, ['.jpg', '.jpeg', '.png', '.gif', '.webp'], 10)
                     if valid:
-                        PropertyImage.objects.create(property=property, image=img)
+                        PropertyImage.objects.create(property=prop, image=img)
+                    else:
+                        logger.warning(f"Gallery image skipped: {msg}")
 
-            messages.success(request, f"Property '{property.title}' added successfully!")
-            logger.info(f"Property created: {property.title} by {request.user.username}")
+            messages.success(request, f"Property '{prop.title}' added successfully!")
+            logger.info(f"Property created: {prop.title} by {request.user.username}")
             return redirect("my_property")
 
         except Exception as e:
             logger.error(f"Property creation error: {str(e)}")
-            messages.error(request, "Failed to create property. Please try again.")
+            messages.error(request, f"Failed to create property: {str(e)}")
             return redirect("add_property")
 
-    # FIX: Changed template path from "user/add_property.html" to "builder/add_property.html"
     return render(request, "builder/property_management.html")
-
 @builder_required
 def property_management(request):
     """Builder property management with pagination"""
