@@ -1051,7 +1051,7 @@ def add_property(request):
             return redirect("add_property")
 
     # FIX: Changed template path from "user/add_property.html" to "builder/add_property.html"
-    return render(request, "builder/add_property.html")
+    return render(request, "builder/property_management.html")
 
 @builder_required
 def property_management(request):
