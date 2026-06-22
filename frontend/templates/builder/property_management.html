@@ -450,11 +450,17 @@ bhk.style.display = "none";
 }
 
 // ===================== DRAG & DROP HANDLER =====================
+// ===================== DRAG & DROP HANDLER (DEBUG VERSION) =====================
 function setupDropzone(dropzoneId, inputId, previewId, placeholderId, imgId, fileNameId, isVideo = false, isPdf = false) {
   const dropzone = document.getElementById(dropzoneId);
   const input = document.getElementById(inputId);
   const preview = document.getElementById(previewId);
   const placeholder = document.getElementById(placeholderId);
+
+  if (!dropzone || !input) {
+    console.error('Dropzone elements not found:', dropzoneId, inputId);
+    return;
+  }
 
   // Prevent default drag behaviors
   ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
@@ -476,6 +482,7 @@ function setupDropzone(dropzoneId, inputId, previewId, placeholderId, imgId, fil
 
   // Handle file input change
   input.addEventListener('change', function(e) {
+    console.log('File input changed for', inputId, 'files:', this.files);
     handleFiles(this.files);
   });
 
@@ -495,13 +502,15 @@ function setupDropzone(dropzoneId, inputId, previewId, placeholderId, imgId, fil
   function handleDrop(e) {
     const dt = e.dataTransfer;
     const files = dt.files;
+    console.log('Files dropped on', dropzoneId, 'count:', files.length);
     handleFiles(files);
   }
 
   function handleFiles(files) {
-    if (!files || files.length === 0) return;
-
-    const file = files[0];
+    if (!files || files.length === 0) {
+      console.log('No files provided');
+      return;
+    }
 
     // For gallery (multiple files)
     if (dropzoneId === 'galleryDropzone') {
@@ -509,10 +518,15 @@ function setupDropzone(dropzoneId, inputId, previewId, placeholderId, imgId, fil
       return;
     }
 
+    const file = files[0];
+    console.log('Processing file:', file.name, 'size:', file.size, 'type:', file.type);
+
     // Create a new FileList-like object for the input
     const dataTransfer = new DataTransfer();
     dataTransfer.items.add(file);
     input.files = dataTransfer.files;
+
+    console.log('Input files set:', input.files.length, input.files[0].name);
 
     // Show preview
     placeholder.classList.add('hidden');
@@ -543,9 +557,13 @@ function handleGalleryFiles(files) {
   const input = document.getElementById('galleryInput');
 
   Array.from(files).forEach(file => {
-    if (!file.type.startsWith('image/')) return;
+    if (!file.type.startsWith('image/')) {
+      console.warn('Skipping non-image file:', file.name);
+      return;
+    }
 
     galleryFiles.push(file);
+    console.log('Added gallery file:', file.name, 'Total:', galleryFiles.length);
 
     const div = document.createElement('div');
     div.className = 'relative group';
@@ -564,6 +582,8 @@ function handleGalleryFiles(files) {
   galleryFiles.forEach(f => dataTransfer.items.add(f));
   input.files = dataTransfer.files;
 
+  console.log('Gallery input files count:', input.files.length);
+
   document.getElementById('galleryPlaceholder').classList.add('hidden');
 }
 
@@ -576,6 +596,8 @@ function removeGalleryImage(btn, fileName) {
   galleryFiles.forEach(f => dataTransfer.items.add(f));
   input.files = dataTransfer.files;
 
+  console.log('Removed gallery file:', fileName, 'Remaining:', galleryFiles.length);
+
   if (galleryFiles.length === 0) {
     document.getElementById('galleryPlaceholder').classList.remove('hidden');
   }
@@ -587,10 +609,13 @@ function clearGallery() {
   document.getElementById('galleryPlaceholder').classList.remove('hidden');
   const input = document.getElementById('galleryInput');
   input.value = '';
+  console.log('Gallery cleared');
 }
 
 // Initialize all dropzones
 document.addEventListener('DOMContentLoaded', function() {
+  console.log('Initializing dropzones...');
+
   // Thumbnail
   setupDropzone('thumbnailDropzone', 'thumbnailInput', 'thumbnailPreview', 'thumbnailPlaceholder', 'thumbnailImg', 'thumbnailFileName');
 
@@ -605,6 +630,23 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Brochure PDF
   setupDropzone('brochureDropzone', 'brochureInput', 'brochurePreview', 'brochurePlaceholder', null, 'brochureFileName', false, true);
+
+  // Form submit debug
+  const form = document.getElementById('propertyForm');
+  if (form) {
+    form.addEventListener('submit', function(e) {
+      console.log('=== FORM SUBMIT DEBUG ===');
+      const formData = new FormData(form);
+      for (let [key, value] of formData.entries()) {
+        if (value instanceof File) {
+          console.log(key + ':', value.name, 'size:', value.size, 'type:', value.type);
+        } else {
+          console.log(key + ':', value);
+        }
+      }
+      console.log('========================');
+    });
+  }
 });
 </script>
 
