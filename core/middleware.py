@@ -20,7 +20,11 @@ class RequestLoggingMiddleware:
                 f"User: {request.user if request.user.is_authenticated else 'Anonymous'}"
             )
 
-        logger.info(
+        # BUG FIX: per-request logging changed INFO -> DEBUG.
+        # At 1000+ users/day this was writing a log line for EVERY request,
+        # which floods log storage/IO and can hit platform log-volume limits.
+        # Slow requests (>1s) still get a WARNING above so problems are visible.
+        logger.debug(
             f"{request.method} {request.path} - {response.status_code} - {duration:.3f}s"
         )
         return response

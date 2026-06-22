@@ -74,6 +74,11 @@ class Property(models.Model):
     title = models.CharField(max_length=255, db_index=True)
     location = models.CharField(max_length=255, db_index=True)
     price = models.CharField(max_length=50, blank=True, null=True)
+    PRICE_UNIT_CHOICES = [
+        ('L', 'Lakh'),
+        ('Cr', 'Crore'),
+    ]
+    price_unit = models.CharField(max_length=2, choices=PRICE_UNIT_CHOICES, default='L')
     project_name = models.CharField(max_length=200, blank=True, null=True, db_index=True)
 
     beds = models.IntegerField(null=True, blank=True, validators=[MinValueValidator(0)])
@@ -560,21 +565,30 @@ class Lead(models.Model):
     def __str__(self):
         return self.name
 
+    @classmethod
+    def from_db(cls, db, field_names, values):
+        # BUG FIX: cache the status this instance was loaded with, so save()
+        # below doesn't need an extra Lead.objects.get() query just to detect
+        # a status change. Removes the N+1 query that ran on every single
+        # lead.save() call (including bulk loops in automation_engine.py).
+        instance = super().from_db(db, field_names, values)
+        instance._loaded_status = instance.status
+        return instance
+
     def save(self, *args, **kwargs):
-        # Auto-update last_contacted on status change
-        if self.pk:
-            try:
-                old = Lead.objects.get(pk=self.pk)
-                if old.status != self.status:
-                    self.last_contacted = timezone.now()
-                    # Use activity_logs (LeadActivity related_name)
-                    LeadActivity.objects.create(
-                        lead=self,
-                        message=f"Status changed from {old.status} to {self.status}"
-                    )
-            except Lead.DoesNotExist:
-                pass
-        super().save(*args, **kwargs)
+        old_status = getattr(self, "_loaded_status", None)
+        # self.pk check keeps old behaviour: skip on first-ever create
+        if self.pk and old_status is not None and old_status != self.status:
+            self.last_contacted = timezone.now()
+            super().save(*args, **kwargs)
+            # Use activity_logs (LeadActivity related_name)
+            LeadActivity.objects.create(
+                lead=self,
+                message=f"Status changed from {old_status} to {self.status}"
+            )
+        else:
+            super().save(*args, **kwargs)
+        self._loaded_status = self.status
 
     def get_next_followup(self):
         """Get next scheduled followup"""
@@ -626,6 +640,14 @@ class Deal(models.Model):
         decimal_places=2,
         validators=[MinValueValidator(Decimal('0.00'))]
     )
+    AMOUNT_UNIT_CHOICES = [
+        ('L', 'Lakh'),
+        ('Cr', 'Crore'),
+    ]
+    # Stores which unit the agent originally picked, purely for display.
+    # `amount` itself always stores the full rupee value so Sum('amount')
+    # on the builder dashboard stays mathematically correct.
+    amount_unit = models.CharField(max_length=2, choices=AMOUNT_UNIT_CHOICES, default='L')
     commission_amount = models.DecimalField(
         max_digits=12,
         decimal_places=2,

@@ -25,6 +25,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.mail import send_mail
 from django.contrib.auth.hashers import make_password
 from django.db.models import Sum, Count, Q, Value, IntegerField, Case, When
+from django.db import transaction
 from django.db.models.functions import ExtractMonth
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -259,20 +260,20 @@ def convert_price(price):
         num_part = re.sub(r'[^\d.]', '', price)
         try:
             return Decimal(num_part) * Decimal("10000000")
-        except:
+        except Exception:
             return Decimal("0")
     
     elif "lakh" in price or "lac" in price or "l" in price:
         num_part = re.sub(r'[^\d.]', '', price)
         try:
             return Decimal(num_part) * Decimal("100000")
-        except:
+        except Exception:
             return Decimal("0")
     
     else:
         try:
             return Decimal(re.sub(r'[^\d.]', '', price))
-        except:
+        except Exception:
             return Decimal("0")
 
 
@@ -611,18 +612,23 @@ def register_view(request):
             return render(request, "public/register.html", {"error": " | ".join(errors)})
 
         try:
-            user = User.objects.create_user(
-                username=username, 
-                email=email, 
-                password=password, 
-                phone=phone, 
-                role="user"
-            )
+            # BUG FIX: wrap User + Profile creation in transaction.atomic().
+            # Without this, if Profile creation fails after User is created,
+            # you get a User account with no Profile (broken/half-created
+            # account) instead of nothing at all.
+            with transaction.atomic():
+                user = User.objects.create_user(
+                    username=username, 
+                    email=email, 
+                    password=password, 
+                    phone=phone, 
+                    role="user"
+                )
 
-            Profile.objects.update_or_create(
-                user=user,
-                defaults={"full_name": full_name, "email": email, "phone": phone}
-            )
+                Profile.objects.update_or_create(
+                    user=user,
+                    defaults={"full_name": full_name, "email": email, "phone": phone}
+                )
 
             messages.success(request, "Registration successful! Please login.")
             logger.info(f"New user registered: {username}")
@@ -899,8 +905,9 @@ def my_properties(request):
     if request.user.role != "builder":
         return redirect("login")
     
-    properties = Property.objects.filter(builder=request.user).select_related('builder')
-    return render(request, "user/my_property.html", {"properties": properties})
+    properties = Property.objects.filter(builder=request.user).select_related('builder').order_by('-created_at')
+    page_obj = get_paginated_queryset(properties, request)
+    return render(request, "user/my_property.html", {"properties": page_obj, "page_obj": page_obj})
 
 
 @login_required
@@ -909,7 +916,8 @@ def my_inquiries(request):
     inquiries = Inquiry.objects.filter(
         email=request.user.email
     ).select_related('property').order_by('-created_at')
-    return render(request, "user/my_inquiries.html", {"inquiries": inquiries})
+    page_obj = get_paginated_queryset(inquiries, request)
+    return render(request, "user/my_inquiries.html", {"inquiries": page_obj, "page_obj": page_obj})
 
 
 # =============================================================================
@@ -929,6 +937,7 @@ def add_property(request):
             'property_type': sanitize_input(request.POST.get("property_type")),
             'builder_name': sanitize_input(request.POST.get("builder_name")),
             'price': sanitize_input(request.POST.get("price")),
+            'price_unit': sanitize_input(request.POST.get("price_unit")) or 'L',
             'starting_price': sanitize_input(request.POST.get("starting_price")),
             'max_price': sanitize_input(request.POST.get("max_price")),
             'beds': request.POST.get("beds"),
@@ -992,43 +1001,49 @@ def add_property(request):
                 })
 
         try:
-            property = Property.objects.create(
-                title=data['title'],
-                location=data['location'],
-                project_name=data['project_name'],
-                price=data['price'],
-                beds=data['beds'],
-                baths=data['baths'],
-                sqft=data['sqft'],
-                description=data['description'],
-                property_type=data['property_type'],
-                status=data['status'],
-                amenities=amenities,
-                highlights=data['highlights'],
-                rera_number=data['rera_number'],
-                possession_date=data['possession_date'],
-                map_link=data['map_link'],
-                configuration=data['configuration'],
-                builder_name=data['builder_name'],
-                starting_price=data['starting_price'],
-                max_price=data['max_price'],
-                project_status=data['project_status'],
-                launch_date=data['launch_date'],
-                total_units=data['total_units'],
-                total_towers=data['total_towers'],
-                land_parcel=data['land_parcel'],
-                nearby_places=nearby_data,
-                sales_head_number=data['sales_head_number'],
-                builder=request.user,
-                **files
-            )
+            # BUG FIX: wrap Property + PropertyImage creation in
+            # transaction.atomic(). Without this, if an image upload fails
+            # midway through the loop below, the Property still gets saved
+            # with only some of its gallery images — silent data corruption.
+            with transaction.atomic():
+                property = Property.objects.create(
+                    title=data['title'],
+                    location=data['location'],
+                    project_name=data['project_name'],
+                    price=data['price'],
+                    price_unit=data['price_unit'],
+                    beds=data['beds'],
+                    baths=data['baths'],
+                    sqft=data['sqft'],
+                    description=data['description'],
+                    property_type=data['property_type'],
+                    status=data['status'],
+                    amenities=amenities,
+                    highlights=data['highlights'],
+                    rera_number=data['rera_number'],
+                    possession_date=data['possession_date'],
+                    map_link=data['map_link'],
+                    configuration=data['configuration'],
+                    builder_name=data['builder_name'],
+                    starting_price=data['starting_price'],
+                    max_price=data['max_price'],
+                    project_status=data['project_status'],
+                    launch_date=data['launch_date'],
+                    total_units=data['total_units'],
+                    total_towers=data['total_towers'],
+                    land_parcel=data['land_parcel'],
+                    nearby_places=nearby_data,
+                    sales_head_number=data['sales_head_number'],
+                    builder=request.user,
+                    **files
+                )
 
-            # Handle gallery images
-            images = request.FILES.getlist("images")
-            for img in images:
-                valid, msg = validate_file_upload(img, ['.jpg', '.jpeg', '.png', '.gif'])
-                if valid:
-                    PropertyImage.objects.create(property=property, image=img)
+                # Handle gallery images
+                images = request.FILES.getlist("images")
+                for img in images:
+                    valid, msg = validate_file_upload(img, ['.jpg', '.jpeg', '.png', '.gif'])
+                    if valid:
+                        PropertyImage.objects.create(property=property, image=img)
 
             messages.success(request, f"Property '{property.title}' added successfully!")
             logger.info(f"Property created: {property.title} by {request.user.username}")
@@ -3136,8 +3151,11 @@ def agent_properties(request):
         demand=Count("interested_leads", distinct=True)
     ).distinct().select_related('builder').order_by("-demand")
 
+    page_obj = get_paginated_queryset(properties, request)
+
     return render(request, "agent/agent_properties.html", {
-        "properties": properties
+        "properties": page_obj,
+        "page_obj": page_obj
     })
 
 
@@ -3453,6 +3471,7 @@ def add_deal(request):
         lead_id = request.POST.get('lead_id')
         client_name = sanitize_input(request.POST.get('client_name')) or "Unknown"
         amount = request.POST.get('amount')
+        amount_unit = sanitize_input(request.POST.get('amount_unit')) or 'L'
         status = sanitize_input(request.POST.get('status', 'NEW'))
 
         property_obj = get_object_or_404(Property, id=property_id)
@@ -3466,9 +3485,15 @@ def add_deal(request):
         if lead_id:
             lead = get_object_or_404(Lead, id=lead_id, assigned_to=agent)
 
+        # FIX: use the explicit L/Cr dropdown instead of guessing the unit
+        # from free text (convert_price's "l" in price check was ambiguous).
+        # amount is always stored as the full rupee value so Sum('amount')
+        # on the builder dashboard stays accurate regardless of unit chosen.
         try:
-            amount = convert_price(amount) if amount else Decimal("0")
-        except:
+            amount_value = Decimal(amount) if amount else Decimal("0")
+            multiplier = Decimal("10000000") if amount_unit == "Cr" else Decimal("100000")
+            amount = amount_value * multiplier
+        except Exception:
             amount = Decimal("0")
 
         try:
@@ -3477,6 +3502,7 @@ def add_deal(request):
                 property=property_obj,
                 client_name=client_name,
                 amount=amount,
+                amount_unit=amount_unit,
                 status=status,
                 agent=agent,
                 builder=property_obj.builder

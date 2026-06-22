@@ -146,8 +146,14 @@
                 <input name="client_name" placeholder="Client Name"
                 class="border p-2 rounded w-full mb-2 text-sm">
 
-                <input name="amount" placeholder="Amount"
-                class="border p-2 rounded w-full mb-2 text-sm">
+                <div class="flex gap-2">
+    <input name="amount" type="number" step="0.01" placeholder="e.g. 78.5" class="flex-1 border p-2 rounded">
+    <select name="amount_unit" class="border p-2 rounded">
+        <option value="L">Lakh (L)</option>
+        <option value="Cr">Crore (Cr)</option>
+    </select>
+</div>
+                
 
                 <select name="status" class="border p-2 rounded w-full mb-2 text-sm">
                     <option value="NEW">New</option>

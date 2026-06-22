@@ -8,8 +8,9 @@ import time
 
 def health_check(request):
     """
+    Production health check endpoint
     URL: /health/
-    Render isko server monitor karne ke liye use karta hai
+    Render isko use karta hai server ko monitor karne ke liye
     """
     status = {
         'status': 'healthy',
@@ -56,6 +57,11 @@ def cache_status(request):
     """
     Cache debug endpoint — /health/cache/
     """
+    from django.core.cache import cache
+
+    cache_info = {}
+
+    # Test write/read speed
     start = time.time()
     cache.set('_speed_test', 'x' * 1000, 10)
     write_time = (time.time() - start) * 1000

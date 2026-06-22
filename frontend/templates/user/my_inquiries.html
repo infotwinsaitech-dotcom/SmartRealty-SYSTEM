@@ -1,11 +1,9 @@
 {% for inquiry in inquiries %}
-
-
-  <p>{{ inquiry.name }}</p>
-  <p>{{ inquiry.email }}</p>
-  <p>{{ inquiry.message }}</p>
-  <hr>
-
+  <div class="bg-white p-4 rounded-lg shadow mb-3">
+    <p>{{ inquiry.name }}</p>
+    <p>{{ inquiry.email }}</p>
+    <p>{{ inquiry.message }}</p>
+    <hr>
 
     {% if inquiry.agent %}
         <p class="text-green-600 font-bold">
@@ -19,6 +17,32 @@
             ⏳ Agent not assigned yet
         </p>
     {% endif %}
-</div>
-
+  </div>
+{% empty %}
+    <p class="text-gray-500">No inquiries found</p>
 {% endfor %}
+
+<!-- PAGINATION -->
+{% if page_obj.has_other_pages %}
+<div class="flex justify-center items-center gap-2 mt-8">
+
+    {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}"
+           class="px-4 py-2 bg-white border rounded-lg text-sm font-semibold hover:bg-gray-100">
+            ← Previous
+        </a>
+    {% endif %}
+
+    <span class="px-4 py-2 text-sm font-semibold text-gray-600">
+        Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+    </span>
+
+    {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}"
+           class="px-4 py-2 bg-white border rounded-lg text-sm font-semibold hover:bg-gray-100">
+            Next →
+        </a>
+    {% endif %}
+
+</div>
+{% endif %}

@@ -39,7 +39,7 @@
 
             <div class="flex items-center gap-4">
                 <span class="text-3xl md:text-4xl font-bold text-yellow-400">
-                    ₹ {{ property.price|format_price }}
+                    ₹{{ property.price }} {{ property.price_unit }}
                 </span>
                 <span class="px-4 py-1.5 bg-yellow-400/20 text-yellow-400 rounded-full text-sm font-semibold border border-yellow-400/30">
                     {{ property.configuration|default:"N/A" }}

@@ -165,7 +165,7 @@ def process_drip_sequences(builder_id=None, dry_run=False):
             # Prepare message
             try:
                 property_name = lead.properties.first().title if lead.properties.exists() else 'this property'
-            except:
+            except Exception:
                 property_name = 'this property'
             
             message = sequence.template_message.format(

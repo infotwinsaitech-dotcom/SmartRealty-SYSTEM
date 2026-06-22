@@ -54,7 +54,7 @@ class="w-full border p-2 rounded text-sm">
 <input type="text" name="project_name" value="{{ property.project_name|default:'' }}" placeholder="Project Name"
 class="border p-2 rounded w-full text-sm">
 
-<input name="price" value="{{ property.price }}" placeholder="Price"
+<input name="price" value="₹{{ property.price }} {{ property.price_unit }}" placeholder="Price"
 class="w-full border p-2 rounded text-sm">
 
 <!-- PROPERTY TYPE -->

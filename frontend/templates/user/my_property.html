@@ -2,7 +2,7 @@
     <div class="bg-white p-4 rounded-lg shadow">
         
         <h3 class="text-xl font-bold">{{ property.title }}</h3>
-        <p>{{ property.price }}</p>
+        <p>{₹{{ property.price }} {{ property.price_unit }} }</p>
 
         <a href="{% url 'property_detail' property.id %}"
            class="text-blue-500 font-bold">
@@ -10,4 +10,31 @@
         </a>
 
     </div>
+{% empty %}
+    <p class="text-gray-500">No properties found</p>
 {% endfor %}
+
+<!-- PAGINATION -->
+{% if page_obj.has_other_pages %}
+<div class="flex justify-center items-center gap-2 mt-8">
+
+    {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}"
+           class="px-4 py-2 bg-white border rounded-lg text-sm font-semibold hover:bg-gray-100">
+            ← Previous
+        </a>
+    {% endif %}
+
+    <span class="px-4 py-2 text-sm font-semibold text-gray-600">
+        Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+    </span>
+
+    {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}"
+           class="px-4 py-2 bg-white border rounded-lg text-sm font-semibold hover:bg-gray-100">
+            Next →
+        </a>
+    {% endif %}
+
+</div>
+{% endif %}
