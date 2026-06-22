@@ -1001,10 +1001,6 @@ def add_property(request):
                 })
 
         try:
-            # BUG FIX: wrap Property + PropertyImage creation in
-            # transaction.atomic(). Without this, if an image upload fails
-            # midway through the loop below, the Property still gets saved
-            # with only some of its gallery images — silent data corruption.
             with transaction.atomic():
                 property = Property.objects.create(
                     title=data['title'],
@@ -1054,8 +1050,8 @@ def add_property(request):
             messages.error(request, "Failed to create property. Please try again.")
             return redirect("add_property")
 
-    return render(request, "user/add_property.html")
-
+    # FIX: Changed template path from "user/add_property.html" to "builder/add_property.html"
+    return render(request, "builder/add_property.html")
 
 @builder_required
 def property_management(request):
