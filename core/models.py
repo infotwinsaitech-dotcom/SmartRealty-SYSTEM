@@ -279,6 +279,9 @@ class SiteSettings(models.Model):
     instagram_url = models.URLField(blank=True, null=True)
     linkedin_url = models.URLField(blank=True, null=True)
     whatsapp_number = models.CharField(max_length=20, blank=True, null=True)
+    enable_scheduler = models.BooleanField(default=True, help_text="Enable agent scheduler")
+    enable_site_visits = models.BooleanField(default=True, help_text="Enable site visits page")
+    
 
     class Meta:
         verbose_name = 'Site Setting'
@@ -436,6 +439,7 @@ class Agent(models.Model):
         default=Decimal('0.00'),
         validators=[MinValueValidator(0), MaxValueValidator(5)]
     )
+    scheduler_enabled = models.BooleanField(default=True, help_text="Agent can toggle their scheduler")
 
     class Meta:
         ordering = ['-created_at']

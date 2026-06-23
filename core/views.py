@@ -3228,47 +3228,41 @@ def agent_properties(request):
 
 @agent_required
 def agent_profile(request):
-    """Agent profile with stats"""
+    """Agent profile page"""
     agent = get_object_or_404(Agent, user=request.user)
-    agent_builders = list(agent.builders.all())
-
-    total_leads = Lead.objects.filter(
-        assigned_to=agent,
-        builder__in=agent_builders
-    ).count()
-
-    hot_leads = Lead.objects.filter(
-        assigned_to=agent,
-        builder__in=agent_builders,
-        status="HOT"
-    ).count()
-
-    visits = SiteVisit.objects.filter(
-        agent=agent,
-        builder__in=agent_builders
-    )
-
-    total_visits = visits.count()
-    completed_visits = visits.filter(status="DONE").count()
-
-    conversion_rate = 0
-    if total_leads:
-        conversion_rate = round((completed_visits / total_leads) * 100, 2)
-
-    return render(request, "agent/agent_profile.html", {
-        "agent": agent,
+    
+    # Stats
+    total_leads = Lead.objects.filter(assigned_to=agent).count()
+    hot_leads = Lead.objects.filter(assigned_to=agent, status='HOT').count()
+    total_visits = SiteVisit.objects.filter(agent=agent).count()
+    
+    # Conversion rate
+    total_deals = Deal.objects.filter(agent=agent).count()
+    closed_deals = Deal.objects.filter(agent=agent, status='CLOSED').count()
+    conversion_rate = round((closed_deals / total_deals * 100), 1) if total_deals else 0
+    
+    return render(request, "agent/profile.html", {
+        "agent": agent,  # IMPORTANT: Template mein chahiye
         "total_leads": total_leads,
         "hot_leads": hot_leads,
         "total_visits": total_visits,
-        "completed_visits": completed_visits,
         "conversion_rate": conversion_rate,
     })
+def get_settings():
+    return SiteSettings.get_settings()
 
+# ==================== SCHEDULER ====================
 
 @agent_required
 def scheduler(request):
-    """Agent visit scheduler"""
+    """Agent visit scheduler - agent can toggle on/off"""
     agent = get_object_or_404(Agent, user=request.user)
+    
+    # 🔴 AGENT TOGGLE CHECK
+    if not agent.scheduler_enabled:
+        messages.info(request, "Your scheduler is currently disabled. Enable it from your profile.")
+        return redirect("agent_profile")  # Ya koi setting page
+    
     agent_builders = list(agent.builders.all())
 
     leads = Lead.objects.filter(
@@ -3326,9 +3320,22 @@ def scheduler(request):
 
     return render(request, "agent/scheduler.html", {
         "leads": leads,
-        "visits": visits
+        "visits": visits,
+        "agent": agent,  # Template mein toggle dikhane ke liye
     })
-
+@agent_required
+def toggle_scheduler(request):
+    """Agent toggles their own scheduler on/off"""
+    agent = get_object_or_404(Agent, user=request.user)
+    
+    # Toggle the flag
+    agent.scheduler_enabled = not agent.scheduler_enabled
+    agent.save(update_fields=['scheduler_enabled'])
+    
+    status = "enabled" if agent.scheduler_enabled else "disabled"
+    messages.success(request, f"Your scheduler has been {status}!")
+    
+    return redirect("agent_profile")  # Ya jahan se toggle kiya
 
 @agent_required
 def property_leads(request, property_id):
@@ -3359,9 +3366,20 @@ def property_leads(request, property_id):
 
 @agent_required
 def site_visits(request):
-    """Site visits page"""
-    return redirect("scheduler")
-
+    """Site visits page - if scheduler disabled, show read-only visits"""
+    agent = get_object_or_404(Agent, user=request.user)
+    agent_builders = list(agent.builders.all())
+    
+    visits = SiteVisit.objects.filter(
+        agent=agent,
+        builder__in=agent_builders
+    ).select_related('property', 'lead').order_by("-date")
+    
+    return render(request, "agent/site_visits.html", {
+        "visits": visits,
+        "agent": agent,
+        "scheduler_enabled": agent.scheduler_enabled,
+    })
 
 @login_required
 def settings_view(request):

@@ -16,8 +16,7 @@ class CoreConfig(AppConfig):
     name = 'core'
 
     def ready(self):
-        # 1. Import signals (cache auto-invalidate)
-        import core.signals  # noqa: F401
+        import core.signals
         
         # 2. Auto-create cache table if missing
         self._init_cache_table()
