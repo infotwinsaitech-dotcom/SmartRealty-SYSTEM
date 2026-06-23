@@ -2,308 +2,185 @@
 {% load cloudinary %}
 {% block content %}
 
-<main class="min-h-screen bg-gray-50 p-4 md:p-6">
+<main class="min-h-screen bg-gray-50">
 
-<div class="max-w-4xl mx-auto">
+<div class="max-w-7xl mx-auto p-4 md:p-8">
 
-<!-- HEADER -->
-<div class="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6 md:mb-8">
+<!-- Property Header -->
+<div class="bg-white rounded-xl shadow p-4 md:p-6 mb-6">
+    <div class="flex flex-col md:flex-row gap-6">
+        
+        <!-- Thumbnail -->
+        <div class="w-full md:w-1/3">
+            {% if property.thumbnail %}
+            <img src="{{ property.thumbnail.url }}" 
+                 class="w-full h-64 object-cover rounded-lg"
+                 alt="{{ property.title }}"
+                 onerror="this.src='https://via.placeholder.com/400x300?text=No+Image'">
+            {% else %}
+            <img src="https://via.placeholder.com/400x300?text=No+Image" 
+                 class="w-full h-64 object-cover rounded-lg"
+                 alt="No image">
+            {% endif %}
+        </div>
 
-<div>
-<h2 class="text-2xl md:text-4xl font-extrabold text-gray-800">
-Edit Property
-</h2>
-<p class="text-gray-500 text-sm md:text-base">
-Update your property details
-</p>
+        <!-- Info -->
+        <div class="flex-1">
+            <h1 class="text-2xl md:text-3xl font-bold text-gray-800">{{ property.title }}</h1>
+            <p class="text-gray-500 mt-1">{{ property.location }}</p>
+            <p class="text-blue-600 font-bold text-xl mt-2">₹{{ property.price }} {{ property.price_unit }}</p>
+            
+            <div class="grid grid-cols-3 gap-4 mt-4">
+                <div class="text-center p-3 bg-gray-50 rounded">
+                    <p class="font-bold text-lg">{{ property.beds|default:"-" }}</p>
+                    <p class="text-xs text-gray-500">Beds</p>
+                </div>
+                <div class="text-center p-3 bg-gray-50 rounded">
+                    <p class="font-bold text-lg">{{ property.baths|default:"-" }}</p>
+                    <p class="text-xs text-gray-500">Baths</p>
+                </div>
+                <div class="text-center p-3 bg-gray-50 rounded">
+                    <p class="font-bold text-lg">{{ property.sqft|default:"-" }}</p>
+                    <p class="text-xs text-gray-500">Sqft</p>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
-<div class="flex gap-3">
-<a href="{% url 'property_management' %}"
-class="bg-gray-200 px-4 py-2 rounded-lg hover:bg-gray-300 text-center">
-← Back
-</a>
-
-<!-- DELETE BUTTON -->
-<form method="POST" action="{% url 'builder_property_detail' property.id %}" 
-      onsubmit="return confirmDelete()" class="inline">
-{% csrf_token %}
-<input type="hidden" name="action" value="delete">
-<button type="submit"
-class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition font-bold">
-🗑 Delete Property
-</button>
-</form>
+<!-- ===== GALLERY IMAGES - N+1 FIXED ===== -->
+{% if gallery_images %}
+<div class="bg-white rounded-xl shadow p-4 md:p-6 mb-6">
+    <h2 class="text-xl font-bold text-gray-800 mb-4">
+        📷 Gallery ({{ gallery_count }} images)
+    </h2>
+    
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        {% for img in gallery_images %}
+        <div class="relative group overflow-hidden rounded-lg">
+            <!-- FIX: Direct Cloudinary URL -->
+            <img src="{{ img.image.url }}" 
+                 class="w-full h-40 object-cover hover:scale-110 transition duration-300 cursor-pointer"
+                 alt="Gallery"
+                 loading="lazy"
+                 onclick="openLightbox(this.src)">
+        </div>
+        {% endfor %}
+    </div>
 </div>
-
-</div>
-
-<!-- FORM CARD -->
-<div class="bg-white p-4 md:p-8 rounded-2xl shadow-xl">
-
-<form method="POST" enctype="multipart/form-data" class="space-y-4">
-{% csrf_token %}
-
-<!-- BASIC INFO -->
-<input name="title" value="{{ property.title }}" placeholder="Title"
-class="w-full border p-2 rounded text-sm">
-
-<input name="location" value="{{ property.location }}" placeholder="Location"
-class="w-full border p-2 rounded text-sm">
-
-<input type="text" name="project_name" value="{{ property.project_name|default:'' }}" placeholder="Project Name"
-class="border p-2 rounded w-full text-sm">
-
-<input name="price" value="₹{{ property.price }} {{ property.price_unit }}" placeholder="Price"
-class="w-full border p-2 rounded text-sm">
-
-<!-- PROPERTY TYPE -->
-<select name="property_type" id="propertyType"
-class="bg-gray-900 text-white p-2 md:p-3 rounded-xl w-full"
-onchange="toggleBHK()">
-<option value="">Select Type</option>
-<!-- Residential -->
-<option value="Flat" {% if property.property_type == "Flat" %}selected{% endif %}>Flat</option>
-<option value="Villa" {% if property.property_type == "Villa" %}selected{% endif %}>Villa</option>
-<option value="Bungalow" {% if property.property_type == "Bungalow" %}selected{% endif %}>Bungalow</option>
-<option value="Duplex" {% if property.property_type == "Duplex" %}selected{% endif %}>Duplex</option>
-<option value="Penthouse" {% if property.property_type == "Penthouse" %}selected{% endif %}>Penthouse</option>
-<!-- Commercial -->
-<option value="Office" {% if property.property_type == "Office" %}selected{% endif %}>Office</option>
-<option value="Shop" {% if property.property_type == "Shop" %}selected{% endif %}>Shop</option>
-<option value="Showroom" {% if property.property_type == "Showroom" %}selected{% endif %}>Showroom</option>
-<option value="Warehouse" {% if property.property_type == "Warehouse" %}selected{% endif %}>Warehouse</option>
-<option value="Industrial" {% if property.property_type == "Industrial" %}selected{% endif %}>Industrial</option>
-<!-- Land -->
-<option value="Land" {% if property.property_type == "Land" %}selected{% endif %}>Land</option>
-<option value="Plot" {% if property.property_type == "Plot" %}selected{% endif %}>Plot</option>
-<option value="Plots" {% if property.property_type == "Plots" %}selected{% endif %}>Plots</option>
-<option value="Farmhouse" {% if property.property_type == "Farmhouse" %}selected{% endif %}>Farmhouse</option>
-</select>
-
-<!-- BHK SECTION -->
-<div id="bhkSection" class="grid grid-cols-1 sm:grid-cols-3 gap-2"
-style="{% if property.has_bhk %}display: grid;{% else %}display: none;{% endif %}">
-<input name="beds" value="{{ property.beds|default:'' }}" placeholder="Beds" class="border p-2 rounded text-sm">
-<input name="baths" value="{{ property.baths|default:'' }}" placeholder="Baths" class="border p-2 rounded text-sm">
-<input name="sqft" value="{{ property.sqft|default:'' }}" placeholder="Sqft" class="border p-2 rounded text-sm">
-</div>
-
-<textarea name="description" placeholder="Description"
-class="w-full border p-2 rounded text-sm">{{ property.description|default:'' }}</textarea>
-
-<select name="status" class="w-full border p-2 rounded text-sm">
-<option value="Available" {% if property.status == "Available" %}selected{% endif %}>Available</option>
-<option value="Sold" {% if property.status == "Sold" %}selected{% endif %}>Sold</option>
-</select>
-
-<!-- THUMBNAIL -->
-<label class="text-sm font-semibold">Thumbnail</label>
-{% if property.thumbnail %}
-<img src="{% cloudinary_url property.thumbnail width=400 height=250 crop='fill' %}"
-class="mb-2 rounded w-full h-40 object-cover">
-{% endif %}
-<input type="file" name="thumbnail"
-class="w-full border p-2 rounded text-sm">
-
-<!-- GALLERY -->
-<label class="text-sm font-semibold">Gallery Images</label>
-<div id="image-container" class="space-y-2">
-{% for img in property.images.all %}
-<div class="flex gap-2 items-center">
-<img src="{% cloudinary_url img.image width=100 height=80 crop='fill' %}" class="rounded h-16 w-20 object-cover">
-<span class="text-xs text-gray-500">Current Image {{ forloop.counter }}</span>
-</div>
-{% endfor %}
-<input type="file" name="images"
-class="w-full border p-2 rounded text-sm">
-</div>
-<button type="button" onclick="addImageField()"
-class="mt-2 bg-green-600 text-white px-3 py-2 rounded text-sm">
-+ Add More Images
-</button>
-
-<!-- AMENITIES -->
-<label class="text-sm font-semibold mt-4 block">Amenities</label>
-<div class="grid grid-cols-2 gap-2 text-sm">
-<label><input type="checkbox" name="amenities" value="Parking" {% if "Parking" in property.amenities %}checked{% endif %}> Parking</label>
-<label><input type="checkbox" name="amenities" value="Lift" {% if "Lift" in property.amenities %}checked{% endif %}> Lift</label>
-<label><input type="checkbox" name="amenities" value="Gym" {% if "Gym" in property.amenities %}checked{% endif %}> Gym</label>
-<label><input type="checkbox" name="amenities" value="Pool" {% if "Pool" in property.amenities %}checked{% endif %}> Pool</label>
-<label><input type="checkbox" name="amenities" value="Security" {% if "Security" in property.amenities %}checked{% endif %}> Security</label>
-<label><input type="checkbox" name="amenities" value="Garden" {% if "Garden" in property.amenities %}checked{% endif %}> Garden</label>
-</div>
-
-<!-- EXTRA FIELDS -->
-<input name="configuration" value="{{ property.configuration|default:'' }}" placeholder="2BHK, 3BHK"
-class="w-full border p-2 rounded text-sm">
-
-<input name="builder_name" value="{{ property.builder_name|default:'' }}" placeholder="Builder Name"
-class="w-full border p-2 rounded text-sm">
-
-<input name="starting_price" value="{{ property.starting_price|default:'' }}" placeholder="Starting Price"
-class="w-full border p-2 rounded text-sm">
-
-<input name="max_price" value="{{ property.max_price|default:'' }}" placeholder="Maximum Price"
-class="w-full border p-2 rounded text-sm">
-
-<!-- PROJECT STATUS -->
-<select name="project_status" class="w-full border p-2 rounded text-sm">
-<option value="">Project Status</option>
-<option value="New Launch" {% if property.project_status == "New Launch" %}selected{% endif %}>New Launch</option>
-<option value="Under Construction" {% if property.project_status == "Under Construction" %}selected{% endif %}>Under Construction</option>
-<option value="Ready To Move" {% if property.project_status == "Ready To Move" %}selected{% endif %}>Ready To Move</option>
-</select>
-
-<!-- LAUNCH DATE -->
-<input name="launch_date" value="{{ property.launch_date|default:'' }}" placeholder="Launch Date"
-class="w-full border p-2 rounded text-sm">
-
-<!-- TOTAL UNITS -->
-<input name="total_units" value="{{ property.total_units|default:'' }}" placeholder="Total Units"
-class="w-full border p-2 rounded text-sm">
-
-<!-- TOTAL TOWERS -->
-<input name="total_towers" value="{{ property.total_towers|default:'' }}" placeholder="Total Towers"
-class="w-full border p-2 rounded text-sm">
-
-<!-- LAND PARCEL -->
-<input name="land_parcel" value="{{ property.land_parcel|default:'' }}" placeholder="Land Parcel"
-class="w-full border p-2 rounded text-sm">
-
-<!-- PROJECT LOGO -->
-<label class="text-sm font-semibold">Project Logo</label>
-{% if property.project_logo %}
-<img src="{% cloudinary_url property.project_logo width=100 height=80 crop='fill' %}"
-class="mb-2 rounded h-16 w-20 object-cover">
-{% endif %}
-<input type="file" name="project_logo"
-class="w-full border p-2 rounded text-sm">
-
-<!-- PROJECT VIDEO -->
-<label class="text-sm font-semibold">Project Video</label>
-{% if property.project_video %}
-<p class="text-xs text-gray-500 mb-1">Current: {{ property.project_video.name }}</p>
-{% endif %}
-<input type="file" name="project_video"
-class="w-full border p-2 rounded text-sm">
-
-<input name="rera_number" value="{{ property.rera_number|default:'' }}" placeholder="RERA Number"
-class="w-full border p-2 rounded text-sm">
-
-<!-- POSSESSION -->
-<select name="possession" class="w-full border p-2 rounded text-sm">
-<option value="">Select Possession</option>
-<option value="Ready to Move" {% if property.possession == "Ready to Move" %}selected{% endif %}>Ready to Move</option>
-<option value="Upto 1 Year" {% if property.possession == "Upto 1 Year" %}selected{% endif %}>Upto 1 Year</option>
-<option value="Upto 2 Years" {% if property.possession == "Upto 2 Years" %}selected{% endif %}>Upto 2 Years</option>
-<option value="2+ Years" {% if property.possession == "2+ Years" %}selected{% endif %}>2+ Years</option>
-</select>
-
-<textarea name="highlights" placeholder="Highlights"
-class="w-full border p-2 rounded text-sm">{{ property.highlights|default:'' }}</textarea>
-
-<input name="map_link" value="{{ property.map_link|default:'' }}" placeholder="Google Map Link"
-class="w-full border p-2 rounded text-sm">
-
-<!-- BROCHURE -->
-<label class="text-sm font-semibold">Brochure (PDF)</label>
-{% if property.brochure %}
-<p class="text-xs text-blue-600 mb-1">
-<a href="{{ property.brochure.url }}" target="_blank">📄 View Current Brochure</a>
-</p>
-{% endif %}
-<input type="file" name="brochure"
-class="w-full border p-2 rounded text-sm">
-
-<!-- NEARBY PLACES -->
-<label class="text-sm font-semibold block mb-2">Nearby Places</label>
-<div id="nearby-container" class="space-y-2">
-{% if property.nearby_places %}
-{% for place in property.nearby_places %}
-<div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
-<input name="nearby_name" value="{{ place.name }}" placeholder="Place" class="border p-2 rounded text-sm">
-<input name="nearby_distance" value="{{ place.distance }}" placeholder="Distance" class="border p-2 rounded text-sm">
-<input name="nearby_icon" value="{{ place.icon }}" placeholder="Icon" class="border p-2 rounded text-sm">
-</div>
-{% endfor %}
 {% else %}
-<div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
-<input name="nearby_name" placeholder="Place" class="border p-2 rounded text-sm">
-<input name="nearby_distance" placeholder="Distance" class="border p-2 rounded text-sm">
-<input name="nearby_icon" placeholder="Icon" class="border p-2 rounded text-sm">
+<div class="bg-white rounded-xl shadow p-4 md:p-6 mb-6">
+    <h2 class="text-xl font-bold text-gray-800 mb-4">📷 Gallery</h2>
+    <p class="text-gray-500 text-center py-8">No gallery images available</p>
 </div>
 {% endif %}
+
+<!-- Description -->
+{% if property.description %}
+<div class="bg-white rounded-xl shadow p-4 md:p-6 mb-6">
+    <h2 class="text-xl font-bold text-gray-800 mb-3">Description</h2>
+    <p class="text-gray-600 whitespace-pre-line">{{ property.description }}</p>
 </div>
-<button type="button" onclick="addNearbyField()"
-class="mt-2 px-3 py-2 bg-green-600 text-white rounded text-sm">
-+ Add More Nearby
-</button>
+{% endif %}
 
-<!-- SALES HEAD NUMBER -->
-<input name="sales_head_number" value="{{ property.sales_head_number|default:'' }}" placeholder="Sales Head Number"
-class="w-full border p-2 rounded text-sm">
+<!-- Amenities -->
+{% if property.amenities %}
+<div class="bg-white rounded-xl shadow p-4 md:p-6 mb-6">
+    <h2 class="text-xl font-bold text-gray-800 mb-3">Amenities</h2>
+    <div class="flex flex-wrap gap-2">
+        {% for amenity in property.amenities %}
+        <span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm">{{ amenity }}</span>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
 
-<!-- SUBMIT -->
-<button type="submit"
-class="w-full mt-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 rounded-lg font-bold">
-Update Property
-</button>
+<!-- Nearby Places -->
+{% if property.nearby_places %}
+<div class="bg-white rounded-xl shadow p-4 md:p-6 mb-6">
+    <h2 class="text-xl font-bold text-gray-800 mb-3">Nearby Places</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+        {% for place in property.nearby_places %}
+        <div class="flex items-center gap-3 p-3 bg-gray-50 rounded">
+            <span class="text-2xl">{{ place.icon|default:"📍" }}</span>
+            <div>
+                <p class="font-semibold">{{ place.name }}</p>
+                <p class="text-sm text-gray-500">{{ place.distance }}</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
 
-</form>
+<!-- Leads Section -->
+<div class="bg-white rounded-xl shadow p-4 md:p-6 mb-6">
+    <h2 class="text-xl font-bold text-gray-800 mb-4">Interested Leads ({{ leads|length }})</h2>
+    
+    {% if leads %}
+    <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="p-3 text-left">Name</th>
+                    <th class="p-3 text-left">Phone</th>
+                    <th class="p-3 text-left">Status</th>
+                    <th class="p-3 text-left">Assigned To</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for lead in leads %}
+                <tr class="border-b">
+                    <td class="p-3">{{ lead.name }}</td>
+                    <td class="p-3">{{ lead.phone }}</td>
+                    <td class="p-3">
+                        <span class="px-2 py-1 rounded text-xs 
+                            {% if lead.status == 'NEW' %}bg-green-100 text-green-700
+                            {% elif lead.status == 'CONTACTED' %}bg-blue-100 text-blue-700
+                            {% else %}bg-gray-100 text-gray-700{% endif %}">
+                            {{ lead.status }}
+                        </span>
+                    </td>
+                    <td class="p-3">{{ lead.assigned_to.name|default:"Unassigned" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p class="text-gray-500 text-center py-4">No leads yet</p>
+    {% endif %}
+</div>
+
+<!-- Action Buttons -->
+<div class="flex gap-4 mb-8">
+    <a href="{% url 'property_management' %}" 
+       class="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg font-semibold hover:bg-gray-300 transition">
+        ← Back
+    </a>
+    
+    <form method="POST" class="inline" onsubmit="return confirm('Delete this property?');">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="delete">
+        <button type="submit" 
+                class="px-6 py-2 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition">
+            🗑️ Delete
+        </button>
+    </form>
 </div>
 
 </div>
+
 </main>
 
+<!-- Lightbox Script -->
 <script>
-function addImageField() {
-const container = document.getElementById("image-container");
-const div = document.createElement("div");
-div.classList.add("flex","gap-2","mt-2");
-div.innerHTML = `
-<input type="file" name="images" class="w-full border p-2 rounded text-sm">
-<button type="button" onclick="removeField(this)" class="bg-red-500 text-white px-3 rounded text-sm">✕</button>
-`;
-container.appendChild(div);
-}
-
-function removeField(btn) {
-btn.parentElement.remove();
-}
-
-function addNearbyField() {
-const container = document.getElementById("nearby-container");
-const div = document.createElement("div");
-div.classList.add("grid","grid-cols-1","sm:grid-cols-3","gap-2","mt-2");
-div.innerHTML = `
-<input name="nearby_name" placeholder="Place" class="border p-2 rounded text-sm">
-<input name="nearby_distance" placeholder="Distance" class="border p-2 rounded text-sm">
-<input name="nearby_icon" placeholder="Icon" class="border p-2 rounded text-sm">
-`;
-container.appendChild(div);
-}
-
-/* BHK SHOW/HIDE */
-function toggleBHK() {
-let type = document.getElementById("propertyType").value;
-let bhk = document.getElementById("bhkSection");
-let residential = ["Flat","Villa","Bungalow","Duplex","Penthouse"];
-if (residential.includes(type)) {
-bhk.style.display = "grid";
-} else {
-bhk.style.display = "none";
-}
-}
-
-// Initialize BHK visibility on page load
-document.addEventListener("DOMContentLoaded", function() {
-toggleBHK();
-});
-
-// Delete confirmation
-function confirmDelete() {
-    return confirm("⚠️ Are you sure you want to delete this property? This action cannot be undone!");
+function openLightbox(src) {
+    const lightbox = document.createElement('div');
+    lightbox.className = 'fixed inset-0 bg-black/90 flex items-center justify-center z-50 cursor-pointer';
+    lightbox.innerHTML = `<img src="${src}" class="max-w-[90%] max-h-[90%] object-contain">`;
+    lightbox.onclick = () => lightbox.remove();
+    document.body.appendChild(lightbox);
 }
 </script>
 

@@ -1093,16 +1093,23 @@ def add_property(request):
     return render(request, "builder/property_management.html")
 @builder_required
 def property_management(request):
-    """Builder property management with pagination"""
+    """Show builder's properties with gallery - N+1 FIXED"""
+    
+    # FIX: prefetch_related('images') se saari images ek hi query mein aa jayengi
     properties = Property.objects.filter(
         builder=request.user
-    ).select_related('builder').prefetch_related('images').order_by("-id")
+    ).prefetch_related(
+        'images'  # N+1 FIX: Gallery images ek saath load hongi
+    ).order_by('-created_at')
     
-    page_obj = get_paginated_queryset(properties, request)
+    # Pagination
+    paginator = Paginator(properties, 12)
+    page = request.GET.get('page')
+    page_obj = paginator.get_page(page)
     
     return render(request, "builder/property_management.html", {
         "properties": page_obj,
-        "page_obj": page_obj
+        "page_obj": page_obj,
     })
 
 
@@ -1760,40 +1767,53 @@ def export_leads(request):
 # PROPERTY DETAIL & EDIT (BUILDER)
 # =============================================================================
 
+logger = logging.getLogger(__name__)
+
 @builder_required
 def builder_property_detail(request, id):
-    """Builder property detail with edit/delete"""
-    property = get_object_or_404(
-        Property.objects.prefetch_related('images', 'interested_leads'), 
+    """Builder property detail with edit/delete - N+1 FIXED"""
+    
+    # FIX: prefetch_related already hai, but select_related builder bhi add karo
+    property_obj = get_object_or_404(
+        Property.objects.select_related('builder').prefetch_related(
+            'images',           # Gallery images
+            'interested_leads',  # Leads
+            'inquiries',         # Inquiries
+        ), 
         id=id, 
         builder=request.user
     )
     
+    # FIX: Leads ko bhi prefetch_related ke saath lao
     leads = Lead.objects.filter(
-        properties=property, 
+        properties=property_obj, 
         builder=request.user
-    ).select_related('assigned_to')
+    ).select_related('assigned_to').prefetch_related('followups')
 
     # Delete handling
     if request.method == "POST" and request.POST.get("action") == "delete":
-        property_title = property.title
-        property.delete()
+        property_title = property_obj.title
+        property_obj.delete()
         messages.success(request, f"Property '{property_title}' deleted successfully!")
         logger.info(f"Property deleted: {property_title}")
         return redirect("property_management")
 
     # Update handling
     if request.method == "POST":
-        return _update_property(request, property)
+        return _update_property(request, property_obj)
 
+    # FIX: Gallery images ko list mein convert karke bhejo - template mein baar-baar query nahi hogi
+    gallery_images = list(property_obj.images.all())
+    
     return render(request, "builder/property_detail.html", {
-        "property": property,
-        "leads": leads
+        "property": property_obj,
+        "leads": leads,
+        "gallery_images": gallery_images,  # N+1 FIX: Pre-loaded list
+        "gallery_count": len(gallery_images),
     })
 
-
-def _update_property(request, property):
-    """Helper to update property"""
+def _update_property(request, property_obj):
+    """Helper to update property - FIXED"""
     fields = {
         'title': 'title',
         'location': 'location',
@@ -1819,19 +1839,27 @@ def _update_property(request, property):
     }
 
     for field, post_key in fields.items():
-        value = sanitize_input(request.POST.get(post_key, getattr(property, field)))
-        setattr(property, field, value)
+        value = sanitize_input(request.POST.get(post_key, getattr(property_obj, field)))
+        setattr(property_obj, field, value)
+
+    # FIX: possession_date bhi set karo (same as possession)
+    property_obj.possession_date = property_obj.possession
 
     # Numeric fields
     try:
-        property.beds = int(sanitize_input(request.POST.get('beds'))) or None
-        property.baths = float(sanitize_input(request.POST.get('baths'))) or None
-        property.sqft = int(sanitize_input(request.POST.get('sqft'))) or None
+        beds_raw = sanitize_input(request.POST.get('beds', ''))
+        property_obj.beds = int(beds_raw) if beds_raw else None
+        
+        baths_raw = sanitize_input(request.POST.get('baths', ''))
+        property_obj.baths = float(baths_raw) if baths_raw else 0.0
+        
+        sqft_raw = sanitize_input(request.POST.get('sqft', ''))
+        property_obj.sqft = int(sqft_raw) if sqft_raw else 0
     except (ValueError, TypeError):
         pass
 
     # Amenities
-    property.amenities = request.POST.getlist("amenities")
+    property_obj.amenities = request.POST.getlist("amenities")
 
     # Nearby places
     nearby_names = request.POST.getlist("nearby_name")
@@ -1845,36 +1873,45 @@ def _update_property(request, property):
                 "distance": sanitize_input(nearby_distances[i]) if i < len(nearby_distances) else "",
                 "icon": sanitize_input(nearby_icons[i]) if i < len(nearby_icons) else ""
             })
-    property.nearby_places = nearby_data
+    property_obj.nearby_places = nearby_data
 
-    # File uploads
+    # File uploads - FIXED: .webp added
     file_fields = {
-        'thumbnail': (['.jpg', '.jpeg', '.png', '.gif'], 10),
-        'project_logo': (['.jpg', '.jpeg', '.png', '.gif'], 10),
-        'project_video': (['.mp4', '.mov', '.avi'], 50),
+        'thumbnail': (['.jpg', '.jpeg', '.png', '.gif', '.webp'], 10),
+        'project_logo': (['.jpg', '.jpeg', '.png', '.gif', '.webp'], 10),
+        'project_video': (['.mp4', '.mov', '.avi', '.mkv'], 50),
         'brochure': (['.pdf'], 10),
     }
 
     for field, (exts, max_size) in file_fields.items():
-        if request.FILES.get(field):
-            valid, msg = validate_file_upload(request.FILES.get(field), exts, max_size)
+        uploaded = request.FILES.get(field)
+        if uploaded:
+            valid, msg = validate_file_upload(uploaded, exts, max_size)
             if valid:
-                setattr(property, field, request.FILES.get(field))
+                setattr(property_obj, field, uploaded)
             else:
                 messages.error(request, f"{field.title()}: {msg}")
 
-    property.save()
+    property_obj.save()
 
-    # New gallery images
+    # New gallery images - FIXED: .webp added, size limit added
     images = request.FILES.getlist("images")
+    logger.info(f"Update: {len(images)} new gallery images received")
+    
     for img in images:
-        valid, msg = validate_file_upload(img, ['.jpg', '.jpeg', '.png', '.gif'])
+        # FIX: .webp added, 10MB size limit
+        valid, msg = validate_file_upload(img, ['.jpg', '.jpeg', '.png', '.gif', '.webp'], 10)
         if valid:
-            PropertyImage.objects.create(property=property, image=img)
+            try:
+                PropertyImage.objects.create(property=property_obj, image=img)
+                logger.info(f"Gallery image added: {img.name}")
+            except Exception as e:
+                logger.error(f"Failed to save gallery image {img.name}: {str(e)}")
+        else:
+            logger.warning(f"Gallery image rejected: {img.name} - {msg}")
 
     messages.success(request, "Property updated successfully!")
-    return redirect('builder_property_detail', id=property.id)
-
+    return redirect('builder_property_detail', id=property_obj.id)
 
 @builder_required
 def delete_property(request, id):
