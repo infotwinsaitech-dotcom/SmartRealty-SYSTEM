@@ -96,7 +96,7 @@ def validate_file_upload(file, allowed_extensions=None, max_size_mb=10):
         return False, "No file provided"
     
     if allowed_extensions is None:
-        allowed_extensions = ['.jpg', '.jpeg', '.png', '.gif', '.pdf', '.mp4', '.mov']
+        allowed_extensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.avif', '.pdf', '.mp4', '.mov']
     
     ext = os.path.splitext(file.name)[1].lower()
     if ext not in allowed_extensions:
@@ -107,7 +107,8 @@ def validate_file_upload(file, allowed_extensions=None, max_size_mb=10):
     mime_type, _ = mimetypes.guess_type(file.name)
     allowed_mimes = {
         '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.png': 'image/png',
-        '.gif': 'image/gif', '.pdf': 'application/pdf',
+        '.gif': 'image/gif', '.webp': 'image/webp', '.avif': 'image/avif',
+        '.pdf': 'application/pdf',
         '.mp4': 'video/mp4', '.mov': 'video/quicktime',
         '.doc': 'application/msword', '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
     }
@@ -994,9 +995,9 @@ def add_property(request):
         # File validations
         files = {}
         file_fields = {
-            'thumbnail': (['.jpg', '.jpeg', '.png', '.gif', '.webp'], 10),
+            'thumbnail': (['.jpg', '.jpeg', '.png', '.gif', '.webp', '.avif'], 10),
             'brochure': (['.pdf'], 10),
-            'project_logo': (['.jpg', '.jpeg', '.png', '.gif', '.webp'], 10),
+            'project_logo': (['.jpg', '.jpeg', '.png', '.gif', '.webp', '.avif'], 10),
             'project_video': (['.mp4', '.mov', '.avi', '.mkv'], 50),
         }
 
@@ -1075,7 +1076,7 @@ def add_property(request):
                 # Handle gallery images
                 images = request.FILES.getlist("images")
                 for img in images:
-                    valid, msg = validate_file_upload(img, ['.jpg', '.jpeg', '.png', '.gif', '.webp'], 10)
+                    valid, msg = validate_file_upload(img, ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.avif'], 10)
                     if valid:
                         PropertyImage.objects.create(property=prop, image=img)
                     else:
@@ -1869,8 +1870,8 @@ def _update_property(request, property):
 
     # File uploads
     file_fields = {
-        'thumbnail': (['.jpg', '.jpeg', '.png', '.gif'], 10),
-        'project_logo': (['.jpg', '.jpeg', '.png', '.gif'], 10),
+        'thumbnail': (['.jpg', '.jpeg', '.png', '.gif', '.avif'], 10),
+        'project_logo': (['.jpg', '.jpeg', '.png', '.gif', '.avif'], 10),
         'project_video': (['.mp4', '.mov', '.avi'], 50),
         'brochure': (['.pdf'], 10),
     }
@@ -1888,7 +1889,7 @@ def _update_property(request, property):
     # New gallery images
     images = request.FILES.getlist("images")
     for img in images:
-        valid, msg = validate_file_upload(img, ['.jpg', '.jpeg', '.png', '.gif'])
+        valid, msg = validate_file_upload(img, ['.jpg', '.jpeg', '.png', '.gif', '.avif'])
         if valid:
             PropertyImage.objects.create(property=property, image=img)
 
@@ -3363,7 +3364,7 @@ def settings_view(request):
         if request.FILES.get("profile_image"):
             valid, msg = validate_file_upload(
                 request.FILES.get("profile_image"),
-                ['.jpg', '.jpeg', '.png', '.gif'],
+                ['.jpg', '.jpeg', '.png', '.gif', '.avif'],
                 5
             )
             if valid:
