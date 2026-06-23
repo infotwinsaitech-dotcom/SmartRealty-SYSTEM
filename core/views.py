@@ -1127,10 +1127,12 @@ def property_management(request):
 @builder_required
 def lead_management(request):
     """Builder lead management with search, filter, pagination"""
+    
     inquiries = Inquiry.objects.filter(
         property__builder=request.user
     ).select_related('property').order_by('-created_at')
     
+    # FIX: 'notes' hatao - TextField hai, prefetch nahi hota
     leads = Lead.objects.filter(
         builder=request.user
     ).select_related('assigned_to').prefetch_related('properties').order_by('-id')
@@ -1161,14 +1163,14 @@ def lead_management(request):
     # Pagination
     page_obj = get_paginated_queryset(leads, request)
 
-    # Selected lead detail
+    # Selected lead detail - FIX: 'notes' hatao
     selected_lead = None
     lead_id = request.GET.get('lead')
     if lead_id and lead_id.isdigit():
         selected_lead = Lead.objects.filter(
             id=int(lead_id), 
             builder=request.user
-        ).select_related('assigned_to').prefetch_related('properties', 'notes').first()
+        ).select_related('assigned_to').prefetch_related('properties').first()  # FIXED
 
     # Stats
     total_pipeline = Deal.objects.filter(
