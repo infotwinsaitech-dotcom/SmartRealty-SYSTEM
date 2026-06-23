@@ -1812,8 +1812,8 @@ def builder_property_detail(request, id):
         "gallery_count": len(gallery_images),
     })
 
-def _update_property(request, property_obj):
-    """Helper to update property - FIXED"""
+def _update_property(request, property):
+    """Helper to update property"""
     fields = {
         'title': 'title',
         'location': 'location',
@@ -1839,27 +1839,19 @@ def _update_property(request, property_obj):
     }
 
     for field, post_key in fields.items():
-        value = sanitize_input(request.POST.get(post_key, getattr(property_obj, field)))
-        setattr(property_obj, field, value)
-
-    # FIX: possession_date bhi set karo (same as possession)
-    property_obj.possession_date = property_obj.possession
+        value = sanitize_input(request.POST.get(post_key, getattr(property, field)))
+        setattr(property, field, value)
 
     # Numeric fields
     try:
-        beds_raw = sanitize_input(request.POST.get('beds', ''))
-        property_obj.beds = int(beds_raw) if beds_raw else None
-        
-        baths_raw = sanitize_input(request.POST.get('baths', ''))
-        property_obj.baths = float(baths_raw) if baths_raw else 0.0
-        
-        sqft_raw = sanitize_input(request.POST.get('sqft', ''))
-        property_obj.sqft = int(sqft_raw) if sqft_raw else 0
+        property.beds = int(sanitize_input(request.POST.get('beds'))) or None
+        property.baths = float(sanitize_input(request.POST.get('baths'))) or None
+        property.sqft = int(sanitize_input(request.POST.get('sqft'))) or None
     except (ValueError, TypeError):
         pass
 
     # Amenities
-    property_obj.amenities = request.POST.getlist("amenities")
+    property.amenities = request.POST.getlist("amenities")
 
     # Nearby places
     nearby_names = request.POST.getlist("nearby_name")
@@ -1873,45 +1865,36 @@ def _update_property(request, property_obj):
                 "distance": sanitize_input(nearby_distances[i]) if i < len(nearby_distances) else "",
                 "icon": sanitize_input(nearby_icons[i]) if i < len(nearby_icons) else ""
             })
-    property_obj.nearby_places = nearby_data
+    property.nearby_places = nearby_data
 
-    # File uploads - FIXED: .webp added
+    # File uploads
     file_fields = {
-        'thumbnail': (['.jpg', '.jpeg', '.png', '.gif', '.webp'], 10),
-        'project_logo': (['.jpg', '.jpeg', '.png', '.gif', '.webp'], 10),
-        'project_video': (['.mp4', '.mov', '.avi', '.mkv'], 50),
+        'thumbnail': (['.jpg', '.jpeg', '.png', '.gif'], 10),
+        'project_logo': (['.jpg', '.jpeg', '.png', '.gif'], 10),
+        'project_video': (['.mp4', '.mov', '.avi'], 50),
         'brochure': (['.pdf'], 10),
     }
 
     for field, (exts, max_size) in file_fields.items():
-        uploaded = request.FILES.get(field)
-        if uploaded:
-            valid, msg = validate_file_upload(uploaded, exts, max_size)
+        if request.FILES.get(field):
+            valid, msg = validate_file_upload(request.FILES.get(field), exts, max_size)
             if valid:
-                setattr(property_obj, field, uploaded)
+                setattr(property, field, request.FILES.get(field))
             else:
                 messages.error(request, f"{field.title()}: {msg}")
 
-    property_obj.save()
+    property.save()
 
-    # New gallery images - FIXED: .webp added, size limit added
+    # New gallery images
     images = request.FILES.getlist("images")
-    logger.info(f"Update: {len(images)} new gallery images received")
-    
     for img in images:
-        # FIX: .webp added, 10MB size limit
-        valid, msg = validate_file_upload(img, ['.jpg', '.jpeg', '.png', '.gif', '.webp'], 10)
+        valid, msg = validate_file_upload(img, ['.jpg', '.jpeg', '.png', '.gif'])
         if valid:
-            try:
-                PropertyImage.objects.create(property=property_obj, image=img)
-                logger.info(f"Gallery image added: {img.name}")
-            except Exception as e:
-                logger.error(f"Failed to save gallery image {img.name}: {str(e)}")
-        else:
-            logger.warning(f"Gallery image rejected: {img.name} - {msg}")
+            PropertyImage.objects.create(property=property, image=img)
 
     messages.success(request, "Property updated successfully!")
-    return redirect('builder_property_detail', id=property_obj.id)
+    return redirect('builder_property_detail', id=property.id)
+
 
 @builder_required
 def delete_property(request, id):
