@@ -1074,13 +1074,23 @@ def add_property(request):
                 )
 
                 # Handle gallery images
+                # Handle gallery images
                 images = request.FILES.getlist("images")
+                logger.info(f"DEBUG: Received {len(images)} gallery image(s) in request.FILES for property '{prop.title}'")
+                saved_count = 0
                 for img in images:
+                    logger.info(f"DEBUG: Processing gallery file: name={img.name}, size={img.size} bytes")
                     valid, msg = validate_file_upload(img, ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.avif'], 10)
                     if valid:
-                        PropertyImage.objects.create(property=prop, image=img)
+                        try:
+                            pi = PropertyImage.objects.create(property=prop, image=img)
+                            saved_count += 1
+                            logger.info(f"DEBUG: Gallery image saved successfully -> id={pi.id}, url={pi.image.url}")
+                        except Exception as img_err:
+                            logger.error(f"DEBUG: Gallery image FAILED to save (likely Cloudinary upload error): {img_err}")
                     else:
                         logger.warning(f"Gallery image skipped: {msg}")
+                logger.info(f"DEBUG: Gallery upload complete -> {saved_count}/{len(images)} images saved for property '{prop.title}'")
 
             messages.success(request, f"Property '{prop.title}' added successfully!")
             logger.info(f"Property created: {prop.title} by {request.user.username}")
