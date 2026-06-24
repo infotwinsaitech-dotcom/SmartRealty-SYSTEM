@@ -3255,14 +3255,8 @@ def get_settings():
 
 @agent_required
 def scheduler(request):
-    """Agent visit scheduler - agent can toggle on/off"""
+    """Agent visit scheduler with edit/reschedule support"""
     agent = get_object_or_404(Agent, user=request.user)
-    
-    # 🔴 AGENT TOGGLE CHECK
-    if not agent.scheduler_enabled:
-        messages.info(request, "Your scheduler is currently disabled. Enable it from your profile.")
-        return redirect("agent_profile")  # Ya koi setting page
-    
     agent_builders = list(agent.builders.all())
 
     leads = Lead.objects.filter(
@@ -3277,51 +3271,95 @@ def scheduler(request):
     visits = SiteVisit.objects.filter(
         agent=agent,
         builder__in=agent_builders
-    ).select_related('property', 'lead').order_by("-date")
+    ).select_related('property', 'lead').order_by("-date", "-time")
 
-    if request.method == "POST":
-        lead_id = request.POST.get("lead")
-        property_id = request.POST.get("property")
-        visit_date = request.POST.get("date")
-        visit_time = request.POST.get("time")
-
-        lead = get_object_or_404(
-            Lead,
-            id=lead_id,
-            assigned_to=agent,
+    # ========== EDIT MODE CHECK (NEW) ==========
+    edit_visit = None
+    edit_id = request.GET.get('edit')
+    if edit_id and edit_id.isdigit():
+        edit_visit = get_object_or_404(
+            SiteVisit, 
+            id=int(edit_id), 
+            agent=agent,
             builder__in=agent_builders
         )
 
-        if lead.status in ["CLOSED", "FAILED"]:
-            messages.error(request, "Cannot schedule visit for closed/failed lead!")
-            return redirect("scheduler")
-
-        if lead.deals.filter(status__in=["CLOSED", "FAILED"]).exists():
-            messages.error(request, "Lead already has closed deal!")
-            return redirect("scheduler")
-
-        try:
-            SiteVisit.objects.create(
-                property_id=property_id,
-                lead=lead,
+    if request.method == "POST":
+        action = request.POST.get("action", "create")
+        
+        # ========== UPDATE EXISTING VISIT (NEW) ==========
+        if action == "update":
+            visit_id = request.POST.get("visit_id")
+            visit = get_object_or_404(
+                SiteVisit, 
+                id=visit_id, 
                 agent=agent,
-                date=visit_date,
-                time=visit_time,
-                builder=lead.builder
+                builder__in=agent_builders
             )
-            messages.success(request, "Visit scheduled successfully!")
-            logger.info(f"Visit scheduled for lead {lead.name}")
             
-        except Exception as e:
-            logger.error(f"Schedule error: {str(e)}")
-            messages.error(request, "Failed to schedule visit")
+            visit_date = request.POST.get("date")
+            visit_time = request.POST.get("time")
+            
+            if visit_date and visit_time:
+                visit.date = visit_date
+                visit.time = visit_time
+                visit.status = "RESCHEDULED"
+                visit.save()
+                messages.success(
+                    request, 
+                    f"Visit rescheduled to {visit_date} at {visit.time}!"
+                )
+                logger.info(f"Visit {visit.id} rescheduled by {agent.name}")
+            else:
+                messages.error(request, "Date and time required!")
+            
+            return redirect("scheduler")
+        
+        # ========== CREATE NEW VISIT ==========
+        else:
+            lead_id = request.POST.get("lead")
+            property_id = request.POST.get("property")
+            visit_date = request.POST.get("date")
+            visit_time = request.POST.get("time")
 
-        return redirect("scheduler")
+            lead = get_object_or_404(
+                Lead,
+                id=lead_id,
+                assigned_to=agent,
+                builder__in=agent_builders
+            )
 
+            if lead.status in ["CLOSED", "FAILED"]:
+                messages.error(request, "Cannot schedule visit for closed/failed lead!")
+                return redirect("scheduler")
+
+            if lead.deals.filter(status__in=["CLOSED", "FAILED"]).exists():
+                messages.error(request, "Lead already has closed deal!")
+                return redirect("scheduler")
+
+            try:
+                SiteVisit.objects.create(
+                    property_id=property_id,
+                    lead=lead,
+                    agent=agent,
+                    date=visit_date,
+                    time=visit_time,
+                    builder=lead.builder
+                )
+                messages.success(request, "Visit scheduled successfully!")
+                logger.info(f"Visit scheduled for lead {lead.name}")
+                
+            except Exception as e:
+                logger.error(f"Schedule error: {str(e)}")
+                messages.error(request, "Failed to schedule visit")
+
+            return redirect("scheduler")
+
+    # ========== FIX: edit_visit context mein pass karo ==========
     return render(request, "agent/scheduler.html", {
         "leads": leads,
         "visits": visits,
-        "agent": agent,  # Template mein toggle dikhane ke liye
+        "edit_visit": edit_visit,  # ← YEH ADD KARO
     })
 @agent_required
 def toggle_scheduler(request):
