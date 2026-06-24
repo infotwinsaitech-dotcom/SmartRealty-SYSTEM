@@ -1,53 +1,56 @@
 {% extends "builder/base.html" %}
 {% load static %}
-{% block title %}Pipeline | Builder{% endblock %}
+{% block title %}Sales Pipeline | Builder{% endblock %}
 
 {% block content %}
-<div class="p-4 md:p-6 bg-gray-100 min-h-screen">
+<div class="space-y-6">
 
     <!-- ===== HEADER ===== -->
-    <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6">
+    <div class="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4">
         <div>
-            <h1 class="text-2xl md:text-3xl font-bold text-gray-800">📊 Sales Pipeline</h1>
-            <p class="text-sm text-gray-500 mt-1">Track all your agents' leads in real-time</p>
+            <h1 class="text-2xl lg:text-3xl font-bold text-on-surface flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary">account_tree</span>
+                Sales Pipeline
+            </h1>
+            <p class="text-sm text-on-surface-variant mt-1">Track all your leads in real-time</p>
         </div>
         
         <!-- Quick Stats -->
-        <div class="flex gap-3">
-            <div class="bg-white px-4 py-2 rounded-lg shadow text-center">
-                <p class="text-xs text-gray-500">Total Leads</p>
-                <p class="text-xl font-bold text-blue-600">{{ total_leads }}</p>
+        <div class="flex gap-3 flex-wrap">
+            <div class="bg-surface-container rounded-xl px-4 py-3 shadow-sm border border-outline-variant text-center min-w-[90px]">
+                <p class="text-xs text-on-surface-variant">Total Leads</p>
+                <p class="text-xl font-bold text-primary">{{ total_leads }}</p>
             </div>
-            <div class="bg-white px-4 py-2 rounded-lg shadow text-center">
-                <p class="text-xs text-gray-500">🔥 Hot</p>
-                <p class="text-xl font-bold text-red-500">{{ hot_leads }}</p>
+            <div class="bg-surface-container rounded-xl px-4 py-3 shadow-sm border border-outline-variant text-center min-w-[90px]">
+                <p class="text-xs text-on-surface-variant">🔥 Hot</p>
+                <p class="text-xl font-bold text-error">{{ hot_leads }}</p>
             </div>
-            <div class="bg-white px-4 py-2 rounded-lg shadow text-center">
-                <p class="text-xs text-gray-500">Closed</p>
-                <p class="text-xl font-bold text-green-600">{{ total_closed }}</p>
+            <div class="bg-surface-container rounded-xl px-4 py-3 shadow-sm border border-outline-variant text-center min-w-[90px]">
+                <p class="text-xs text-on-surface-variant">Closed</p>
+                <p class="text-xl font-bold text-secondary">{{ total_closed }}</p>
             </div>
-            <div class="bg-white px-4 py-2 rounded-lg shadow text-center">
-                <p class="text-xs text-gray-500">Conversion</p>
-                <p class="text-xl font-bold text-purple-600">{{ conversion_rate }}%</p>
+            <div class="bg-surface-container rounded-xl px-4 py-3 shadow-sm border border-outline-variant text-center min-w-[90px]">
+                <p class="text-xs text-on-surface-variant">Conversion</p>
+                <p class="text-xl font-bold text-primary-container">{{ conversion_rate }}%</p>
             </div>
         </div>
     </div>
 
     <!-- ===== AGENT FILTER TABS ===== -->
-    <div class="bg-white rounded-xl shadow mb-6 overflow-x-auto">
+    <div class="bg-surface-container rounded-xl shadow-sm border border-outline-variant overflow-x-auto">
         <div class="flex gap-2 p-3 min-w-max">
             <button onclick="filterByAgent('all')" 
-                    class="agent-tab px-4 py-2 rounded-lg text-sm font-semibold bg-blue-600 text-white transition-all"
+                    class="agent-tab px-4 py-2 rounded-lg text-sm font-semibold bg-primary-container text-on-primary transition-all"
                     data-agent="all">
                 👥 All Agents ({{ total_leads }})
             </button>
             {% for agent_id, data in agent_pipeline.items %}
             <button onclick="filterByAgent('{{ agent_id }}')" 
-                    class="agent-tab px-4 py-2 rounded-lg text-sm font-semibold bg-gray-100 text-gray-600 hover:bg-gray-200 transition-all"
+                    class="agent-tab px-4 py-2 rounded-lg text-sm font-semibold bg-surface text-on-surface hover:bg-surface-variant transition-all"
                     data-agent="{{ agent_id }}">
                 👤 {{ data.agent.name }} ({{ data.total }})
                 {% if data.hot > 0 %}
-                    <span class="ml-1 text-red-500">🔥{{ data.hot }}</span>
+                    <span class="ml-1 text-error">🔥{{ data.hot }}</span>
                 {% endif %}
             </button>
             {% endfor %}
@@ -59,266 +62,265 @@
 
         <!-- 🔵 NEW -->
         <div class="min-w-[280px] flex-shrink-0">
-            <div class="bg-blue-50 rounded-t-xl p-3 border-b-2 border-blue-500">
+            <div class="bg-primary/10 rounded-t-xl p-3 border-b-2 border-primary">
                 <div class="flex justify-between items-center">
-                    <h3 class="font-bold text-blue-800 flex items-center gap-2">
-                        <span class="w-3 h-3 rounded-full bg-blue-500"></span>
+                    <h3 class="font-bold text-primary flex items-center gap-2">
+                        <span class="w-3 h-3 rounded-full bg-primary"></span>
                         NEW
                     </h3>
-                    <span class="bg-blue-200 text-blue-800 text-xs px-2 py-1 rounded-full font-bold" id="count-NEW">
+                    <span class="bg-primary-fixed text-primary text-xs px-2 py-1 rounded-full font-bold" id="count-NEW">
                         {{ pipeline_data.NEW|length }}
                     </span>
                 </div>
             </div>
-            <div class="bg-blue-50/50 rounded-b-xl p-2 min-h-[400px] space-y-2" id="stage-NEW">
+            <div class="bg-primary/5 rounded-b-xl p-2 min-h-[400px] space-y-2" id="stage-NEW">
                 {% for lead in pipeline_data.NEW %}
-                <div class="lead-card bg-white p-3 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-all cursor-pointer"
+                <div class="lead-card bg-surface rounded-lg p-3 shadow-sm border border-outline-variant hover:shadow-md transition-all cursor-pointer"
                      data-agent="{{ lead.assigned_to.id|default:'unassigned' }}"
                      onclick="openLeadModal({{ lead.id }})">
                     
                     <div class="flex justify-between items-start mb-2">
-                        <h4 class="font-semibold text-sm text-gray-800">{{ lead.name }}</h4>
+                        <h4 class="font-semibold text-sm text-on-surface">{{ lead.name }}</h4>
                         {% if lead.priority == 'HOT' %}
-                            <span class="text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded-full">🔥 HOT</span>
+                            <span class="text-xs bg-error-container text-error px-2 py-0.5 rounded-full">🔥 HOT</span>
                         {% elif lead.priority == 'WARM' %}
-                            <span class="text-xs bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full">WARM</span>
+                            <span class="text-xs bg-tertiary-fixed text-tertiary px-2 py-0.5 rounded-full">WARM</span>
                         {% else %}
-                            <span class="text-xs bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full">COLD</span>
+                            <span class="text-xs bg-primary-fixed text-primary px-2 py-0.5 rounded-full">COLD</span>
                         {% endif %}
                     </div>
                     
-                    <p class="text-xs text-gray-500 mb-1">📞 {{ lead.phone }}</p>
-                    <p class="text-xs text-gray-500 mb-2">🏠 {{ lead.interest|default:"No property" }}</p>
+                    <p class="text-xs text-on-surface-variant mb-1 flex items-center gap-1">
+                        <span class="material-symbols-outlined text-xs">phone</span>
+                        {{ lead.phone }}
+                    </p>
+                    <p class="text-xs text-on-surface-variant mb-2 flex items-center gap-1">
+                        <span class="material-symbols-outlined text-xs">home</span>
+                        {{ lead.interest|default:"No property" }}
+                    </p>
                     
                     <div class="flex justify-between items-center">
-                        <span class="text-xs text-gray-400">{{ lead.created_at|date:"d M" }}</span>
+                        <span class="text-xs text-on-surface-variant">{{ lead.created_at|date:"d M" }}</span>
                         {% if lead.assigned_to %}
-                            <span class="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded">
-                                👤 {{ lead.assigned_to.name }}
+                            <span class="text-xs bg-surface-variant text-on-surface px-2 py-0.5 rounded flex items-center gap-1">
+                                <span class="material-symbols-outlined text-xs">person</span>
+                                {{ lead.assigned_to.name }}
                             </span>
                         {% else %}
-                            <span class="text-xs bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded">Unassigned</span>
+                            <span class="text-xs bg-error-container/50 text-error px-2 py-0.5 rounded flex items-center gap-1">
+                                <span class="material-symbols-outlined text-xs">warning</span>
+                                Unassigned
+                            </span>
                         {% endif %}
                     </div>
                 </div>
                 {% empty %}
-                <div class="text-center py-8 text-gray-400 text-sm">No leads</div>
+                <div class="text-center py-8 text-on-surface-variant/50 text-sm">No leads</div>
                 {% endfor %}
             </div>
         </div>
 
         <!-- 🟡 CONTACTED -->
         <div class="min-w-[280px] flex-shrink-0">
-            <div class="bg-yellow-50 rounded-t-xl p-3 border-b-2 border-yellow-500">
+            <div class="bg-tertiary/10 rounded-t-xl p-3 border-b-2 border-tertiary">
                 <div class="flex justify-between items-center">
-                    <h3 class="font-bold text-yellow-800 flex items-center gap-2">
-                        <span class="w-3 h-3 rounded-full bg-yellow-500"></span>
+                    <h3 class="font-bold text-tertiary flex items-center gap-2">
+                        <span class="w-3 h-3 rounded-full bg-tertiary"></span>
                         CONTACTED
                     </h3>
-                    <span class="bg-yellow-200 text-yellow-800 text-xs px-2 py-1 rounded-full font-bold" id="count-CONTACTED">
+                    <span class="bg-tertiary-fixed text-tertiary text-xs px-2 py-1 rounded-full font-bold" id="count-CONTACTED">
                         {{ pipeline_data.CONTACTED|length }}
                     </span>
                 </div>
             </div>
-            <div class="bg-yellow-50/50 rounded-b-xl p-2 min-h-[400px] space-y-2" id="stage-CONTACTED">
+            <div class="bg-tertiary/5 rounded-b-xl p-2 min-h-[400px] space-y-2" id="stage-CONTACTED">
                 {% for lead in pipeline_data.CONTACTED %}
-                <div class="lead-card bg-white p-3 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-all cursor-pointer"
+                <div class="lead-card bg-surface rounded-lg p-3 shadow-sm border border-outline-variant hover:shadow-md transition-all cursor-pointer"
                      data-agent="{{ lead.assigned_to.id|default:'unassigned' }}"
                      onclick="openLeadModal({{ lead.id }})">
                     
                     <div class="flex justify-between items-start mb-2">
-                        <h4 class="font-semibold text-sm text-gray-800">{{ lead.name }}</h4>
+                        <h4 class="font-semibold text-sm text-on-surface">{{ lead.name }}</h4>
                         {% if lead.priority == 'HOT' %}
-                            <span class="text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded-full">🔥 HOT</span>
+                            <span class="text-xs bg-error-container text-error px-2 py-0.5 rounded-full">🔥 HOT</span>
                         {% endif %}
                     </div>
                     
-                    <p class="text-xs text-gray-500 mb-1">📞 {{ lead.phone }}</p>
-                    <p class="text-xs text-gray-500 mb-2">🏠 {{ lead.interest|default:"No property" }}</p>
+                    <p class="text-xs text-on-surface-variant mb-1 flex items-center gap-1">
+                        <span class="material-symbols-outlined text-xs">phone</span>
+                        {{ lead.phone }}
+                    </p>
+                    <p class="text-xs text-on-surface-variant mb-2 flex items-center gap-1">
+                        <span class="material-symbols-outlined text-xs">home</span>
+                        {{ lead.interest|default:"No property" }}
+                    </p>
                     
                     <div class="flex justify-between items-center">
-                        <span class="text-xs text-gray-400">{{ lead.created_at|date:"d M" }}</span>
+                        <span class="text-xs text-on-surface-variant">{{ lead.created_at|date:"d M" }}</span>
                         {% if lead.assigned_to %}
-                            <span class="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded">
-                                👤 {{ lead.assigned_to.name }}
+                            <span class="text-xs bg-surface-variant text-on-surface px-2 py-0.5 rounded flex items-center gap-1">
+                                <span class="material-symbols-outlined text-xs">person</span>
+                                {{ lead.assigned_to.name }}
                             </span>
                         {% endif %}
                     </div>
                 </div>
                 {% empty %}
-                <div class="text-center py-8 text-gray-400 text-sm">No leads</div>
+                <div class="text-center py-8 text-on-surface-variant/50 text-sm">No leads</div>
                 {% endfor %}
             </div>
         </div>
 
         <!-- 🟠 VISIT -->
         <div class="min-w-[280px] flex-shrink-0">
-            <div class="bg-orange-50 rounded-t-xl p-3 border-b-2 border-orange-500">
+            <div class="bg-secondary/10 rounded-t-xl p-3 border-b-2 border-secondary">
                 <div class="flex justify-between items-center">
-                    <h3 class="font-bold text-orange-800 flex items-center gap-2">
-                        <span class="w-3 h-3 rounded-full bg-orange-500"></span>
+                    <h3 class="font-bold text-secondary flex items-center gap-2">
+                        <span class="w-3 h-3 rounded-full bg-secondary"></span>
                         SITE VISIT
                     </h3>
-                    <span class="bg-orange-200 text-orange-800 text-xs px-2 py-1 rounded-full font-bold" id="count-VISIT">
+                    <span class="bg-secondary-fixed text-secondary text-xs px-2 py-1 rounded-full font-bold" id="count-VISIT">
                         {{ pipeline_data.VISIT|length }}
                     </span>
                 </div>
             </div>
-            <div class="bg-orange-50/50 rounded-b-xl p-2 min-h-[400px] space-y-2" id="stage-VISIT">
+            <div class="bg-secondary/5 rounded-b-xl p-2 min-h-[400px] space-y-2" id="stage-VISIT">
                 {% for lead in pipeline_data.VISIT %}
-                <div class="lead-card bg-white p-3 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-all cursor-pointer"
+                <div class="lead-card bg-surface rounded-lg p-3 shadow-sm border border-outline-variant hover:shadow-md transition-all cursor-pointer"
                      data-agent="{{ lead.assigned_to.id|default:'unassigned' }}"
                      onclick="openLeadModal({{ lead.id }})">
                     
                     <div class="flex justify-between items-start mb-2">
-                        <h4 class="font-semibold text-sm text-gray-800">{{ lead.name }}</h4>
+                        <h4 class="font-semibold text-sm text-on-surface">{{ lead.name }}</h4>
                         {% if lead.priority == 'HOT' %}
-                            <span class="text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded-full">🔥 HOT</span>
+                            <span class="text-xs bg-error-container text-error px-2 py-0.5 rounded-full">🔥 HOT</span>
                         {% endif %}
                     </div>
                     
-                    <p class="text-xs text-gray-500 mb-1">📞 {{ lead.phone }}</p>
-                    <p class="text-xs text-gray-500 mb-2">🏠 {{ lead.interest|default:"No property" }}</p>
+                    <p class="text-xs text-on-surface-variant mb-1 flex items-center gap-1">
+                        <span class="material-symbols-outlined text-xs">phone</span>
+                        {{ lead.phone }}
+                    </p>
+                    <p class="text-xs text-on-surface-variant mb-2 flex items-center gap-1">
+                        <span class="material-symbols-outlined text-xs">home</span>
+                        {{ lead.interest|default:"No property" }}
+                    </p>
                     
                     <div class="flex justify-between items-center">
-                        <span class="text-xs text-gray-400">{{ lead.created_at|date:"d M" }}</span>
+                        <span class="text-xs text-on-surface-variant">{{ lead.created_at|date:"d M" }}</span>
                         {% if lead.assigned_to %}
-                            <span class="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded">
-                                👤 {{ lead.assigned_to.name }}
+                            <span class="text-xs bg-surface-variant text-on-surface px-2 py-0.5 rounded flex items-center gap-1">
+                                <span class="material-symbols-outlined text-xs">person</span>
+                                {{ lead.assigned_to.name }}
                             </span>
                         {% endif %}
                     </div>
                 </div>
                 {% empty %}
-                <div class="text-center py-8 text-gray-400 text-sm">No leads</div>
+                <div class="text-center py-8 text-on-surface-variant/50 text-sm">No leads</div>
                 {% endfor %}
             </div>
         </div>
 
         <!-- 🟣 NEGOTIATION -->
         <div class="min-w-[280px] flex-shrink-0">
-            <div class="bg-purple-50 rounded-t-xl p-3 border-b-2 border-purple-500">
+            <div class="bg-primary-container/20 rounded-t-xl p-3 border-b-2 border-primary-container">
                 <div class="flex justify-between items-center">
-                    <h3 class="font-bold text-purple-800 flex items-center gap-2">
-                        <span class="w-3 h-3 rounded-full bg-purple-500"></span>
+                    <h3 class="font-bold text-primary-container flex items-center gap-2">
+                        <span class="w-3 h-3 rounded-full bg-primary-container"></span>
                         NEGOTIATION
                     </h3>
-                    <span class="bg-purple-200 text-purple-800 text-xs px-2 py-1 rounded-full font-bold" id="count-NEGOTIATION">
+                    <span class="bg-primary-fixed-dim text-primary-container text-xs px-2 py-1 rounded-full font-bold" id="count-NEGOTIATION">
                         {{ pipeline_data.NEGOTIATION|length }}
                     </span>
                 </div>
             </div>
-            <div class="bg-purple-50/50 rounded-b-xl p-2 min-h-[400px] space-y-2" id="stage-NEGOTIATION">
+            <div class="bg-primary-container/5 rounded-b-xl p-2 min-h-[400px] space-y-2" id="stage-NEGOTIATION">
                 {% for lead in pipeline_data.NEGOTIATION %}
-                <div class="lead-card bg-white p-3 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-all cursor-pointer"
+                <div class="lead-card bg-surface rounded-lg p-3 shadow-sm border border-outline-variant hover:shadow-md transition-all cursor-pointer"
                      data-agent="{{ lead.assigned_to.id|default:'unassigned' }}"
                      onclick="openLeadModal({{ lead.id }})">
                     
                     <div class="flex justify-between items-start mb-2">
-                        <h4 class="font-semibold text-sm text-gray-800">{{ lead.name }}</h4>
+                        <h4 class="font-semibold text-sm text-on-surface">{{ lead.name }}</h4>
                         {% if lead.priority == 'HOT' %}
-                            <span class="text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded-full">🔥 HOT</span>
+                            <span class="text-xs bg-error-container text-error px-2 py-0.5 rounded-full">🔥 HOT</span>
                         {% endif %}
                     </div>
                     
-                    <p class="text-xs text-gray-500 mb-1">📞 {{ lead.phone }}</p>
-                    <p class="text-xs text-gray-500 mb-2">🏠 {{ lead.interest|default:"No property" }}</p>
+                    <p class="text-xs text-on-surface-variant mb-1 flex items-center gap-1">
+                        <span class="material-symbols-outlined text-xs">phone</span>
+                        {{ lead.phone }}
+                    </p>
+                    <p class="text-xs text-on-surface-variant mb-2 flex items-center gap-1">
+                        <span class="material-symbols-outlined text-xs">home</span>
+                        {{ lead.interest|default:"No property" }}
+                    </p>
                     
                     <div class="flex justify-between items-center">
-                        <span class="text-xs text-gray-400">{{ lead.created_at|date:"d M" }}</span>
+                        <span class="text-xs text-on-surface-variant">{{ lead.created_at|date:"d M" }}</span>
                         {% if lead.assigned_to %}
-                            <span class="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded">
-                                👤 {{ lead.assigned_to.name }}
+                            <span class="text-xs bg-surface-variant text-on-surface px-2 py-0.5 rounded flex items-center gap-1">
+                                <span class="material-symbols-outlined text-xs">person</span>
+                                {{ lead.assigned_to.name }}
                             </span>
                         {% endif %}
                     </div>
                 </div>
                 {% empty %}
-                <div class="text-center py-8 text-gray-400 text-sm">No leads</div>
+                <div class="text-center py-8 text-on-surface-variant/50 text-sm">No leads</div>
                 {% endfor %}
             </div>
         </div>
 
         <!-- 🟢 CLOSED -->
         <div class="min-w-[280px] flex-shrink-0">
-            <div class="bg-green-50 rounded-t-xl p-3 border-b-2 border-green-500">
+            <div class="bg-secondary/10 rounded-t-xl p-3 border-b-2 border-secondary">
                 <div class="flex justify-between items-center">
-                    <h3 class="font-bold text-green-800 flex items-center gap-2">
-                        <span class="w-3 h-3 rounded-full bg-green-500"></span>
+                    <h3 class="font-bold text-secondary flex items-center gap-2">
+                        <span class="w-3 h-3 rounded-full bg-secondary"></span>
                         CLOSED
                     </h3>
-                    <span class="bg-green-200 text-green-800 text-xs px-2 py-1 rounded-full font-bold" id="count-CLOSED">
+                    <span class="bg-secondary-fixed text-secondary text-xs px-2 py-1 rounded-full font-bold" id="count-CLOSED">
                         {{ pipeline_data.CLOSED|length }}
                     </span>
                 </div>
             </div>
-            <div class="bg-green-50/50 rounded-b-xl p-2 min-h-[400px] space-y-2" id="stage-CLOSED">
+            <div class="bg-secondary/5 rounded-b-xl p-2 min-h-[400px] space-y-2" id="stage-CLOSED">
                 {% for lead in pipeline_data.CLOSED %}
-                <div class="lead-card bg-white p-3 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-all cursor-pointer opacity-75"
+                <div class="lead-card bg-surface rounded-lg p-3 shadow-sm border border-outline-variant hover:shadow-md transition-all cursor-pointer opacity-75"
                      data-agent="{{ lead.assigned_to.id|default:'unassigned' }}"
                      onclick="openLeadModal({{ lead.id }})">
                     
                     <div class="flex justify-between items-start mb-2">
-                        <h4 class="font-semibold text-sm text-gray-800">{{ lead.name }}</h4>
-                        <span class="text-xs bg-green-100 text-green-600 px-2 py-0.5 rounded-full">✅ WON</span>
+                        <h4 class="font-semibold text-sm text-on-surface">{{ lead.name }}</h4>
+                        <span class="text-xs bg-secondary-fixed text-secondary px-2 py-0.5 rounded-full flex items-center gap-1">
+                            <span class="material-symbols-outlined text-xs">check_circle</span>
+                            WON
+                        </span>
                     </div>
                     
-                    <p class="text-xs text-gray-500 mb-1">📞 {{ lead.phone }}</p>
-                    <p class="text-xs text-gray-500 mb-2">🏠 {{ lead.interest|default:"No property" }}</p>
+                    <p class="text-xs text-on-surface-variant mb-1 flex items-center gap-1">
+                        <span class="material-symbols-outlined text-xs">phone</span>
+                        {{ lead.phone }}
+                    </p>
+                    <p class="text-xs text-on-surface-variant mb-2 flex items-center gap-1">
+                        <span class="material-symbols-outlined text-xs">home</span>
+                        {{ lead.interest|default:"No property" }}
+                    </p>
                     
                     <div class="flex justify-between items-center">
-                        <span class="text-xs text-gray-400">{{ lead.created_at|date:"d M" }}</span>
+                        <span class="text-xs text-on-surface-variant">{{ lead.created_at|date:"d M" }}</span>
                         {% if lead.assigned_to %}
-                            <span class="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded">
-                                👤 {{ lead.assigned_to.name }}
+                            <span class="text-xs bg-surface-variant text-on-surface px-2 py-0.5 rounded flex items-center gap-1">
+                                <span class="material-symbols-outlined text-xs">person</span>
+                                {{ lead.assigned_to.name }}
                             </span>
                         {% endif %}
                     </div>
                 </div>
                 {% empty %}
-                <div class="text-center py-8 text-gray-400 text-sm">No leads</div>
-                {% endfor %}
-            </div>
-        </div>
-
-        <!-- 🔴 FAILED -->
-        <div class="min-w-[280px] flex-shrink-0">
-            <div class="bg-red-50 rounded-t-xl p-3 border-b-2 border-red-500">
-                <div class="flex justify-between items-center">
-                    <h3 class="font-bold text-red-800 flex items-center gap-2">
-                        <span class="w-3 h-3 rounded-full bg-red-500"></span>
-                        FAILED
-                    </h3>
-                    <span class="bg-red-200 text-red-800 text-xs px-2 py-1 rounded-full font-bold" id="count-FAILED">
-                        {{ pipeline_data.FAILED|length }}
-                    </span>
-                </div>
-            </div>
-            <div class="bg-red-50/50 rounded-b-xl p-2 min-h-[400px] space-y-2" id="stage-FAILED">
-                {% for lead in pipeline_data.FAILED %}
-                <div class="lead-card bg-white p-3 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-all cursor-pointer opacity-60"
-                     data-agent="{{ lead.assigned_to.id|default:'unassigned' }}"
-                     onclick="openLeadModal({{ lead.id }})">
-                    
-                    <div class="flex justify-between items-start mb-2">
-                        <h4 class="font-semibold text-sm text-gray-800">{{ lead.name }}</h4>
-                        <span class="text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded-full">❌ LOST</span>
-                    </div>
-                    
-                    <p class="text-xs text-gray-500 mb-1">📞 {{ lead.phone }}</p>
-                    <p class="text-xs text-gray-500 mb-2">🏠 {{ lead.interest|default:"No property" }}</p>
-                    
-                    <div class="flex justify-between items-center">
-                        <span class="text-xs text-gray-400">{{ lead.created_at|date:"d M" }}</span>
-                        {% if lead.assigned_to %}
-                            <span class="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded">
-                                👤 {{ lead.assigned_to.name }}
-                            </span>
-                        {% endif %}
-                    </div>
-                </div>
-                {% empty %}
-                <div class="text-center py-8 text-gray-400 text-sm">No leads</div>
+                <div class="text-center py-8 text-on-surface-variant/50 text-sm">No leads</div>
                 {% endfor %}
             </div>
         </div>
@@ -326,22 +328,28 @@
     </div>
 
     <!-- ===== RECENT ACTIVITY ===== -->
-    <div class="mt-6 bg-white rounded-xl shadow p-4">
-        <h3 class="font-bold text-lg mb-3">🕐 Recent Activity</h3>
+    {% if recent_activities %}
+    <div class="bg-surface-container rounded-xl shadow-sm border border-outline-variant p-4">
+        <h3 class="font-bold text-on-surface mb-3 text-sm flex items-center gap-2">
+            <span class="material-symbols-outlined text-sm">history</span>
+            Recent Activity
+        </h3>
         <div class="space-y-2 max-h-48 overflow-y-auto">
             {% for activity in recent_activities %}
-            <div class="flex items-center gap-3 text-sm p-2 hover:bg-gray-50 rounded">
-                <span class="text-gray-400 text-xs">{{ activity.created_at|date:"d M H:i" }}</span>
-                <span class="text-gray-600">{{ activity.message }}</span>
+            <div class="flex items-center gap-3 text-sm p-2 hover:bg-surface-variant rounded-lg transition">
+                <span class="text-on-surface-variant text-xs whitespace-nowrap">{{ activity.created_at|date:"d M H:i" }}</span>
+                <span class="text-on-surface flex-1">{{ activity.message }}</span>
                 {% if activity.created_by %}
-                    <span class="text-xs text-gray-400">by {{ activity.created_by.username }}</span>
+                    <span class="text-xs text-on-surface-variant whitespace-nowrap flex items-center gap-1">
+                        <span class="material-symbols-outlined text-xs">person</span>
+                        {{ activity.created_by.username }}
+                    </span>
                 {% endif %}
             </div>
-            {% empty %}
-            <p class="text-gray-400 text-sm">No recent activity</p>
             {% endfor %}
         </div>
     </div>
+    {% endif %}
 
 </div>
 
@@ -352,11 +360,11 @@ function filterByAgent(agentId) {
     // Update tab styles
     document.querySelectorAll('.agent-tab').forEach(tab => {
         if (tab.dataset.agent === agentId) {
-            tab.classList.remove('bg-gray-100', 'text-gray-600');
-            tab.classList.add('bg-blue-600', 'text-white');
+            tab.classList.remove('bg-surface', 'text-on-surface');
+            tab.classList.add('bg-primary-container', 'text-on-primary');
         } else {
-            tab.classList.remove('bg-blue-600', 'text-white');
-            tab.classList.add('bg-gray-100', 'text-gray-600');
+            tab.classList.remove('bg-primary-container', 'text-on-primary');
+            tab.classList.add('bg-surface', 'text-on-surface');
         }
     });
     
@@ -370,7 +378,7 @@ function filterByAgent(agentId) {
     });
     
     // Update counts per stage
-    const stages = ['NEW', 'CONTACTED', 'VISIT', 'NEGOTIATION', 'CLOSED', 'FAILED'];
+    const stages = ['NEW', 'CONTACTED', 'VISIT', 'NEGOTIATION', 'CLOSED'];
     stages.forEach(stage => {
         const container = document.getElementById('stage-' + stage);
         const visibleCards = container.querySelectorAll('.lead-card[style*="display: block"], .lead-card:not([style*="display: none"])');
@@ -378,9 +386,8 @@ function filterByAgent(agentId) {
     });
 }
 
-// Open Lead Detail Modal (placeholder - aap apna modal bana sakte ho)
+// Open Lead Detail
 function openLeadModal(leadId) {
-    // Aap yeh redirect kar sakte ho detail page pe
     window.location.href = '/builder/leads/?lead=' + leadId;
 }
 </script>

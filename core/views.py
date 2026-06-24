@@ -2089,64 +2089,49 @@ def remove_agent_from_builder(request, agent_id):
 # =============================================================================
 # PIPELINE & LEAD STATUS
 # =============================================================================
-
 @builder_required
 def builder_pipeline(request):
     """
-    Builder Pipeline - Property-wise lead stages
-    Sirf logged-in builder ki properties aur unpe aaye leads
+    Builder Pipeline - Sab leads stage-wise dikhao
+    Sirf logged-in builder ke leads, chahe kisi property se linked ho ya na ho
     """
     builder = request.user
     
-    # Step 1: Builder ki saari properties lao
-    properties = Property.objects.filter(
+    # Step 1: Builder ke SAARE leads lao (property link se independent)
+    all_leads = Lead.objects.filter(
         builder=builder
-    ).prefetch_related(
-        'interested_leads',      # Lead model ka related_name
-        'interested_leads__assigned_to',
-        'images'
-    ).order_by('-created_at')
+    ).select_related('assigned_to').prefetch_related('properties').order_by('-updated_at')
     
-    # Step 2: Property-wise pipeline data banao
-    property_pipeline = {}
+    # Step 2: Stage-wise group karo
+    pipeline_data = {
+        'NEW': all_leads.filter(status='NEW'),
+        'CONTACTED': all_leads.filter(status='CONTACTED'),
+        'VISIT': all_leads.filter(status='VISIT'),
+        'NEGOTIATION': all_leads.filter(status='NEGOTIATION'),
+        'CLOSED': all_leads.filter(status='CLOSED'),
+        'FAILED': all_leads.filter(status='FAILED'),
+    }
     
-    for prop in properties:
-        # Sirf is property ke leads (kisi bhi agent ke)
-        prop_leads = Lead.objects.filter(
-            properties=prop,
-            builder=builder
-        ).select_related('assigned_to').order_by('-updated_at')
-        
-        property_pipeline[prop.id] = {
-            'property': prop,
-            'total_leads': prop_leads.count(),
-            'hot_leads': prop_leads.filter(priority='HOT').count(),
-            'closed_deals': prop_leads.filter(status='CLOSED').count(),
-            'conversion_rate': round(
-                (prop_leads.filter(status='CLOSED').count() / prop_leads.count() * 100), 1
-            ) if prop_leads.count() else 0,
-            'stages': {
-                'NEW': prop_leads.filter(status='NEW'),
-                'CONTACTED': prop_leads.filter(status='CONTACTED'),
-                'VISIT': prop_leads.filter(status='VISIT'),
-                'NEGOTIATION': prop_leads.filter(status='NEGOTIATION'),
-                'CLOSED': prop_leads.filter(status='CLOSED'),
-                'FAILED': prop_leads.filter(status='FAILED'),
-            }
+    # Step 3: Agent-wise filter ke liye
+    agents = Agent.objects.filter(
+        builders=builder,
+        is_active=True
+    ).select_related('user')
+    
+    agent_pipeline = {}
+    for agent in agents:
+        agent_leads = all_leads.filter(assigned_to=agent)
+        agent_pipeline[agent.id] = {
+            'agent': agent,
+            'total': agent_leads.count(),
+            'hot': agent_leads.filter(priority='HOT').count(),
         }
     
-    # Step 3: Overall stats (sab properties mila ke)
-    all_leads = Lead.objects.filter(builder=builder)
-    
-    # Step 4: Overall stage-wise count (pure builder ka)
-    overall_pipeline = {
-        'NEW': all_leads.filter(status='NEW').count(),
-        'CONTACTED': all_leads.filter(status='CONTACTED').count(),
-        'VISIT': all_leads.filter(status='VISIT').count(),
-        'NEGOTIATION': all_leads.filter(status='NEGOTIATION').count(),
-        'CLOSED': all_leads.filter(status='CLOSED').count(),
-        'FAILED': all_leads.filter(status='FAILED').count(),
-    }
+    # Step 4: Stats
+    total_leads = all_leads.count()
+    hot_leads = all_leads.filter(priority='HOT').count()
+    total_closed = all_leads.filter(status='CLOSED').count()
+    conversion_rate = round((total_closed / total_leads * 100), 1) if total_leads else 0
     
     # Step 5: Recent activity
     recent_activities = LeadActivity.objects.filter(
@@ -2154,11 +2139,13 @@ def builder_pipeline(request):
     ).select_related('lead', 'created_by').order_by('-created_at')[:10]
     
     context = {
-        'property_pipeline': property_pipeline,    # Property-wise sab kuch
-        'overall_pipeline': overall_pipeline,      # Pure builder ka summary
-        'total_properties': properties.count(),
-        'total_leads': all_leads.count(),
-        'hot_leads': all_leads.filter(priority='HOT').count(),
+        'pipeline_data': pipeline_data,       # Stage-wise leads
+        'agent_pipeline': agent_pipeline,     # Agent filter ke liye
+        'agents': agents,
+        'total_leads': total_leads,
+        'hot_leads': hot_leads,
+        'total_closed': total_closed,
+        'conversion_rate': conversion_rate,
         'recent_activities': recent_activities,
     }
     
