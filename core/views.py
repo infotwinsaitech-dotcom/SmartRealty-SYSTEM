@@ -2092,61 +2092,83 @@ def remove_agent_from_builder(request, agent_id):
 @builder_required
 def builder_pipeline(request):
     """
-    Builder Pipeline - Sab leads stage-wise dikhao
-    Sirf logged-in builder ke leads, chahe kisi property se linked ho ya na ho
+    Builder Pipeline - Agent-wise lead stages
+    Har agent ka alag section, builder sab dekhe
     """
     builder = request.user
     
-    # Step 1: Builder ke SAARE leads lao (property link se independent)
-    all_leads = Lead.objects.filter(
-        builder=builder
-    ).select_related('assigned_to').prefetch_related('properties').order_by('-updated_at')
+    # DEBUG: Check karo ki leads hain bhi ya nahi
+    all_builder_leads = Lead.objects.filter(builder=builder)
+    print(f"DEBUG: Total leads for builder {builder.username}: {all_builder_leads.count()}")
     
-    # Step 2: Stage-wise group karo
-    pipeline_data = {
-        'NEW': all_leads.filter(status='NEW'),
-        'CONTACTED': all_leads.filter(status='CONTACTED'),
-        'VISIT': all_leads.filter(status='VISIT'),
-        'NEGOTIATION': all_leads.filter(status='NEGOTIATION'),
-        'CLOSED': all_leads.filter(status='CLOSED'),
-        'FAILED': all_leads.filter(status='FAILED'),
-    }
-    
-    # Step 3: Agent-wise filter ke liye
+    # Step 1: Builder ke saare active agents lao
     agents = Agent.objects.filter(
         builders=builder,
         is_active=True
-    ).select_related('user')
+    ).select_related('user').order_by('name')
     
+    # Step 2: Har agent ka pipeline data banao
     agent_pipeline = {}
+    unassigned_leads = []
+    
     for agent in agents:
-        agent_leads = all_leads.filter(assigned_to=agent)
+        # Agent ke leads (builder confirm karo)
+        agent_leads = Lead.objects.filter(
+            assigned_to=agent,
+            builder=builder  # SECURITY: Sirf is builder ke leads
+        ).select_related('assigned_to').prefetch_related('properties').order_by('-updated_at')
+        
+        # DEBUG
+        print(f"DEBUG: Agent {agent.name} has {agent_leads.count()} leads")
+        
+        # Stage-wise split
+        stages = {
+            'NEW': list(agent_leads.filter(status='NEW')),
+            'CONTACTED': list(agent_leads.filter(status='CONTACTED')),
+            'VISIT': list(agent_leads.filter(status='VISIT')),
+            'NEGOTIATION': list(agent_leads.filter(status='NEGOTIATION')),
+            'CLOSED': list(agent_leads.filter(status='CLOSED')),
+            'FAILED': list(agent_leads.filter(status='FAILED')),
+        }
+        
         agent_pipeline[agent.id] = {
             'agent': agent,
             'total': agent_leads.count(),
             'hot': agent_leads.filter(priority='HOT').count(),
+            'stages': stages,
         }
     
-    # Step 4: Stats
-    total_leads = all_leads.count()
-    hot_leads = all_leads.filter(priority='HOT').count()
-    total_closed = all_leads.filter(status='CLOSED').count()
-    conversion_rate = round((total_closed / total_leads * 100), 1) if total_leads else 0
+    # Step 3: Unassigned leads (jinko koi agent nahi mila)
+    unassigned_leads = Lead.objects.filter(
+        builder=builder,
+        assigned_to__isnull=True
+    ).select_related('assigned_to').prefetch_related('properties').order_by('-updated_at')
     
-    # Step 5: Recent activity
-    recent_activities = LeadActivity.objects.filter(
-        lead__builder=builder
-    ).select_related('lead', 'created_by').order_by('-created_at')[:10]
+    unassigned_stages = {
+        'NEW': list(unassigned_leads.filter(status='NEW')),
+        'CONTACTED': list(unassigned_leads.filter(status='CONTACTED')),
+        'VISIT': list(unassigned_leads.filter(status='VISIT')),
+        'NEGOTIATION': list(unassigned_leads.filter(status='NEGOTIATION')),
+        'CLOSED': list(unassigned_leads.filter(status='CLOSED')),
+        'FAILED': list(unassigned_leads.filter(status='FAILED')),
+    }
+    
+    # Step 4: Overall stats
+    all_leads = Lead.objects.filter(builder=builder)
     
     context = {
-        'pipeline_data': pipeline_data,       # Stage-wise leads
-        'agent_pipeline': agent_pipeline,     # Agent filter ke liye
+        'agent_pipeline': agent_pipeline,      # Har agent ka data
+        'unassigned': {
+            'total': unassigned_leads.count(),
+            'stages': unassigned_stages,
+        },
         'agents': agents,
-        'total_leads': total_leads,
-        'hot_leads': hot_leads,
-        'total_closed': total_closed,
-        'conversion_rate': conversion_rate,
-        'recent_activities': recent_activities,
+        'total_leads': all_leads.count(),
+        'hot_leads': all_leads.filter(priority='HOT').count(),
+        'total_closed': all_leads.filter(status='CLOSED').count(),
+        'conversion_rate': round(
+            (all_leads.filter(status='CLOSED').count() / all_leads.count() * 100), 1
+        ) if all_leads.count() else 0,
     }
     
     return render(request, "builder/pipeline.html", context)

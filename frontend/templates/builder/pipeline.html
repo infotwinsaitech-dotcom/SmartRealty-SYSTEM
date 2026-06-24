@@ -1,6 +1,7 @@
 {% extends "builder/base.html" %}
 {% load static %}
-{% block title %}Sales Pipeline | Builder{% endblock %}
+{% load humanize %}
+{% block title %}Agent Pipeline | Builder{% endblock %}
 
 {% block content %}
 <div class="space-y-6">
@@ -10,12 +11,12 @@
         <div>
             <h1 class="text-2xl lg:text-3xl font-bold text-on-surface flex items-center gap-2">
                 <span class="material-symbols-outlined text-primary">account_tree</span>
-                Sales Pipeline
+                Agent Pipeline
             </h1>
-            <p class="text-sm text-on-surface-variant mt-1">Track all your leads in real-time</p>
+            <p class="text-sm text-on-surface-variant mt-1">Track each agent's leads separately</p>
         </div>
         
-        <!-- Quick Stats -->
+        <!-- Overall Stats -->
         <div class="flex gap-3 flex-wrap">
             <div class="bg-surface-container rounded-xl px-4 py-3 shadow-sm border border-outline-variant text-center min-w-[90px]">
                 <p class="text-xs text-on-surface-variant">Total Leads</p>
@@ -36,16 +37,16 @@
         </div>
     </div>
 
-    <!-- ===== AGENT FILTER TABS ===== -->
+    <!-- ===== AGENT TABS ===== -->
     <div class="bg-surface-container rounded-xl shadow-sm border border-outline-variant overflow-x-auto">
         <div class="flex gap-2 p-3 min-w-max">
-            <button onclick="filterByAgent('all')" 
+            <button onclick="showAgent('all')" 
                     class="agent-tab px-4 py-2 rounded-lg text-sm font-semibold bg-primary-container text-on-primary transition-all"
                     data-agent="all">
                 👥 All Agents ({{ total_leads }})
             </button>
             {% for agent_id, data in agent_pipeline.items %}
-            <button onclick="filterByAgent('{{ agent_id }}')" 
+            <button onclick="showAgent('{{ agent_id }}')" 
                     class="agent-tab px-4 py-2 rounded-lg text-sm font-semibold bg-surface text-on-surface hover:bg-surface-variant transition-all"
                     data-agent="{{ agent_id }}">
                 👤 {{ data.agent.name }} ({{ data.total }})
@@ -54,297 +55,519 @@
                 {% endif %}
             </button>
             {% endfor %}
+            {% if unassigned.total > 0 %}
+            <button onclick="showAgent('unassigned')" 
+                    class="agent-tab px-4 py-2 rounded-lg text-sm font-semibold bg-surface text-on-surface hover:bg-surface-variant transition-all"
+                    data-agent="unassigned">
+                ⚠️ Unassigned ({{ unassigned.total }})
+            </button>
+            {% endif %}
         </div>
     </div>
 
-    <!-- ===== KANBAN BOARD ===== -->
-    <div class="flex gap-4 overflow-x-auto pb-4 min-h-[500px]" id="pipeline-board">
-
-        <!-- 🔵 NEW -->
-        <div class="min-w-[280px] flex-shrink-0">
-            <div class="bg-primary/10 rounded-t-xl p-3 border-b-2 border-primary">
-                <div class="flex justify-between items-center">
-                    <h3 class="font-bold text-primary flex items-center gap-2">
-                        <span class="w-3 h-3 rounded-full bg-primary"></span>
-                        NEW
-                    </h3>
-                    <span class="bg-primary-fixed text-primary text-xs px-2 py-1 rounded-full font-bold" id="count-NEW">
-                        {{ pipeline_data.NEW|length }}
-                    </span>
-                </div>
-            </div>
-            <div class="bg-primary/5 rounded-b-xl p-2 min-h-[400px] space-y-2" id="stage-NEW">
-                {% for lead in pipeline_data.NEW %}
-                <div class="lead-card bg-surface rounded-lg p-3 shadow-sm border border-outline-variant hover:shadow-md transition-all cursor-pointer"
-                     data-agent="{{ lead.assigned_to.id|default:'unassigned' }}"
-                     onclick="openLeadModal({{ lead.id }})">
-                    
-                    <div class="flex justify-between items-start mb-2">
-                        <h4 class="font-semibold text-sm text-on-surface">{{ lead.name }}</h4>
-                        {% if lead.priority == 'HOT' %}
-                            <span class="text-xs bg-error-container text-error px-2 py-0.5 rounded-full">🔥 HOT</span>
-                        {% elif lead.priority == 'WARM' %}
-                            <span class="text-xs bg-tertiary-fixed text-tertiary px-2 py-0.5 rounded-full">WARM</span>
-                        {% else %}
-                            <span class="text-xs bg-primary-fixed text-primary px-2 py-0.5 rounded-full">COLD</span>
-                        {% endif %}
-                    </div>
-                    
-                    <p class="text-xs text-on-surface-variant mb-1 flex items-center gap-1">
-                        <span class="material-symbols-outlined text-xs">phone</span>
-                        {{ lead.phone }}
-                    </p>
-                    <p class="text-xs text-on-surface-variant mb-2 flex items-center gap-1">
-                        <span class="material-symbols-outlined text-xs">home</span>
-                        {{ lead.interest|default:"No property" }}
-                    </p>
-                    
-                    <div class="flex justify-between items-center">
-                        <span class="text-xs text-on-surface-variant">{{ lead.created_at|date:"d M" }}</span>
-                        {% if lead.assigned_to %}
-                            <span class="text-xs bg-surface-variant text-on-surface px-2 py-0.5 rounded flex items-center gap-1">
-                                <span class="material-symbols-outlined text-xs">person</span>
-                                {{ lead.assigned_to.name }}
-                            </span>
-                        {% else %}
-                            <span class="text-xs bg-error-container/50 text-error px-2 py-0.5 rounded flex items-center gap-1">
-                                <span class="material-symbols-outlined text-xs">warning</span>
-                                Unassigned
+    <!-- ===== ALL AGENTS SECTION ===== -->
+    <div id="section-all" class="agent-section space-y-6">
+        {% for agent_id, data in agent_pipeline.items %}
+            <!-- Agent Header -->
+            <div class="bg-surface-container rounded-xl p-4 border border-outline-variant shadow-sm">
+                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center">
+                            <span class="material-symbols-outlined text-on-primary">person</span>
+                        </div>
+                        <div>
+                            <h2 class="text-lg font-bold text-on-surface">{{ data.agent.name }}</h2>
+                            <p class="text-sm text-on-surface-variant">{{ data.agent.user.email }}</p>
+                        </div>
+                        {% if data.hot > 0 %}
+                            <span class="bg-error-container text-on-error text-xs font-bold px-2 py-1 rounded-full">
+                                🔥 {{ data.hot }} Hot
                             </span>
                         {% endif %}
                     </div>
-                </div>
-                {% empty %}
-                <div class="text-center py-8 text-on-surface-variant/50 text-sm">No leads</div>
-                {% endfor %}
-            </div>
-        </div>
-
-        <!-- 🟡 CONTACTED -->
-        <div class="min-w-[280px] flex-shrink-0">
-            <div class="bg-tertiary/10 rounded-t-xl p-3 border-b-2 border-tertiary">
-                <div class="flex justify-between items-center">
-                    <h3 class="font-bold text-tertiary flex items-center gap-2">
-                        <span class="w-3 h-3 rounded-full bg-tertiary"></span>
-                        CONTACTED
-                    </h3>
-                    <span class="bg-tertiary-fixed text-tertiary text-xs px-2 py-1 rounded-full font-bold" id="count-CONTACTED">
-                        {{ pipeline_data.CONTACTED|length }}
-                    </span>
-                </div>
-            </div>
-            <div class="bg-tertiary/5 rounded-b-xl p-2 min-h-[400px] space-y-2" id="stage-CONTACTED">
-                {% for lead in pipeline_data.CONTACTED %}
-                <div class="lead-card bg-surface rounded-lg p-3 shadow-sm border border-outline-variant hover:shadow-md transition-all cursor-pointer"
-                     data-agent="{{ lead.assigned_to.id|default:'unassigned' }}"
-                     onclick="openLeadModal({{ lead.id }})">
-                    
-                    <div class="flex justify-between items-start mb-2">
-                        <h4 class="font-semibold text-sm text-on-surface">{{ lead.name }}</h4>
-                        {% if lead.priority == 'HOT' %}
-                            <span class="text-xs bg-error-container text-error px-2 py-0.5 rounded-full">🔥 HOT</span>
-                        {% endif %}
-                    </div>
-                    
-                    <p class="text-xs text-on-surface-variant mb-1 flex items-center gap-1">
-                        <span class="material-symbols-outlined text-xs">phone</span>
-                        {{ lead.phone }}
-                    </p>
-                    <p class="text-xs text-on-surface-variant mb-2 flex items-center gap-1">
-                        <span class="material-symbols-outlined text-xs">home</span>
-                        {{ lead.interest|default:"No property" }}
-                    </p>
-                    
-                    <div class="flex justify-between items-center">
-                        <span class="text-xs text-on-surface-variant">{{ lead.created_at|date:"d M" }}</span>
-                        {% if lead.assigned_to %}
-                            <span class="text-xs bg-surface-variant text-on-surface px-2 py-0.5 rounded flex items-center gap-1">
-                                <span class="material-symbols-outlined text-xs">person</span>
-                                {{ lead.assigned_to.name }}
-                            </span>
-                        {% endif %}
-                    </div>
-                </div>
-                {% empty %}
-                <div class="text-center py-8 text-on-surface-variant/50 text-sm">No leads</div>
-                {% endfor %}
-            </div>
-        </div>
-
-        <!-- 🟠 VISIT -->
-        <div class="min-w-[280px] flex-shrink-0">
-            <div class="bg-secondary/10 rounded-t-xl p-3 border-b-2 border-secondary">
-                <div class="flex justify-between items-center">
-                    <h3 class="font-bold text-secondary flex items-center gap-2">
-                        <span class="w-3 h-3 rounded-full bg-secondary"></span>
-                        SITE VISIT
-                    </h3>
-                    <span class="bg-secondary-fixed text-secondary text-xs px-2 py-1 rounded-full font-bold" id="count-VISIT">
-                        {{ pipeline_data.VISIT|length }}
-                    </span>
-                </div>
-            </div>
-            <div class="bg-secondary/5 rounded-b-xl p-2 min-h-[400px] space-y-2" id="stage-VISIT">
-                {% for lead in pipeline_data.VISIT %}
-                <div class="lead-card bg-surface rounded-lg p-3 shadow-sm border border-outline-variant hover:shadow-md transition-all cursor-pointer"
-                     data-agent="{{ lead.assigned_to.id|default:'unassigned' }}"
-                     onclick="openLeadModal({{ lead.id }})">
-                    
-                    <div class="flex justify-between items-start mb-2">
-                        <h4 class="font-semibold text-sm text-on-surface">{{ lead.name }}</h4>
-                        {% if lead.priority == 'HOT' %}
-                            <span class="text-xs bg-error-container text-error px-2 py-0.5 rounded-full">🔥 HOT</span>
-                        {% endif %}
-                    </div>
-                    
-                    <p class="text-xs text-on-surface-variant mb-1 flex items-center gap-1">
-                        <span class="material-symbols-outlined text-xs">phone</span>
-                        {{ lead.phone }}
-                    </p>
-                    <p class="text-xs text-on-surface-variant mb-2 flex items-center gap-1">
-                        <span class="material-symbols-outlined text-xs">home</span>
-                        {{ lead.interest|default:"No property" }}
-                    </p>
-                    
-                    <div class="flex justify-between items-center">
-                        <span class="text-xs text-on-surface-variant">{{ lead.created_at|date:"d M" }}</span>
-                        {% if lead.assigned_to %}
-                            <span class="text-xs bg-surface-variant text-on-surface px-2 py-0.5 rounded flex items-center gap-1">
-                                <span class="material-symbols-outlined text-xs">person</span>
-                                {{ lead.assigned_to.name }}
-                            </span>
-                        {% endif %}
-                    </div>
-                </div>
-                {% empty %}
-                <div class="text-center py-8 text-on-surface-variant/50 text-sm">No leads</div>
-                {% endfor %}
-            </div>
-        </div>
-
-        <!-- 🟣 NEGOTIATION -->
-        <div class="min-w-[280px] flex-shrink-0">
-            <div class="bg-primary-container/20 rounded-t-xl p-3 border-b-2 border-primary-container">
-                <div class="flex justify-between items-center">
-                    <h3 class="font-bold text-primary-container flex items-center gap-2">
-                        <span class="w-3 h-3 rounded-full bg-primary-container"></span>
-                        NEGOTIATION
-                    </h3>
-                    <span class="bg-primary-fixed-dim text-primary-container text-xs px-2 py-1 rounded-full font-bold" id="count-NEGOTIATION">
-                        {{ pipeline_data.NEGOTIATION|length }}
-                    </span>
-                </div>
-            </div>
-            <div class="bg-primary-container/5 rounded-b-xl p-2 min-h-[400px] space-y-2" id="stage-NEGOTIATION">
-                {% for lead in pipeline_data.NEGOTIATION %}
-                <div class="lead-card bg-surface rounded-lg p-3 shadow-sm border border-outline-variant hover:shadow-md transition-all cursor-pointer"
-                     data-agent="{{ lead.assigned_to.id|default:'unassigned' }}"
-                     onclick="openLeadModal({{ lead.id }})">
-                    
-                    <div class="flex justify-between items-start mb-2">
-                        <h4 class="font-semibold text-sm text-on-surface">{{ lead.name }}</h4>
-                        {% if lead.priority == 'HOT' %}
-                            <span class="text-xs bg-error-container text-error px-2 py-0.5 rounded-full">🔥 HOT</span>
-                        {% endif %}
-                    </div>
-                    
-                    <p class="text-xs text-on-surface-variant mb-1 flex items-center gap-1">
-                        <span class="material-symbols-outlined text-xs">phone</span>
-                        {{ lead.phone }}
-                    </p>
-                    <p class="text-xs text-on-surface-variant mb-2 flex items-center gap-1">
-                        <span class="material-symbols-outlined text-xs">home</span>
-                        {{ lead.interest|default:"No property" }}
-                    </p>
-                    
-                    <div class="flex justify-between items-center">
-                        <span class="text-xs text-on-surface-variant">{{ lead.created_at|date:"d M" }}</span>
-                        {% if lead.assigned_to %}
-                            <span class="text-xs bg-surface-variant text-on-surface px-2 py-0.5 rounded flex items-center gap-1">
-                                <span class="material-symbols-outlined text-xs">person</span>
-                                {{ lead.assigned_to.name }}
-                            </span>
-                        {% endif %}
-                    </div>
-                </div>
-                {% empty %}
-                <div class="text-center py-8 text-on-surface-variant/50 text-sm">No leads</div>
-                {% endfor %}
-            </div>
-        </div>
-
-        <!-- 🟢 CLOSED -->
-        <div class="min-w-[280px] flex-shrink-0">
-            <div class="bg-secondary/10 rounded-t-xl p-3 border-b-2 border-secondary">
-                <div class="flex justify-between items-center">
-                    <h3 class="font-bold text-secondary flex items-center gap-2">
-                        <span class="w-3 h-3 rounded-full bg-secondary"></span>
-                        CLOSED
-                    </h3>
-                    <span class="bg-secondary-fixed text-secondary text-xs px-2 py-1 rounded-full font-bold" id="count-CLOSED">
-                        {{ pipeline_data.CLOSED|length }}
-                    </span>
-                </div>
-            </div>
-            <div class="bg-secondary/5 rounded-b-xl p-2 min-h-[400px] space-y-2" id="stage-CLOSED">
-                {% for lead in pipeline_data.CLOSED %}
-                <div class="lead-card bg-surface rounded-lg p-3 shadow-sm border border-outline-variant hover:shadow-md transition-all cursor-pointer opacity-75"
-                     data-agent="{{ lead.assigned_to.id|default:'unassigned' }}"
-                     onclick="openLeadModal({{ lead.id }})">
-                    
-                    <div class="flex justify-between items-start mb-2">
-                        <h4 class="font-semibold text-sm text-on-surface">{{ lead.name }}</h4>
-                        <span class="text-xs bg-secondary-fixed text-secondary px-2 py-0.5 rounded-full flex items-center gap-1">
-                            <span class="material-symbols-outlined text-xs">check_circle</span>
-                            WON
+                    <div class="flex gap-2">
+                        <span class="bg-surface px-3 py-1 rounded-lg text-sm font-semibold text-on-surface border border-outline-variant">
+                            {{ data.total }} Leads
                         </span>
                     </div>
-                    
-                    <p class="text-xs text-on-surface-variant mb-1 flex items-center gap-1">
-                        <span class="material-symbols-outlined text-xs">phone</span>
-                        {{ lead.phone }}
-                    </p>
-                    <p class="text-xs text-on-surface-variant mb-2 flex items-center gap-1">
-                        <span class="material-symbols-outlined text-xs">home</span>
-                        {{ lead.interest|default:"No property" }}
-                    </p>
-                    
-                    <div class="flex justify-between items-center">
-                        <span class="text-xs text-on-surface-variant">{{ lead.created_at|date:"d M" }}</span>
-                        {% if lead.assigned_to %}
-                            <span class="text-xs bg-surface-variant text-on-surface px-2 py-0.5 rounded flex items-center gap-1">
-                                <span class="material-symbols-outlined text-xs">person</span>
-                                {{ lead.assigned_to.name }}
+                </div>
+            </div>
+
+            <!-- Kanban Board -->
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-6 gap-4">
+                {% for stage_name, leads in data.stages.items %}
+                <div class="bg-surface-container rounded-xl border border-outline-variant shadow-sm flex flex-col max-h-[600px]">
+                    <!-- Stage Header -->
+                    <div class="p-3 border-b border-outline-variant bg-surface-container-high rounded-t-xl">
+                        <div class="flex justify-between items-center">
+                            <h3 class="text-sm font-bold text-on-surface flex items-center gap-2">
+                                {% if stage_name == 'NEW' %}
+                                    <span class="w-2 h-2 rounded-full bg-info"></span>
+                                {% elif stage_name == 'CONTACTED' %}
+                                    <span class="w-2 h-2 rounded-full bg-primary"></span>
+                                {% elif stage_name == 'VISIT' %}
+                                    <span class="w-2 h-2 rounded-full bg-tertiary"></span>
+                                {% elif stage_name == 'NEGOTIATION' %}
+                                    <span class="w-2 h-2 rounded-full bg-warning"></span>
+                                {% elif stage_name == 'CLOSED' %}
+                                    <span class="w-2 h-2 rounded-full bg-success"></span>
+                                {% elif stage_name == 'FAILED' %}
+                                    <span class="w-2 h-2 rounded-full bg-error"></span>
+                                {% endif %}
+                                {{ stage_name }}
+                            </h3>
+                            <span class="text-xs font-bold bg-surface text-on-surface-variant px-2 py-0.5 rounded-full">
+                                {{ leads|length }}
                             </span>
-                        {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Leads List -->
+                    <div class="p-2 overflow-y-auto flex-1 space-y-2">
+                        {% for lead in leads %}
+                        <div class="bg-surface rounded-lg p-3 border border-outline-variant hover:border-primary transition-all cursor-pointer group"
+                             onclick="window.location.href='{% url 'builder:lead_detail' lead.id %}'">
+                            
+                            <!-- Lead Priority & Status -->
+                            <div class="flex justify-between items-start mb-2">
+                                <span class="text-xs font-mono text-on-surface-variant">#{{ lead.id }}</span>
+                                {% if lead.priority == 'HOT' %}
+                                    <span class="text-xs bg-error-container text-on-error px-1.5 py-0.5 rounded font-bold">🔥 HOT</span>
+                                {% elif lead.priority == 'WARM' %}
+                                    <span class="text-xs bg-warning-container text-on-warning px-1.5 py-0.5 rounded font-bold">WARM</span>
+                                {% elif lead.priority == 'COLD' %}
+                                    <span class="text-xs bg-surface-variant text-on-surface-variant px-1.5 py-0.5 rounded font-bold">COLD</span>
+                                {% endif %}
+                            </div>
+
+                            <!-- Lead Name & Contact -->
+                            <h4 class="text-sm font-bold text-on-surface mb-1 truncate">{{ lead.name }}</h4>
+                            <div class="flex items-center gap-1 text-xs text-on-surface-variant mb-1">
+                                <span class="material-symbols-outlined text-[14px]">phone</span>
+                                {{ lead.phone|default:"N/A" }}
+                            </div>
+                            {% if lead.email %}
+                            <div class="flex items-center gap-1 text-xs text-on-surface-variant mb-1">
+                                <span class="material-symbols-outlined text-[14px]">email</span>
+                                <span class="truncate">{{ lead.email }}</span>
+                            </div>
+                            {% endif %}
+
+                            <!-- Property Info -->
+                            {% with props=lead.properties.all %}
+                            {% if props %}
+                            <div class="flex items-center gap-1 text-xs text-primary mb-2">
+                                <span class="material-symbols-outlined text-[14px]">apartment</span>
+                                <span class="truncate">
+                                    {% for p in props|slice:":1" %}{{ p.title|default:p.address|truncatechars:25 }}{% endfor %}
+                                    {% if props|length > 1 %}+{{ props|length|add:"-1" }} more{% endif %}
+                                </span>
+                            </div>
+                            {% endif %}
+                            {% endwith %}
+
+                            <!-- Budget & Source -->
+                            <div class="flex justify-between items-center text-xs mt-2 pt-2 border-t border-outline-variant">
+                                <span class="text-on-surface-variant">
+                                    {% if lead.budget_min or lead.budget_max %}
+                                        ₹{{ lead.budget_min|default:"0"|intcomma }} - ₹{{ lead.budget_max|default:"0"|intcomma }}
+                                    {% else %}
+                                        Budget N/A
+                                    {% endif %}
+                                </span>
+                                <span class="text-on-surface-variant">{{ lead.source|default:"Organic"|truncatechars:12 }}</span>
+                            </div>
+
+                            <!-- Last Updated -->
+                            <div class="text-[10px] text-on-surface-variant mt-1 text-right">
+                                {{ lead.updated_at|naturaltime }}
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="text-center py-8 text-on-surface-variant text-sm">
+                            <span class="material-symbols-outlined text-3xl mb-2 opacity-50">inbox</span>
+                            <p>No leads in {{ stage_name }}</p>
+                        </div>
+                        {% endfor %}
                     </div>
                 </div>
-                {% empty %}
-                <div class="text-center py-8 text-on-surface-variant/50 text-sm">No leads</div>
                 {% endfor %}
+            </div>
+        {% endfor %}
+        
+        {% if unassigned.total > 0 %}
+            <!-- Unassigned Header -->
+            <div class="bg-error-container rounded-xl p-4 mt-6 border border-error shadow-sm">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-error flex items-center justify-center">
+                        <span class="material-symbols-outlined text-on-error">warning</span>
+                    </div>
+                    <div>
+                        <h2 class="text-lg font-bold text-on-error-container">Unassigned Leads</h2>
+                        <p class="text-sm text-on-error-container opacity-80">{{ unassigned.total }} leads need assignment</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Unassigned Kanban Board -->
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-6 gap-4 mt-4">
+                {% for stage_name, leads in unassigned.stages.items %}
+                <div class="bg-surface-container rounded-xl border border-outline-variant shadow-sm flex flex-col max-h-[600px]">
+                    <!-- Stage Header -->
+                    <div class="p-3 border-b border-outline-variant bg-surface-container-high rounded-t-xl">
+                        <div class="flex justify-between items-center">
+                            <h3 class="text-sm font-bold text-on-surface flex items-center gap-2">
+                                {% if stage_name == 'NEW' %}
+                                    <span class="w-2 h-2 rounded-full bg-info"></span>
+                                {% elif stage_name == 'CONTACTED' %}
+                                    <span class="w-2 h-2 rounded-full bg-primary"></span>
+                                {% elif stage_name == 'VISIT' %}
+                                    <span class="w-2 h-2 rounded-full bg-tertiary"></span>
+                                {% elif stage_name == 'NEGOTIATION' %}
+                                    <span class="w-2 h-2 rounded-full bg-warning"></span>
+                                {% elif stage_name == 'CLOSED' %}
+                                    <span class="w-2 h-2 rounded-full bg-success"></span>
+                                {% elif stage_name == 'FAILED' %}
+                                    <span class="w-2 h-2 rounded-full bg-error"></span>
+                                {% endif %}
+                                {{ stage_name }}
+                            </h3>
+                            <span class="text-xs font-bold bg-surface text-on-surface-variant px-2 py-0.5 rounded-full">
+                                {{ leads|length }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Leads List -->
+                    <div class="p-2 overflow-y-auto flex-1 space-y-2">
+                        {% for lead in leads %}
+                        <div class="bg-surface rounded-lg p-3 border border-error-container hover:border-error transition-all cursor-pointer group relative"
+                             onclick="window.location.href='{% url 'builder:lead_detail' lead.id %}'">
+                            
+                            <!-- Assign Button Overlay -->
+                            <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <a href="{% url 'builder:assign_lead' lead.id %}" 
+                                   class="bg-primary text-on-primary text-xs px-2 py-1 rounded font-bold"
+                                   onclick="event.stopPropagation()">
+                                    Assign
+                                </a>
+                            </div>
+
+                            <!-- Lead Priority -->
+                            <div class="flex justify-between items-start mb-2">
+                                <span class="text-xs font-mono text-on-surface-variant">#{{ lead.id }}</span>
+                                {% if lead.priority == 'HOT' %}
+                                    <span class="text-xs bg-error-container text-on-error px-1.5 py-0.5 rounded font-bold">🔥 HOT</span>
+                                {% elif lead.priority == 'WARM' %}
+                                    <span class="text-xs bg-warning-container text-on-warning px-1.5 py-0.5 rounded font-bold">WARM</span>
+                                {% elif lead.priority == 'COLD' %}
+                                    <span class="text-xs bg-surface-variant text-on-surface-variant px-1.5 py-0.5 rounded font-bold">COLD</span>
+                                {% endif %}
+                            </div>
+
+                            <h4 class="text-sm font-bold text-on-surface mb-1 truncate">{{ lead.name }}</h4>
+                            <div class="flex items-center gap-1 text-xs text-on-surface-variant mb-1">
+                                <span class="material-symbols-outlined text-[14px]">phone</span>
+                                {{ lead.phone|default:"N/A" }}
+                            </div>
+                            {% if lead.email %}
+                            <div class="flex items-center gap-1 text-xs text-on-surface-variant mb-1">
+                                <span class="material-symbols-outlined text-[14px]">email</span>
+                                <span class="truncate">{{ lead.email }}</span>
+                            </div>
+                            {% endif %}
+
+                            <!-- Property Info -->
+                            {% with props=lead.properties.all %}
+                            {% if props %}
+                            <div class="flex items-center gap-1 text-xs text-primary mb-2">
+                                <span class="material-symbols-outlined text-[14px]">apartment</span>
+                                <span class="truncate">
+                                    {% for p in props|slice:":1" %}{{ p.title|default:p.address|truncatechars:25 }}{% endfor %}
+                                    {% if props|length > 1 %}+{{ props|length|add:"-1" }} more{% endif %}
+                                </span>
+                            </div>
+                            {% endif %}
+                            {% endwith %}
+
+                            <div class="flex justify-between items-center text-xs mt-2 pt-2 border-t border-outline-variant">
+                                <span class="text-on-surface-variant">
+                                    {% if lead.budget_min or lead.budget_max %}
+                                        ₹{{ lead.budget_min|default:"0"|intcomma }} - ₹{{ lead.budget_max|default:"0"|intcomma }}
+                                    {% else %}
+                                        Budget N/A
+                                    {% endif %}
+                                </span>
+                                <span class="text-on-surface-variant">{{ lead.source|default:"Organic"|truncatechars:12 }}</span>
+                            </div>
+
+                            <div class="text-[10px] text-on-surface-variant mt-1 text-right">
+                                {{ lead.updated_at|naturaltime }}
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="text-center py-8 text-on-surface-variant text-sm">
+                            <span class="material-symbols-outlined text-3xl mb-2 opacity-50">inbox</span>
+                            <p>No leads in {{ stage_name }}</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- ===== INDIVIDUAL AGENT SECTIONS (For Tab Switching) ===== -->
+    {% for agent_id, data in agent_pipeline.items %}
+    <div id="section-{{ agent_id }}" class="agent-section hidden space-y-6">
+        <!-- Agent Header -->
+        <div class="bg-surface-container rounded-xl p-4 border border-outline-variant shadow-sm">
+            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center">
+                        <span class="material-symbols-outlined text-on-primary">person</span>
+                    </div>
+                    <div>
+                        <h2 class="text-lg font-bold text-on-surface">{{ data.agent.name }}</h2>
+                        <p class="text-sm text-on-surface-variant">{{ data.agent.user.email }}</p>
+                    </div>
+                    {% if data.hot > 0 %}
+                        <span class="bg-error-container text-on-error text-xs font-bold px-2 py-1 rounded-full">
+                            🔥 {{ data.hot }} Hot
+                        </span>
+                    {% endif %}
+                </div>
+                <div class="flex gap-2">
+                    <span class="bg-surface px-3 py-1 rounded-lg text-sm font-semibold text-on-surface border border-outline-variant">
+                        {{ data.total }} Leads
+                    </span>
+                </div>
             </div>
         </div>
 
-    </div>
+        <!-- Kanban Board -->
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-6 gap-4">
+            {% for stage_name, leads in data.stages.items %}
+            <div class="bg-surface-container rounded-xl border border-outline-variant shadow-sm flex flex-col max-h-[600px]">
+                <!-- Stage Header -->
+                <div class="p-3 border-b border-outline-variant bg-surface-container-high rounded-t-xl">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-sm font-bold text-on-surface flex items-center gap-2">
+                            {% if stage_name == 'NEW' %}
+                                <span class="w-2 h-2 rounded-full bg-info"></span>
+                            {% elif stage_name == 'CONTACTED' %}
+                                <span class="w-2 h-2 rounded-full bg-primary"></span>
+                            {% elif stage_name == 'VISIT' %}
+                                <span class="w-2 h-2 rounded-full bg-tertiary"></span>
+                            {% elif stage_name == 'NEGOTIATION' %}
+                                <span class="w-2 h-2 rounded-full bg-warning"></span>
+                            {% elif stage_name == 'CLOSED' %}
+                                <span class="w-2 h-2 rounded-full bg-success"></span>
+                            {% elif stage_name == 'FAILED' %}
+                                <span class="w-2 h-2 rounded-full bg-error"></span>
+                            {% endif %}
+                            {{ stage_name }}
+                        </h3>
+                        <span class="text-xs font-bold bg-surface text-on-surface-variant px-2 py-0.5 rounded-full">
+                            {{ leads|length }}
+                        </span>
+                    </div>
+                </div>
 
-    <!-- ===== RECENT ACTIVITY ===== -->
-    {% if recent_activities %}
-    <div class="bg-surface-container rounded-xl shadow-sm border border-outline-variant p-4">
-        <h3 class="font-bold text-on-surface mb-3 text-sm flex items-center gap-2">
-            <span class="material-symbols-outlined text-sm">history</span>
-            Recent Activity
-        </h3>
-        <div class="space-y-2 max-h-48 overflow-y-auto">
-            {% for activity in recent_activities %}
-            <div class="flex items-center gap-3 text-sm p-2 hover:bg-surface-variant rounded-lg transition">
-                <span class="text-on-surface-variant text-xs whitespace-nowrap">{{ activity.created_at|date:"d M H:i" }}</span>
-                <span class="text-on-surface flex-1">{{ activity.message }}</span>
-                {% if activity.created_by %}
-                    <span class="text-xs text-on-surface-variant whitespace-nowrap flex items-center gap-1">
-                        <span class="material-symbols-outlined text-xs">person</span>
-                        {{ activity.created_by.username }}
-                    </span>
-                {% endif %}
+                <!-- Leads List -->
+                <div class="p-2 overflow-y-auto flex-1 space-y-2">
+                    {% for lead in leads %}
+                    <div class="bg-surface rounded-lg p-3 border border-outline-variant hover:border-primary transition-all cursor-pointer group"
+                         onclick="window.location.href='{% url 'builder:lead_detail' lead.id %}'">
+                        
+                        <!-- Lead Priority & Status -->
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="text-xs font-mono text-on-surface-variant">#{{ lead.id }}</span>
+                            {% if lead.priority == 'HOT' %}
+                                <span class="text-xs bg-error-container text-on-error px-1.5 py-0.5 rounded font-bold">🔥 HOT</span>
+                            {% elif lead.priority == 'WARM' %}
+                                <span class="text-xs bg-warning-container text-on-warning px-1.5 py-0.5 rounded font-bold">WARM</span>
+                            {% elif lead.priority == 'COLD' %}
+                                <span class="text-xs bg-surface-variant text-on-surface-variant px-1.5 py-0.5 rounded font-bold">COLD</span>
+                            {% endif %}
+                        </div>
+
+                        <!-- Lead Name & Contact -->
+                        <h4 class="text-sm font-bold text-on-surface mb-1 truncate">{{ lead.name }}</h4>
+                        <div class="flex items-center gap-1 text-xs text-on-surface-variant mb-1">
+                            <span class="material-symbols-outlined text-[14px]">phone</span>
+                            {{ lead.phone|default:"N/A" }}
+                        </div>
+                        {% if lead.email %}
+                        <div class="flex items-center gap-1 text-xs text-on-surface-variant mb-1">
+                            <span class="material-symbols-outlined text-[14px]">email</span>
+                            <span class="truncate">{{ lead.email }}</span>
+                        </div>
+                        {% endif %}
+
+                        <!-- Property Info -->
+                        {% with props=lead.properties.all %}
+                        {% if props %}
+                        <div class="flex items-center gap-1 text-xs text-primary mb-2">
+                            <span class="material-symbols-outlined text-[14px]">apartment</span>
+                            <span class="truncate">
+                                {% for p in props|slice:":1" %}{{ p.title|default:p.address|truncatechars:25 }}{% endfor %}
+                                {% if props|length > 1 %}+{{ props|length|add:"-1" }} more{% endif %}
+                            </span>
+                        </div>
+                        {% endif %}
+                        {% endwith %}
+
+                        <!-- Budget & Source -->
+                        <div class="flex justify-between items-center text-xs mt-2 pt-2 border-t border-outline-variant">
+                            <span class="text-on-surface-variant">
+                                {% if lead.budget_min or lead.budget_max %}
+                                    ₹{{ lead.budget_min|default:"0"|intcomma }} - ₹{{ lead.budget_max|default:"0"|intcomma }}
+                                {% else %}
+                                    Budget N/A
+                                {% endif %}
+                            </span>
+                            <span class="text-on-surface-variant">{{ lead.source|default:"Organic"|truncatechars:12 }}</span>
+                        </div>
+
+                        <!-- Last Updated -->
+                        <div class="text-[10px] text-on-surface-variant mt-1 text-right">
+                            {{ lead.updated_at|naturaltime }}
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="text-center py-8 text-on-surface-variant text-sm">
+                        <span class="material-symbols-outlined text-3xl mb-2 opacity-50">inbox</span>
+                        <p>No leads in {{ stage_name }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endfor %}
+
+    <!-- ===== UNASSIGNED SECTION (For Tab Switching) ===== -->
+    {% if unassigned.total > 0 %}
+    <div id="section-unassigned" class="agent-section hidden space-y-6">
+        <!-- Unassigned Header -->
+        <div class="bg-error-container rounded-xl p-4 border border-error shadow-sm">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-error flex items-center justify-center">
+                    <span class="material-symbols-outlined text-on-error">warning</span>
+                </div>
+                <div>
+                    <h2 class="text-lg font-bold text-on-error-container">Unassigned Leads</h2>
+                    <p class="text-sm text-on-error-container opacity-80">{{ unassigned.total }} leads need assignment</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Unassigned Kanban Board -->
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-6 gap-4">
+            {% for stage_name, leads in unassigned.stages.items %}
+            <div class="bg-surface-container rounded-xl border border-outline-variant shadow-sm flex flex-col max-h-[600px]">
+                <!-- Stage Header -->
+                <div class="p-3 border-b border-outline-variant bg-surface-container-high rounded-t-xl">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-sm font-bold text-on-surface flex items-center gap-2">
+                            {% if stage_name == 'NEW' %}
+                                <span class="w-2 h-2 rounded-full bg-info"></span>
+                            {% elif stage_name == 'CONTACTED' %}
+                                <span class="w-2 h-2 rounded-full bg-primary"></span>
+                            {% elif stage_name == 'VISIT' %}
+                                <span class="w-2 h-2 rounded-full bg-tertiary"></span>
+                            {% elif stage_name == 'NEGOTIATION' %}
+                                <span class="w-2 h-2 rounded-full bg-warning"></span>
+                            {% elif stage_name == 'CLOSED' %}
+                                <span class="w-2 h-2 rounded-full bg-success"></span>
+                            {% elif stage_name == 'FAILED' %}
+                                <span class="w-2 h-2 rounded-full bg-error"></span>
+                            {% endif %}
+                            {{ stage_name }}
+                        </h3>
+                        <span class="text-xs font-bold bg-surface text-on-surface-variant px-2 py-0.5 rounded-full">
+                            {{ leads|length }}
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Leads List -->
+                <div class="p-2 overflow-y-auto flex-1 space-y-2">
+                    {% for lead in leads %}
+                    <div class="bg-surface rounded-lg p-3 border border-error-container hover:border-error transition-all cursor-pointer group relative"
+                         onclick="window.location.href='{% url 'builder:lead_detail' lead.id %}'">
+                        
+                        <!-- Assign Button Overlay -->
+                        <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <a href="{% url 'builder:assign_lead' lead.id %}" 
+                               class="bg-primary text-on-primary text-xs px-2 py-1 rounded font-bold"
+                               onclick="event.stopPropagation()">
+                                Assign
+                            </a>
+                        </div>
+
+                        <!-- Lead Priority -->
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="text-xs font-mono text-on-surface-variant">#{{ lead.id }}</span>
+                            {% if lead.priority == 'HOT' %}
+                                <span class="text-xs bg-error-container text-on-error px-1.5 py-0.5 rounded font-bold">🔥 HOT</span>
+                            {% elif lead.priority == 'WARM' %}
+                                <span class="text-xs bg-warning-container text-on-warning px-1.5 py-0.5 rounded font-bold">WARM</span>
+                            {% elif lead.priority == 'COLD' %}
+                                <span class="text-xs bg-surface-variant text-on-surface-variant px-1.5 py-0.5 rounded font-bold">COLD</span>
+                            {% endif %}
+                        </div>
+
+                        <h4 class="text-sm font-bold text-on-surface mb-1 truncate">{{ lead.name }}</h4>
+                        <div class="flex items-center gap-1 text-xs text-on-surface-variant mb-1">
+                            <span class="material-symbols-outlined text-[14px]">phone</span>
+                            {{ lead.phone|default:"N/A" }}
+                        </div>
+                        {% if lead.email %}
+                        <div class="flex items-center gap-1 text-xs text-on-surface-variant mb-1">
+                            <span class="material-symbols-outlined text-[14px]">email</span>
+                            <span class="truncate">{{ lead.email }}</span>
+                        </div>
+                        {% endif %}
+
+                        <!-- Property Info -->
+                        {% with props=lead.properties.all %}
+                        {% if props %}
+                        <div class="flex items-center gap-1 text-xs text-primary mb-2">
+                            <span class="material-symbols-outlined text-[14px]">apartment</span>
+                            <span class="truncate">
+                                {% for p in props|slice:":1" %}{{ p.title|default:p.address|truncatechars:25 }}{% endfor %}
+                                {% if props|length > 1 %}+{{ props|length|add:"-1" }} more{% endif %}
+                            </span>
+                        </div>
+                        {% endif %}
+                        {% endwith %}
+
+                        <div class="flex justify-between items-center text-xs mt-2 pt-2 border-t border-outline-variant">
+                            <span class="text-on-surface-variant">
+                                {% if lead.budget_min or lead.budget_max %}
+                                    ₹{{ lead.budget_min|default:"0"|intcomma }} - ₹{{ lead.budget_max|default:"0"|intcomma }}
+                                {% else %}
+                                    Budget N/A
+                                {% endif %}
+                            </span>
+                            <span class="text-on-surface-variant">{{ lead.source|default:"Organic"|truncatechars:12 }}</span>
+                        </div>
+
+                        <div class="text-[10px] text-on-surface-variant mt-1 text-right">
+                            {{ lead.updated_at|naturaltime }}
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="text-center py-8 text-on-surface-variant text-sm">
+                        <span class="material-symbols-outlined text-3xl mb-2 opacity-50">inbox</span>
+                        <p>No leads in {{ stage_name }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
             </div>
             {% endfor %}
         </div>
@@ -353,43 +576,45 @@
 
 </div>
 
-<!-- ===== JAVASCRIPT ===== -->
+<!-- ===== JAVASCRIPT FOR TAB SWITCHING ===== -->
 <script>
-// Agent Filter Function
-function filterByAgent(agentId) {
-    // Update tab styles
-    document.querySelectorAll('.agent-tab').forEach(tab => {
-        if (tab.dataset.agent === agentId) {
-            tab.classList.remove('bg-surface', 'text-on-surface');
-            tab.classList.add('bg-primary-container', 'text-on-primary');
-        } else {
+    function showAgent(agentId) {
+        // Sab sections hide karo
+        document.querySelectorAll('.agent-section').forEach(section => {
+            section.classList.add('hidden');
+        });
+        
+        // Selected section show karo
+        const selectedSection = document.getElementById('section-' + agentId);
+        if (selectedSection) {
+            selectedSection.classList.remove('hidden');
+        }
+        
+        // Sab tabs reset karo
+        document.querySelectorAll('.agent-tab').forEach(tab => {
             tab.classList.remove('bg-primary-container', 'text-on-primary');
             tab.classList.add('bg-surface', 'text-on-surface');
+        });
+        
+        // Active tab highlight karo
+        const activeTab = document.querySelector(`.agent-tab[data-agent="${agentId}"]`);
+        if (activeTab) {
+            activeTab.classList.remove('bg-surface', 'text-on-surface');
+            activeTab.classList.add('bg-primary-container', 'text-on-primary');
         }
-    });
+        
+        // URL hash update karo
+        window.location.hash = agentId;
+    }
     
-    // Filter lead cards
-    document.querySelectorAll('.lead-card').forEach(card => {
-        if (agentId === 'all' || card.dataset.agent === agentId) {
-            card.style.display = 'block';
+    // Page load pe hash check karo ya "all" show karo
+    document.addEventListener('DOMContentLoaded', function() {
+        const hash = window.location.hash.replace('#', '');
+        if (hash && document.getElementById('section-' + hash)) {
+            showAgent(hash);
         } else {
-            card.style.display = 'none';
+            showAgent('all');
         }
     });
-    
-    // Update counts per stage
-    const stages = ['NEW', 'CONTACTED', 'VISIT', 'NEGOTIATION', 'CLOSED'];
-    stages.forEach(stage => {
-        const container = document.getElementById('stage-' + stage);
-        const visibleCards = container.querySelectorAll('.lead-card[style*="display: block"], .lead-card:not([style*="display: none"])');
-        document.getElementById('count-' + stage).textContent = visibleCards.length;
-    });
-}
-
-// Open Lead Detail
-function openLeadModal(leadId) {
-    window.location.href = '/builder/leads/?lead=' + leadId;
-}
 </script>
-
 {% endblock %}
