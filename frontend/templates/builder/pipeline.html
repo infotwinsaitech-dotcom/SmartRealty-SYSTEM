@@ -126,7 +126,7 @@
                     <div class="p-2 overflow-y-auto flex-1 space-y-2">
                         {% for lead in leads %}
                         <div class="bg-surface rounded-lg p-3 border border-outline-variant hover:border-primary transition-all cursor-pointer group"
-                             onclick="window.location.href='{% url 'builder:lead_detail' lead.id %}'">
+                             onclick="window.location.href='{% url 'lead_detail_api' lead.id %}'">
                             
                             <!-- Lead Priority & Status -->
                             <div class="flex justify-between items-start mb-2">
@@ -242,7 +242,7 @@
                     <div class="p-2 overflow-y-auto flex-1 space-y-2">
                         {% for lead in leads %}
                         <div class="bg-surface rounded-lg p-3 border border-error-container hover:border-error transition-all cursor-pointer group relative"
-                             onclick="window.location.href='{% url 'builder:lead_detail' lead.id %}'">
+                             onclick="window.location.href='{% url 'lead_detail_api' lead.id %}'">
                             
                             <!-- Assign Button Overlay -->
                             <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -379,7 +379,7 @@
                 <div class="p-2 overflow-y-auto flex-1 space-y-2">
                     {% for lead in leads %}
                     <div class="bg-surface rounded-lg p-3 border border-outline-variant hover:border-primary transition-all cursor-pointer group"
-                         onclick="window.location.href='{% url 'builder:lead_detail' lead.id %}'">
+                         onclick="window.location.href='{% url 'lead_detail_api' lead.id %}'">
                         
                         <!-- Lead Priority & Status -->
                         <div class="flex justify-between items-start mb-2">
@@ -498,7 +498,7 @@
                 <div class="p-2 overflow-y-auto flex-1 space-y-2">
                     {% for lead in leads %}
                     <div class="bg-surface rounded-lg p-3 border border-error-container hover:border-error transition-all cursor-pointer group relative"
-                         onclick="window.location.href='{% url 'builder:lead_detail' lead.id %}'">
+                         onclick="window.location.href='{% url 'lead_detail_api' lead.id %}'">
                         
                         <!-- Assign Button Overlay -->
                         <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
