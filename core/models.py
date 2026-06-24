@@ -439,7 +439,10 @@ class Agent(models.Model):
         default=Decimal('0.00'),
         validators=[MinValueValidator(0), MaxValueValidator(5)]
     )
-    scheduler_enabled = models.BooleanField(default=True, help_text="Agent can toggle their scheduler")
+    scheduler_enabled = models.BooleanField(
+        default=True, 
+        help_text="Agent can toggle their scheduler"
+    )
 
     class Meta:
         ordering = ['-created_at']

@@ -3242,15 +3242,12 @@ def agent_profile(request):
     conversion_rate = round((closed_deals / total_deals * 100), 1) if total_deals else 0
     
     return render(request, "agent/profile.html", {
-        "agent": agent,  # IMPORTANT: Template mein chahiye
+        "agent": agent,
         "total_leads": total_leads,
         "hot_leads": hot_leads,
         "total_visits": total_visits,
         "conversion_rate": conversion_rate,
     })
-def get_settings():
-    return SiteSettings.get_settings()
-
 # ==================== SCHEDULER ====================
 
 @agent_required
@@ -3362,12 +3359,7 @@ def scheduler(request):
         "visits": visits,
         "edit_visit": edit_visit,
     })
-    # ========== FIX: edit_visit context mein pass karo ==========
-    return render(request, "agent/scheduler.html", {
-        "leads": leads,
-        "visits": visits,
-        "edit_visit": edit_visit,  # ← YEH ADD KARO
-    })
+
 @agent_required
 def toggle_scheduler(request):
     """Agent toggles their own scheduler on/off"""
@@ -3380,7 +3372,7 @@ def toggle_scheduler(request):
     status = "enabled" if agent.scheduler_enabled else "disabled"
     messages.success(request, f"Your scheduler has been {status}!")
     
-    return redirect("agent_profile")  # Ya jahan se toggle kiya
+    return redirect("agent_profile")
 
 @agent_required
 def property_leads(request, property_id):
