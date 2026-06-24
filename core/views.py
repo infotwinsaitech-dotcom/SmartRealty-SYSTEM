@@ -2091,40 +2091,81 @@ def remove_agent_from_builder(request, agent_id):
 # =============================================================================
 
 @builder_required
-def pipeline(request):
-    """Lead pipeline view"""
-    if request.method == "POST":
-        lead_id = request.POST.get("lead_id")
-        new_status = sanitize_input(request.POST.get("status"))
-        
-        if lead_id and lead_id.isdigit() and new_status:
-            lead = get_object_or_404(Lead, id=int(lead_id), builder=request.user)
-            old_status = lead.status
-            lead.status = new_status
-            lead.save()
-            
-            LeadActivity.objects.create(
-                lead=lead,
-                message=f"Status changed from {old_status} to {new_status}",
-                created_by=request.user
-            )
-            
-        return redirect("pipeline")
-
-    leads = Lead.objects.filter(
-        builder=request.user
-    ).select_related('assigned_to').prefetch_related('properties').order_by('-created_at')
-
-    return render(request, "builder/pipeline.html", {
-        "columns": [
-            ("NEW", leads.filter(status="NEW")),
-            ("CONTACTED", leads.filter(status="CONTACTED")),
-            ("VISIT", leads.filter(status="VISIT")),
-            ("NEGOTIATION", leads.filter(status="NEGOTIATION")),
-            ("CLOSED", leads.filter(status="CLOSED")),
-        ]
-    })
-
+def builder_pipeline(request):
+    """
+    Builder Pipeline - Sab agents ke leads stage-wise dikhao
+    Sirf logged-in builder ke agents aur unke leads
+    """
+    builder = request.user
+    
+    # Step 1: Builder ke saare agents lao
+    agents = Agent.objects.filter(
+        builders=builder,
+        is_active=True
+    ).select_related('user').prefetch_related('leads')
+    
+    # Step 2: Builder ke saare leads lao (kisi bhi agent ke)
+    # Yeh critical hai - sirf is builder ke leads, kisi aur builder ke nahi
+    all_leads = Lead.objects.filter(
+        builder=builder
+    ).select_related('assigned_to').prefetch_related('properties').order_by('-updated_at')
+    
+    # Step 3: Stage-wise group karo
+    pipeline_data = {
+        'NEW': [],
+        'CONTACTED': [],
+        'VISIT': [],
+        'NEGOTIATION': [],
+        'CLOSED': [],
+        'FAILED': [],
+    }
+    
+    # Step 4: Agent-wise bhi group karo (sidebar/filter ke liye)
+    agent_pipeline = {}
+    
+    for agent in agents:
+        agent_leads = all_leads.filter(assigned_to=agent)
+        agent_pipeline[agent.id] = {
+            'agent': agent,
+            'total': agent_leads.count(),
+            'hot': agent_leads.filter(priority='HOT').count(),
+            'stages': {
+                'NEW': agent_leads.filter(status='NEW'),
+                'CONTACTED': agent_leads.filter(status='CONTACTED'),
+                'VISIT': agent_leads.filter(status='VISIT'),
+                'NEGOTIATION': agent_leads.filter(status='NEGOTIATION'),
+                'CLOSED': agent_leads.filter(status='CLOSED'),
+                'FAILED': agent_leads.filter(status='FAILED'),
+            }
+        }
+    
+    # Step 5: Overall pipeline (sab agents mila ke)
+    for status in pipeline_data.keys():
+        pipeline_data[status] = all_leads.filter(status=status)
+    
+    # Step 6: Stats
+    total_leads = all_leads.count()
+    hot_leads = all_leads.filter(priority='HOT').count()
+    total_closed = all_leads.filter(status='CLOSED').count()
+    conversion_rate = round((total_closed / total_leads * 100), 1) if total_leads else 0
+    
+    # Step 7: Recent activity (lead status changes)
+    recent_activities = LeadActivity.objects.filter(
+        lead__builder=builder
+    ).select_related('lead', 'created_by').order_by('-created_at')[:10]
+    
+    context = {
+        'pipeline_data': pipeline_data,           # Overall sab stages
+        'agent_pipeline': agent_pipeline,         # Agent-wise breakdown
+        'agents': agents,
+        'total_leads': total_leads,
+        'hot_leads': hot_leads,
+        'total_closed': total_closed,
+        'conversion_rate': conversion_rate,
+        'recent_activities': recent_activities,
+    }
+    
+    return render(request, "builder/pipeline.html", context)
 
 @login_required
 @require_POST

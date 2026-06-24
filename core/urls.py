@@ -142,6 +142,7 @@ urlpatterns = [
     path("get-messages-ajax/", views.get_messages_ajax, name="get_messages_ajax"),
     # urls.py
 path("agent/toggle-scheduler/", views.toggle_scheduler, name="toggle_scheduler"),
+path('pipeline/', views.builder_pipeline, name='builder_pipeline'),
 ]
 
 if settings.DEBUG:

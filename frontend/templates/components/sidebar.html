@@ -75,13 +75,11 @@
             <span class="material-symbols-outlined">trending_up</span>
             Agent Performance
         </a>
-        <a href="{% url 'pipeline' %}"
-           class="mx-3 px-4 py-3 rounded-lg flex items-center gap-3 text-white hover:bg-blue-700
-           {% if request.resolver_match.url_name == 'pipeline' %} bg-blue-700 {% endif %}">
-            <span class="material-symbols-outlined">account_tree</span>
-            Pipeline
-        </a>
-
+        <a href="{% url 'builder_pipeline' %}" 
+   class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-surface-variant transition-colors {% if request.resolver_match.url_name == 'builder_pipeline' %}bg-surface-variant text-primary{% endif %}">
+    <span class="material-symbols-outlined">account_tree</span>
+    <span class="font-medium">Pipeline</span>
+</a>
         <a href="{% url 'analytics' %}"
            class="mx-3 px-4 py-3 rounded-lg flex items-center gap-3 text-white hover:bg-blue-700
            {% if request.resolver_match.url_name == 'analytics' %} bg-blue-700 {% endif %}">

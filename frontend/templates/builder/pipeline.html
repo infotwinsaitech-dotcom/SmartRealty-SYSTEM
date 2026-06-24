@@ -1,204 +1,387 @@
-{% extends "builder/base.html" %}
+{% extends "agent/base.html" %}
+{% load static %}
+{% block title %}Pipeline | Builder{% endblock %}
+
 {% block content %}
+<div class="p-4 md:p-6 bg-gray-100 min-h-screen">
 
-<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
-
-<main class="min-h-screen bg-surface p-4 md:p-6 overflow-x-auto">
-
-<!-- MOBILE NOTE -->
-<p class="text-xs text-gray-500 mb-3 md:hidden">
-    👉 Swipe horizontally to view pipeline
-</p>
-
-<div class="flex gap-4 md:gap-6 min-w-max">
-
-{% for status, leads in columns %}
-<div class="w-72 md:w-80 bg-white/70 backdrop-blur rounded-xl p-3 md:p-4 shadow-sm flex-shrink-0">
-
-    <!-- HEADER -->
-    <h3 class="font-bold mb-3 md:mb-4 text-xs md:text-sm uppercase text-gray-700">
-        {{ status }}
-    </h3>
-
-    <!-- COLUMN -->
-    <div class="space-y-3 md:space-y-4 min-h-[150px] md:min-h-[200px] pipeline-column"
-         data-status="{{ status }}">
-
-        {% for lead in leads %}
-        <div class="bg-white p-3 md:p-4 rounded-xl shadow cursor-pointer hover:shadow-md transition"
-             data-id="{{ lead.id }}"
-             onclick="openModal({{ lead.id }})">
-
-            <h4 class="font-semibold text-sm md:text-base">{{ lead.name }}</h4>
-
-            <p class="text-[11px] md:text-xs text-gray-500">{{ lead.phone }}</p>
-
-            <p class="text-[10px] md:text-xs text-gray-400">
-                {{ lead.agent|default:"No Agent" }}
-            </p>
-
-            <!-- PRIORITY -->
-            <span class="inline-block mt-2 text-[10px] md:text-xs px-2 py-1 rounded
-            {% if lead.priority == 'HOT' %}bg-red-100 text-red-600
-            {% elif lead.priority == 'WARM' %}bg-yellow-100 text-yellow-600
-            {% else %}bg-blue-100 text-blue-600{% endif %}">
-                {{ lead.priority }}
-            </span>
-
+    <!-- ===== HEADER ===== -->
+    <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6">
+        <div>
+            <h1 class="text-2xl md:text-3xl font-bold text-gray-800">📊 Sales Pipeline</h1>
+            <p class="text-sm text-gray-500 mt-1">Track all your agents' leads in real-time</p>
         </div>
-        {% endfor %}
+        
+        <!-- Quick Stats -->
+        <div class="flex gap-3">
+            <div class="bg-white px-4 py-2 rounded-lg shadow text-center">
+                <p class="text-xs text-gray-500">Total Leads</p>
+                <p class="text-xl font-bold text-blue-600">{{ total_leads }}</p>
+            </div>
+            <div class="bg-white px-4 py-2 rounded-lg shadow text-center">
+                <p class="text-xs text-gray-500">🔥 Hot</p>
+                <p class="text-xl font-bold text-red-500">{{ hot_leads }}</p>
+            </div>
+            <div class="bg-white px-4 py-2 rounded-lg shadow text-center">
+                <p class="text-xs text-gray-500">Closed</p>
+                <p class="text-xl font-bold text-green-600">{{ total_closed }}</p>
+            </div>
+            <div class="bg-white px-4 py-2 rounded-lg shadow text-center">
+                <p class="text-xs text-gray-500">Conversion</p>
+                <p class="text-xl font-bold text-purple-600">{{ conversion_rate }}%</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== AGENT FILTER TABS ===== -->
+    <div class="bg-white rounded-xl shadow mb-6 overflow-x-auto">
+        <div class="flex gap-2 p-3 min-w-max">
+            <button onclick="filterByAgent('all')" 
+                    class="agent-tab px-4 py-2 rounded-lg text-sm font-semibold bg-blue-600 text-white transition-all"
+                    data-agent="all">
+                👥 All Agents ({{ total_leads }})
+            </button>
+            {% for agent_id, data in agent_pipeline.items %}
+            <button onclick="filterByAgent('{{ agent_id }}')" 
+                    class="agent-tab px-4 py-2 rounded-lg text-sm font-semibold bg-gray-100 text-gray-600 hover:bg-gray-200 transition-all"
+                    data-agent="{{ agent_id }}">
+                👤 {{ data.agent.name }} ({{ data.total }})
+                {% if data.hot > 0 %}
+                    <span class="ml-1 text-red-500">🔥{{ data.hot }}</span>
+                {% endif %}
+            </button>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- ===== KANBAN BOARD ===== -->
+    <div class="flex gap-4 overflow-x-auto pb-4 min-h-[500px]" id="pipeline-board">
+
+        <!-- 🔵 NEW -->
+        <div class="min-w-[280px] flex-shrink-0">
+            <div class="bg-blue-50 rounded-t-xl p-3 border-b-2 border-blue-500">
+                <div class="flex justify-between items-center">
+                    <h3 class="font-bold text-blue-800 flex items-center gap-2">
+                        <span class="w-3 h-3 rounded-full bg-blue-500"></span>
+                        NEW
+                    </h3>
+                    <span class="bg-blue-200 text-blue-800 text-xs px-2 py-1 rounded-full font-bold" id="count-NEW">
+                        {{ pipeline_data.NEW|length }}
+                    </span>
+                </div>
+            </div>
+            <div class="bg-blue-50/50 rounded-b-xl p-2 min-h-[400px] space-y-2" id="stage-NEW">
+                {% for lead in pipeline_data.NEW %}
+                <div class="lead-card bg-white p-3 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-all cursor-pointer"
+                     data-agent="{{ lead.assigned_to.id|default:'unassigned' }}"
+                     onclick="openLeadModal({{ lead.id }})">
+                    
+                    <div class="flex justify-between items-start mb-2">
+                        <h4 class="font-semibold text-sm text-gray-800">{{ lead.name }}</h4>
+                        {% if lead.priority == 'HOT' %}
+                            <span class="text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded-full">🔥 HOT</span>
+                        {% elif lead.priority == 'WARM' %}
+                            <span class="text-xs bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full">WARM</span>
+                        {% else %}
+                            <span class="text-xs bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full">COLD</span>
+                        {% endif %}
+                    </div>
+                    
+                    <p class="text-xs text-gray-500 mb-1">📞 {{ lead.phone }}</p>
+                    <p class="text-xs text-gray-500 mb-2">🏠 {{ lead.interest|default:"No property" }}</p>
+                    
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs text-gray-400">{{ lead.created_at|date:"d M" }}</span>
+                        {% if lead.assigned_to %}
+                            <span class="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded">
+                                👤 {{ lead.assigned_to.name }}
+                            </span>
+                        {% else %}
+                            <span class="text-xs bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded">Unassigned</span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% empty %}
+                <div class="text-center py-8 text-gray-400 text-sm">No leads</div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- 🟡 CONTACTED -->
+        <div class="min-w-[280px] flex-shrink-0">
+            <div class="bg-yellow-50 rounded-t-xl p-3 border-b-2 border-yellow-500">
+                <div class="flex justify-between items-center">
+                    <h3 class="font-bold text-yellow-800 flex items-center gap-2">
+                        <span class="w-3 h-3 rounded-full bg-yellow-500"></span>
+                        CONTACTED
+                    </h3>
+                    <span class="bg-yellow-200 text-yellow-800 text-xs px-2 py-1 rounded-full font-bold" id="count-CONTACTED">
+                        {{ pipeline_data.CONTACTED|length }}
+                    </span>
+                </div>
+            </div>
+            <div class="bg-yellow-50/50 rounded-b-xl p-2 min-h-[400px] space-y-2" id="stage-CONTACTED">
+                {% for lead in pipeline_data.CONTACTED %}
+                <div class="lead-card bg-white p-3 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-all cursor-pointer"
+                     data-agent="{{ lead.assigned_to.id|default:'unassigned' }}"
+                     onclick="openLeadModal({{ lead.id }})">
+                    
+                    <div class="flex justify-between items-start mb-2">
+                        <h4 class="font-semibold text-sm text-gray-800">{{ lead.name }}</h4>
+                        {% if lead.priority == 'HOT' %}
+                            <span class="text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded-full">🔥 HOT</span>
+                        {% endif %}
+                    </div>
+                    
+                    <p class="text-xs text-gray-500 mb-1">📞 {{ lead.phone }}</p>
+                    <p class="text-xs text-gray-500 mb-2">🏠 {{ lead.interest|default:"No property" }}</p>
+                    
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs text-gray-400">{{ lead.created_at|date:"d M" }}</span>
+                        {% if lead.assigned_to %}
+                            <span class="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded">
+                                👤 {{ lead.assigned_to.name }}
+                            </span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% empty %}
+                <div class="text-center py-8 text-gray-400 text-sm">No leads</div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- 🟠 VISIT -->
+        <div class="min-w-[280px] flex-shrink-0">
+            <div class="bg-orange-50 rounded-t-xl p-3 border-b-2 border-orange-500">
+                <div class="flex justify-between items-center">
+                    <h3 class="font-bold text-orange-800 flex items-center gap-2">
+                        <span class="w-3 h-3 rounded-full bg-orange-500"></span>
+                        SITE VISIT
+                    </h3>
+                    <span class="bg-orange-200 text-orange-800 text-xs px-2 py-1 rounded-full font-bold" id="count-VISIT">
+                        {{ pipeline_data.VISIT|length }}
+                    </span>
+                </div>
+            </div>
+            <div class="bg-orange-50/50 rounded-b-xl p-2 min-h-[400px] space-y-2" id="stage-VISIT">
+                {% for lead in pipeline_data.VISIT %}
+                <div class="lead-card bg-white p-3 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-all cursor-pointer"
+                     data-agent="{{ lead.assigned_to.id|default:'unassigned' }}"
+                     onclick="openLeadModal({{ lead.id }})">
+                    
+                    <div class="flex justify-between items-start mb-2">
+                        <h4 class="font-semibold text-sm text-gray-800">{{ lead.name }}</h4>
+                        {% if lead.priority == 'HOT' %}
+                            <span class="text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded-full">🔥 HOT</span>
+                        {% endif %}
+                    </div>
+                    
+                    <p class="text-xs text-gray-500 mb-1">📞 {{ lead.phone }}</p>
+                    <p class="text-xs text-gray-500 mb-2">🏠 {{ lead.interest|default:"No property" }}</p>
+                    
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs text-gray-400">{{ lead.created_at|date:"d M" }}</span>
+                        {% if lead.assigned_to %}
+                            <span class="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded">
+                                👤 {{ lead.assigned_to.name }}
+                            </span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% empty %}
+                <div class="text-center py-8 text-gray-400 text-sm">No leads</div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- 🟣 NEGOTIATION -->
+        <div class="min-w-[280px] flex-shrink-0">
+            <div class="bg-purple-50 rounded-t-xl p-3 border-b-2 border-purple-500">
+                <div class="flex justify-between items-center">
+                    <h3 class="font-bold text-purple-800 flex items-center gap-2">
+                        <span class="w-3 h-3 rounded-full bg-purple-500"></span>
+                        NEGOTIATION
+                    </h3>
+                    <span class="bg-purple-200 text-purple-800 text-xs px-2 py-1 rounded-full font-bold" id="count-NEGOTIATION">
+                        {{ pipeline_data.NEGOTIATION|length }}
+                    </span>
+                </div>
+            </div>
+            <div class="bg-purple-50/50 rounded-b-xl p-2 min-h-[400px] space-y-2" id="stage-NEGOTIATION">
+                {% for lead in pipeline_data.NEGOTIATION %}
+                <div class="lead-card bg-white p-3 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-all cursor-pointer"
+                     data-agent="{{ lead.assigned_to.id|default:'unassigned' }}"
+                     onclick="openLeadModal({{ lead.id }})">
+                    
+                    <div class="flex justify-between items-start mb-2">
+                        <h4 class="font-semibold text-sm text-gray-800">{{ lead.name }}</h4>
+                        {% if lead.priority == 'HOT' %}
+                            <span class="text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded-full">🔥 HOT</span>
+                        {% endif %}
+                    </div>
+                    
+                    <p class="text-xs text-gray-500 mb-1">📞 {{ lead.phone }}</p>
+                    <p class="text-xs text-gray-500 mb-2">🏠 {{ lead.interest|default:"No property" }}</p>
+                    
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs text-gray-400">{{ lead.created_at|date:"d M" }}</span>
+                        {% if lead.assigned_to %}
+                            <span class="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded">
+                                👤 {{ lead.assigned_to.name }}
+                            </span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% empty %}
+                <div class="text-center py-8 text-gray-400 text-sm">No leads</div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- 🟢 CLOSED -->
+        <div class="min-w-[280px] flex-shrink-0">
+            <div class="bg-green-50 rounded-t-xl p-3 border-b-2 border-green-500">
+                <div class="flex justify-between items-center">
+                    <h3 class="font-bold text-green-800 flex items-center gap-2">
+                        <span class="w-3 h-3 rounded-full bg-green-500"></span>
+                        CLOSED
+                    </h3>
+                    <span class="bg-green-200 text-green-800 text-xs px-2 py-1 rounded-full font-bold" id="count-CLOSED">
+                        {{ pipeline_data.CLOSED|length }}
+                    </span>
+                </div>
+            </div>
+            <div class="bg-green-50/50 rounded-b-xl p-2 min-h-[400px] space-y-2" id="stage-CLOSED">
+                {% for lead in pipeline_data.CLOSED %}
+                <div class="lead-card bg-white p-3 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-all cursor-pointer opacity-75"
+                     data-agent="{{ lead.assigned_to.id|default:'unassigned' }}"
+                     onclick="openLeadModal({{ lead.id }})">
+                    
+                    <div class="flex justify-between items-start mb-2">
+                        <h4 class="font-semibold text-sm text-gray-800">{{ lead.name }}</h4>
+                        <span class="text-xs bg-green-100 text-green-600 px-2 py-0.5 rounded-full">✅ WON</span>
+                    </div>
+                    
+                    <p class="text-xs text-gray-500 mb-1">📞 {{ lead.phone }}</p>
+                    <p class="text-xs text-gray-500 mb-2">🏠 {{ lead.interest|default:"No property" }}</p>
+                    
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs text-gray-400">{{ lead.created_at|date:"d M" }}</span>
+                        {% if lead.assigned_to %}
+                            <span class="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded">
+                                👤 {{ lead.assigned_to.name }}
+                            </span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% empty %}
+                <div class="text-center py-8 text-gray-400 text-sm">No leads</div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- 🔴 FAILED -->
+        <div class="min-w-[280px] flex-shrink-0">
+            <div class="bg-red-50 rounded-t-xl p-3 border-b-2 border-red-500">
+                <div class="flex justify-between items-center">
+                    <h3 class="font-bold text-red-800 flex items-center gap-2">
+                        <span class="w-3 h-3 rounded-full bg-red-500"></span>
+                        FAILED
+                    </h3>
+                    <span class="bg-red-200 text-red-800 text-xs px-2 py-1 rounded-full font-bold" id="count-FAILED">
+                        {{ pipeline_data.FAILED|length }}
+                    </span>
+                </div>
+            </div>
+            <div class="bg-red-50/50 rounded-b-xl p-2 min-h-[400px] space-y-2" id="stage-FAILED">
+                {% for lead in pipeline_data.FAILED %}
+                <div class="lead-card bg-white p-3 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-all cursor-pointer opacity-60"
+                     data-agent="{{ lead.assigned_to.id|default:'unassigned' }}"
+                     onclick="openLeadModal({{ lead.id }})">
+                    
+                    <div class="flex justify-between items-start mb-2">
+                        <h4 class="font-semibold text-sm text-gray-800">{{ lead.name }}</h4>
+                        <span class="text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded-full">❌ LOST</span>
+                    </div>
+                    
+                    <p class="text-xs text-gray-500 mb-1">📞 {{ lead.phone }}</p>
+                    <p class="text-xs text-gray-500 mb-2">🏠 {{ lead.interest|default:"No property" }}</p>
+                    
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs text-gray-400">{{ lead.created_at|date:"d M" }}</span>
+                        {% if lead.assigned_to %}
+                            <span class="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded">
+                                👤 {{ lead.assigned_to.name }}
+                            </span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% empty %}
+                <div class="text-center py-8 text-gray-400 text-sm">No leads</div>
+                {% endfor %}
+            </div>
+        </div>
 
     </div>
 
-</div>
-{% endfor %}
-
-</div>
-
-</main>
-
-<!-- ================= MODAL ================= -->
-<div id="leadModal"
-     class="fixed inset-0 bg-black/50 hidden items-end md:items-center justify-center z-50">
-
-    <!-- MOBILE: bottom sheet / DESKTOP: center -->
-    <div class="bg-white w-full md:w-[500px] p-5 md:p-6 rounded-t-2xl md:rounded-xl shadow-lg max-h-[90vh] overflow-y-auto">
-
-        <h2 class="text-lg md:text-xl font-bold mb-4">Lead Detail</h2>
-
-        <div id="modalContent" data-id=""></div>
-
-        <!-- NOTE -->
-        <textarea id="noteText" placeholder="Add note..."
-                  class="w-full border p-2 mt-3 rounded text-sm"></textarea>
-
-        <button onclick="addNote()"
-                class="bg-blue-600 text-white px-3 py-2 mt-2 rounded w-full text-sm">
-            Add Note
-        </button>
-
-        <button onclick="closeModal()"
-                class="mt-3 bg-red-500 text-white px-4 py-2 rounded w-full text-sm">
-            Close
-        </button>
-
+    <!-- ===== RECENT ACTIVITY ===== -->
+    <div class="mt-6 bg-white rounded-xl shadow p-4">
+        <h3 class="font-bold text-lg mb-3">🕐 Recent Activity</h3>
+        <div class="space-y-2 max-h-48 overflow-y-auto">
+            {% for activity in recent_activities %}
+            <div class="flex items-center gap-3 text-sm p-2 hover:bg-gray-50 rounded">
+                <span class="text-gray-400 text-xs">{{ activity.created_at|date:"d M H:i" }}</span>
+                <span class="text-gray-600">{{ activity.message }}</span>
+                {% if activity.created_by %}
+                    <span class="text-xs text-gray-400">by {{ activity.created_by.username }}</span>
+                {% endif %}
+            </div>
+            {% empty %}
+            <p class="text-gray-400 text-sm">No recent activity</p>
+            {% endfor %}
+        </div>
     </div>
 
 </div>
 
-<!-- ================= SCRIPT ================= -->
+<!-- ===== JAVASCRIPT ===== -->
 <script>
-
-/* ===== DRAG & DROP ===== */
-document.querySelectorAll('.pipeline-column').forEach(column => {
-    new Sortable(column, {
-        group: 'pipeline',
-        animation: 150,
-
-        onEnd: function (evt) {
-
-            let leadId = evt.item.dataset.id;
-            let newStatus = evt.to.dataset.status;
-
-            fetch("{% url 'update_lead_status' %}", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-CSRFToken": "{{ csrf_token }}"
-                },
-                body: JSON.stringify({
-                    lead_id: leadId,
-                    status: newStatus
-                })
-            });
-
+// Agent Filter Function
+function filterByAgent(agentId) {
+    // Update tab styles
+    document.querySelectorAll('.agent-tab').forEach(tab => {
+        if (tab.dataset.agent === agentId) {
+            tab.classList.remove('bg-gray-100', 'text-gray-600');
+            tab.classList.add('bg-blue-600', 'text-white');
+        } else {
+            tab.classList.remove('bg-blue-600', 'text-white');
+            tab.classList.add('bg-gray-100', 'text-gray-600');
         }
     });
-});
-
-/* ===== OPEN MODAL ===== */
-function openModal(id) {
-
-    fetch(`/builder/lead/${id}/`)
-    .then(res => res.json())
-    .then(data => {
-
-        document.getElementById("leadModal").classList.remove("hidden");
-        document.getElementById("modalContent").dataset.id = data.id;
-
-        let colorClass = "";
-
-        if(data.priority === "HOT"){
-            colorClass = "bg-red-100 text-red-600";
-        }else if(data.priority === "WARM"){
-            colorClass = "bg-yellow-100 text-yellow-600";
-        }else{
-            colorClass = "bg-blue-100 text-blue-600";
+    
+    // Filter lead cards
+    document.querySelectorAll('.lead-card').forEach(card => {
+        if (agentId === 'all' || card.dataset.agent === agentId) {
+            card.style.display = 'block';
+        } else {
+            card.style.display = 'none';
         }
-
-        document.getElementById("modalContent").innerHTML = `
-            <p><b>Name:</b> ${data.name}</p>
-            <p><b>Phone:</b> ${data.phone}</p>
-            <p><b>Source:</b> ${data.source}</p>
-            <p><b>Status:</b> ${data.status}</p>
-
-            <p class="mt-2"><b>Priority:</b>
-                <span class="px-2 py-1 rounded ${colorClass}">
-                    ${data.priority}
-                </span>
-            </p>
-
-            <select onchange="updatePriority(${data.id}, this.value)"
-                    class="border p-2 mt-3 w-full rounded">
-                <option value="HOT" ${data.priority === "HOT" ? "selected" : ""}>Hot</option>
-                <option value="WARM" ${data.priority === "WARM" ? "selected" : ""}>Warm</option>
-                <option value="COLD" ${data.priority === "COLD" ? "selected" : ""}>Cold</option>
-            </select>
-        `;
+    });
+    
+    // Update counts per stage
+    const stages = ['NEW', 'CONTACTED', 'VISIT', 'NEGOTIATION', 'CLOSED', 'FAILED'];
+    stages.forEach(stage => {
+        const container = document.getElementById('stage-' + stage);
+        const visibleCards = container.querySelectorAll('.lead-card[style*="display: block"], .lead-card:not([style*="display: none"])');
+        document.getElementById('count-' + stage).textContent = visibleCards.length;
     });
 }
 
-/* ===== CLOSE MODAL ===== */
-function closeModal(){
-    document.getElementById("leadModal").classList.add("hidden");
-}
-
-/* ===== ADD NOTE ===== */
-function addNote(){
-
-    let note = document.getElementById("noteText").value;
-    let leadId = document.getElementById("modalContent").dataset.id;
-
-    fetch("/add-note/", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "X-CSRFToken": "{{ csrf_token }}"
-        },
-        body: JSON.stringify({
-            lead_id: leadId,
-            note: note
-        })
-    });
-
-    document.getElementById("noteText").value = "";
-}
-
-/* ===== UPDATE PRIORITY ===== */
-function updatePriority(id, value){
-
-    fetch("/update-priority/", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "X-CSRFToken": "{{ csrf_token }}"
-        },
-        body: JSON.stringify({
-            lead_id: id,
-            priority: value
-        })
-    });
-
+// Open Lead Detail Modal (placeholder - aap apna modal bana sakte ho)
+function openLeadModal(leadId) {
+    // Aap yeh redirect kar sakte ho detail page pe
+    window.location.href = '/builder/leads/?lead=' + leadId;
 }
 </script>
 
