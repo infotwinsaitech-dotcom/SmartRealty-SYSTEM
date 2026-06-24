@@ -475,9 +475,6 @@ class Lead(models.Model):
         ('NEGOTIATION', 'Negotiation'),
         ('CLOSED', 'Closed'),
         ('FAILED', 'Failed'),
-        ('HOT', 'Hot'),
-        ('WARM', 'Warm'),
-        ('COLD', 'Cold'),
     ]
 
     PRIORITY_CHOICES = [

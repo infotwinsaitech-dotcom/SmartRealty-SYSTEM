@@ -335,7 +335,8 @@ def property_detail(request, id):
                 name=name,
                 email=email,
                 phone=phone,
-                status='HOT',
+                status='NEW',
+                priority='HOT', 
                 source='Website',
                 interest=property.title,
                 builder=property.builder,
@@ -2091,37 +2092,22 @@ def remove_agent_from_builder(request, agent_id):
 # =============================================================================
 @builder_required
 def builder_pipeline(request):
-    """
-    Builder Pipeline - Agent-wise lead stages
-    Har agent ka alag section, builder sab dekhe
-    """
     builder = request.user
     
-    # DEBUG: Check karo ki leads hain bhi ya nahi
-    all_builder_leads = Lead.objects.filter(builder=builder)
-    print(f"DEBUG: Total leads for builder {builder.username}: {all_builder_leads.count()}")
-    
-    # Step 1: Builder ke saare active agents lao
     agents = Agent.objects.filter(
         builders=builder,
         is_active=True
     ).select_related('user').order_by('name')
     
-    # Step 2: Har agent ka pipeline data banao
     agent_pipeline = {}
-    unassigned_leads = []
     
     for agent in agents:
-        # Agent ke leads (builder confirm karo)
         agent_leads = Lead.objects.filter(
             assigned_to=agent,
-            builder=builder  # SECURITY: Sirf is builder ke leads
+            builder=builder
         ).select_related('assigned_to').prefetch_related('properties').order_by('-updated_at')
         
-        # DEBUG
-        print(f"DEBUG: Agent {agent.name} has {agent_leads.count()} leads")
-        
-        # Stage-wise split
+        # ✅ Saare valid statuses + OTHER stage
         stages = {
             'NEW': list(agent_leads.filter(status='NEW')),
             'CONTACTED': list(agent_leads.filter(status='CONTACTED')),
@@ -2129,6 +2115,9 @@ def builder_pipeline(request):
             'NEGOTIATION': list(agent_leads.filter(status='NEGOTIATION')),
             'CLOSED': list(agent_leads.filter(status='CLOSED')),
             'FAILED': list(agent_leads.filter(status='FAILED')),
+            'OTHER': list(agent_leads.exclude(
+                status__in=['NEW', 'CONTACTED', 'VISIT', 'NEGOTIATION', 'CLOSED', 'FAILED']
+            )),
         }
         
         agent_pipeline[agent.id] = {
@@ -2138,7 +2127,7 @@ def builder_pipeline(request):
             'stages': stages,
         }
     
-    # Step 3: Unassigned leads (jinko koi agent nahi mila)
+    # Unassigned leads
     unassigned_leads = Lead.objects.filter(
         builder=builder,
         assigned_to__isnull=True
@@ -2151,13 +2140,15 @@ def builder_pipeline(request):
         'NEGOTIATION': list(unassigned_leads.filter(status='NEGOTIATION')),
         'CLOSED': list(unassigned_leads.filter(status='CLOSED')),
         'FAILED': list(unassigned_leads.filter(status='FAILED')),
+        'OTHER': list(unassigned_leads.exclude(
+            status__in=['NEW', 'CONTACTED', 'VISIT', 'NEGOTIATION', 'CLOSED', 'FAILED']
+        )),
     }
     
-    # Step 4: Overall stats
     all_leads = Lead.objects.filter(builder=builder)
     
     context = {
-        'agent_pipeline': agent_pipeline,      # Har agent ka data
+        'agent_pipeline': agent_pipeline,
         'unassigned': {
             'total': unassigned_leads.count(),
             'stages': unassigned_stages,
@@ -2172,7 +2163,6 @@ def builder_pipeline(request):
     }
     
     return render(request, "builder/pipeline.html", context)
-
 @login_required
 @require_POST
 def update_lead_status(request):
