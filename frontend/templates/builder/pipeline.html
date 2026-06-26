@@ -126,7 +126,7 @@
                     <div class="p-2 overflow-y-auto flex-1 space-y-2">
                         {% for lead in leads %}
                         <div class="bg-surface rounded-lg p-3 border border-outline-variant hover:border-primary transition-all cursor-pointer group"
-                             onclick="window.location.href='{% url 'lead_detail_api' lead.id %}'">
+                             onclick="window.location.href='{% url 'lead_management' %}?lead={{ lead.id }}'">
                             
                             <!-- Lead Priority & Status -->
                             <div class="flex justify-between items-start mb-2">
@@ -242,15 +242,15 @@
                     <div class="p-2 overflow-y-auto flex-1 space-y-2">
                         {% for lead in leads %}
                         <div class="bg-surface rounded-lg p-3 border border-error-container hover:border-error transition-all cursor-pointer group relative"
-                             onclick="window.location.href='{% url 'lead_detail_api' lead.id %}'">
+                             onclick="window.location.href='{% url 'lead_management' %}?lead={{ lead.id }}'">
                             
                             <!-- Assign Button Overlay -->
                             <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                <a href="{% url 'builder:assign_lead' lead.id %}" 
-                                   class="bg-primary text-on-primary text-xs px-2 py-1 rounded font-bold"
-                                   onclick="event.stopPropagation()">
-                                    Assign
-                                </a>
+                                <a href="{% url 'assign_property' %}?lead={{ lead.id }}" 
+   class="bg-primary text-on-primary text-xs px-2 py-1 rounded font-bold"
+   onclick="event.stopPropagation()">
+    Assign
+</a>
                             </div>
 
                             <!-- Lead Priority -->
@@ -379,7 +379,7 @@
                 <div class="p-2 overflow-y-auto flex-1 space-y-2">
                     {% for lead in leads %}
                     <div class="bg-surface rounded-lg p-3 border border-outline-variant hover:border-primary transition-all cursor-pointer group"
-                         onclick="window.location.href='{% url 'lead_detail_api' lead.id %}'">
+                         onclick="window.location.href='{% url 'lead_management' %}?lead={{ lead.id }}'">
                         
                         <!-- Lead Priority & Status -->
                         <div class="flex justify-between items-start mb-2">
@@ -498,7 +498,7 @@
                 <div class="p-2 overflow-y-auto flex-1 space-y-2">
                     {% for lead in leads %}
                     <div class="bg-surface rounded-lg p-3 border border-error-container hover:border-error transition-all cursor-pointer group relative"
-                         onclick="window.location.href='{% url 'lead_detail_api' lead.id %}'">
+                         onclick="window.location.href='{% url 'lead_management' %}?lead={{ lead.id }}'">
                         
                         <!-- Assign Button Overlay -->
                         <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
