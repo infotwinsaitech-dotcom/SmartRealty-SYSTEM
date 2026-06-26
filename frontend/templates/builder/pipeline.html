@@ -159,7 +159,7 @@
                             <div class="flex items-center gap-1 text-xs text-primary mb-2">
                                 <span class="material-symbols-outlined text-[14px]">apartment</span>
                                 <span class="truncate">
-                                    {% for p in props|slice:":1" %}{{ p.title|default:p.address|truncatechars:25 }}{% endfor %}
+                                    {% for p in props|slice:":1" %}{{ p.title|default:p.location|truncatechars:25 }}{% endfor %}
                                     {% if props|length > 1 %}+{{ props|length|add:"-1" }} more{% endif %}
                                 </span>
                             </div>
@@ -283,7 +283,7 @@
                             <div class="flex items-center gap-1 text-xs text-primary mb-2">
                                 <span class="material-symbols-outlined text-[14px]">apartment</span>
                                 <span class="truncate">
-                                    {% for p in props|slice:":1" %}{{ p.title|default:p.address|truncatechars:25 }}{% endfor %}
+                                    {% for p in props|slice:":1" %}{{ p.title|default:p.location|truncatechars:25 }}{% endfor %}
                                     {% if props|length > 1 %}+{{ props|length|add:"-1" }} more{% endif %}
                                 </span>
                             </div>
@@ -412,7 +412,7 @@
                         <div class="flex items-center gap-1 text-xs text-primary mb-2">
                             <span class="material-symbols-outlined text-[14px]">apartment</span>
                             <span class="truncate">
-                                {% for p in props|slice:":1" %}{{ p.title|default:p.address|truncatechars:25 }}{% endfor %}
+                                {% for p in props|slice:":1" %}{{ p.title|default:p.location|truncatechars:25 }}{% endfor %}
                                 {% if props|length > 1 %}+{{ props|length|add:"-1" }} more{% endif %}
                             </span>
                         </div>
@@ -539,7 +539,7 @@
                         <div class="flex items-center gap-1 text-xs text-primary mb-2">
                             <span class="material-symbols-outlined text-[14px]">apartment</span>
                             <span class="truncate">
-                                {% for p in props|slice:":1" %}{{ p.title|default:p.address|truncatechars:25 }}{% endfor %}
+                                {% for p in props|slice:":1" %}{{ p.title|default:p.location|truncatechars:25 }}{% endfor %}
                                 {% if props|length > 1 %}+{{ props|length|add:"-1" }} more{% endif %}
                             </span>
                         </div>
