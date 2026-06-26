@@ -237,17 +237,40 @@ class="mb-3 px-3 py-1.5 bg-red-100 text-red-600 rounded text-sm font-medium hove
 Clear Gallery
 </button>
 
-<!-- AMENITIES -->
-<label class="font-semibold mt-4 block text-sm">Amenities</label>
+<!-- ==================== DYNAMIC AMENITIES (CUSTOM ADD) ==================== -->
+<label class="font-semibold mt-4 block text-sm">Amenities <span class="text-gray-400 font-normal">(Type & press Enter to add custom)</span></label>
 
-<div class="grid grid-cols-2 gap-2 mb-3 text-sm">
-<label><input type="checkbox" name="amenities" value="Parking"> Parking</label>
-<label><input type="checkbox" name="amenities" value="Lift"> Lift</label>
-<label><input type="checkbox" name="amenities" value="Gym"> Gym</label>
-<label><input type="checkbox" name="amenities" value="Pool"> Pool</label>
-<label><input type="checkbox" name="amenities" value="Security"> Security</label>
-<label><input type="checkbox" name="amenities" value="Garden"> Garden</label>
+<!-- Predefined amenities as quick tags -->
+<div class="flex flex-wrap gap-2 mb-2" id="amenityTags">
+  <button type="button" onclick="toggleAmenityTag(this, 'Parking')" class="amenity-tag px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs border hover:bg-blue-100 hover:border-blue-300 transition">Parking</button>
+  <button type="button" onclick="toggleAmenityTag(this, 'Lift')" class="amenity-tag px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs border hover:bg-blue-100 hover:border-blue-300 transition">Lift</button>
+  <button type="button" onclick="toggleAmenityTag(this, 'Gym')" class="amenity-tag px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs border hover:bg-blue-100 hover:border-blue-300 transition">Gym</button>
+  <button type="button" onclick="toggleAmenityTag(this, 'Pool')" class="amenity-tag px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs border hover:bg-blue-100 hover:border-blue-300 transition">Pool</button>
+  <button type="button" onclick="toggleAmenityTag(this, 'Security')" class="amenity-tag px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs border hover:bg-blue-100 hover:border-blue-300 transition">Security</button>
+  <button type="button" onclick="toggleAmenityTag(this, 'Garden')" class="amenity-tag px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs border hover:bg-blue-100 hover:border-blue-300 transition">Garden</button>
+  <button type="button" onclick="toggleAmenityTag(this, 'Club House')" class="amenity-tag px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs border hover:bg-blue-100 hover:border-blue-300 transition">Club House</button>
+  <button type="button" onclick="toggleAmenityTag(this, 'Power Backup')" class="amenity-tag px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs border hover:bg-blue-100 hover:border-blue-300 transition">Power Backup</button>
+  <button type="button" onclick="toggleAmenityTag(this, 'Water Supply')" class="amenity-tag px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs border hover:bg-blue-100 hover:border-blue-300 transition">Water Supply</button>
+  <button type="button" onclick="toggleAmenityTag(this, 'CCTV')" class="amenity-tag px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs border hover:bg-blue-100 hover:border-blue-300 transition">CCTV</button>
+  <button type="button" onclick="toggleAmenityTag(this, 'Play Area')" class="amenity-tag px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs border hover:bg-blue-100 hover:border-blue-300 transition">Play Area</button>
+  <button type="button" onclick="toggleAmenityTag(this, 'Jogging Track')" class="amenity-tag px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs border hover:bg-blue-100 hover:border-blue-300 transition">Jogging Track</button>
 </div>
+
+<!-- Custom amenity input -->
+<div class="flex gap-2 mb-3">
+  <input type="text" id="customAmenityInput" placeholder="Type custom amenity & press Enter..."
+    class="flex-1 border p-2 rounded text-sm" onkeypress="handleAmenityKeypress(event)">
+  <button type="button" onclick="addCustomAmenity()"
+    class="px-4 py-2 bg-blue-600 text-white rounded text-sm font-medium hover:bg-blue-700 transition">+ Add</button>
+</div>
+
+<!-- Selected amenities display -->
+<div id="selectedAmenities" class="flex flex-wrap gap-2 mb-3 min-h-[30px]">
+  <!-- JS will populate this -->
+</div>
+
+<!-- Hidden inputs for form submission -->
+<div id="amenityHiddenInputs"></div>
 
 <input name="configuration" placeholder="2BHK, 3BHK"
 class="w-full mb-3 border p-2 rounded text-sm">
@@ -361,23 +384,43 @@ class="w-full mb-3 border p-2 rounded text-sm">
   </div>
 </div>
 
-<!-- NEARBY -->
-<label class="font-semibold block mb-2 text-sm">Nearby Places</label>
+<!-- ==================== DYNAMIC NEARBY PLACES (CUSTOM ADD) ==================== -->
+<label class="font-semibold block mb-2 text-sm">What's Nearby <span class="text-gray-400 font-normal">(Add places near your property)</span></label>
 
-<div id="nearby-container" class="space-y-2">
-
-<div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
-<input name="nearby_name" placeholder="Place" class="border p-2 rounded text-sm">
-<input name="nearby_distance" placeholder="Distance" class="border p-2 rounded text-sm">
-<input name="nearby_icon" placeholder="Icon" class="border p-2 rounded text-sm">
+<!-- Predefined nearby tags -->
+<div class="flex flex-wrap gap-2 mb-2" id="nearbyTags">
+  <button type="button" onclick="addNearbyFromTag('School', '0.5 km', 'school')" class="nearby-tag px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs border hover:bg-green-100 hover:border-green-300 transition">🏫 School</button>
+  <button type="button" onclick="addNearbyFromTag('Hospital', '1 km', 'local_hospital')" class="nearby-tag px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs border hover:bg-green-100 hover:border-green-300 transition">🏥 Hospital</button>
+  <button type="button" onclick="addNearbyFromTag('Metro Station', '2 km', 'train')" class="nearby-tag px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs border hover:bg-green-100 hover:border-green-300 transition">🚇 Metro</button>
+  <button type="button" onclick="addNearbyFromTag('Mall', '3 km', 'shopping_bag')" class="nearby-tag px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs border hover:bg-green-100 hover:border-green-300 transition">🛍️ Mall</button>
+  <button type="button" onclick="addNearbyFromTag('Airport', '10 km', 'flight')" class="nearby-tag px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs border hover:bg-green-100 hover:border-green-300 transition">✈️ Airport</button>
+  <button type="button" onclick="addNearbyFromTag('Railway Station', '5 km', 'directions_railway')" class="nearby-tag px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs border hover:bg-green-100 hover:border-green-300 transition">🚉 Railway</button>
+  <button type="button" onclick="addNearbyFromTag('Bus Stop', '0.2 km', 'directions_bus')" class="nearby-tag px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs border hover:bg-green-100 hover:border-green-300 transition">🚌 Bus Stop</button>
+  <button type="button" onclick="addNearbyFromTag('Park', '1 km', 'park')" class="nearby-tag px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs border hover:bg-green-100 hover:border-green-300 transition">🌳 Park</button>
+  <button type="button" onclick="addNearbyFromTag('Bank', '0.8 km', 'account_balance')" class="nearby-tag px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs border hover:bg-green-100 hover:border-green-300 transition">🏦 Bank</button>
+  <button type="button" onclick="addNearbyFromTag('Restaurant', '0.3 km', 'restaurant')" class="nearby-tag px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs border hover:bg-green-100 hover:border-green-300 transition">🍽️ Restaurant</button>
+  <button type="button" onclick="addNearbyFromTag('ATM', '0.1 km', 'atm')" class="nearby-tag px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs border hover:bg-green-100 hover:border-green-300 transition">🏧 ATM</button>
+  <button type="button" onclick="addNearbyFromTag('Highway', '2 km', 'add_road')" class="nearby-tag px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs border hover:bg-green-100 hover:border-green-300 transition">🛣️ Highway</button>
 </div>
 
+<!-- Custom nearby input -->
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-2">
+  <input type="text" id="customNearbyName" placeholder="Place name (e.g. Big Bazaar)" class="border p-2 rounded text-sm">
+  <input type="text" id="customNearbyDistance" placeholder="Distance (e.g. 1.5 km)" class="border p-2 rounded text-sm">
+  <div class="flex gap-2">
+    <input type="text" id="customNearbyIcon" placeholder="Icon name" class="flex-1 border p-2 rounded text-sm">
+    <button type="button" onclick="addCustomNearby()"
+      class="px-4 py-2 bg-green-600 text-white rounded text-sm font-medium hover:bg-green-700 transition">+ Add</button>
+  </div>
 </div>
 
-<button type="button" onclick="addNearbyField()"
-class="mt-2 px-3 py-2 bg-green-600 text-white rounded text-sm">
-+ Add More Nearby
-</button>
+<!-- Selected nearby places display -->
+<div id="selectedNearby" class="space-y-2 mb-3">
+  <!-- JS will populate this -->
+</div>
+
+<!-- Hidden inputs for form submission -->
+<div id="nearbyHiddenInputs"></div>
 
 <!-- SALES HEAD NUMBER -->
 <input
@@ -397,6 +440,170 @@ Save Property
 
 <!-- JS -->
 <script>
+// ===================== AMENITIES SYSTEM =====================
+let selectedAmenities = [];
+
+function toggleAmenityTag(btn, amenity) {
+  if (selectedAmenities.includes(amenity)) {
+    // Remove
+    selectedAmenities = selectedAmenities.filter(a => a !== amenity);
+    btn.classList.remove('bg-blue-500', 'text-white', 'border-blue-500');
+    btn.classList.add('bg-gray-100', 'text-gray-700');
+  } else {
+    // Add
+    selectedAmenities.push(amenity);
+    btn.classList.remove('bg-gray-100', 'text-gray-700');
+    btn.classList.add('bg-blue-500', 'text-white', 'border-blue-500');
+  }
+  updateAmenityDisplay();
+}
+
+function handleAmenityKeypress(e) {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    addCustomAmenity();
+  }
+}
+
+function addCustomAmenity() {
+  const input = document.getElementById('customAmenityInput');
+  const value = input.value.trim();
+
+  if (!value) return;
+  if (selectedAmenities.includes(value)) {
+    input.value = '';
+    return;
+  }
+
+  selectedAmenities.push(value);
+  input.value = '';
+  updateAmenityDisplay();
+}
+
+function removeAmenity(amenity) {
+  selectedAmenities = selectedAmenities.filter(a => a !== amenity);
+
+  // Also uncheck the tag if it exists
+  const tags = document.querySelectorAll('.amenity-tag');
+  tags.forEach(tag => {
+    if (tag.textContent === amenity) {
+      tag.classList.remove('bg-blue-500', 'text-white', 'border-blue-500');
+      tag.classList.add('bg-gray-100', 'text-gray-700');
+    }
+  });
+
+  updateAmenityDisplay();
+}
+
+function updateAmenityDisplay() {
+  const container = document.getElementById('selectedAmenities');
+  const hiddenContainer = document.getElementById('amenityHiddenInputs');
+
+  container.innerHTML = '';
+  hiddenContainer.innerHTML = '';
+
+  selectedAmenities.forEach(amenity => {
+    // Show pill
+    const pill = document.createElement('div');
+    pill.className = 'flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs border border-blue-300';
+    pill.innerHTML = `
+      <span>${amenity}</span>
+      <button type="button" onclick="removeAmenity('${amenity}')" class="hover:text-red-500 font-bold ml-1">×</button>
+    `;
+    container.appendChild(pill);
+
+    // Hidden input for form
+    const hidden = document.createElement('input');
+    hidden.type = 'hidden';
+    hidden.name = 'amenities';
+    hidden.value = amenity;
+    hiddenContainer.appendChild(hidden);
+  });
+}
+
+// ===================== NEARBY PLACES SYSTEM =====================
+let nearbyPlaces = [];
+let nearbyCounter = 0;
+
+function addNearbyFromTag(name, distance, icon) {
+  addNearbyPlace(name, distance, icon);
+}
+
+function addCustomNearby() {
+  const nameInput = document.getElementById('customNearbyName');
+  const distanceInput = document.getElementById('customNearbyDistance');
+  const iconInput = document.getElementById('customNearbyIcon');
+
+  const name = nameInput.value.trim();
+  const distance = distanceInput.value.trim();
+  const icon = iconInput.value.trim() || 'place';
+
+  if (!name || !distance) {
+    alert('Please enter both place name and distance');
+    return;
+  }
+
+  addNearbyPlace(name, distance, icon);
+
+  // Clear inputs
+  nameInput.value = '';
+  distanceInput.value = '';
+  iconInput.value = '';
+}
+
+function addNearbyPlace(name, distance, icon) {
+  const id = nearbyCounter++;
+  nearbyPlaces.push({ id, name, distance, icon });
+  updateNearbyDisplay();
+}
+
+function removeNearby(id) {
+  nearbyPlaces = nearbyPlaces.filter(p => p.id !== id);
+  updateNearbyDisplay();
+}
+
+function updateNearbyDisplay() {
+  const container = document.getElementById('selectedNearby');
+  const hiddenContainer = document.getElementById('nearbyHiddenInputs');
+
+  container.innerHTML = '';
+  hiddenContainer.innerHTML = '';
+
+  nearbyPlaces.forEach(place => {
+    // Show card
+    const card = document.createElement('div');
+    card.className = 'flex items-center justify-between p-2 bg-green-50 border border-green-200 rounded-lg';
+    card.innerHTML = `
+      <div class="flex items-center gap-2">
+        <span class="material-icons text-green-600 text-sm">${place.icon}</span>
+        <span class="text-sm font-medium text-gray-800">${place.name}</span>
+        <span class="text-xs text-gray-500">— ${place.distance}</span>
+      </div>
+      <button type="button" onclick="removeNearby(${place.id})" class="text-red-400 hover:text-red-600 text-sm font-bold px-2">×</button>
+    `;
+    container.appendChild(card);
+
+    // Hidden inputs for form
+    const hiddenName = document.createElement('input');
+    hiddenName.type = 'hidden';
+    hiddenName.name = 'nearby_name';
+    hiddenName.value = place.name;
+    hiddenContainer.appendChild(hiddenName);
+
+    const hiddenDistance = document.createElement('input');
+    hiddenDistance.type = 'hidden';
+    hiddenDistance.name = 'nearby_distance';
+    hiddenDistance.value = place.distance;
+    hiddenContainer.appendChild(hiddenDistance);
+
+    const hiddenIcon = document.createElement('input');
+    hiddenIcon.type = 'hidden';
+    hiddenIcon.name = 'nearby_icon';
+    hiddenIcon.value = place.icon;
+    hiddenContainer.appendChild(hiddenIcon);
+  });
+}
+
 function openModal() {
 document.getElementById('propertyModal').classList.remove('hidden');
 }
@@ -600,6 +807,13 @@ document.addEventListener('DOMContentLoaded', function() {
   border-color: #3b82f6;
   background-color: #eff6ff;
   border-width: 4px;
+}
+
+/* Amenity tag selected state */
+.amenity-tag.selected {
+  background-color: #3b82f6 !important;
+  color: white !important;
+  border-color: #3b82f6 !important;
 }
 </style>
 
