@@ -64,8 +64,6 @@ User = get_user_model()
 # CONSTANTS
 # =============================================================================
 
-PAGE_SIZE = 20
-CACHE_TTL = 300  # 5 minutes
 OTP_EXPIRY_SECONDS = 300
 MAX_LOGIN_ATTEMPTS = 5
 MAX_OTP_ATTEMPTS = 3
@@ -127,7 +125,7 @@ OTP_WINDOW = 600  # 10 minutes
 
 
 # Call immediately on module import
-_#ensure_site_and_socialapp()
+#_ensure_site_and_socialapp()
 def sanitize_input(text):
     """Remove potentially dangerous HTML/JS from user input"""
     if not text:
