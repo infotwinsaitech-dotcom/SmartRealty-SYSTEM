@@ -64,52 +64,50 @@ class CoreConfig(AppConfig):
     def _init_social_app(self):
         if self._is_management_command():
             return
-        
-        import time
-        
-        # Retry 3 times with delay
-        for attempt in range(3):
-            try:
-                from django.contrib.sites.models import Site
-                from allauth.socialaccount.models import SocialApp
-                import os
-                
-                # 1. Ensure Site exists
-                site, _ = Site.objects.get_or_create(
-                    id=1,
-                    defaults={
-                        'domain': 'smartrealty-system.onrender.com',
-                        'name': 'SmartRealty'
-                    }
-                )
-                
-                # 2. STRONG CLEANUP: Delete ALL Google apps using raw SQL
-                from django.db import connection
-                with connection.cursor() as cursor:
-                    cursor.execute("DELETE FROM socialaccount_socialapp_sites WHERE socialapp_id IN (SELECT id FROM socialaccount_socialapp WHERE provider = 'google');")
-                    cursor.execute("DELETE FROM socialaccount_socialapp WHERE provider = 'google';")
-                    logger.info("[AUTO-SETUP] Deleted all Google SocialApps via raw SQL")
-                
-                # 3. Create FRESH
-                client_id = os.getenv('GOOGLE_CLIENT_ID', '').strip()
-                secret = os.getenv('GOOGLE_CLIENT_SECRET', '').strip()
-                
-                if client_id and secret:
-                    app = SocialApp.objects.create(
-                        provider='google',
-                        name='Google OAuth',
-                        client_id=client_id,
-                        secret=secret,
-                    )
-                    app.sites.add(site)
-                    logger.info("[AUTO-SETUP] Google SocialApp created fresh")
-                    return  # Success!
-                else:
-                    logger.warning("[AUTO-SETUP] Google credentials not set!")
-                    return
-                    
-            except Exception as e:
-                logger.error(f"[AUTO-SETUP] Attempt {attempt + 1} failed: {e}")
-                time.sleep(2)  # Wait before retry
-        
-        logger.error("[AUTO-SETUP] All attempts failed")
+
+        try:
+            from django.contrib.sites.models import Site
+            from allauth.socialaccount.models import SocialApp
+            import os
+
+            # 1. Ensure Site exists
+            site, _ = Site.objects.get_or_create(
+                id=1,
+                defaults={
+                    'domain': 'smartrealty-system.onrender.com',
+                    'name': 'SmartRealty'
+                }
+            )
+
+            client_id = os.getenv('GOOGLE_CLIENT_ID', '').strip()
+            secret = os.getenv('GOOGLE_CLIENT_SECRET', '').strip()
+
+            if not (client_id and secret):
+                logger.warning("[AUTO-SETUP] Google credentials not set!")
+                return
+
+            # BUG FIX: the old code did a raw-SQL DELETE of every Google
+            # SocialApp followed by a fresh CREATE, every single time this
+            # ready() hook ran. With multiple gunicorn workers all booting
+            # at once on every deploy/restart, each worker raced to delete
+            # and recreate the same row at the same time — this caused
+            # intermittent "SocialApp matching query does not exist" / DB
+            # lock errors on "Continue with Google" right after a deploy.
+            # update_or_create is idempotent: if the row already has the
+            # right credentials nothing changes; if it's missing or stale,
+            # it's fixed in place without ever deleting it first.
+            app, created = SocialApp.objects.update_or_create(
+                provider='google',
+                defaults={
+                    'name': 'Google OAuth',
+                    'client_id': client_id,
+                    'secret': secret,
+                }
+            )
+            if not app.sites.filter(pk=site.pk).exists():
+                app.sites.add(site)
+
+            logger.info(f"[AUTO-SETUP] Google SocialApp {'created' if created else 'verified'}")
+
+        except Exception as e:
+            logger.error(f"[AUTO-SETUP] SocialApp setup failed: {e}")

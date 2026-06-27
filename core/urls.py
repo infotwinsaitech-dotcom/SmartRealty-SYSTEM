@@ -143,6 +143,7 @@ urlpatterns = [
     # urls.py
 path("agent/toggle-scheduler/", views.toggle_scheduler, name="toggle_scheduler"),
 path('pipeline/', views.builder_pipeline, name='builder_pipeline'),
+path('accounts/', include('allauth.urls')),
 ]
 
 if settings.DEBUG:
