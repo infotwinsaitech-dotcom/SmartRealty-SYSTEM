@@ -86,16 +86,20 @@ class CoreConfig(AppConfig):
                 logger.warning("[AUTO-SETUP] Google credentials not set!")
                 return
 
-            # BUG FIX: the old code did a raw-SQL DELETE of every Google
-            # SocialApp followed by a fresh CREATE, every single time this
-            # ready() hook ran. With multiple gunicorn workers all booting
-            # at once on every deploy/restart, each worker raced to delete
-            # and recreate the same row at the same time — this caused
-            # intermittent "SocialApp matching query does not exist" / DB
-            # lock errors on "Continue with Google" right after a deploy.
-            # update_or_create is idempotent: if the row already has the
-            # right credentials nothing changes; if it's missing or stale,
-            # it's fixed in place without ever deleting it first.
+            # SELF-HEAL: earlier buggy code could have left duplicate
+            # SocialApp rows for 'google' in the database (race condition
+            # across multiple gunicorn workers). update_or_create() crashes
+            # with MultipleObjectsReturned if more than one row already
+            # exists, so clean that up first — keep the oldest row, delete
+            # the rest. This runs safely every boot; once duplicates are
+            # gone it's a no-op.
+            existing = SocialApp.objects.filter(provider='google').order_by('id')
+            if existing.count() > 1:
+                keep_id = existing.first().id
+                deleted_count = existing.exclude(id=keep_id).count()
+                existing.exclude(id=keep_id).delete()
+                logger.warning(f"[AUTO-SETUP] Removed {deleted_count} duplicate Google SocialApp row(s)")
+
             app, created = SocialApp.objects.update_or_create(
                 provider='google',
                 defaults={
