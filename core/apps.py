@@ -19,7 +19,7 @@ class CoreConfig(AppConfig):
         # 2. PostgreSQL optimization
         self._optimize_postgres()
         
-        # 3. Auto-create Google SocialApp (delayed)
+        # 3. Auto-create Google SocialApp
         self._init_social_app()
         
         logger.info("✅ Core app initialized")
@@ -62,54 +62,49 @@ class CoreConfig(AppConfig):
             logger.debug(f"PG optimize: {e}")
 
     def _init_social_app(self):
-        """Auto-create Site + SocialApp after DB is ready — delayed"""
+        """Auto-create Site + SocialApp — IMMEDIATE, no delay"""
         if self._is_management_command():
             return
         
-        import threading
-        def delayed_setup():
-            import time
-            time.sleep(3)
-            try:
-                from django.contrib.sites.models import Site
-                from allauth.socialaccount.models import SocialApp
-                import os
-                
-                # 1. Ensure Site exists
-                site, created = Site.objects.get_or_create(
-                    id=1,
-                    defaults={
-                        'domain': 'smartrealty-system.onrender.com',
-                        'name': 'SmartRealty'
-                    }
+        try:
+            from django.contrib.sites.models import Site
+            from allauth.socialaccount.models import SocialApp
+            import os
+            
+            # 1. Ensure Site exists
+            site, created = Site.objects.get_or_create(
+                id=1,
+                defaults={
+                    'domain': 'smartrealty-system.onrender.com',
+                    'name': 'SmartRealty'
+                }
+            )
+            if created:
+                logger.info(f"[AUTO-SETUP] Site created: {site.domain}")
+            
+            # 2. Delete ALL existing Google apps (clean slate)
+            google_apps = SocialApp.objects.filter(provider='google')
+            if google_apps.exists():
+                logger.warning(f"[AUTO-SETUP] Deleting {google_apps.count()} existing Google SocialApps")
+                google_apps.delete()
+            
+            # 3. Create FRESH SocialApp
+            client_id = os.getenv('GOOGLE_CLIENT_ID', '').strip()
+            secret = os.getenv('GOOGLE_CLIENT_SECRET', '').strip()
+            
+            if client_id and secret:
+                app = SocialApp.objects.create(
+                    provider='google',
+                    name='Google OAuth',
+                    client_id=client_id,
+                    secret=secret,
                 )
-                if created:
-                    logger.info(f"[AUTO-SETUP] Site created: {site.domain}")
+                app.sites.add(site)
+                logger.info("[AUTO-SETUP] Google SocialApp created fresh")
+            else:
+                logger.warning("[AUTO-SETUP] Google credentials not set!")
                 
-                # 2. Delete ALL existing Google apps (clean slate)
-                google_apps = SocialApp.objects.filter(provider='google')
-                if google_apps.exists():
-                    logger.warning(f"[AUTO-SETUP] Deleting {google_apps.count()} existing Google SocialApps")
-                    google_apps.delete()
-                
-                # 3. Create FRESH SocialApp
-                client_id = os.getenv('GOOGLE_CLIENT_ID', '').strip()
-                secret = os.getenv('GOOGLE_CLIENT_SECRET', '').strip()
-                
-                if client_id and secret:
-                    app = SocialApp.objects.create(
-                        provider='google',
-                        name='Google OAuth',
-                        client_id=client_id,
-                        secret=secret,
-                    )
-                    app.sites.add(site)
-                    logger.info("[AUTO-SETUP] Google SocialApp created fresh")
-                else:
-                    logger.warning("[AUTO-SETUP] Google credentials not set!")
-                    
-            except Exception as e:
-                logger.error(f"[AUTO-SETUP] Error: {e}")
-        
-        thread = threading.Thread(target=delayed_setup, daemon=True)
-        thread.start()
+        except ProgrammingError:
+            logger.warning("[AUTO-SETUP] Tables not ready yet")
+        except Exception as e:
+            logger.error(f"[AUTO-SETUP] Error: {e}")
