@@ -18,39 +18,23 @@
             </svg>
         </div>
 
-        <h2 class="text-3xl font-bold mb-2 gold">
-            Complete Registration
-        </h2>
+        <h2 class="text-3xl font-bold mb-2 gold">Complete Registration</h2>
+        <p class="text-gray-400 mb-6">Please confirm your details to finish signing up with Google.</p>
 
-        <p class="text-gray-400 mb-6">
-            Please confirm your details to finish signing up with Google.
-        </p>
+        <!-- ========== ALL ERROR DISPLAY ========== -->
 
-        <!-- Django Messages (Success/Error popup) -->
-        {% if messages %}
-            {% for message in messages %}
-                <div class="mb-4 p-4 rounded-xl {% if message.tags == 'success' %}bg-green-500/20 border border-green-500/30 text-green-300{% else %}bg-red-500/20 border border-red-500/30 text-red-300{% endif %} animate-fade-in">
-                    <div class="flex items-center justify-center gap-2">
-                        {% if message.tags == 'success' %}
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
-                        {% else %}
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
-                        {% endif %}
-                        <span class="font-semibold">{{ message }}</span>
-                    </div>
-                </div>
+        <!-- Non-field errors -->
+        {% if form.non_field_errors %}
+            {% for error in form.non_field_errors %}
+                <div class="mb-4 p-3 rounded bg-red-500/20 text-red-300 text-sm">{{ error }}</div>
             {% endfor %}
         {% endif %}
 
-        <!-- Form Errors -->
-        {% if form.non_field_errors %}
-            {% for error in form.non_field_errors %}
-                <div class="mb-4 p-3 rounded bg-red-500/20 text-red-300 text-sm">
-                    {{ error }}
+        <!-- Django messages -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="mb-4 p-3 rounded {% if message.tags == 'success' %}bg-green-500/20 text-green-300{% else %}bg-red-500/20 text-red-300{% endif %} text-sm">
+                    {{ message }}
                 </div>
             {% endfor %}
         {% endif %}
@@ -58,7 +42,7 @@
         <form method="post" action="{{ request.path }}" class="space-y-4 text-left">
             {% csrf_token %}
 
-            <!-- Email (read-only from Google) -->
+            <!-- Email -->
             <div>
                 <label class="text-gray-400 text-sm block mb-1">Email</label>
                 <input type="email" value="{{ form.email.value|default:'' }}" disabled
@@ -66,77 +50,39 @@
                 {% if form.email.value %}
                 <input type="hidden" name="email" value="{{ form.email.value }}">
                 {% endif %}
+                {% if form.email.errors %}
+                    <p class="text-red-400 text-xs mt-1">{{ form.email.errors.0 }}</p>
+                {% endif %}
             </div>
 
-            <!-- Username (auto-filled from email prefix) -->
+            <!-- Username -->
             <div>
                 <label class="text-gray-400 text-sm block mb-1">Username <span class="text-red-400">*</span></label>
-                {{ form.username }}
+                <input type="text" name="username" value="{{ form.username.value|default:'' }}" 
+                    class="w-full p-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:ring-2 focus:ring-yellow-400 outline-none"
+                    placeholder="Choose a username" required minlength="3">
                 {% if form.username.errors %}
                     <p class="text-red-400 text-xs mt-1">{{ form.username.errors.0 }}</p>
                 {% endif %}
                 <p class="text-gray-500 text-xs mt-1">Auto-filled from your email. You can change it.</p>
             </div>
 
-            <!-- Hidden role field -->
-            <input type="hidden" name="role" value="user">
+            <!-- Hidden fields that allauth needs -->
+            {% for field in form.hidden_fields %}
+                {{ field }}
+            {% endfor %}
 
             <button type="submit" 
-                    class="w-full py-3 bg-gradient-to-r from-yellow-500 to-yellow-300 text-black font-bold rounded-xl hover:scale-105 transition mt-4">
+                class="w-full py-3 bg-gradient-to-r from-yellow-500 to-yellow-300 text-black font-bold rounded-xl hover:scale-105 transition mt-4">
                 Complete Registration
             </button>
         </form>
 
         <p class="text-center text-gray-400 text-sm mt-6">
-            Already have an account?
-            <a href="{% url 'login' %}" class="text-yellow-400 hover:underline">
-                Login
-            </a>
+            Already have an account? <a href="{% url 'login' %}" class="text-yellow-400 hover:underline">Login</a>
         </p>
 
     </div>
-
 </section>
-
-<!-- Toast Notification -->
-<div id="toast" class="fixed top-4 right-4 transform translate-x-full transition-transform duration-300 z-50">
-    <div id="toastInner" class="bg-green-500/90 backdrop-blur text-white px-6 py-3 rounded-xl shadow-lg flex items-center gap-3">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-        </svg>
-        <span id="toastMessage">Registration successful!</span>
-    </div>
-</div>
-
-<style>
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(-10px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-    .animate-fade-in {
-        animation: fadeIn 0.5s ease-out;
-    }
-</style>
-
-<script>
-// Show toast function
-function showToast(message, type = 'success') {
-    const toast = document.getElementById('toast');
-    const toastInner = document.getElementById('toastInner');
-    const toastMessage = document.getElementById('toastMessage');
-    toastMessage.textContent = message;
-
-    if (type === 'success') {
-        toastInner.className = 'bg-green-500/90 backdrop-blur text-white px-6 py-3 rounded-xl shadow-lg flex items-center gap-3';
-    } else {
-        toastInner.className = 'bg-red-500/90 backdrop-blur text-white px-6 py-3 rounded-xl shadow-lg flex items-center gap-3';
-    }
-
-    toast.classList.remove('translate-x-full');
-    setTimeout(() => {
-        toast.classList.add('translate-x-full');
-    }, 4000);
-}
-</script>
 
 {% endblock %}
