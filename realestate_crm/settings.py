@@ -130,15 +130,17 @@ LOGIN_URL = "/login/"
 GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", "")
 GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET", "")  # FIXED: was GOOGLE_SECRET
 
-# Auto-create SocialApp in database (needed for provider_login_url)
+# BUG FIX: do NOT also define "APP" here. The Google app is already
+# created/maintained in the database via core/apps.py's _init_social_app().
+# allauth combines BOTH the settings-based APP config below AND the
+# database SocialApp row into one list — having both for the same
+# provider is exactly what allauth's own docs warn against, and it's
+# what caused every "Continue with Google" click to crash with
+# MultipleObjectsReturned (2 apps found: 1 from settings, 1 from DB).
+# SCOPE/AUTH_PARAMS alone (no "APP" key) is safe to keep here.
 if GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET:
     SOCIALACCOUNT_PROVIDERS = {
         "google": {
-            "APP": {
-                "client_id": GOOGLE_CLIENT_ID,
-                "secret": GOOGLE_CLIENT_SECRET,
-                "key": ""
-            },
             "SCOPE": ["profile", "email"],
             "AUTH_PARAMS": {"access_type": "online"},
         }
