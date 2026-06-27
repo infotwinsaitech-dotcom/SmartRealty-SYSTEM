@@ -123,16 +123,20 @@ ACCOUNT_LOGOUT_REDIRECT_URL = "/"
 LOGIN_REDIRECT_URL = "/auth/redirect/"
 LOGOUT_REDIRECT_URL = "/login/"
 LOGIN_URL = "/login/"
+# =============================================================================
+# GOOGLE OAUTH SETTINGS
+# =============================================================================
 
 GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", "")
-GOOGLE_SECRET = os.environ.get("GOOGLE_SECRET", "")
+GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET", "")  # FIXED: was GOOGLE_SECRET
 
-if GOOGLE_CLIENT_ID and GOOGLE_SECRET:
+# Auto-create SocialApp in database (needed for provider_login_url)
+if GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET:
     SOCIALACCOUNT_PROVIDERS = {
         "google": {
             "APP": {
                 "client_id": GOOGLE_CLIENT_ID,
-                "secret": GOOGLE_SECRET,
+                "secret": GOOGLE_CLIENT_SECRET,
                 "key": ""
             },
             "SCOPE": ["profile", "email"],
@@ -507,3 +511,66 @@ if DEBUG and not IS_TEST:
     print(f"  EMAIL: {'SendGrid' if SENDGRID_API_KEY else 'Console only'}")
     print(f"  SENTRY: {'Enabled' if SENTRY_DSN else 'Disabled'}")
     print("=" * 60)
+    # =============================================================================
+# AUTO-SETUP ON STARTUP (No shell needed for Render free tier)
+# =============================================================================
+
+def _auto_setup_site_and_socialapp():
+    """Called after all apps are ready. Creates Site + SocialApp in DB."""
+    import os
+    import logging
+    
+    logger = logging.getLogger("core.setup")
+    
+    try:
+        from django.contrib.sites.models import Site
+        from allauth.socialaccount.models import SocialApp
+        
+        # 1. Create Site
+        site, created = Site.objects.get_or_create(
+            id=1,
+            defaults={
+                'domain': 'smartrealty-system.onrender.com',
+                'name': 'SmartRealty'
+            }
+        )
+        if created:
+            logger.info(f"[AUTO-SETUP] Site created: {site.domain}")
+        
+        # 2. Create SocialApp
+        client_id = os.environ.get("GOOGLE_CLIENT_ID", "").strip()
+        secret = os.environ.get("GOOGLE_CLIENT_SECRET", "").strip()
+        
+        if client_id and secret:
+            app, created = SocialApp.objects.get_or_create(
+                provider='google',
+                defaults={
+                    'name': 'Google OAuth',
+                    'client_id': client_id,
+                    'secret': secret,
+                }
+            )
+            if not app.sites.filter(pk=site.pk).exists():
+                app.sites.add(site)
+            if created:
+                logger.info("[AUTO-SETUP] Google SocialApp created")
+            else:
+                logger.info("[AUTO-SETUP] Google SocialApp already exists")
+        else:
+            logger.warning("[AUTO-SETUP] Google credentials not set")
+            
+    except Exception as e:
+        logger.error(f"[AUTO-SETUP] Error: {e}")
+
+
+# Delayed import — runs after Django is fully ready
+import django
+from django.db.utils import ProgrammingError
+
+try:
+    django.setup()
+    _auto_setup_site_and_socialapp()
+except ProgrammingError:
+    pass  # Tables don't exist yet (first migration)
+except Exception:
+    pass  # Will retry on next request via views.py

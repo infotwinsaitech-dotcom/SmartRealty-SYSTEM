@@ -75,7 +75,55 @@ OTP_WINDOW = 600  # 10 minutes
 # =============================================================================
 # SECURITY HELPERS
 # =============================================================================
+# =============================================================================
+# AUTO-SETUP: Site + SocialApp (Immediate fix, no deploy wait)
+# =============================================================================
 
+def _ensure_site_and_socialapp():
+    """Lazy setup: runs on first view call. No shell needed."""
+    from django.contrib.sites.models import Site
+    from allauth.socialaccount.models import SocialApp
+    import os
+
+    try:
+        # 1. Ensure Site exists
+        site, created = Site.objects.get_or_create(
+            id=1,
+            defaults={
+                'domain': 'smartrealty-system.onrender.com',
+                'name': 'SmartRealty'
+            }
+        )
+        if created:
+            print(f"[AUTO-SETUP] Site created: {site.domain}")
+
+        # 2. Ensure SocialApp exists
+        client_id = os.getenv('GOOGLE_CLIENT_ID', '').strip()
+        secret = os.getenv('GOOGLE_CLIENT_SECRET', '').strip()
+
+        if client_id and secret:
+            app, created = SocialApp.objects.get_or_create(
+                provider='google',
+                name='Google OAuth',
+                defaults={
+                    'client_id': client_id,
+                    'secret': secret,
+                }
+            )
+            # Link to site
+            if not app.sites.filter(pk=site.pk).exists():
+                app.sites.add(site)
+            if created:
+                print(f"[AUTO-SETUP] SocialApp created: Google OAuth")
+        else:
+            print("[AUTO-SETUP] WARNING: GOOGLE_CLIENT_ID or GOOGLE_CLIENT_SECRET not set!")
+
+    except Exception as e:
+        print(f"[AUTO-SETUP] Error (will retry): {e}")
+
+
+# Call immediately on module import
+_ensure_site_and_socialapp()
 def sanitize_input(text):
     """Remove potentially dangerous HTML/JS from user input"""
     if not text:

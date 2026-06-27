@@ -60,17 +60,47 @@ class CoreConfig(AppConfig):
         except Exception as e:
             logger.debug(f"PG optimize: {e}")
 
-    def _init_social_app(self):
-        """Auto-create SocialApp after DB is ready"""
-        if self._is_management_command():
-            return
-        
-        try:
-            from core.signals import create_social_app
-            create_social_app()
-        except Exception as e:
-            logger.debug(f"SocialApp init: {e}")
+    # core/apps.py — UPDATE _init_social_app method
 
+def _init_social_app(self):
+    """Auto-create SocialApp after DB is ready"""
+    if self._is_management_command():
+        return
+    
+    try:
+        from django.contrib.sites.models import Site
+        from allauth.socialaccount.models import SocialApp
+        import os
+        
+        # Create Site first (CRITICAL - this was missing!)
+        site, _ = Site.objects.get_or_create(
+            id=1,
+            defaults={
+                'domain': 'smartrealty-system.onrender.com',
+                'name': 'SmartRealty'
+            }
+        )
+        
+        # Now create SocialApp
+        client_id = os.getenv('GOOGLE_CLIENT_ID', '').strip()
+        secret = os.getenv('GOOGLE_CLIENT_SECRET', '').strip()
+        
+        if client_id and secret:
+            app, created = SocialApp.objects.get_or_create(
+                provider='google',
+                defaults={
+                    'name': 'Google OAuth',
+                    'client_id': client_id,
+                    'secret': secret,
+                }
+            )
+            if not app.sites.filter(pk=site.pk).exists():
+                app.sites.add(site)
+            if created:
+                logger.info("[AUTO-SETUP] Google SocialApp created")
+                
+    except Exception as e:
+        logger.error(f"SocialApp init: {e}")
     def _is_management_command(self):
         """Detect if running management command"""
         mgmt = ['migrate', 'makemigrations', 'collectstatic', 
