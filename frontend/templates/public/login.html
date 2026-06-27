@@ -62,7 +62,7 @@
             {% load socialaccount %}
             {% get_providers as socialaccount_providers %}
             {% if socialaccount_providers %}
-                <a href="{% provider_login_url 'google' %}" 
+                <a href="{% get_providers %}" 
                    class="w-full flex items-center justify-center gap-3 py-3 bg-white text-gray-800 font-semibold rounded-xl hover:bg-gray-100 transition mb-4 border border-gray-300">
                     <svg class="w-5 h-5" viewBox="0 0 24 24">
                         <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>

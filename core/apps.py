@@ -58,15 +58,17 @@ class CoreConfig(AppConfig):
         except Exception as e:
             logger.debug(f"PG optimize: {e}")
 
-    def _init_social_app(self):
-     if self._is_management_command():
+    # core/apps.py — _init_social_app() method
+
+def _init_social_app(self):
+    """Auto-create Site + SocialApp after DB is ready — delayed to avoid warning"""
+    if self._is_management_command():
         return
     
-    # Delay database access to avoid "Accessing database during app initialization" warning
     import threading
     def delayed_setup():
         import time
-        time.sleep(2)  # Wait for Django to fully initialize
+        time.sleep(3)  # Thoda zyada wait for Django to fully initialize
         try:
             from django.contrib.sites.models import Site
             from allauth.socialaccount.models import SocialApp
@@ -83,44 +85,37 @@ class CoreConfig(AppConfig):
             if created:
                 logger.info(f"[AUTO-SETUP] Site created: {site.domain}")
             
-            # 2. DUPLICATE CLEANUP
-            google_apps = SocialApp.objects.filter(provider='google')
-            if google_apps.count() > 1:
-                logger.warning(f"[AUTO-SETUP] Found {google_apps.count()} Google SocialApps — cleaning up")
-                first_app = google_apps.first()
-                google_apps.exclude(pk=first_app.pk).delete()
-                logger.info("[AUTO-SETUP] Duplicates deleted")
+            # 2. STRONG DUPLICATE CLEANUP: Delete ALL existing Google apps, then create fresh
+            google_apps = list(SocialApp.objects.filter(provider='google'))
+            if len(google_apps) > 1:
+                logger.warning(f"[AUTO-SETUP] Found {len(google_apps)} Google SocialApps — deleting ALL")
+                for app in google_apps:
+                    app.delete()
+                logger.info("[AUTO-SETUP] All duplicates deleted")
+            elif len(google_apps) == 1:
+                # Even single one — delete and recreate to ensure clean state
+                google_apps[0].delete()
+                logger.info("[AUTO-SETUP] Old SocialApp deleted for clean recreate")
             
-            # 3. Create/update SocialApp
+            # 3. Create FRESH SocialApp
             client_id = os.getenv('GOOGLE_CLIENT_ID', '').strip()
             secret = os.getenv('GOOGLE_CLIENT_SECRET', '').strip()
             
             if client_id and secret:
-                app, created = SocialApp.objects.get_or_create(
+                app = SocialApp.objects.create(
                     provider='google',
-                    defaults={
-                        'name': 'Google OAuth',
-                        'client_id': client_id,
-                        'secret': secret,
-                    }
+                    name='Google OAuth',
+                    client_id=client_id,
+                    secret=secret,
                 )
-                if not created:
-                    app.client_id = client_id
-                    app.secret = secret
-                    app.save()
-                
-                if not app.sites.filter(pk=site.pk).exists():
-                    app.sites.add(site)
-                
-                if created:
-                    logger.info("[AUTO-SETUP] Google SocialApp created")
-                else:
-                    logger.info("[AUTO-SETUP] Google SocialApp updated")
+                app.sites.add(site)
+                logger.info("[AUTO-SETUP] Google SocialApp FRESH created")
+            else:
+                logger.warning("[AUTO-SETUP] GOOGLE_CLIENT_ID or GOOGLE_CLIENT_SECRET not set!")
                     
         except Exception as e:
             logger.error(f"[AUTO-SETUP] Error: {e}")
     
-    # Run in background thread so startup doesn't block
     thread = threading.Thread(target=delayed_setup, daemon=True)
     thread.start()
     def _is_management_command(self):
