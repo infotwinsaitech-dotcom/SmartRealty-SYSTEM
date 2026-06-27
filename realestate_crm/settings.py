@@ -514,9 +514,12 @@ if DEBUG and not IS_TEST:
     # =============================================================================
 # AUTO-SETUP ON STARTUP (No shell needed for Render free tier)
 # =============================================================================
+# =============================================================================
+# AUTO-SETUP: Site + SocialApp (Called after Django is fully ready)
+# =============================================================================
 
 def _auto_setup_site_and_socialapp():
-    """Called after all apps are ready. Creates Site + SocialApp in DB."""
+    """Auto-create Site and SocialApp. Call from apps.py ready(), NOT here."""
     import os
     import logging
     
@@ -561,16 +564,3 @@ def _auto_setup_site_and_socialapp():
             
     except Exception as e:
         logger.error(f"[AUTO-SETUP] Error: {e}")
-
-
-# Delayed import — runs after Django is fully ready
-import django
-from django.db.utils import ProgrammingError
-
-try:
-    django.setup()
-    _auto_setup_site_and_socialapp()
-except ProgrammingError:
-    pass  # Tables don't exist yet (first migration)
-except Exception:
-    pass  # Will retry on next request via views.py

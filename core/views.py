@@ -79,47 +79,51 @@ OTP_WINDOW = 600  # 10 minutes
 # AUTO-SETUP: Site + SocialApp (Immediate fix, no deploy wait)
 # =============================================================================
 
+# core/views.py — TOP OF FILE, after imports
+
 def _ensure_site_and_socialapp():
-    """Lazy setup: runs on first view call. No shell needed."""
+    """Lazy backup setup: runs on first view call"""
     from django.contrib.sites.models import Site
     from allauth.socialaccount.models import SocialApp
     import os
 
     try:
-        # 1. Ensure Site exists
-        site, created = Site.objects.get_or_create(
+        # Check if already exists
+        Site.objects.get(id=1)
+        SocialApp.objects.get(provider='google')
+        return  # Already setup, skip
+    except Exception:
+        pass  # Need to create
+
+    try:
+        site, _ = Site.objects.get_or_create(
             id=1,
             defaults={
                 'domain': 'smartrealty-system.onrender.com',
                 'name': 'SmartRealty'
             }
         )
-        if created:
-            print(f"[AUTO-SETUP] Site created: {site.domain}")
 
-        # 2. Ensure SocialApp exists
         client_id = os.getenv('GOOGLE_CLIENT_ID', '').strip()
         secret = os.getenv('GOOGLE_CLIENT_SECRET', '').strip()
 
         if client_id and secret:
-            app, created = SocialApp.objects.get_or_create(
+            app, _ = SocialApp.objects.get_or_create(
                 provider='google',
-                name='Google OAuth',
                 defaults={
+                    'name': 'Google OAuth',
                     'client_id': client_id,
                     'secret': secret,
                 }
             )
-            # Link to site
             if not app.sites.filter(pk=site.pk).exists():
                 app.sites.add(site)
-            if created:
-                print(f"[AUTO-SETUP] SocialApp created: Google OAuth")
-        else:
-            print("[AUTO-SETUP] WARNING: GOOGLE_CLIENT_ID or GOOGLE_CLIENT_SECRET not set!")
+    except Exception:
+        pass  # Will retry next request
 
-    except Exception as e:
-        print(f"[AUTO-SETUP] Error (will retry): {e}")
+
+# Call once at module import (safe because Django already ready)
+_ensure_site_and_socialapp()
 
 
 # Call immediately on module import

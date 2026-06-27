@@ -257,44 +257,50 @@ def connect_all_signals():
 # =============================================================================
 # PART 5: AUTO-CREATE SOCIALAPP (Called from apps.py ready())
 # =============================================================================
-
 def create_social_app():
     """
     Auto-create Google SocialApp if credentials exist.
-    Isse admin panel mein manually add karne ki zaroorat nahi.
+    Called from apps.py ready() on startup.
     """
     from django.conf import settings
+    from django.contrib.sites.models import Site
+    from allauth.socialaccount.models import SocialApp
 
     client_id = getattr(settings, 'GOOGLE_CLIENT_ID', '')
-    secret = getattr(settings, 'GOOGLE_SECRET', '')
+    secret = getattr(settings, 'GOOGLE_CLIENT_SECRET', '')  # FIXED: was GOOGLE_SECRET
 
     if not client_id or not secret:
         logger.info("Google OAuth credentials not set, skipping SocialApp creation")
         return
 
     try:
-        from allauth.socialaccount.models import SocialApp
-        from django.contrib.sites.models import Site
-
+        # Ensure Site exists FIRST
         site, _ = Site.objects.get_or_create(
             pk=1,
-            defaults={'domain': 'smartrealty-system.onrender.com', 'name': 'SmartRealty'}
+            defaults={
+                'domain': 'smartrealty-system.onrender.com',
+                'name': 'SmartRealty'
+            }
         )
 
+        # Create/update SocialApp
         app, created = SocialApp.objects.get_or_create(
             provider='google',
             defaults={
-                'name': 'Google',
+                'name': 'Google OAuth',
                 'client_id': client_id,
                 'secret': secret,
             }
         )
 
+        # Link to site
         if not app.sites.filter(pk=site.pk).exists():
             app.sites.add(site)
 
         if created:
-            logger.info("Google SocialApp auto-created")
+            logger.info("✅ Google SocialApp auto-created")
+        else:
+            logger.info("✅ Google SocialApp already exists")
 
     except ProgrammingError:
         logger.warning("SocialApp table not ready yet — will retry on next startup")

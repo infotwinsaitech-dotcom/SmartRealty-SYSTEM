@@ -1,7 +1,4 @@
-# =============================================================================
-# core/apps.py — PRODUCTION READY
-# Auto Cache Table + PostgreSQL Optimize + SocialApp Create
-# =============================================================================
+# core/apps.py — COMPLETE FILE
 
 from django.apps import AppConfig
 from django.db import connection, ProgrammingError, OperationalError
@@ -18,13 +15,13 @@ class CoreConfig(AppConfig):
     def ready(self):
         import core.signals
         
-        # 2. Auto-create cache table if missing
+        # 1. Auto-create cache table if missing
         self._init_cache_table()
         
-        # 3. PostgreSQL optimization
+        # 2. PostgreSQL optimization
         self._optimize_postgres()
         
-        # 4. Auto-create Google SocialApp (if credentials exist)
+        # 3. Auto-create Google SocialApp (CRITICAL FIX)
         self._init_social_app()
         
         logger.info("✅ Core app initialized")
@@ -60,47 +57,54 @@ class CoreConfig(AppConfig):
         except Exception as e:
             logger.debug(f"PG optimize: {e}")
 
-    # core/apps.py — UPDATE _init_social_app method
-
-def _init_social_app(self):
-    """Auto-create SocialApp after DB is ready"""
-    if self._is_management_command():
-        return
-    
-    try:
-        from django.contrib.sites.models import Site
-        from allauth.socialaccount.models import SocialApp
-        import os
+    def _init_social_app(self):
+        """Auto-create Site + SocialApp after DB is ready"""
+        if self._is_management_command():
+            return
         
-        # Create Site first (CRITICAL - this was missing!)
-        site, _ = Site.objects.get_or_create(
-            id=1,
-            defaults={
-                'domain': 'smartrealty-system.onrender.com',
-                'name': 'SmartRealty'
-            }
-        )
-        
-        # Now create SocialApp
-        client_id = os.getenv('GOOGLE_CLIENT_ID', '').strip()
-        secret = os.getenv('GOOGLE_CLIENT_SECRET', '').strip()
-        
-        if client_id and secret:
-            app, created = SocialApp.objects.get_or_create(
-                provider='google',
+        try:
+            from django.contrib.sites.models import Site
+            from allauth.socialaccount.models import SocialApp
+            import os
+            
+            # 1. Ensure Site exists (CRITICAL FIX)
+            site, created = Site.objects.get_or_create(
+                id=1,
                 defaults={
-                    'name': 'Google OAuth',
-                    'client_id': client_id,
-                    'secret': secret,
+                    'domain': 'smartrealty-system.onrender.com',
+                    'name': 'SmartRealty'
                 }
             )
-            if not app.sites.filter(pk=site.pk).exists():
-                app.sites.add(site)
             if created:
-                logger.info("[AUTO-SETUP] Google SocialApp created")
+                logger.info(f"[AUTO-SETUP] Site created: {site.domain}")
+            
+            # 2. Ensure SocialApp exists
+            client_id = os.getenv('GOOGLE_CLIENT_ID', '').strip()
+            secret = os.getenv('GOOGLE_CLIENT_SECRET', '').strip()
+            
+            if client_id and secret:
+                app, created = SocialApp.objects.get_or_create(
+                    provider='google',
+                    defaults={
+                        'name': 'Google OAuth',
+                        'client_id': client_id,
+                        'secret': secret,
+                    }
+                )
+                if not app.sites.filter(pk=site.pk).exists():
+                    app.sites.add(site)
+                if created:
+                    logger.info("[AUTO-SETUP] Google SocialApp created")
+                else:
+                    logger.info("[AUTO-SETUP] Google SocialApp already exists")
+            else:
+                logger.warning("[AUTO-SETUP] GOOGLE_CLIENT_ID or GOOGLE_CLIENT_SECRET not set!")
                 
-    except Exception as e:
-        logger.error(f"SocialApp init: {e}")
+        except ProgrammingError:
+            logger.warning("[AUTO-SETUP] Tables not ready yet — will retry on next startup")
+        except Exception as e:
+            logger.error(f"[AUTO-SETUP] Error: {e}")
+
     def _is_management_command(self):
         """Detect if running management command"""
         mgmt = ['migrate', 'makemigrations', 'collectstatic', 
