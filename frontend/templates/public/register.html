@@ -30,12 +30,8 @@
             </div>
         {% endif %}
 
-        <!-- GOOGLE BUTTON HIDDEN — database cleanup ke baad enable karenge -->
-        {% comment %}
-        {% load socialaccount %}
-        {% get_providers as social_providers %}
-        {% if social_providers %}
-        <a href="{% provider_login_url 'google' %}" 
+        <!-- GOOGLE BUTTON — Direct URL (no template tag, no database query) -->
+        <a href="/accounts/google/login/?process=login" 
            class="w-full flex items-center justify-center gap-3 py-3 bg-white text-gray-800 font-semibold rounded-xl hover:bg-gray-100 transition mb-4 border border-gray-300">
             <svg class="w-5 h-5" viewBox="0 0 24 24">
                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -49,14 +45,6 @@
         <div class="flex items-center gap-4 mb-4">
             <div class="flex-1 h-px bg-white/20"></div>
             <span class="text-gray-400 text-sm">or register with email</span>
-            <div class="flex-1 h-px bg-white/20"></div>
-        </div>
-        {% endcomment %}
-
-        <!-- Divider without Google -->
-        <div class="flex items-center gap-4 mb-4">
-            <div class="flex-1 h-px bg-white/20"></div>
-            <span class="text-gray-400 text-sm">register with email</span>
             <div class="flex-1 h-px bg-white/20"></div>
         </div>
 
