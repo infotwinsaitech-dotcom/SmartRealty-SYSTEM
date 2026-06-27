@@ -3654,6 +3654,13 @@ def add_deal(request):
                 agent=agent,
                 builder=property_obj.builder
             )
+            # FIX: keep Lead.status in sync with Deal.status. Without this,
+            # a deal marked CLOSED/FAILED here never reflects on the Lead's
+            # own status field, so the Pipeline page (which buckets leads
+            # by Lead.status) keeps showing the lead under "OTHER" forever.
+            if lead and status in ("CLOSED", "FAILED", "NEGOTIATION"):
+                lead.status = status
+                lead.save()
             messages.success(request, "Deal created successfully!")
             
         except Exception as e:
@@ -3675,6 +3682,13 @@ def update_deal(request, deal_id):
         old_status = deal.status
         deal.status = status
         deal.save()
+
+        # FIX: same sync as add_deal above — otherwise updating an existing
+        # deal to CLOSED/FAILED still leaves the Lead stuck in its old
+        # status on the Pipeline board.
+        if deal.lead and status in ("CLOSED", "FAILED", "NEGOTIATION"):
+            deal.lead.status = status
+            deal.lead.save()
         
         LeadActivity.objects.create(
             lead=deal.lead,
