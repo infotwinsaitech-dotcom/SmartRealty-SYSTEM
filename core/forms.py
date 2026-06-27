@@ -1,6 +1,7 @@
 """
 core/forms.py — Custom Social Signup Form & Regular Forms
 FIXED: Default username from email prefix for Google OAuth
+FIXED v2: clean_username no longer uses self.instance (allauth SignupForm is not a ModelForm)
 """
 
 from django import forms
@@ -95,12 +96,9 @@ class CustomSocialSignupForm(SocialSignupForm):
         if len(username) < 3:
             raise forms.ValidationError("Username must be at least 3 characters.")
 
-        # Check if username already exists (excluding current user if editing)
-        existing = User.objects.filter(username__iexact=username)
-        if self.instance and self.instance.pk:
-            existing = existing.exclude(pk=self.instance.pk)
-
-        if existing.exists():
+        # Check if username already exists
+        # FIXED: allauth SignupForm is NOT a ModelForm, so no self.instance
+        if User.objects.filter(username__iexact=username).exists():
             raise forms.ValidationError("This username is already taken. Please choose another.")
 
         return username
