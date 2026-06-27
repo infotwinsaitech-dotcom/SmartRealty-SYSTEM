@@ -169,3 +169,9 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 {% endblock %}
 {% endblock %}
+{% load social_safe %}
+
+{% get_google_login_url as google_url %}
+{% if google_url %}
+<a href="{{ google_url }}" class="...">Continue with Google</a>
+{% endif %}
