@@ -62,49 +62,54 @@ class CoreConfig(AppConfig):
             logger.debug(f"PG optimize: {e}")
 
     def _init_social_app(self):
-        """Auto-create Site + SocialApp — IMMEDIATE, no delay"""
         if self._is_management_command():
             return
         
-        try:
-            from django.contrib.sites.models import Site
-            from allauth.socialaccount.models import SocialApp
-            import os
-            
-            # 1. Ensure Site exists
-            site, created = Site.objects.get_or_create(
-                id=1,
-                defaults={
-                    'domain': 'smartrealty-system.onrender.com',
-                    'name': 'SmartRealty'
-                }
-            )
-            if created:
-                logger.info(f"[AUTO-SETUP] Site created: {site.domain}")
-            
-            # 2. Delete ALL existing Google apps (clean slate)
-            google_apps = SocialApp.objects.filter(provider='google')
-            if google_apps.exists():
-                logger.warning(f"[AUTO-SETUP] Deleting {google_apps.count()} existing Google SocialApps")
-                google_apps.delete()
-            
-            # 3. Create FRESH SocialApp
-            client_id = os.getenv('GOOGLE_CLIENT_ID', '').strip()
-            secret = os.getenv('GOOGLE_CLIENT_SECRET', '').strip()
-            
-            if client_id and secret:
-                app = SocialApp.objects.create(
-                    provider='google',
-                    name='Google OAuth',
-                    client_id=client_id,
-                    secret=secret,
-                )
-                app.sites.add(site)
-                logger.info("[AUTO-SETUP] Google SocialApp created fresh")
-            else:
-                logger.warning("[AUTO-SETUP] Google credentials not set!")
+        import time
+        
+        # Retry 3 times with delay
+        for attempt in range(3):
+            try:
+                from django.contrib.sites.models import Site
+                from allauth.socialaccount.models import SocialApp
+                import os
                 
-        except ProgrammingError:
-            logger.warning("[AUTO-SETUP] Tables not ready yet")
-        except Exception as e:
-            logger.error(f"[AUTO-SETUP] Error: {e}")
+                # 1. Ensure Site exists
+                site, _ = Site.objects.get_or_create(
+                    id=1,
+                    defaults={
+                        'domain': 'smartrealty-system.onrender.com',
+                        'name': 'SmartRealty'
+                    }
+                )
+                
+                # 2. STRONG CLEANUP: Delete ALL Google apps using raw SQL
+                from django.db import connection
+                with connection.cursor() as cursor:
+                    cursor.execute("DELETE FROM socialaccount_socialapp_sites WHERE socialapp_id IN (SELECT id FROM socialaccount_socialapp WHERE provider = 'google');")
+                    cursor.execute("DELETE FROM socialaccount_socialapp WHERE provider = 'google';")
+                    logger.info("[AUTO-SETUP] Deleted all Google SocialApps via raw SQL")
+                
+                # 3. Create FRESH
+                client_id = os.getenv('GOOGLE_CLIENT_ID', '').strip()
+                secret = os.getenv('GOOGLE_CLIENT_SECRET', '').strip()
+                
+                if client_id and secret:
+                    app = SocialApp.objects.create(
+                        provider='google',
+                        name='Google OAuth',
+                        client_id=client_id,
+                        secret=secret,
+                    )
+                    app.sites.add(site)
+                    logger.info("[AUTO-SETUP] Google SocialApp created fresh")
+                    return  # Success!
+                else:
+                    logger.warning("[AUTO-SETUP] Google credentials not set!")
+                    return
+                    
+            except Exception as e:
+                logger.error(f"[AUTO-SETUP] Attempt {attempt + 1} failed: {e}")
+                time.sleep(2)  # Wait before retry
+        
+        logger.error("[AUTO-SETUP] All attempts failed")

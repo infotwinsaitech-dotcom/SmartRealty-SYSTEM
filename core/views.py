@@ -79,54 +79,6 @@ OTP_WINDOW = 600  # 10 minutes
 # =============================================================================
 
 # core/views.py — TOP OF FILE, after imports
-
-#def _ensure_site_and_socialapp():
-    #"""Lazy backup setup: runs on first view call"""
-    #from django.contrib.sites.models import Site
-    #from allauth.socialaccount.models import SocialApp
-    #import os
-
-    #try:
-        # Check if already exists
-        #Site.objects.get(id=1)
-        #SocialApp.objects.get(provider='google')
-        #return  # Already setup, skip
-    #except Exception:
-        #pass  # Need to create
-
-    #try:
-        #site, _ = Site.objects.get_or_create(
-            #id=1,
-            #defaults={
-                #'domain': 'smartrealty-system.onrender.com',
-                #'name': 'SmartRealty'
-            #}
-        #)
-
-        #client_id = os.getenv('GOOGLE_CLIENT_ID', '').strip()
-        #secret = os.getenv('GOOGLE_CLIENT_SECRET', '').strip()
-
-        #if client_id and secret:
-            #app, _ = SocialApp.objects.get_or_create(
-                #provider='google',
-                #defaults={
-                    #'name': 'Google OAuth',
-                    #'client_id': client_id,
-                    #'secret': secret,
-                #}
-            #)
-            #if not app.sites.filter(pk=site.pk).exists():
-                #app.sites.add(site)
-    #except Exception:
-        #pass  # Will retry next request
-
-
-# Call once at module import (safe because Django already ready)
-
-
-
-# Call immediately on module import
-#_ensure_site_and_socialapp()
 def sanitize_input(text):
     """Remove potentially dangerous HTML/JS from user input"""
     if not text:
