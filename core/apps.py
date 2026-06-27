@@ -13,7 +13,8 @@ class CoreConfig(AppConfig):
     name = 'core'
 
     def ready(self):
-        import core.signals
+        # ❌ signals import mat karo agar wahan se create_social_app call hota hai
+        # import core.signals  # COMMENT KAR DO YA HATA DO
         
         # 1. Auto-create cache table if missing
         self._init_cache_table()
@@ -21,7 +22,7 @@ class CoreConfig(AppConfig):
         # 2. PostgreSQL optimization
         self._optimize_postgres()
         
-        # 3. Auto-create Google SocialApp (CRITICAL FIX)
+        # 3. Auto-create Google SocialApp (EK HI JAGAH SE)
         self._init_social_app()
         
         logger.info("✅ Core app initialized")
@@ -58,7 +59,10 @@ class CoreConfig(AppConfig):
             logger.debug(f"PG optimize: {e}")
 
     def _init_social_app(self):
-        """Auto-create Site + SocialApp after DB is ready"""
+        """
+        Auto-create Site + SocialApp. 
+        DUPLICATE cleanup ke saath — agar multiple ban gaye hain toh delete karke ek rakho.
+        """
         if self._is_management_command():
             return
         
@@ -67,7 +71,7 @@ class CoreConfig(AppConfig):
             from allauth.socialaccount.models import SocialApp
             import os
             
-            # 1. Ensure Site exists (CRITICAL FIX)
+            # 1. Ensure Site exists
             site, created = Site.objects.get_or_create(
                 id=1,
                 defaults={
@@ -78,7 +82,16 @@ class CoreConfig(AppConfig):
             if created:
                 logger.info(f"[AUTO-SETUP] Site created: {site.domain}")
             
-            # 2. Ensure SocialApp exists
+            # 2. DUPLICATE CLEANUP: Agar multiple Google SocialApp hain, toh sab delete karke ek naya banao
+            google_apps = SocialApp.objects.filter(provider='google')
+            if google_apps.count() > 1:
+                logger.warning(f"[AUTO-SETUP] Found {google_apps.count()} Google SocialApps — cleaning up duplicates")
+                # Pehle wala rakh, baaki delete
+                first_app = google_apps.first()
+                google_apps.exclude(pk=first_app.pk).delete()
+                logger.info("[AUTO-SETUP] Duplicates deleted")
+            
+            # 3. Create/update SocialApp (ab sirf ek hi hoga ya zero)
             client_id = os.getenv('GOOGLE_CLIENT_ID', '').strip()
             secret = os.getenv('GOOGLE_CLIENT_SECRET', '').strip()
             
@@ -91,12 +104,22 @@ class CoreConfig(AppConfig):
                         'secret': secret,
                     }
                 )
+                
+                # Update existing if needed
+                if not created:
+                    app.client_id = client_id
+                    app.secret = secret
+                    app.name = 'Google OAuth'
+                    app.save()
+                
+                # Link to site
                 if not app.sites.filter(pk=site.pk).exists():
                     app.sites.add(site)
+                
                 if created:
                     logger.info("[AUTO-SETUP] Google SocialApp created")
                 else:
-                    logger.info("[AUTO-SETUP] Google SocialApp already exists")
+                    logger.info("[AUTO-SETUP] Google SocialApp updated")
             else:
                 logger.warning("[AUTO-SETUP] GOOGLE_CLIENT_ID or GOOGLE_CLIENT_SECRET not set!")
                 

@@ -12,14 +12,26 @@ from django.dispatch import receiver
 from django.core.cache import cache
 from django.db import ProgrammingError, OperationalError
 import logging
-
+from .models import Profile
+from django.contrib.auth import get_user_model
 logger = logging.getLogger(__name__)
-
+User = get_user_model()
 # =============================================================================
 # LAZY MODEL IMPORTS — import inside functions to avoid circular imports
 # These are resolved at signal-connect time, not at module load time
 # =============================================================================
-
+@receiver(post_save, sender=User)
+def create_user_profile(sender, instance, created, **kwargs):
+    """Auto-create profile on user creation"""
+    if created:
+        Profile.objects.get_or_create(
+            user=instance,
+            defaults={
+                "full_name": instance.username,
+                "email": instance.email,
+                "phone": getattr(instance, "phone", "")
+            }
+        )
 def get_models():
     """
     Lazily import models to avoid circular import issues.
@@ -257,52 +269,4 @@ def connect_all_signals():
 # =============================================================================
 # PART 5: AUTO-CREATE SOCIALAPP (Called from apps.py ready())
 # =============================================================================
-def create_social_app():
-    """
-    Auto-create Google SocialApp if credentials exist.
-    Called from apps.py ready() on startup.
-    """
-    from django.conf import settings
-    from django.contrib.sites.models import Site
-    from allauth.socialaccount.models import SocialApp
-
-    client_id = getattr(settings, 'GOOGLE_CLIENT_ID', '')
-    secret = getattr(settings, 'GOOGLE_CLIENT_SECRET', '')  # FIXED: was GOOGLE_SECRET
-
-    if not client_id or not secret:
-        logger.info("Google OAuth credentials not set, skipping SocialApp creation")
-        return
-
-    try:
-        # Ensure Site exists FIRST
-        site, _ = Site.objects.get_or_create(
-            pk=1,
-            defaults={
-                'domain': 'smartrealty-system.onrender.com',
-                'name': 'SmartRealty'
-            }
-        )
-
-        # Create/update SocialApp
-        app, created = SocialApp.objects.get_or_create(
-            provider='google',
-            defaults={
-                'name': 'Google OAuth',
-                'client_id': client_id,
-                'secret': secret,
-            }
-        )
-
-        # Link to site
-        if not app.sites.filter(pk=site.pk).exists():
-            app.sites.add(site)
-
-        if created:
-            logger.info("✅ Google SocialApp auto-created")
-        else:
-            logger.info("✅ Google SocialApp already exists")
-
-    except ProgrammingError:
-        logger.warning("SocialApp table not ready yet — will retry on next startup")
-    except Exception as e:
-        logger.error(f"SocialApp creation failed: {e}")
+#
