@@ -59,13 +59,14 @@ class CoreConfig(AppConfig):
             logger.debug(f"PG optimize: {e}")
 
     def _init_social_app(self):
-        """
-        Auto-create Site + SocialApp. 
-        DUPLICATE cleanup ke saath — agar multiple ban gaye hain toh delete karke ek rakho.
-        """
-        if self._is_management_command():
-            return
-        
+     if self._is_management_command():
+        return
+    
+    # Delay database access to avoid "Accessing database during app initialization" warning
+    import threading
+    def delayed_setup():
+        import time
+        time.sleep(2)  # Wait for Django to fully initialize
         try:
             from django.contrib.sites.models import Site
             from allauth.socialaccount.models import SocialApp
@@ -82,16 +83,15 @@ class CoreConfig(AppConfig):
             if created:
                 logger.info(f"[AUTO-SETUP] Site created: {site.domain}")
             
-            # 2. DUPLICATE CLEANUP: Agar multiple Google SocialApp hain, toh sab delete karke ek naya banao
+            # 2. DUPLICATE CLEANUP
             google_apps = SocialApp.objects.filter(provider='google')
             if google_apps.count() > 1:
-                logger.warning(f"[AUTO-SETUP] Found {google_apps.count()} Google SocialApps — cleaning up duplicates")
-                # Pehle wala rakh, baaki delete
+                logger.warning(f"[AUTO-SETUP] Found {google_apps.count()} Google SocialApps — cleaning up")
                 first_app = google_apps.first()
                 google_apps.exclude(pk=first_app.pk).delete()
                 logger.info("[AUTO-SETUP] Duplicates deleted")
             
-            # 3. Create/update SocialApp (ab sirf ek hi hoga ya zero)
+            # 3. Create/update SocialApp
             client_id = os.getenv('GOOGLE_CLIENT_ID', '').strip()
             secret = os.getenv('GOOGLE_CLIENT_SECRET', '').strip()
             
@@ -104,15 +104,11 @@ class CoreConfig(AppConfig):
                         'secret': secret,
                     }
                 )
-                
-                # Update existing if needed
                 if not created:
                     app.client_id = client_id
                     app.secret = secret
-                    app.name = 'Google OAuth'
                     app.save()
                 
-                # Link to site
                 if not app.sites.filter(pk=site.pk).exists():
                     app.sites.add(site)
                 
@@ -120,14 +116,13 @@ class CoreConfig(AppConfig):
                     logger.info("[AUTO-SETUP] Google SocialApp created")
                 else:
                     logger.info("[AUTO-SETUP] Google SocialApp updated")
-            else:
-                logger.warning("[AUTO-SETUP] GOOGLE_CLIENT_ID or GOOGLE_CLIENT_SECRET not set!")
-                
-        except ProgrammingError:
-            logger.warning("[AUTO-SETUP] Tables not ready yet — will retry on next startup")
+                    
         except Exception as e:
             logger.error(f"[AUTO-SETUP] Error: {e}")
-
+    
+    # Run in background thread so startup doesn't block
+    thread = threading.Thread(target=delayed_setup, daemon=True)
+    thread.start()
     def _is_management_command(self):
         """Detect if running management command"""
         mgmt = ['migrate', 'makemigrations', 'collectstatic', 
