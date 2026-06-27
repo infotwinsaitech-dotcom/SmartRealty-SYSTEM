@@ -2093,75 +2093,137 @@ def remove_agent_from_builder(request, agent_id):
 @builder_required
 def builder_pipeline(request):
     builder = request.user
-    
+
+    # ===== DATE FILTERING =====
+    filter_type = request.GET.get('filter', 'all')  # all, today, week, month, custom
+    start_date_str = request.GET.get('start_date', '')
+    end_date_str = request.GET.get('end_date', '')
+
+    today = date.today()
+
+    # Calculate date range based on filter
+    if filter_type == 'today':
+        start_date = today
+        end_date = today
+    elif filter_type == 'week':
+        # This week (Monday to Sunday)
+        start_date = today - timedelta(days=today.weekday())
+        end_date = start_date + timedelta(days=6)
+    elif filter_type == 'month':
+        # This month
+        start_date = today.replace(day=1)
+        # Last day of month
+        if today.month == 12:
+            end_date = today.replace(day=31)
+        else:
+            end_date = today.replace(month=today.month + 1, day=1) - timedelta(days=1)
+    elif filter_type == 'custom' and start_date_str and end_date_str:
+        try:
+            start_date = datetime.strptime(start_date_str, '%Y-%m-%d').date()
+            end_date = datetime.strptime(end_date_str, '%Y-%m-%d').date()
+        except ValueError:
+            start_date = None
+            end_date = None
+    else:
+        start_date = None
+        end_date = None
+
+    # Base queryset for agents
     agents = Agent.objects.filter(
         builders=builder,
         is_active=True
     ).select_related('user').order_by('name')
-    
+
     agent_pipeline = {}
-    
+
     for agent in agents:
-        agent_leads = Lead.objects.filter(
+        # Apply date filter to leads
+        agent_leads_qs = Lead.objects.filter(
             assigned_to=agent,
             builder=builder
         ).select_related('assigned_to').prefetch_related('properties').order_by('-updated_at')
-        
-        # ✅ Saare valid statuses + OTHER stage
+
+        # Apply date range filter if specified
+        if start_date and end_date:
+            agent_leads_qs = agent_leads_qs.filter(
+                created_at__date__range=[start_date, end_date]
+            )
+
         stages = {
-            'NEW': list(agent_leads.filter(status='NEW')),
-            'CONTACTED': list(agent_leads.filter(status='CONTACTED')),
-            'VISIT': list(agent_leads.filter(status='VISIT')),
-            'NEGOTIATION': list(agent_leads.filter(status='NEGOTIATION')),
-            'CLOSED': list(agent_leads.filter(status='CLOSED')),
-            'FAILED': list(agent_leads.filter(status='FAILED')),
-            'OTHER': list(agent_leads.exclude(
+            'NEW': list(agent_leads_qs.filter(status='NEW')),
+            'CONTACTED': list(agent_leads_qs.filter(status='CONTACTED')),
+            'VISIT': list(agent_leads_qs.filter(status='VISIT')),
+            'NEGOTIATION': list(agent_leads_qs.filter(status='NEGOTIATION')),
+            'CLOSED': list(agent_leads_qs.filter(status='CLOSED')),
+            'FAILED': list(agent_leads_qs.filter(status='FAILED')),
+            'OTHER': list(agent_leads_qs.exclude(
                 status__in=['NEW', 'CONTACTED', 'VISIT', 'NEGOTIATION', 'CLOSED', 'FAILED']
             )),
         }
-        
+
         agent_pipeline[agent.id] = {
             'agent': agent,
-            'total': agent_leads.count(),
-            'hot': agent_leads.filter(priority='HOT').count(),
+            'total': agent_leads_qs.count(),
+            'hot': agent_leads_qs.filter(priority='HOT').count(),
             'stages': stages,
         }
-    
-    # Unassigned leads
-    unassigned_leads = Lead.objects.filter(
+
+    # Unassigned leads with date filter
+    unassigned_qs = Lead.objects.filter(
         builder=builder,
         assigned_to__isnull=True
     ).select_related('assigned_to').prefetch_related('properties').order_by('-updated_at')
-    
+
+    if start_date and end_date:
+        unassigned_qs = unassigned_qs.filter(
+            created_at__date__range=[start_date, end_date]
+        )
+
     unassigned_stages = {
-        'NEW': list(unassigned_leads.filter(status='NEW')),
-        'CONTACTED': list(unassigned_leads.filter(status='CONTACTED')),
-        'VISIT': list(unassigned_leads.filter(status='VISIT')),
-        'NEGOTIATION': list(unassigned_leads.filter(status='NEGOTIATION')),
-        'CLOSED': list(unassigned_leads.filter(status='CLOSED')),
-        'FAILED': list(unassigned_leads.filter(status='FAILED')),
-        'OTHER': list(unassigned_leads.exclude(
+        'NEW': list(unassigned_qs.filter(status='NEW')),
+        'CONTACTED': list(unassigned_qs.filter(status='CONTACTED')),
+        'VISIT': list(unassigned_qs.filter(status='VISIT')),
+        'NEGOTIATION': list(unassigned_qs.filter(status='NEGOTIATION')),
+        'CLOSED': list(unassigned_qs.filter(status='CLOSED')),
+        'FAILED': list(unassigned_qs.filter(status='FAILED')),
+        'OTHER': list(unassigned_qs.exclude(
             status__in=['NEW', 'CONTACTED', 'VISIT', 'NEGOTIATION', 'CLOSED', 'FAILED']
         )),
     }
-    
-    all_leads = Lead.objects.filter(builder=builder)
-    
+
+    # Stats with date filter
+    all_leads_qs = Lead.objects.filter(builder=builder)
+    if start_date and end_date:
+        all_leads_qs = all_leads_qs.filter(
+            created_at__date__range=[start_date, end_date]
+        )
+
     context = {
         'agent_pipeline': agent_pipeline,
         'unassigned': {
-            'total': unassigned_leads.count(),
+            'total': unassigned_qs.count(),
             'stages': unassigned_stages,
         },
         'agents': agents,
-        'total_leads': all_leads.count(),
-        'hot_leads': all_leads.filter(priority='HOT').count(),
-        'total_closed': all_leads.filter(status='CLOSED').count(),
+        'total_leads': all_leads_qs.count(),
+        'hot_leads': all_leads_qs.filter(priority='HOT').count(),
+        'total_closed': all_leads_qs.filter(status='CLOSED').count(),
         'conversion_rate': round(
-            (all_leads.filter(status='CLOSED').count() / all_leads.count() * 100), 1
-        ) if all_leads.count() else 0,
+            (all_leads_qs.filter(status='CLOSED').count() / all_leads_qs.count() * 100), 1
+        ) if all_leads_qs.count() else 0,
+        # Date filter context for template
+        'filter_type': filter_type,
+        'start_date': start_date_str if start_date_str else '',
+        'end_date': end_date_str if end_date_str else '',
+        'filter_label': {
+            'all': 'All Time',
+            'today': 'Today',
+            'week': 'This Week',
+            'month': 'This Month',
+            'custom': 'Custom Range'
+        }.get(filter_type, 'All Time'),
     }
-    
+
     return render(request, "builder/pipeline.html", context)
 @login_required
 @require_POST
