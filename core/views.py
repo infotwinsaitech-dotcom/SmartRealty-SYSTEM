@@ -4222,9 +4222,24 @@ def property_leads_page(request, property_id):
 # GOOGLE LOGIN REDIRECT
 # =============================================================================
 
+
+# =============================================================================
+# GOOGLE LOGIN REDIRECT — WITH SUCCESS MESSAGE
+# =============================================================================
+
+from django.contrib import messages
+
 @login_required
 def google_login_redirect(request):
-    """Redirect after Google OAuth login"""
+    """Redirect after Google OAuth login with success message."""
+
+    # Check if this is a newly created user (first login)
+    # You can track this via session or a flag
+    is_new_user = request.session.pop('is_new_social_user', False)
+
+    if is_new_user:
+        messages.success(request, "🎉 Registration completed successfully! Welcome to SmartRealty.")
+
     if request.user.role == 'user':
         return redirect('home')
     elif request.user.role == 'builder':
@@ -4232,8 +4247,6 @@ def google_login_redirect(request):
     elif request.user.role == 'agent':
         return redirect('agent_dashboard')
     return redirect('home')
-
-
 # =============================================================================
 # USERNAME CHECK API
 # =============================================================================

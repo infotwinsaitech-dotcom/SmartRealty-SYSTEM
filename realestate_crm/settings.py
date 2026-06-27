@@ -115,6 +115,11 @@ AUTHENTICATION_BACKENDS = [
 # ALLAUTH SETTINGS
 # =============================================================================
 
+
+# =============================================================================
+# ALLAUTH SETTINGS — UPDATED FOR GOOGLE OAUTH WITH AUTO USERNAME
+# =============================================================================
+
 ACCOUNT_EMAIL_VERIFICATION = "mandatory" if IS_PRODUCTION else "none"
 ACCOUNT_LOGIN_METHODS = {"email"}
 ACCOUNT_SIGNUP_FIELDS = ["email*", "username*", "password1*", "password2*"]
@@ -123,29 +128,34 @@ ACCOUNT_LOGOUT_REDIRECT_URL = "/"
 LOGIN_REDIRECT_URL = "/auth/redirect/"
 LOGOUT_REDIRECT_URL = "/login/"
 LOGIN_URL = "/login/"
+
+# Auto-redirect after social signup (bypass form if possible)
+SOCIALACCOUNT_AUTO_SIGNUP = True  # Try auto signup first
+
+# Custom forms for social signup
+SOCIALACCOUNT_FORMS = {
+    "signup": "core.forms.CustomSocialSignupForm"
+}
+
+# Custom adapter for social accounts
+SOCIALACCOUNT_ADAPTER = "core.adapters.CustomSocialAccountAdapter"
+
 # =============================================================================
 # GOOGLE OAUTH SETTINGS
 # =============================================================================
 
 GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", "")
-GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET", "")  # FIXED: was GOOGLE_SECRET
+GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET", "")
 
-# BUG FIX: do NOT also define "APP" here. The Google app is already
-# created/maintained in the database via core/apps.py's _init_social_app().
-# allauth combines BOTH the settings-based APP config below AND the
-# database SocialApp row into one list — having both for the same
-# provider is exactly what allauth's own docs warn against, and it's
-# what caused every "Continue with Google" click to crash with
-# MultipleObjectsReturned (2 apps found: 1 from settings, 1 from DB).
-# SCOPE/AUTH_PARAMS alone (no "APP" key) is safe to keep here.
 if GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET:
     SOCIALACCOUNT_PROVIDERS = {
         "google": {
             "SCOPE": ["profile", "email"],
             "AUTH_PARAMS": {"access_type": "online"},
+            # Fetch these fields from Google
+            "FETCH_USERINFO": True,
         }
     }
-    SOCIALACCOUNT_AUTO_SIGNUP = True
 else:
     SOCIALACCOUNT_PROVIDERS = {}
     SOCIALACCOUNT_AUTO_SIGNUP = False
