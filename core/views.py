@@ -3260,11 +3260,7 @@ def agent_leads(request):
     leads = Lead.objects.filter(
         assigned_to=agent,
         builder__in=agent_builders
-    ).select_related('builder').prefetch_related(
-        'properties',
-        'leadnote_set',
-        'deals'
-    ).order_by("-created_at")
+    ).select_related('builder').prefetch_related('properties').order_by("-created_at")
 
     q = sanitize_input(request.GET.get("q", ""))
     if q:
@@ -3292,18 +3288,11 @@ def agent_leads(request):
         deals__status__in=["CLOSED", "FAILED"]
     ).distinct()
 
-    # Stats for template - DEFINED AFTER active_leads
-    hot = active_leads.filter(priority='HOT').count()
-    warm = active_leads.filter(priority='WARM').count()
-    cold = active_leads.filter(priority='COLD').count()
-
     return render(request, "agent/agent_leads.html", {
         "leads": active_leads,
         "success_leads": success_leads,
-        "hot": hot,
-        "warm": warm,
-        "cold": cold,
     })
+
 
 @agent_required
 def delete_lead(request, lead_id):
