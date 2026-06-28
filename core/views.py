@@ -4349,3 +4349,24 @@ def get_messages_ajax(request):
         "messages": data, 
         "last_id": msgs.last().id if msgs else last_id
     })
+@agent_required
+def property_leads(request, property_id):
+    """Leads for specific property"""
+    agent = get_object_or_404(Agent, user=request.user)
+    agent_builders = list(agent.builders.all())
+
+    property_obj = get_object_or_404(
+        Property,
+        id=property_id,
+        builder__in=agent_builders
+    )
+
+    leads = Lead.objects.filter(
+        properties__id=property_id,
+        builder__in=agent_builders
+    ).select_related('builder').distinct().order_by("-created_at")
+
+    return render(request, "agent/property_leads.html", {
+        "property": property_obj,
+        "leads": leads,
+    })
