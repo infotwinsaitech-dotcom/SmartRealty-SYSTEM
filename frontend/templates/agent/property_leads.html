@@ -1,0 +1,314 @@
+{% extends "agent/base.html" %}
+{% block content %}
+
+<div class="p-3 md:p-6 bg-gray-50 min-h-screen">
+<div class="max-w-6xl mx-auto">
+
+    <!-- HEADER -->
+    <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-3 mb-5">
+
+        <div>
+            <a href="{% url 'agent_properties' %}"
+               class="text-blue-600 hover:text-blue-800 text-sm font-medium mb-1 inline-flex items-center gap-1">
+                ← Back to Properties
+            </a>
+            <h1 class="text-xl md:text-2xl font-bold text-gray-800">
+                Leads — {{ property.project_name|default:property.title }}
+            </h1>
+            {% if property.configuration %}
+            <p class="text-sm text-gray-500 mt-0.5">
+                🛏️ {{ property.configuration }}
+                {% if property.price %} &nbsp;•&nbsp; ₹{{ property.price }} {{ property.price_unit }}{% endif %}
+            </p>
+            {% endif %}
+        </div>
+
+        <!-- STATS PILLS -->
+        <div class="flex flex-wrap gap-2 text-sm">
+            <span class="bg-blue-100 text-blue-700 px-3 py-1.5 rounded-full font-semibold">
+                Total: {{ leads|length }}
+            </span>
+            <span class="bg-red-100 text-red-700 px-3 py-1.5 rounded-full font-semibold">
+                🔥 HOT: {{ leads|dictsort:"priority"|length }}
+            </span>
+        </div>
+
+    </div>
+
+    <!-- STATUS FILTER TABS -->
+    <div class="flex flex-wrap gap-2 mb-5">
+        <a href="?status="
+           class="px-4 py-1.5 rounded-full text-sm font-medium border transition
+                  {% if not request.GET.status %}bg-gray-800 text-white border-gray-800{% else %}bg-white text-gray-600 border-gray-300 hover:border-gray-500{% endif %}">
+            All
+        </a>
+        <a href="?status=NEW"
+           class="px-4 py-1.5 rounded-full text-sm font-medium border transition
+                  {% if request.GET.status == 'NEW' %}bg-blue-600 text-white border-blue-600{% else %}bg-white text-blue-600 border-blue-300 hover:border-blue-500{% endif %}">
+            🆕 New
+        </a>
+        <a href="?status=CONTACTED"
+           class="px-4 py-1.5 rounded-full text-sm font-medium border transition
+                  {% if request.GET.status == 'CONTACTED' %}bg-purple-600 text-white border-purple-600{% else %}bg-white text-purple-600 border-purple-300 hover:border-purple-500{% endif %}">
+            📞 Contacted
+        </a>
+        <a href="?status=VISIT"
+           class="px-4 py-1.5 rounded-full text-sm font-medium border transition
+                  {% if request.GET.status == 'VISIT' %}bg-yellow-500 text-white border-yellow-500{% else %}bg-white text-yellow-600 border-yellow-300 hover:border-yellow-500{% endif %}">
+            🏠 Site Visit
+        </a>
+        <a href="?status=NEGOTIATION"
+           class="px-4 py-1.5 rounded-full text-sm font-medium border transition
+                  {% if request.GET.status == 'NEGOTIATION' %}bg-orange-500 text-white border-orange-500{% else %}bg-white text-orange-600 border-orange-300 hover:border-orange-500{% endif %}">
+            🤝 Negotiation
+        </a>
+        <a href="?status=CLOSED"
+           class="px-4 py-1.5 rounded-full text-sm font-medium border transition
+                  {% if request.GET.status == 'CLOSED' %}bg-green-600 text-white border-green-600{% else %}bg-white text-green-600 border-green-300 hover:border-green-500{% endif %}">
+            ✅ Closed
+        </a>
+        <a href="?status=FAILED"
+           class="px-4 py-1.5 rounded-full text-sm font-medium border transition
+                  {% if request.GET.status == 'FAILED' %}bg-red-600 text-white border-red-600{% else %}bg-white text-red-600 border-red-300 hover:border-red-500{% endif %}">
+            ❌ Failed
+        </a>
+    </div>
+
+    <!-- LEADS LIST -->
+    <div class="space-y-4">
+
+        {% for lead in leads %}
+
+        <!-- Filter by status if selected -->
+        {% if not request.GET.status or lead.status == request.GET.status %}
+
+        <div class="bg-white shadow-md hover:shadow-lg transition rounded-2xl p-4 flex flex-col lg:flex-row gap-4 border
+            {% if lead.priority == 'HOT' %}border-l-4 border-l-red-500
+            {% elif lead.priority == 'WARM' %}border-l-4 border-l-yellow-400
+            {% else %}border-l-4 border-l-gray-300{% endif %}">
+
+            <!-- LEFT: Client Info -->
+            <div class="flex-1 min-w-0">
+
+                <!-- Name + Priority -->
+                <div class="flex items-center gap-2 flex-wrap mb-1">
+                    <h2 class="text-lg font-bold text-gray-800">{{ lead.name }}</h2>
+                    <span class="text-xs font-bold px-2 py-0.5 rounded-full
+                        {% if lead.priority == 'HOT' %}bg-red-100 text-red-700
+                        {% elif lead.priority == 'WARM' %}bg-yellow-100 text-yellow-700
+                        {% else %}bg-gray-100 text-gray-600{% endif %}">
+                        {% if lead.priority == 'HOT' %}🔥{% elif lead.priority == 'WARM' %}🌤️{% else %}❄️{% endif %}
+                        {{ lead.priority }}
+                    </span>
+                </div>
+
+                <!-- Contact -->
+                <div class="flex flex-wrap gap-3 mt-1">
+                    <a href="tel:{{ lead.phone }}"
+                       class="flex items-center gap-1.5 text-base font-semibold text-blue-700 hover:underline">
+                        📱 {{ lead.phone }}
+                    </a>
+                    {% if lead.email %}
+                    <span class="text-sm text-gray-500">{{ lead.email }}</span>
+                    {% endif %}
+                </div>
+
+                <!-- Lead Status Badge -->
+                <div class="mt-2">
+                    <span class="inline-block px-3 py-1 text-sm font-semibold rounded-full
+                        {% if lead.status == 'NEW' %}bg-blue-100 text-blue-700
+                        {% elif lead.status == 'CONTACTED' %}bg-purple-100 text-purple-700
+                        {% elif lead.status == 'VISIT' %}bg-yellow-100 text-yellow-700
+                        {% elif lead.status == 'NEGOTIATION' %}bg-orange-100 text-orange-700
+                        {% elif lead.status == 'CLOSED' %}bg-green-100 text-green-700
+                        {% elif lead.status == 'FAILED' %}bg-red-100 text-red-700
+                        {% else %}bg-gray-100 text-gray-700{% endif %}">
+                        {% if lead.status == 'NEW' %}🆕
+                        {% elif lead.status == 'CONTACTED' %}📞
+                        {% elif lead.status == 'VISIT' %}🏠
+                        {% elif lead.status == 'NEGOTIATION' %}🤝
+                        {% elif lead.status == 'CLOSED' %}✅
+                        {% elif lead.status == 'FAILED' %}❌
+                        {% endif %}
+                        {{ lead.get_status_display }}
+                    </span>
+                </div>
+
+                <!-- Source & Date -->
+                <div class="mt-2 flex flex-wrap gap-3 text-xs text-gray-400">
+                    <span>Source: {{ lead.source }}</span>
+                    <span>Added: {{ lead.created_at|date:"d M Y" }}</span>
+                    {% if lead.last_contacted %}
+                    <span>Last Contact: {{ lead.last_contacted|date:"d M Y" }}</span>
+                    {% endif %}
+                </div>
+
+                <!-- Notes -->
+                {% if lead.leadnote_set.all %}
+                <div class="mt-3 bg-gray-50 rounded-lg p-2.5">
+                    <p class="text-xs text-gray-400 font-semibold mb-1">📋 Notes</p>
+                    <div id="notes-{{ lead.id }}" class="space-y-1 max-h-24 overflow-y-auto text-sm text-gray-600">
+                        {% for n in lead.leadnote_set.all %}
+                        <p>• {{ n.note }}</p>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% else %}
+                <div id="notes-{{ lead.id }}" class="hidden"></div>
+                {% endif %}
+
+                <!-- Add Note -->
+                <div class="mt-2 flex gap-2">
+                    <input type="text"
+                           id="note-input-{{ lead.id }}"
+                           placeholder="Add note..."
+                           class="border px-3 py-1.5 rounded text-sm w-full focus:ring-2 focus:ring-blue-400">
+                    <button onclick="addNote({{ lead.id }})"
+                            class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1.5 rounded text-sm font-medium shrink-0 transition">
+                        Add
+                    </button>
+                </div>
+
+            </div>
+
+            <!-- RIGHT: Deals -->
+            <div class="w-full lg:w-80 flex-shrink-0 space-y-3">
+
+                <!-- Existing Deals -->
+                {% if lead.deals.all %}
+                {% for deal in lead.deals.all %}
+                <div class="bg-gray-50 border rounded-xl p-3">
+                    <div class="flex items-center justify-between mb-1">
+                        <p class="font-bold text-gray-800 text-sm">{{ deal.client_name }}</p>
+                        <span class="text-xs px-2 py-0.5 rounded-full font-semibold
+                            {% if deal.status == 'NEW' %}bg-blue-100 text-blue-700
+                            {% elif deal.status == 'NEGOTIATION' %}bg-orange-100 text-orange-700
+                            {% elif deal.status == 'BOOKED' %}bg-indigo-100 text-indigo-700
+                            {% elif deal.status == 'CLOSED' %}bg-green-100 text-green-700
+                            {% elif deal.status == 'FAILED' %}bg-red-100 text-red-700
+                            {% elif deal.status == 'CANCELLED' %}bg-gray-100 text-gray-600
+                            {% endif %}">
+                            {{ deal.get_status_display }}
+                        </span>
+                    </div>
+                    {% if deal.client_phone %}
+                    <p class="text-xs text-gray-500">📱 {{ deal.client_phone }}</p>
+                    {% endif %}
+                    {% if deal.amount %}
+                    <p class="text-sm font-semibold text-green-700 mt-0.5">
+                        ₹{{ deal.amount }} {{ deal.amount_unit|default:"" }}
+                    </p>
+                    {% endif %}
+
+                    <!-- Update Deal Status -->
+                    <form method="POST" action="{% url 'update_deal' deal.id %}" class="mt-2">
+                        {% csrf_token %}
+                        <select name="status" onchange="this.form.submit()"
+                                class="border px-2 py-1.5 rounded w-full text-sm bg-white">
+                            <option value="NEW" {% if deal.status == "NEW" %}selected{% endif %}>🆕 New</option>
+                            <option value="NEGOTIATION" {% if deal.status == "NEGOTIATION" %}selected{% endif %}>🤝 Negotiation</option>
+                            <option value="BOOKED" {% if deal.status == "BOOKED" %}selected{% endif %}>📋 Booked</option>
+                            <option value="CLOSED" {% if deal.status == "CLOSED" %}selected{% endif %}>✅ Closed</option>
+                            <option value="FAILED" {% if deal.status == "FAILED" %}selected{% endif %}>❌ Failed</option>
+                            <option value="CANCELLED" {% if deal.status == "CANCELLED" %}selected{% endif %}>🚫 Cancelled</option>
+                        </select>
+                    </form>
+                </div>
+                {% endfor %}
+                {% endif %}
+
+                <!-- Add New Deal -->
+                <details class="bg-white border border-dashed border-blue-300 rounded-xl">
+                    <summary class="p-3 text-sm font-medium text-blue-600 cursor-pointer hover:bg-blue-50 rounded-xl">
+                        ➕ Add Deal / Update Status
+                    </summary>
+                    <form method="POST" action="{% url 'add_deal' %}" class="p-3 pt-0 space-y-2">
+                        {% csrf_token %}
+                        <input type="hidden" name="property_id" value="{{ property.id }}">
+                        <input type="hidden" name="lead_id" value="{{ lead.id }}">
+
+                        <input name="client_name" placeholder="Client Name *"
+                               value="{{ lead.name }}"
+                               class="border px-3 py-2 rounded w-full text-sm focus:ring-2 focus:ring-blue-400">
+
+                        <input name="client_phone" placeholder="Client Phone"
+                               value="{{ lead.phone }}"
+                               class="border px-3 py-2 rounded w-full text-sm focus:ring-2 focus:ring-blue-400">
+
+                        <div class="flex gap-2">
+                            <input name="amount" type="number" step="0.01" placeholder="Amount (e.g. 78.5)"
+                                   class="flex-1 border px-3 py-2 rounded text-sm focus:ring-2 focus:ring-blue-400">
+                            <select name="amount_unit" class="w-24 border px-2 py-2 rounded text-sm">
+                                <option value="L">Lakh (L)</option>
+                                <option value="Cr">Crore (Cr)</option>
+                            </select>
+                        </div>
+
+                        <select name="status" class="border px-3 py-2 rounded w-full text-sm">
+                            <option value="NEW">🆕 New</option>
+                            <option value="NEGOTIATION">🤝 Negotiation</option>
+                            <option value="BOOKED">📋 Booked</option>
+                            <option value="CLOSED">✅ Closed</option>
+                            <option value="FAILED">❌ Failed</option>
+                        </select>
+
+                        <button class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded w-full text-sm font-semibold transition">
+                            💾 Save Deal
+                        </button>
+                    </form>
+                </details>
+
+                <!-- Action Buttons -->
+                <div class="flex flex-wrap gap-2">
+                    <a href="tel:{{ lead.phone }}"
+                       class="flex-1 text-center bg-blue-100 hover:bg-blue-200 text-blue-700 px-3 py-2 rounded-lg text-sm font-medium transition">
+                        📞 Call
+                    </a>
+                    <a href="https://wa.me/91{{ lead.phone }}"
+                       target="_blank"
+                       class="flex-1 text-center bg-green-100 hover:bg-green-200 text-green-700 px-3 py-2 rounded-lg text-sm font-medium transition">
+                        💬 WhatsApp
+                    </a>
+                </div>
+
+            </div>
+
+        </div>
+
+        {% endif %}
+        {% empty %}
+        <div class="text-center py-16 text-gray-400">
+            <p class="text-5xl mb-3">📭</p>
+            <p class="text-lg font-medium">No leads for this property yet</p>
+        </div>
+        {% endfor %}
+
+    </div>
+
+</div>
+</div>
+
+<script>
+function addNote(leadId) {
+    const input = document.getElementById("note-input-" + leadId);
+    const note = input.value.trim();
+    if (!note) return;
+
+    fetch("/add-note/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ lead_id: leadId, note: note })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            const notesDiv = document.getElementById("notes-" + leadId);
+            notesDiv.classList.remove("hidden");
+            notesDiv.innerHTML += `<p>• ${note}</p>`;
+            input.value = "";
+        }
+    });
+}
+</script>
+
+{% endblock %}
