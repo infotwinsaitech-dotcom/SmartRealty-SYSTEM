@@ -1,35 +1,37 @@
 {% extends "agent/base.html" %}
 {% block content %}
 
-<div class="p-4 md:p-6 bg-gray-50 min-h-screen">
+<div class="p-3 md:p-6 bg-gray-50 min-h-screen">
 
-<div class="max-w-7xl mx-auto">
+<div class="max-w-6xl mx-auto">
 
     <!-- HEADER -->
-    <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6">
+    <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-3 mb-5">
 
-        <h1 class="text-2xl md:text-3xl font-bold text-gray-800">My Leads</h1>
+        <h1 class="text-xl md:text-2xl font-bold text-gray-800">My Leads</h1>
 
         <form method="GET"
-              class="flex flex-col md:flex-row gap-2 w-full md:w-auto bg-white p-3 rounded-xl shadow">
+              class="flex flex-col sm:flex-row gap-2 w-full md:w-auto bg-white p-3 rounded-xl shadow">
 
             <input type="text" name="q" value="{{ request.GET.q }}"
                 placeholder="Search name / phone..."
-                class="border px-3 py-2 rounded w-full md:w-64 text-sm focus:ring-2 focus:ring-blue-400">
+                class="border px-3 py-2 rounded w-full sm:w-56 text-base focus:ring-2 focus:ring-blue-400">
 
-            <select name="status" class="border px-2 py-2 rounded text-sm w-full md:w-auto">
-                <option value="">All</option>
-                <option value="HOT">HOT</option>
-                <option value="WARM">WARM</option>
-                <option value="COLD">COLD</option>
-            </select>
+            <div class="flex gap-2">
+                <select name="status" class="border px-2 py-2 rounded text-base flex-1">
+                    <option value="">All</option>
+                    <option value="HOT">HOT</option>
+                    <option value="WARM">WARM</option>
+                    <option value="COLD">COLD</option>
+                </select>
 
-            <select name="sort" class="border px-2 py-2 rounded text-sm w-full md:w-auto">
-                <option value="new">Newest</option>
-                <option value="old">Oldest</option>
-            </select>
+                <select name="sort" class="border px-2 py-2 rounded text-base flex-1">
+                    <option value="new">Newest</option>
+                    <option value="old">Oldest</option>
+                </select>
+            </div>
 
-            <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm transition w-full md:w-auto">
+            <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-base font-medium transition w-full sm:w-auto">
                 Search
             </button>
 
@@ -37,36 +39,36 @@
     </div>
 
     <!-- STATS -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 text-center text-sm max-w-5xl mx-auto">
+    <div class="grid grid-cols-3 gap-2 md:gap-3 mb-5 text-center text-sm max-w-2xl mx-auto">
 
-        <div class="bg-gradient-to-r from-red-500 to-red-600 text-white p-4 rounded-xl shadow flex items-center justify-center font-semibold">
+        <div class="bg-gradient-to-r from-red-500 to-red-600 text-white py-3 rounded-xl shadow flex items-center justify-center font-semibold">
             HOT
         </div>
 
-        <div class="bg-gradient-to-r from-yellow-400 to-yellow-500 text-white p-4 rounded-xl shadow flex items-center justify-center font-semibold">
+        <div class="bg-gradient-to-r from-yellow-400 to-yellow-500 text-white py-3 rounded-xl shadow flex items-center justify-center font-semibold">
             WARM
         </div>
 
-        <div class="bg-gradient-to-r from-gray-500 to-gray-600 text-white p-4 rounded-xl shadow flex items-center justify-center font-semibold">
+        <div class="bg-gradient-to-r from-gray-500 to-gray-600 text-white py-3 rounded-xl shadow flex items-center justify-center font-semibold">
             COLD
         </div>
 
     </div>
 
     <!-- LEADS LIST -->
-    <div class="space-y-5">
+    <div class="space-y-4">
 
         {% for lead in leads %}
-        <div class="bg-white shadow-lg hover:shadow-xl transition rounded-2xl p-5 flex flex-col lg:flex-row lg:justify-between gap-5 border">
+        <div class="bg-white shadow-md hover:shadow-lg transition rounded-2xl p-4 flex flex-col lg:flex-row gap-4 border">
 
             <!-- LEFT -->
             <div class="flex-1 min-w-0">
-                <h2 class="text-lg md:text-xl font-bold text-gray-800 break-words">{{ lead.name }}</h2>
-                <p class="text-sm text-gray-500 break-words">{{ lead.email }}</p>
-                <p class="text-sm font-medium text-gray-700">{{ lead.phone }}</p>
+                <h2 class="text-lg font-bold text-gray-800 break-words">{{ lead.name }}</h2>
+                <p class="text-base text-gray-500 break-words">{{ lead.email }}</p>
+                <p class="text-base font-medium text-gray-700">{{ lead.phone }}</p>
 
                 {% if lead.last_contacted %}
-                <p class="text-xs text-gray-400 mt-1">
+                <p class="text-sm text-gray-400 mt-1">
                     Last: {{ lead.last_contacted }}
                 </p>
                 {% endif %}
@@ -75,7 +77,7 @@
                 {% if lead.properties.all %}
                 <div class="mt-3 flex flex-wrap gap-2">
                     {% for p in lead.properties.all %}
-                    <div class="inline-flex items-center gap-1.5 bg-gradient-to-r from-indigo-50 to-blue-50 border border-indigo-200 rounded-full pl-2 pr-3 py-1.5 text-xs shadow-sm">
+                    <div class="inline-flex items-center gap-1.5 bg-gradient-to-r from-indigo-50 to-blue-50 border border-indigo-200 rounded-full pl-2 pr-3 py-1.5 text-sm shadow-sm">
                         <span class="text-indigo-600">🏠</span>
                         <span class="font-semibold text-indigo-800">{{ p.project_name|default:p.title }}</span>
                         {% if p.configuration %}
@@ -93,10 +95,10 @@
             </div>
 
             <!-- RIGHT -->
-            <div class="w-full lg:w-96 flex-shrink-0">
+            <div class="w-full lg:w-72 flex-shrink-0">
 
                 <!-- STATUS -->
-                <span class="inline-block px-3 py-1 text-xs rounded-full text-white mb-2
+                <span class="inline-block px-3 py-1 text-sm font-medium rounded-full text-white mb-2
                     {% if lead.status == 'HOT' %} bg-red-500
                     {% elif lead.status == 'WARM' %} bg-yellow-500
                     {% else %} bg-gray-500 {% endif %}">
@@ -104,9 +106,9 @@
                 </span>
 
                 <!-- NOTES -->
-                <div class="mt-2 bg-gray-50 p-3 rounded-lg">
+                <div class="mt-2 bg-gray-50 p-2.5 rounded-lg">
 
-                    <div id="notes-{{ lead.id }}" class="text-xs text-gray-600 mb-2 space-y-1 max-h-32 overflow-y-auto">
+                    <div id="notes-{{ lead.id }}" class="text-sm text-gray-600 mb-2 space-y-1 max-h-28 overflow-y-auto">
                         {% for n in lead.leadnote_set.all %}
                             <p>• {{ n.note }}</p>
                         {% endfor %}
@@ -116,10 +118,10 @@
                         <input type="text"
                                id="note-input-{{ lead.id }}"
                                placeholder="Add note..."
-                               class="border p-2 rounded text-xs w-full focus:ring-2 focus:ring-blue-400">
+                               class="border p-2 rounded text-sm w-full focus:ring-2 focus:ring-blue-400">
 
                         <button onclick="addNote({{ lead.id }})"
-                                class="bg-blue-500 hover:bg-blue-600 text-white px-3 rounded text-xs transition">
+                                class="bg-blue-500 hover:bg-blue-600 text-white px-3 rounded text-sm font-medium transition shrink-0">
                             Add
                         </button>
                     </div>
@@ -127,27 +129,27 @@
                 </div>
 
                 <!-- ACTIONS -->
-                <div class="mt-3 flex flex-wrap gap-2">
+                <div class="mt-2.5 flex flex-wrap gap-2">
 
                     <a href="tel:{{ lead.phone }}"
-                       class="bg-blue-100 hover:bg-blue-200 text-blue-700 px-3 py-1 rounded text-xs transition">
+                       class="bg-blue-100 hover:bg-blue-200 text-blue-700 px-3 py-1.5 rounded text-sm font-medium transition">
                         Call
                     </a>
 
                     <a href="https://wa.me/{{ lead.phone }}"
-                       class="bg-green-100 hover:bg-green-200 text-green-700 px-3 py-1 rounded text-xs transition">
+                       class="bg-green-100 hover:bg-green-200 text-green-700 px-3 py-1.5 rounded text-sm font-medium transition">
                         WhatsApp
                     </a>
 
                     <a href="#"
-                       class="bg-purple-100 hover:bg-purple-200 text-purple-700 px-3 py-1 rounded text-xs transition">
+                       class="bg-purple-100 hover:bg-purple-200 text-purple-700 px-3 py-1.5 rounded text-sm font-medium transition">
                         Update
                     </a>
 
                 </div>
 
                 <!-- DEAL FORM -->
-                <form method="POST" action="{% url 'add_deal' %}" class="mt-3 bg-gray-50 p-3 rounded-lg">
+                <form method="POST" action="{% url 'add_deal' %}" class="mt-2.5 bg-gray-50 p-2.5 rounded-lg">
                 {% csrf_token %}
 
                 <input type="hidden" name="property_id" value="{{ lead.properties.first.id }}">
@@ -155,14 +157,13 @@
                 <input name="client_name" placeholder="Client Name"
                 class="border p-2 rounded w-full mb-2 text-sm">
 
-                <div class="flex gap-2">
-    <input name="amount" type="number" step="0.01" placeholder="e.g. 78.5" class="flex-1 border p-2 rounded">
-    <select name="amount_unit" class="border p-2 rounded">
-        <option value="L">Lakh (L)</option>
-        <option value="Cr">Crore (Cr)</option>
-    </select>
-</div>
-                
+                <div class="flex gap-2 mb-2">
+                    <input name="amount" type="number" step="0.01" placeholder="e.g. 78.5" class="flex-1 border p-2 rounded text-sm">
+                    <select name="amount_unit" class="border p-2 rounded text-sm">
+                        <option value="L">Lakh (L)</option>
+                        <option value="Cr">Crore (Cr)</option>
+                    </select>
+                </div>
 
                 <select name="status" class="border p-2 rounded w-full mb-2 text-sm">
                     <option value="NEW">New</option>
@@ -172,7 +173,7 @@
                     <option value="FAILED">Failed</option>
                 </select>
 
-                <button class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded w-full text-sm transition">
+                <button class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded w-full text-sm font-medium transition">
                     Save Deal
                 </button>
 
@@ -206,26 +207,26 @@
     </div>
 
     <!-- ✅ SUCCESS LEADS (FIXED) -->
-    <div class="mt-10">
+    <div class="mt-8">
 
-        <h2 class="text-xl font-bold text-green-700 mb-4">
+        <h2 class="text-lg font-bold text-green-700 mb-3">
             ✅ Closed / Failed Leads
         </h2>
 
-        <div class="space-y-4">
+        <div class="space-y-3">
 
             {% for lead in success_leads %}
-            <div class="bg-green-50 border border-green-200 rounded-xl p-4 flex justify-between items-center">
+            <div class="bg-green-50 border border-green-200 rounded-xl p-3.5 flex justify-between items-center flex-wrap gap-2">
 
                 <div>
-                    <p class="font-semibold text-gray-800">{{ lead.name }}</p>
+                    <p class="font-semibold text-gray-800 text-base">{{ lead.name }}</p>
                     <p class="text-sm text-gray-500">{{ lead.phone }}</p>
                 </div>
 
                 <div class="flex gap-2 items-center">
 
                     {% for deal in lead.deals.all %}
-                    <span class="px-2 py-1 text-xs rounded
+                    <span class="px-2 py-1 text-sm font-medium rounded
                         {% if deal.status == 'CLOSED' %} bg-green-500 text-white
                         {% elif deal.status == 'FAILED' %} bg-red-500 text-white
                         {% endif %}
@@ -235,7 +236,7 @@
                     {% endfor %}
 
                     <a href="{% url 'delete_lead' lead.id %}"
-                       class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-xs">
+                       class="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded text-sm font-medium">
                         Delete
                     </a>
 
