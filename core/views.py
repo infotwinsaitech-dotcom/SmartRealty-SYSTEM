@@ -3253,19 +3253,20 @@ def agent_dashboard(request):
 
 @agent_required
 def agent_leads(request):
-    """Agent leads management"""
+    """Agent leads management - Production Ready"""
     agent = get_object_or_404(Agent, user=request.user)
     agent_builders = list(agent.builders.all())
 
+    # Base queryset with optimized selects
     leads = Lead.objects.filter(
         assigned_to=agent,
         builder__in=agent_builders
-    ).select_related('builder').prefetch_related(
-        'properties',
-        'leadnote_set',
-        'deals'
+    ).select_related('builder', 'assigned_to').prefetch_related(
+        'properties',   # For property details display
+        'deals'         # For deal status checking
     ).order_by("-created_at")
 
+    # Search filter
     q = sanitize_input(request.GET.get("q", ""))
     if q:
         leads = leads.filter(
@@ -3274,16 +3275,19 @@ def agent_leads(request):
             Q(phone__icontains=q)
         )
 
+    # Status filter
     status = sanitize_input(request.GET.get("status", ""))
     if status:
         leads = leads.filter(status=status)
 
+    # Sort
     sort = sanitize_input(request.GET.get("sort", ""))
     if sort == "old":
         leads = leads.order_by("created_at")
     else:
         leads = leads.order_by("-created_at")
 
+    # Split into active and closed/failed
     active_leads = leads.exclude(
         deals__status__in=["CLOSED", "FAILED"]
     ).distinct()
