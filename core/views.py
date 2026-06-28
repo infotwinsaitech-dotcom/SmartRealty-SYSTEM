@@ -3253,6 +3253,7 @@ def agent_dashboard(request):
 
 @agent_required
 def agent_leads(request):
+    """Agent leads management"""
     agent = get_object_or_404(Agent, user=request.user)
     agent_builders = list(agent.builders.all())
 
@@ -3260,14 +3261,38 @@ def agent_leads(request):
         assigned_to=agent,
         builder__in=agent_builders
     ).select_related('builder').prefetch_related(
-        'properties',        # <-- YEH ADD KARO
-        'leadnote_set',      # <-- YEH ADD KARO  
-        'deals'              # <-- YEH ADD KARO
+        'properties',
+        'leadnote_set',
+        'deals'
     ).order_by("-created_at")
 
-    # ... baaki same code ...
+    q = sanitize_input(request.GET.get("q", ""))
+    if q:
+        leads = leads.filter(
+            Q(name__icontains=q) |
+            Q(email__icontains=q) |
+            Q(phone__icontains=q)
+        )
+
+    status = sanitize_input(request.GET.get("status", ""))
+    if status:
+        leads = leads.filter(status=status)
+
+    sort = sanitize_input(request.GET.get("sort", ""))
+    if sort == "old":
+        leads = leads.order_by("created_at")
+    else:
+        leads = leads.order_by("-created_at")
+
+    active_leads = leads.exclude(
+        deals__status__in=["CLOSED", "FAILED"]
+    ).distinct()
     
-    # End mein ye stats bhi pass karo:
+    success_leads = leads.filter(
+        deals__status__in=["CLOSED", "FAILED"]
+    ).distinct()
+
+    # Stats for template - DEFINED AFTER active_leads
     hot = active_leads.filter(priority='HOT').count()
     warm = active_leads.filter(priority='WARM').count()
     cold = active_leads.filter(priority='COLD').count()
