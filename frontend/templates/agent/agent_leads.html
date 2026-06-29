@@ -162,20 +162,16 @@
                     </a>
 
                     <!-- FIXED: Status update dropdown with all choices -->
-                    <form method="POST" action="{% url 'update_lead_status' %}" class="inline" onsubmit="return false;">
-                        {% csrf_token %}
-                        <input type="hidden" name="lead_id" value="{{ lead.id }}">
-                        <select name="status" onchange="updateStatus(this, {{ lead.id }})"
-                                class="border px-2 py-1.5 rounded text-sm font-medium bg-purple-100 text-purple-700 hover:bg-purple-200 transition cursor-pointer">
-                            <option value="" disabled selected>Update Status</option>
-                            <option value="NEW">New</option>
-                            <option value="CONTACTED">Contacted</option>
-                            <option value="VISIT">Site Visit</option>
-                            <option value="NEGOTIATION">Negotiation</option>
-                            <option value="CLOSED">Closed</option>
-                            <option value="FAILED">Failed</option>
-                        </select>
-                    </form>
+                    <select onchange="updateStatus(this, {{ lead.id }})"
+                            class="border px-2 py-1.5 rounded text-sm font-medium bg-purple-100 text-purple-700 hover:bg-purple-200 transition cursor-pointer">
+                        <option value="" disabled selected>Update Status</option>
+                        <option value="NEW">New</option>
+                        <option value="CONTACTED">Contacted</option>
+                        <option value="VISIT">Site Visit</option>
+                        <option value="NEGOTIATION">Negotiation</option>
+                        <option value="CLOSED">Closed</option>
+                        <option value="FAILED">Failed</option>
+                    </select>
 
                 </div>
 
@@ -285,7 +281,7 @@
 </div>
 
 <script>
-// FIXED: Proper AJAX status update
+// FIXED: Proper AJAX status update with correct URL
 function updateStatus(selectEl, leadId) {
     const status = selectEl.value;
     if (!status) return;
@@ -304,7 +300,6 @@ function updateStatus(selectEl, leadId) {
     .then(res => res.json())
     .then(data => {
         if (data.success) {
-            // Reload page to show updated status badge
             window.location.reload();
         } else {
             alert(data.message || "Failed to update status");
@@ -313,12 +308,12 @@ function updateStatus(selectEl, leadId) {
     })
     .catch(err => {
         console.error(err);
-        alert("Network error");
+        alert("Network error - make sure /update-lead-status/ URL is registered in urls.py");
         selectEl.value = "";
     });
 }
 
-// FIXED: Proper AJAX note add
+// FIXED: Proper AJAX note add with correct URL
 function addNote(leadId) {
     let input = document.getElementById("note-input-" + leadId);
     let note = input.value.trim();
@@ -340,7 +335,6 @@ function addNote(leadId) {
     .then(data => {
         if (data.success) {
             let notesDiv = document.getElementById("notes-" + leadId);
-            // Remove "No notes yet" text if present
             if (notesDiv.querySelector('.italic')) {
                 notesDiv.innerHTML = '';
             }
@@ -352,7 +346,7 @@ function addNote(leadId) {
     })
     .catch(err => {
         console.error(err);
-        alert("Network error");
+        alert("Network error - make sure /add-note/ URL is registered in urls.py");
     });
 }
 

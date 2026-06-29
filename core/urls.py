@@ -144,6 +144,9 @@ urlpatterns = [
 path("agent/toggle-scheduler/", views.toggle_scheduler, name="toggle_scheduler"),
 path('pipeline/', views.builder_pipeline, name='builder_pipeline'),
 path('accounts/', include('allauth.urls')),
+    path("update-lead-status/", views.update_lead_status, name="update_lead_status"),
+    path("add-note/", views.add_note, name="add_note"),
+    path("update-priority/", views.update_priority, name="update_priority"),
 ]
 
 if settings.DEBUG:
