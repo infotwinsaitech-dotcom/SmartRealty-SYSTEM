@@ -1,5 +1,6 @@
 {% extends "agent/base.html" %}
 {% block content %}
+{% load humanize %}
 
 <div class="p-3 md:p-6 bg-gray-50 min-h-screen">
 <div class="max-w-6xl mx-auto">
@@ -17,7 +18,7 @@
             {% if property.configuration %}
             <p class="text-sm text-gray-500 mt-0.5">
                 🛏️ {{ property.configuration }}
-                {% if property.price %}&nbsp;•&nbsp;₹{{ property.price }} {{ property.price_unit }}{% endif %}
+                {% if property.price %}&nbsp;•&nbsp;{{ property.price|floatformat:0|intcomma }} {{ property.price_unit }}{% endif %}
             </p>
             {% endif %}
         </div>
@@ -149,7 +150,13 @@
                         Deal: {{ deal.get_status_display }}
                     </span>
                     {% if deal.amount %}
-                    <p class="text-xs font-bold text-green-700 mt-0.5">₹{{ deal.amount }} {{ deal.amount_unit|default:"" }}</p>
+                    <p class="text-xs font-bold text-green-700 mt-0.5">
+                        {% if deal.amount_unit == 'Cr' %}
+                            ₹{{ deal.amount|div:10000000|floatformat:1 }} Cr
+                        {% else %}
+                            ₹{{ deal.amount|div:100000|floatformat:1 }} L
+                        {% endif %}
+                    </p>
                     {% endif %}
                 </div>
                 {% endfor %}
