@@ -4351,7 +4351,7 @@ def get_messages_ajax(request):
     })
 @agent_required
 def property_leads(request, property_id):
-    """Leads for specific property"""
+    """Leads for specific property - FIXED with formatted prices"""
     agent = get_object_or_404(Agent, user=request.user)
     agent_builders = list(agent.builders.all())
 
@@ -4361,7 +4361,7 @@ def property_leads(request, property_id):
         builder__in=agent_builders
     )
 
-    # Format property price
+    # ===== FIX: Format property price =====
     if property_obj.price:
         try:
             price_val = float(property_obj.price)
@@ -4381,7 +4381,7 @@ def property_leads(request, property_id):
         builder__in=agent_builders
     ).select_related('builder').distinct().order_by("-created_at")
 
-    # Format deal amounts
+    # ===== FIX: Format deal amounts =====
     for lead in leads:
         for deal in lead.deals.all():
             if deal.amount:

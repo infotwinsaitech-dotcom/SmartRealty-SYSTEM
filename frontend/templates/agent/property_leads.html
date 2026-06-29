@@ -1,5 +1,4 @@
 {% extends "agent/base.html" %}
-{% load custom_filters %}
 {% block content %}
 
 <div class="p-3 md:p-6 bg-gray-50 min-h-screen">
@@ -18,7 +17,7 @@
             {% if property.configuration %}
             <p class="text-sm text-gray-500 mt-0.5">
                 🛏️ {{ property.configuration }}
-                {% if property.price %}&nbsp;•&nbsp;{{ property.price|format_price }}{% endif %}
+                {% if property.display_price %}&nbsp;•&nbsp;{{ property.display_price }}{% endif %}
             </p>
             {% endif %}
         </div>
@@ -149,9 +148,9 @@
                         {% endif %}">
                         Deal: {{ deal.get_status_display }}
                     </span>
-                    {% if deal.amount %}
+                    {% if deal.display_amount %}
                     <p class="text-xs font-bold text-green-700 mt-0.5">
-                        {{ deal.amount|format_price }}
+                        {{ deal.display_amount }}
                     </p>
                     {% endif %}
                 </div>
