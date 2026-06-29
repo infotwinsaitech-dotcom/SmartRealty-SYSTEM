@@ -4361,10 +4361,42 @@ def property_leads(request, property_id):
         builder__in=agent_builders
     )
 
+    # Format property price
+    if property_obj.price:
+        try:
+            price_val = float(property_obj.price)
+            if price_val >= 10000000:
+                property_obj.display_price = f"₹{price_val/10000000:.1f} Cr"
+            elif price_val >= 100000:
+                property_obj.display_price = f"₹{price_val/100000:.0f} Lakh"
+            else:
+                property_obj.display_price = f"₹{price_val:.0f}"
+        except (ValueError, TypeError):
+            property_obj.display_price = f"₹{property_obj.price}"
+    else:
+        property_obj.display_price = None
+
     leads = Lead.objects.filter(
         properties__id=property_id,
         builder__in=agent_builders
     ).select_related('builder').distinct().order_by("-created_at")
+
+    # Format deal amounts
+    for lead in leads:
+        for deal in lead.deals.all():
+            if deal.amount:
+                try:
+                    amt = float(deal.amount)
+                    if amt >= 10000000:
+                        deal.display_amount = f"₹{amt/10000000:.1f} Cr"
+                    elif amt >= 100000:
+                        deal.display_amount = f"₹{amt/100000:.0f} Lakh"
+                    else:
+                        deal.display_amount = f"₹{amt:.0f}"
+                except (ValueError, TypeError):
+                    deal.display_amount = f"₹{deal.amount}"
+            else:
+                deal.display_amount = None
 
     return render(request, "agent/property_leads.html", {
         "property": property_obj,
