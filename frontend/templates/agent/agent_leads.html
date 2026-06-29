@@ -18,16 +18,20 @@
                 class="border px-3 py-2 rounded w-full sm:w-56 text-base focus:ring-2 focus:ring-blue-400">
 
             <div class="flex gap-2">
+                <!-- FIXED: Status dropdown now shows all Lead.STATUS_CHOICES from model -->
                 <select name="status" class="border px-2 py-2 rounded text-base flex-1">
-                    <option value="">All</option>
-                    <option value="HOT">HOT</option>
-                    <option value="WARM">WARM</option>
-                    <option value="COLD">COLD</option>
+                    <option value="">All Status</option>
+                    <option value="NEW" {% if request.GET.status == "NEW" %}selected{% endif %}>New</option>
+                    <option value="CONTACTED" {% if request.GET.status == "CONTACTED" %}selected{% endif %}>Contacted</option>
+                    <option value="VISIT" {% if request.GET.status == "VISIT" %}selected{% endif %}>Site Visit</option>
+                    <option value="NEGOTIATION" {% if request.GET.status == "NEGOTIATION" %}selected{% endif %}>Negotiation</option>
+                    <option value="CLOSED" {% if request.GET.status == "CLOSED" %}selected{% endif %}>Closed</option>
+                    <option value="FAILED" {% if request.GET.status == "FAILED" %}selected{% endif %}>Failed</option>
                 </select>
 
                 <select name="sort" class="border px-2 py-2 rounded text-base flex-1">
-                    <option value="new">Newest</option>
-                    <option value="old">Oldest</option>
+                    <option value="new" {% if request.GET.sort == "new" %}selected{% endif %}>Newest</option>
+                    <option value="old" {% if request.GET.sort == "old" %}selected{% endif %}>Oldest</option>
                 </select>
             </div>
 
@@ -73,7 +77,7 @@
                 </p>
                 {% endif %}
 
-                <!-- PROPERTY TAGS — colorful chip with icons -->
+                <!-- PROPERTY TAGS -->
                 {% if lead.properties.all %}
                 <div class="mt-3 flex flex-wrap gap-2">
                     {% for p in lead.properties.all %}
@@ -97,20 +101,36 @@
             <!-- RIGHT -->
             <div class="w-full lg:w-72 flex-shrink-0">
 
-                <!-- STATUS -->
+                <!-- STATUS BADGE -->
+                <!-- FIXED: All 6 status choices with proper colors -->
                 <span class="inline-block px-3 py-1 text-sm font-medium rounded-full text-white mb-2
-                    {% if lead.status == 'HOT' %} bg-red-500
-                    {% elif lead.status == 'WARM' %} bg-yellow-500
-                    {% else %} bg-gray-500 {% endif %}">
+                    {% if lead.status == 'NEW' %} bg-gray-500
+                    {% elif lead.status == 'CONTACTED' %} bg-blue-500
+                    {% elif lead.status == 'VISIT' %} bg-purple-500
+                    {% elif lead.status == 'NEGOTIATION' %} bg-orange-500
+                    {% elif lead.status == 'CLOSED' %} bg-green-500
+                    {% elif lead.status == 'FAILED' %} bg-red-500
+                    {% else %} bg-gray-400 {% endif %}">
                     {{ lead.status }}
+                </span>
+
+                <!-- PRIORITY BADGE -->
+                <span class="inline-block px-2 py-0.5 text-xs font-medium rounded-full text-white ml-1
+                    {% if lead.priority == 'HOT' %} bg-red-500
+                    {% elif lead.priority == 'WARM' %} bg-yellow-500
+                    {% else %} bg-gray-400 {% endif %}">
+                    {{ lead.priority }}
                 </span>
 
                 <!-- NOTES -->
                 <div class="mt-2 bg-gray-50 p-2.5 rounded-lg">
 
+                    <!-- FIXED: Use correct related_name 'lead_notes' instead of 'leadnote_set' -->
                     <div id="notes-{{ lead.id }}" class="text-sm text-gray-600 mb-2 space-y-1 max-h-28 overflow-y-auto">
-                        {% for n in lead.leadnote_set.all %}
+                        {% for n in lead.lead_notes.all %}
                             <p>• {{ n.note }}</p>
+                        {% empty %}
+                            <p class="text-gray-400 italic text-xs">No notes yet</p>
                         {% endfor %}
                     </div>
 
@@ -141,10 +161,21 @@
                         WhatsApp
                     </a>
 
-                    <a href="#"
-                       class="bg-purple-100 hover:bg-purple-200 text-purple-700 px-3 py-1.5 rounded text-sm font-medium transition">
-                        Update
-                    </a>
+                    <!-- FIXED: Status update dropdown with all choices -->
+                    <form method="POST" action="{% url 'update_lead_status' %}" class="inline" onsubmit="return false;">
+                        {% csrf_token %}
+                        <input type="hidden" name="lead_id" value="{{ lead.id }}">
+                        <select name="status" onchange="updateStatus(this, {{ lead.id }})"
+                                class="border px-2 py-1.5 rounded text-sm font-medium bg-purple-100 text-purple-700 hover:bg-purple-200 transition cursor-pointer">
+                            <option value="" disabled selected>Update Status</option>
+                            <option value="NEW">New</option>
+                            <option value="CONTACTED">Contacted</option>
+                            <option value="VISIT">Site Visit</option>
+                            <option value="NEGOTIATION">Negotiation</option>
+                            <option value="CLOSED">Closed</option>
+                            <option value="FAILED">Failed</option>
+                        </select>
+                    </form>
 
                 </div>
 
@@ -158,12 +189,12 @@
                 class="border p-2 rounded w-full mb-2 text-sm">
 
                 <div class="flex gap-2 mb-2">
-    <input name="amount" type="number" step="0.01" placeholder="e.g. 78.5" class="flex-1 min-w-0 border p-2 rounded text-sm">
-    <select name="amount_unit" class="shrink-0 w-24 border p-2 rounded text-sm">
-        <option value="L">Lakh(L)</option>
-        <option value="Cr">Crore(Cr)</option>
-    </select>
-</div>
+                    <input name="amount" type="number" step="0.01" placeholder="e.g. 78.5" class="flex-1 min-w-0 border p-2 rounded text-sm">
+                    <select name="amount_unit" class="shrink-0 w-24 border p-2 rounded text-sm">
+                        <option value="L">Lakh(L)</option>
+                        <option value="Cr">Crore(Cr)</option>
+                    </select>
+                </div>
 
                 <select name="status" class="border p-2 rounded w-full mb-2 text-sm">
                     <option value="NEW">New</option>
@@ -206,7 +237,7 @@
 
     </div>
 
-    <!-- ✅ SUCCESS LEADS (FIXED) -->
+    <!-- SUCCESS LEADS -->
     <div class="mt-8">
 
         <h2 class="text-lg font-bold text-green-700 mb-3">
@@ -229,8 +260,7 @@
                     <span class="px-2 py-1 text-sm font-medium rounded
                         {% if deal.status == 'CLOSED' %} bg-green-500 text-white
                         {% elif deal.status == 'FAILED' %} bg-red-500 text-white
-                        {% endif %}
-                    ">
+                        {% endif %}">
                         {{ deal.status }}
                     </span>
                     {% endfor %}
@@ -255,9 +285,43 @@
 </div>
 
 <script>
+// FIXED: Proper AJAX status update
+function updateStatus(selectEl, leadId) {
+    const status = selectEl.value;
+    if (!status) return;
+
+    fetch("/update-lead-status/", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": getCookie('csrftoken')
+        },
+        body: JSON.stringify({
+            lead_id: leadId,
+            status: status
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            // Reload page to show updated status badge
+            window.location.reload();
+        } else {
+            alert(data.message || "Failed to update status");
+            selectEl.value = "";
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        alert("Network error");
+        selectEl.value = "";
+    });
+}
+
+// FIXED: Proper AJAX note add
 function addNote(leadId) {
     let input = document.getElementById("note-input-" + leadId);
-    let note = input.value;
+    let note = input.value.trim();
 
     if (!note) return;
 
@@ -265,6 +329,7 @@ function addNote(leadId) {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
+            "X-CSRFToken": getCookie('csrftoken')
         },
         body: JSON.stringify({
             lead_id: leadId,
@@ -275,10 +340,36 @@ function addNote(leadId) {
     .then(data => {
         if (data.success) {
             let notesDiv = document.getElementById("notes-" + leadId);
+            // Remove "No notes yet" text if present
+            if (notesDiv.querySelector('.italic')) {
+                notesDiv.innerHTML = '';
+            }
             notesDiv.innerHTML += `<p>• ${note}</p>`;
             input.value = "";
+        } else {
+            alert(data.message || "Failed to add note");
         }
+    })
+    .catch(err => {
+        console.error(err);
+        alert("Network error");
     });
+}
+
+// Helper to get CSRF token from cookies
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
 }
 </script>
 
