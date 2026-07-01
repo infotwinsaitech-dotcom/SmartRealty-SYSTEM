@@ -103,25 +103,27 @@
             <!-- RIGHT -->
             <div class="w-full lg:w-72 flex-shrink-0">
 
-                <!-- STATUS BADGE -->
-                <span class="inline-block px-3 py-1 text-sm font-medium rounded-full text-white mb-2
-                    {% if lead.status == 'NEW' %} bg-gray-500
-                    {% elif lead.status == 'CONTACTED' %} bg-blue-500
-                    {% elif lead.status == 'VISIT' %} bg-purple-500
-                    {% elif lead.status == 'NEGOTIATION' %} bg-orange-500
-                    {% elif lead.status == 'CLOSED' %} bg-green-500
-                    {% elif lead.status == 'FAILED' %} bg-red-500
-                    {% else %} bg-gray-400 {% endif %}">
-                    {{ lead.status }}
-                </span>
-
-                <!-- PRIORITY BADGE -->
-                <span class="inline-block px-2 py-0.5 text-xs font-medium rounded-full text-white ml-1
-                    {% if lead.priority == 'HOT' %} bg-red-500
-                    {% elif lead.priority == 'WARM' %} bg-yellow-500
-                    {% else %} bg-gray-400 {% endif %}">
-                    {{ lead.priority }}
-                </span>
+                <!-- STATUS + PRIORITY COMBINED - No duplication -->
+                <div class="flex items-center gap-2 mb-2">
+                    <!-- Main Status Badge -->
+                    <span class="inline-block px-3 py-1 text-sm font-medium rounded-full text-white
+                        {% if lead.status == 'NEW' %} bg-gray-500
+                        {% elif lead.status == 'CONTACTED' %} bg-blue-500
+                        {% elif lead.status == 'VISIT' %} bg-purple-500
+                        {% elif lead.status == 'NEGOTIATION' %} bg-orange-500
+                        {% elif lead.status == 'CLOSED' %} bg-green-500
+                        {% elif lead.status == 'FAILED' %} bg-red-500
+                        {% else %} bg-gray-400 {% endif %}">
+                        {{ lead.status }}
+                    </span>
+                    <!-- Priority as small dot/label only -->
+                    <span class="text-xs font-medium px-2 py-0.5 rounded-full
+                        {% if lead.priority == 'HOT' %} bg-red-100 text-red-600
+                        {% elif lead.priority == 'WARM' %} bg-yellow-100 text-yellow-600
+                        {% else %} bg-gray-100 text-gray-500 {% endif %}">
+                        {{ lead.priority }}
+                    </span>
+                </div>
 
                 <!-- NOTES -->
                 <div class="mt-2 bg-gray-50 p-2.5 rounded-lg">
@@ -161,22 +163,25 @@
                         WhatsApp
                     </a>
 
-                    <!-- Status update dropdown -->
-                    <select onchange="updateStatus(this, {{ lead.id }})"
-                            class="border px-2 py-1.5 rounded text-sm font-medium bg-purple-100 text-purple-700 hover:bg-purple-200 transition cursor-pointer">
-                        <option value="" disabled selected>Update Status</option>
-                        <option value="NEW">New</option>
-                        <option value="CONTACTED">Contacted</option>
-                        <option value="VISIT">Site Visit</option>
-                        <option value="NEGOTIATION">Negotiation</option>
-                        <option value="CLOSED">Closed</option>
-                        <option value="FAILED">Failed</option>
-                    </select>
+                </div>
 
+                <!-- STATUS UPDATE - Single dropdown, no duplicate -->
+                <div class="mt-2">
+                    <label class="text-xs text-gray-500 font-medium mb-1 block">Change Status:</label>
+                    <select onchange="updateStatus(this, {{ lead.id }})"
+                            class="border px-3 py-2 rounded text-sm w-full bg-white hover:bg-gray-50 transition cursor-pointer">
+                        <option value="" disabled {% if lead.status not in 'NEW,CONTACTED,VISIT,NEGOTIATION,CLOSED,FAILED' %}selected{% endif %}>-- Select --</option>
+                        <option value="NEW" {% if lead.status == 'NEW' %}selected{% endif %}>🆕 New</option>
+                        <option value="CONTACTED" {% if lead.status == 'CONTACTED' %}selected{% endif %}>📞 Contacted</option>
+                        <option value="VISIT" {% if lead.status == 'VISIT' %}selected{% endif %}>🏠 Site Visit</option>
+                        <option value="NEGOTIATION" {% if lead.status == 'NEGOTIATION' %}selected{% endif %}>🤝 Negotiation</option>
+                        <option value="CLOSED" {% if lead.status == 'CLOSED' %}selected{% endif %}>✅ Closed</option>
+                        <option value="FAILED" {% if lead.status == 'FAILED' %}selected{% endif %}>❌ Failed</option>
+                    </select>
                 </div>
 
                 <!-- DEAL FORM -->
-                <form method="POST" action="{% url 'add_deal' %}" class="mt-2.5 bg-gray-50 p-2.5 rounded-lg">
+                <form method="POST" action="{% url 'add_deal' %}" class="mt-3 bg-gray-50 p-2.5 rounded-lg">
                 {% csrf_token %}
 
                 <input type="hidden" name="property_id" value="{{ lead.properties.first.id }}">
@@ -286,11 +291,8 @@
 // ============================================
 
 function getCSRFToken() {
-    // Method 1: From the hidden form input (most reliable)
     const input = document.querySelector('input[name="csrfmiddlewaretoken"]');
     if (input) return input.value;
-    
-    // Method 2: From cookie
     return getCookie('csrftoken');
 }
 
@@ -341,13 +343,13 @@ function updateStatus(selectEl, leadId) {
             window.location.reload();
         } else {
             alert(data.message || "Failed to update status");
-            selectEl.value = "";
+            selectEl.value = lead.status;
         }
     })
     .catch(err => {
         console.error(err);
         alert(err.message || "Network error");
-        selectEl.value = "";
+        selectEl.value = lead.status;
     });
 }
 
