@@ -16,6 +16,7 @@ from datetime import date, datetime, timedelta
 from collections import defaultdict
 
 from django.shortcuts import render, get_object_or_404, redirect
+from django.urls import reverse
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.http import require_POST, require_GET
 from django.core.paginator import Paginator
@@ -1115,6 +1116,8 @@ def property_management(request):
         builder=request.user
     ).prefetch_related(
         'images'  # N+1 FIX: Gallery images ek saath load hongi
+    ).annotate(
+        wishlist_count=Count('wishlisted_by', distinct=True)
     ).order_by('-created_at')
     
     # Pagination
@@ -1127,6 +1130,32 @@ def property_management(request):
         "page_obj": page_obj,
     })
 
+@builder_required
+def property_wishlist_list(request):
+    """Builder ko dikhao ki kaunse users ne kaunsi property wishlist ki hai"""
+
+    wishlist_items = Wishlist.objects.filter(
+        property__builder=request.user
+    ).select_related('user', 'property').order_by('-created_at')
+
+    # Optional filter by property
+    property_id = request.GET.get('property')
+    if property_id and property_id.isdigit():
+        wishlist_items = wishlist_items.filter(property_id=int(property_id))
+
+    # Pagination
+    paginator = Paginator(wishlist_items, 20)
+    page = request.GET.get('page')
+    page_obj = paginator.get_page(page)
+
+    properties = Property.objects.filter(builder=request.user).only('id', 'title')
+
+    return render(request, "builder/property_wishlist.html", {
+        "wishlist_items": page_obj,
+        "page_obj": page_obj,
+        "properties": properties,
+        "selected_property": property_id,
+    })
 
 @builder_required
 def lead_management(request):
@@ -3928,6 +3957,31 @@ def wishlist_add(request, property_id):
         property=property_obj
     )
 
+    # Builder ko notification bhejo jab naya wishlist add ho (duplicate par nahi)
+    if created and property_obj.builder:
+        Notification.objects.create(
+            recipient=property_obj.builder,
+            title="Property Wishlisted",
+            message=f"{request.user.username} ne aapki property '{property_obj.title}' wishlist mein add ki hai.",
+            type='system',
+            action_url=reverse('property_wishlist_list'),
+            icon='favorite'
+        )
+
+    count = Wishlist.objects.filter(user=request.user).count()
+    # Builder ko notification bhejo jab naya wishlist add ho (duplicate par nahi)
+    if created and property_obj.builder:
+        Notification.objects.create(
+            recipient=property_obj.builder,
+            title="Property Wishlisted",
+            message=f"{request.user.username} ne aapki property '{property_obj.title}' wishlist mein add ki hai.",
+            type='system',
+            action_url=reverse('property_wishlist_list'),
+            icon='favorite'
+        )
+
+    count = Wishlist.objects.filter(user=request.user).count()
+
     # Pehli baar wishlist mein add hua to builder ko notify karo
     if created and property_obj.builder:
         Notification.objects.create(
@@ -3944,6 +3998,7 @@ def wishlist_add(request, property_id):
         'success': True,
         'wishlist_count': count,
         'created': created,
+        'wishlist_item':wishlist_item,
         'message': 'Added to wishlist!' if created else 'Already in wishlist!'
     })
 

@@ -56,6 +56,14 @@ alt="No image">
 ₹{{ property.price }} {{ property.price }}
 </p>
 
+{% if property.wishlist_count > 0 %}
+<p class="text-xs md:text-sm text-pink-600 font-semibold mt-1 flex items-center gap-1">
+❤️ {{ property.wishlist_count }} user{{ property.wishlist_count|pluralize }} wishlisted this
+</p>
+{% else %}
+<p class="text-xs text-gray-400 mt-1">No wishlists yet</p>
+{% endif %}
+
 <!-- ===== GALLERY IMAGES - N+1 FIXED ===== -->
 {# prefetch_related se images already loaded hain, .all nahi chahiye #}
 {% with gallery_images=property.images.all %}

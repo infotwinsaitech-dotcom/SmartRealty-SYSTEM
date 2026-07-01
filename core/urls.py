@@ -59,6 +59,7 @@ urlpatterns = [
     path("builder/", views.builder_root),
     path("builder/dashboard/", views.builder_dashboard, name="builder_dashboard"),
     path("builder/properties/", views.property_management, name="property_management"),
+    path("builder/properties/wishlist/", views.property_wishlist_list, name="property_wishlist_list"),
     path("builder/property/<int:id>/", views.builder_property_detail, name="builder_property_detail"),
     path("builder/property/delete/<int:id>/", views.delete_property, name="delete_property"),
     path("builder/leads/", views.lead_management, name="lead_management"),
