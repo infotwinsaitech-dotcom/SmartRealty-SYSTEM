@@ -1,6 +1,9 @@
 {% extends "agent/base.html" %}
 {% block content %}
 
+<!-- FIX: Hidden form to ensure CSRF cookie is set -->
+<form style="display:none;">{% csrf_token %}</form>
+
 <div class="p-3 md:p-6 bg-gray-50 min-h-screen">
 
 <div class="max-w-6xl mx-auto">
@@ -18,7 +21,6 @@
                 class="border px-3 py-2 rounded w-full sm:w-56 text-base focus:ring-2 focus:ring-blue-400">
 
             <div class="flex gap-2">
-                <!-- FIXED: Status dropdown now shows all Lead.STATUS_CHOICES from model -->
                 <select name="status" class="border px-2 py-2 rounded text-base flex-1">
                     <option value="">All Status</option>
                     <option value="NEW" {% if request.GET.status == "NEW" %}selected{% endif %}>New</option>
@@ -102,7 +104,6 @@
             <div class="w-full lg:w-72 flex-shrink-0">
 
                 <!-- STATUS BADGE -->
-                <!-- FIXED: All 6 status choices with proper colors -->
                 <span class="inline-block px-3 py-1 text-sm font-medium rounded-full text-white mb-2
                     {% if lead.status == 'NEW' %} bg-gray-500
                     {% elif lead.status == 'CONTACTED' %} bg-blue-500
@@ -125,7 +126,6 @@
                 <!-- NOTES -->
                 <div class="mt-2 bg-gray-50 p-2.5 rounded-lg">
 
-                    <!-- FIXED: Use correct related_name 'lead_notes' instead of 'leadnote_set' -->
                     <div id="notes-{{ lead.id }}" class="text-sm text-gray-600 mb-2 space-y-1 max-h-28 overflow-y-auto">
                         {% for n in lead.lead_notes.all %}
                             <p>• {{ n.note }}</p>
@@ -161,7 +161,7 @@
                         WhatsApp
                     </a>
 
-                    <!-- FIXED: Status update dropdown with all choices -->
+                    <!-- Status update dropdown -->
                     <select onchange="updateStatus(this, {{ lead.id }})"
                             class="border px-2 py-1.5 rounded text-sm font-medium bg-purple-100 text-purple-700 hover:bg-purple-200 transition cursor-pointer">
                         <option value="" disabled selected>Update Status</option>
@@ -281,23 +281,61 @@
 </div>
 
 <script>
-// FIXED: Proper AJAX status update with correct URL
+// ============================================
+// ROBUST CSRF TOKEN HANDLER
+// ============================================
+
+function getCSRFToken() {
+    // Method 1: From the hidden form input (most reliable)
+    const input = document.querySelector('input[name="csrfmiddlewaretoken"]');
+    if (input) return input.value;
+    
+    // Method 2: From cookie
+    return getCookie('csrftoken');
+}
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
 function updateStatus(selectEl, leadId) {
     const status = selectEl.value;
     if (!status) return;
+
+    const csrfToken = getCSRFToken();
+    if (!csrfToken) {
+        alert("CSRF token not found. Please refresh the page.");
+        return;
+    }
 
     fetch("/update-lead-status/", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
-            "X-CSRFToken": getCookie('csrftoken')
+            "X-CSRFToken": csrfToken
         },
         body: JSON.stringify({
             lead_id: leadId,
             status: status
         })
     })
-    .then(res => res.json())
+    .then(res => {
+        if (res.status === 403) {
+            throw new Error("CSRF validation failed. Please refresh the page.");
+        }
+        return res.json();
+    })
     .then(data => {
         if (data.success) {
             window.location.reload();
@@ -308,30 +346,40 @@ function updateStatus(selectEl, leadId) {
     })
     .catch(err => {
         console.error(err);
-        alert("Network error - make sure /update-lead-status/ URL is registered in urls.py");
+        alert(err.message || "Network error");
         selectEl.value = "";
     });
 }
 
-// FIXED: Proper AJAX note add with correct URL
 function addNote(leadId) {
     let input = document.getElementById("note-input-" + leadId);
     let note = input.value.trim();
 
     if (!note) return;
 
+    const csrfToken = getCSRFToken();
+    if (!csrfToken) {
+        alert("CSRF token not found. Please refresh the page.");
+        return;
+    }
+
     fetch("/add-note/", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
-            "X-CSRFToken": getCookie('csrftoken')
+            "X-CSRFToken": csrfToken
         },
         body: JSON.stringify({
             lead_id: leadId,
             note: note
         })
     })
-    .then(res => res.json())
+    .then(res => {
+        if (res.status === 403) {
+            throw new Error("CSRF validation failed. Please refresh the page.");
+        }
+        return res.json();
+    })
     .then(data => {
         if (data.success) {
             let notesDiv = document.getElementById("notes-" + leadId);
@@ -346,24 +394,8 @@ function addNote(leadId) {
     })
     .catch(err => {
         console.error(err);
-        alert("Network error - make sure /add-note/ URL is registered in urls.py");
+        alert(err.message || "Network error");
     });
-}
-
-// Helper to get CSRF token from cookies
-function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i].trim();
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
-    }
-    return cookieValue;
 }
 </script>
 
