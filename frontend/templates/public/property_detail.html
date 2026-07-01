@@ -379,23 +379,21 @@
             {% endif %}
 
             <!-- Location Map -->
-            <div class="reveal">
-                <div class="flex items-center gap-3 mb-6">
-                    <div class="w-1 h-8 bg-yellow-400 rounded-full"></div>
-                    <h2 class="text-3xl font-bold text-white">Location</h2>
-                </div>
-                <div class="rounded-2xl overflow-hidden shadow-2xl border border-white/10">
-                    {% if property.map_link %}
-    <iframe src="{{ property.map_link }}"
-            width="100%" height="400" style="border:0;" allowfullscreen loading="lazy">
-    </iframe>
+            {% if property.map_link %}
+    {% if "maps/embed" in property.map_link or "output=embed" in property.map_link %}
+        <!-- Already embed URL hai — directly use karo -->
+        <iframe src="{{ property.map_link }}"
+                width="100%" height="400" style="border:0;" allowfullscreen loading="lazy">
+        </iframe>
+    {% else %}
+        <!-- Normal link ya coordinates — Google se auto-embed banao -->
+        <iframe src="https://maps.google.com/maps?q={{ property.map_link|urlencode }}&output=embed&zoom=17"
+                width="100%" height="400" style="border:0;" allowfullscreen loading="lazy">
+        </iframe>
+    {% endif %}
 {% else %}
-    <p class="text-gray-400 text-sm text-center py-8">
-        📍 {{ property.location }}
-    </p>
+    <p class="text-gray-400 text-sm text-center py-8">📍 {{ property.location }}</p>
 {% endif %}
-                </div>
-            </div>
 
             <!-- Similar Properties -->
             {% if similar_properties %}
