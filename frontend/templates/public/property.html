@@ -487,7 +487,26 @@ document.addEventListener('click', function(e) {
 function toggleWishlist(btn, propertyId) {
     event.preventDefault();
     event.stopPropagation();
-    btn.classList.toggle('heart-active');
+
+    fetch(`/wishlist/add/${propertyId}/`, {
+        method: 'GET',
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            btn.classList.toggle('heart-active');
+            // Navbar count update karo
+            const countEl = document.querySelector('#wishlist-count, .wishlist-count');
+            if (countEl) countEl.textContent = data.wishlist_count;
+        } else if (data.error === 'login') {
+            window.location.href = '/login/';
+        }
+    })
+    .catch(() => {
+        // Login nahi kiya to login page pe bhejo
+        window.location.href = '/login/';
+    });
 }
 
 // =========================
