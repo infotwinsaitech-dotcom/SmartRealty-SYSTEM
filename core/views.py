@@ -3928,6 +3928,16 @@ def wishlist_add(request, property_id):
         property=property_obj
     )
 
+    # Pehli baar wishlist mein add hua to builder ko notify karo
+    if created and property_obj.builder:
+        Notification.objects.create(
+            recipient=property_obj.builder,
+            title="❤️ Property Wishlist mein Add Hui",
+            message=f"{request.user.get_full_name() or request.user.username} ne aapki property '{property_obj.project_name or property_obj.title}' apni wishlist mein add ki hai.",
+            type="lead"
+        )
+        logger.info(f"Wishlist notification sent to builder {property_obj.builder.username} for property {property_obj.title}")
+
     count = Wishlist.objects.filter(user=request.user).count()
 
     return JsonResponse({
