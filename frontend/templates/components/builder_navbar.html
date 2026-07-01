@@ -9,6 +9,15 @@
             {{ request.user.username }}
         </span>
 
+        <a href="{% url 'notifications' %}" class="relative p-2 hover:bg-gray-100 rounded-full inline-block">
+            <span class="text-xl">🔔</span>
+            {% if notifications_unread_count > 0 %}
+            <span class="absolute top-0 right-0 bg-red-500 text-white text-[10px] font-bold h-5 w-5 flex items-center justify-center rounded-full">
+                {{ notifications_unread_count }}
+            </span>
+            {% endif %}
+        </a>
+
         <a href="{% url 'logout' %}" class="text-red-500 text-sm">
             Logout
         </a>
