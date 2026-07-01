@@ -51,11 +51,18 @@ Dekho kaunse users ne aapki kaunsi property wishlist ki hai
         {% for item in wishlist_items %}
         <tr class="hover:bg-gray-50">
             <td class="px-4 py-3 font-semibold text-gray-800">
-                {{ item.user.get_full_name|default:item.user.username }}
+                {{ item.user.get_full_name|default:item.user.profile.full_name|default:item.user.username }}
             </td>
             <td class="px-4 py-3 text-gray-600">
                 {{ item.user.email }}
-                {% if item.user.phone %}<br>{{ item.user.phone }}{% endif %}
+                <br>
+                {% if item.user.phone %}
+                    {{ item.user.phone }}
+                {% elif item.user.profile.phone %}
+                    {{ item.user.profile.phone }}
+                {% else %}
+                    <span class="text-gray-400 italic">Not provided</span>
+                {% endif %}
             </td>
             <td class="px-4 py-3">
                 <a href="{% url 'builder_property_detail' item.property.id %}" class="text-blue-600 hover:underline">
