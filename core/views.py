@@ -449,22 +449,6 @@ def property_list(request):
 
     properties = properties.filter(filters)
 
-    # Price filtering (on converted values - simplified for performance)
-    # Note: For production, store numeric price in separate field
-    if min_price:
-        try:
-            min_val = float(min_price)
-            properties = properties.filter(price__gte=min_val)
-        except ValueError:
-            pass
-
-    if max_price:
-        try:
-            max_val = float(max_price)
-            properties = properties.filter(price__lte=max_val)
-        except ValueError:
-            pass
-
     # Relevance scoring for search
     if query:
         properties = properties.annotate(
@@ -498,6 +482,35 @@ def property_list(request):
             properties = nearest if nearest.exists() else all_properties[:10]
         else:
             properties = all_properties[:10]
+
+    # Price filtering (FIXED): price DB mein text hai ("50 Lakh", "1.2 Cr" jaisa),
+    # isliye DB-level number comparison kabhi sahi kaam nahi karta.
+    # get_price_numeric() se asli numeric value nikaal ke Python mein compare karo.
+    # min/max blank ho to koi filter nahi lagta - saari properties dikhengi (default).
+    min_val = None
+    max_val = None
+    if min_price:
+        try:
+            min_val = float(min_price)
+        except ValueError:
+            pass
+    if max_price:
+        try:
+            max_val = float(max_price)
+        except ValueError:
+            pass
+
+    if min_val is not None or max_val is not None:
+        properties = list(properties)
+        filtered = []
+        for p in properties:
+            price_num = float(p.get_price_numeric())
+            if min_val is not None and price_num < min_val:
+                continue
+            if max_val is not None and price_num > max_val:
+                continue
+            filtered.append(p)
+        properties = filtered
 
     page_obj = get_paginated_queryset(properties, request)
 
@@ -923,7 +936,7 @@ def my_inquiries(request):
     """User inquiries - sirf isi logged-in user ki, chahe purani email-based ho ya nayi user-linked"""
     inquiries = Inquiry.objects.filter(
         Q(user=request.user) | Q(email=request.user.email)
-    ).select_related('property', 'agent').order_by('-created_at')
+    ).select_related('property', 'agent', 'agent__agent_profile').order_by('-created_at')
     page_obj = get_paginated_queryset(inquiries, request)
     return render(request, "user/my_inquiries.html", {"inquiries": page_obj, "page_obj": page_obj})
 
