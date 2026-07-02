@@ -111,9 +111,6 @@ class Property(models.Model):
     latitude = models.DecimalField(max_digits=10, decimal_places=8, null=True, blank=True)
     longitude = models.DecimalField(max_digits=11, decimal_places=8, null=True, blank=True)
 
-# Meta.indexes mein add karo:
-    Index(fields=['latitude', 'longitude']),
-
     agent_name = models.CharField(max_length=100, default="Agent")
     agent_role = models.CharField(max_length=100, default="Advisor")
     agent_image = models.ImageField(upload_to='agents/', blank=True, null=True)
@@ -158,6 +155,7 @@ class Property(models.Model):
             Index(fields=['project_name']),
             Index(fields=['status', 'created_at']),
             Index(fields=['property_type', 'status']),
+            Index(fields=['latitude', 'longitude']),
         ]
         verbose_name = 'Property'
         verbose_name_plural = 'Properties'

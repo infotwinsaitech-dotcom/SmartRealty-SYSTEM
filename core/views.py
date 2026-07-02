@@ -1024,6 +1024,16 @@ def add_property(request):
             messages.error(request, "Invalid numeric values for beds, baths, or sqft")
             return redirect("add_property")
 
+        # Parse map coordinates (used by the public Property Map page)
+        lat_raw = request.POST.get("latitude", "").strip()
+        lng_raw = request.POST.get("longitude", "").strip()
+        try:
+            latitude_val = float(lat_raw) if lat_raw else None
+            longitude_val = float(lng_raw) if lng_raw else None
+        except ValueError:
+            latitude_val = None
+            longitude_val = None
+
         # Parse amenities
         amenities = request.POST.getlist("amenities")
 
@@ -1074,6 +1084,8 @@ def add_property(request):
                     land_parcel=data['land_parcel'],
                     nearby_places=nearby_data,
                     sales_head_number=data['sales_head_number'],
+                    latitude=latitude_val,
+                    longitude=longitude_val,
                     builder=request.user,
                     **files
                 )
@@ -1107,6 +1119,7 @@ def add_property(request):
             return redirect("add_property")
 
     return render(request, "builder/property_management.html")
+
 @builder_required
 def property_management(request):
     """Show builder's properties with gallery - N+1 FIXED"""
@@ -1896,6 +1909,18 @@ def _update_property(request, property):
     except (ValueError, TypeError):
         pass
 
+    # Map coordinates (used by the public Property Map page)
+    lat_raw = (request.POST.get('latitude') or '').strip()
+    lng_raw = (request.POST.get('longitude') or '').strip()
+    try:
+        property.latitude = float(lat_raw) if lat_raw else None
+    except (ValueError, TypeError):
+        pass
+    try:
+        property.longitude = float(lng_raw) if lng_raw else None
+    except (ValueError, TypeError):
+        pass
+
     # Amenities
     property.amenities = request.POST.getlist("amenities")
 
@@ -1940,7 +1965,6 @@ def _update_property(request, property):
 
     messages.success(request, "Property updated successfully!")
     return redirect('builder_property_detail', id=property.id)
-
 
 @builder_required
 def delete_property(request, id):
