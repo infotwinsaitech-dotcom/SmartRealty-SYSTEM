@@ -355,7 +355,8 @@ def property_detail(request, id):
                 name=name,
                 email=email,
                 phone=phone,
-                message=message
+                message=message,
+                agent=agent.user if agent else None
             )
             
             # Create follow-up
