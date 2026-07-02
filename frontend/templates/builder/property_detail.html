@@ -52,19 +52,38 @@ class="w-full border p-2 rounded text-sm">
 class="w-full border p-2 rounded text-sm">
 
 <!-- MAP COORDINATES (needed for Property Map page) -->
-<div>
+<div class="border border-gray-200 rounded-lg p-3 bg-gray-50">
+    <p class="text-xs font-bold text-gray-600 mb-2">📍 Property Map Location</p>
+
+    <!-- OPTION 1: Paste Google Maps link (most reliable for complex/informal addresses) -->
+    <div class="flex gap-2 mb-2">
+        <input type="text" id="editMapLinkInput" placeholder="Paste Google Maps link here (recommended)"
+        class="flex-1 border p-2 rounded text-sm">
+        <button type="button" id="editExtractBtn"
+            onclick="extractCoordsFromLink('editMapLinkInput','editLatInput','editLngInput','editExtractBtn')"
+            class="px-3 py-2 bg-blue-600 text-white text-xs font-semibold rounded-lg hover:bg-blue-700 whitespace-nowrap">
+            📍 Get Coordinates
+        </button>
+    </div>
+    <p class="text-[11px] text-gray-400 mb-2">
+        Google Maps kholo → address search karo → address bar ka full URL copy karke yahan paste karo (short "maps.app.goo.gl" link kaam nahi karega, address bar wala poora link chahiye).
+    </p>
+
+    <!-- OPTION 2: Auto-find from location text (works only for simple addresses) -->
     <button type="button" id="editGeocodeBtn"
         onclick="geocodeLocation('editLocationInput','editLatInput','editLngInput','editGeocodeBtn')"
         class="text-xs font-semibold text-blue-600 hover:text-blue-800 mb-1.5 flex items-center gap-1">
-        🌍 Auto-find coordinates from Location
+        🌍 Or auto-find from Location text (simple addresses only)
     </button>
+
+    <!-- OPTION 3: Manual entry -->
     <div class="flex gap-2">
         <input type="number" step="any" name="latitude" id="editLatInput" value="{{ property.latitude|default:'' }}" placeholder="Latitude (e.g. 23.0225)"
         class="flex-1 border p-2 rounded text-sm">
         <input type="number" step="any" name="longitude" id="editLngInput" value="{{ property.longitude|default:'' }}" placeholder="Longitude (e.g. 72.5714)"
         class="flex-1 border p-2 rounded text-sm">
     </div>
-    <p class="text-[11px] text-gray-400 mt-1">Coordinates place this property on the public Property Map.</p>
+    <p class="text-[11px] text-gray-400 mt-1">Ye coordinates hi is property ko public "Property Map" page par pin dikhate hain.</p>
 </div>
 
 <input type="text" name="project_name" value="{{ property.project_name|default:'' }}" placeholder="Project Name"
@@ -273,6 +292,41 @@ Update Property
 </main>
 
 <script>
+// ===================== EXTRACT COORDS FROM GOOGLE MAPS LINK =====================
+// Most reliable option — works for complex/informal addresses since it reads the
+// exact coordinates Google Maps already resolved, instead of re-guessing from text.
+function extractCoordsFromLink(linkInputId, latInputId, lngInputId, btnId) {
+    const linkEl = document.getElementById(linkInputId);
+    const link = linkEl ? linkEl.value.trim() : '';
+    if (!link) {
+        alert('Pehle Google Maps ka link paste karein.');
+        return;
+    }
+
+    if (link.includes('maps.app.goo.gl') || link.includes('goo.gl/maps')) {
+        alert('Ye short link hai, isse coordinates nikalna possible nahi hai.\n\nGoogle Maps par address search karke, browser ke address bar se poora (lamba) URL copy karke yahan paste karein.');
+        return;
+    }
+
+    const patterns = [
+        /@(-?\d+\.\d+),(-?\d+\.\d+)/,
+        /!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/,
+        /[?&]q=(-?\d+\.\d+),(-?\d+\.\d+)/,
+        /[?&]ll=(-?\d+\.\d+),(-?\d+\.\d+)/,
+    ];
+
+    for (const pattern of patterns) {
+        const match = link.match(pattern);
+        if (match) {
+            document.getElementById(latInputId).value = parseFloat(match[1]).toFixed(6);
+            document.getElementById(lngInputId).value = parseFloat(match[2]).toFixed(6);
+            return;
+        }
+    }
+
+    alert('Is link se coordinates nahi mile.\n\nGoogle Maps par apna address search karein, phir browser ke address bar se poora URL copy karke yahan paste karein (share button wala short link kaam nahi karega).');
+}
+
 // ===================== GEOCODE HELPER (Free, no API key - OpenStreetMap Nominatim) =====================
 async function geocodeLocation(locationInputId, latInputId, lngInputId, btnId) {
   const locationEl = document.getElementById(locationInputId);
