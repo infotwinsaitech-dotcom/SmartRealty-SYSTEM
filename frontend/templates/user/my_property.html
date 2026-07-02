@@ -1,40 +1,185 @@
 {% for property in properties %}
-    <div class="bg-white p-4 rounded-lg shadow">
+    <div class="group relative bg-surface-container-low rounded-xl border border-outline-variant shadow-sm hover:shadow-lg hover:shadow-primary/10 transition-all duration-300 overflow-hidden">
         
-        <h3 class="text-xl font-bold">{{ property.title }}</h3>
-        <p>{₹{{ property.price }} {{ property.price_unit }} }</p>
+        <!-- Thumbnail -->
+        <div class="relative aspect-[4/3] overflow-hidden">
+            {% if property.thumbnail %}
+                <img src="{{ property.thumbnail.url }}" 
+                     alt="{{ property.title }}" 
+                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+            {% else %}
+                <div class="w-full h-full bg-surface-variant flex items-center justify-center">
+                    <span class="material-symbols-outlined text-4xl text-on-surface-variant/40">apartment</span>
+                </div>
+            {% endif %}
+            
+            <!-- Status Badge -->
+            <div class="absolute top-3 left-3">
+                <span class="px-2.5 py-1 text-xs font-semibold rounded-full 
+                    {% if property.status == 'Available' %}bg-tertiary-container/90 text-on-tertiary-container
+                    {% elif property.status == 'Sold Out' %}bg-error-container/90 text-on-error-container
+                    {% else %}bg-secondary-container/90 text-on-secondary{% endif %} backdrop-blur-sm">
+                    {{ property.status }}
+                </span>
+            </div>
+            
+            <!-- Wishlist Button -->
+            <button onclick="toggleWishlist({{ property.id }})" 
+                    class="absolute top-3 right-3 p-2 rounded-full bg-surface/80 backdrop-blur-sm hover:bg-surface transition-colors"
+                    id="wishlist-btn-{{ property.id }}">
+                <span class="material-symbols-outlined text-error {% if property.id in user_wishlist_ids %}active-icon{% endif %}">
+                    favorite
+                </span>
+            </button>
+            
+            <!-- Property Type Badge -->
+            <div class="absolute bottom-3 left-3">
+                <span class="px-2.5 py-1 text-xs font-medium rounded-full bg-surface/90 text-on-surface backdrop-blur-sm">
+                    {{ property.property_type }}
+                </span>
+            </div>
+        </div>
 
-        <a href="{% url 'property_detail' property.id %}"
-           class="text-blue-500 font-bold">
-           View Details →
-        </a>
+        <!-- Content -->
+        <div class="p-4 space-y-3">
+            
+            <!-- Title & Location -->
+            <div>
+                <h3 class="text-base font-bold text-on-surface line-clamp-1 group-hover:text-primary transition-colors">
+                    {{ property.title }}
+                </h3>
+                <div class="flex items-center gap-1 mt-1 text-on-surface-variant">
+                    <span class="material-symbols-outlined text-sm">location_on</span>
+                    <span class="text-xs font-medium truncate">{{ property.location }}</span>
+                </div>
+            </div>
 
+            <!-- Price -->
+            <div class="flex items-baseline gap-1">
+                <span class="text-lg font-extrabold text-primary">₹{{ property.price }}</span>
+                <span class="text-sm font-semibold text-on-surface-variant">
+                    {% if property.price_unit == 'Cr' %}Crore{% else %}Lakh{% endif %}
+                </span>
+            </div>
+
+            <!-- Specs -->
+            <div class="flex items-center gap-4 py-2 border-y border-outline-variant/50">
+                {% if property.beds %}
+                <div class="flex items-center gap-1 text-on-surface-variant">
+                    <span class="material-symbols-outlined text-sm">bed</span>
+                    <span class="text-xs font-semibold">{{ property.beds }} BHK</span>
+                </div>
+                {% endif %}
+                {% if property.baths %}
+                <div class="flex items-center gap-1 text-on-surface-variant">
+                    <span class="material-symbols-outlined text-sm">bathtub</span>
+                    <span class="text-xs font-semibold">{{ property.baths }} Bath</span>
+                </div>
+                {% endif %}
+                {% if property.sqft %}
+                <div class="flex items-center gap-1 text-on-surface-variant">
+                    <span class="material-symbols-outlined text-sm">square_foot</span>
+                    <span class="text-xs font-semibold">{{ property.sqft }} sqft</span>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Builder & CTA -->
+            <div class="flex items-center justify-between pt-1">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center">
+                        <span class="text-xs font-bold text-on-primary-container">
+                            {{ property.builder_name|default:property.builder.username|first|upper }}
+                        </span>
+                    </div>
+                    <span class="text-xs font-medium text-on-surface-variant truncate max-w-[80px]">
+                        {{ property.builder_name|default:property.builder.username }}
+                    </span>
+                </div>
+                
+                <a href="{% url 'property_detail' property.id %}"
+                   class="inline-flex items-center gap-1 px-4 py-2 bg-primary-container text-on-primary-fixed-variant text-sm font-bold rounded-lg hover:bg-primary hover:text-on-primary transition-colors duration-200">
+                    View Details
+                    <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                </a>
+            </div>
+        </div>
     </div>
 {% empty %}
-    <p class="text-gray-500">No properties found</p>
+    <div class="col-span-full flex flex-col items-center justify-center py-16 text-center">
+        <div class="w-20 h-20 rounded-full bg-surface-variant flex items-center justify-center mb-4">
+            <span class="material-symbols-outlined text-4xl text-on-surface-variant">search_off</span>
+        </div>
+        <h3 class="text-lg font-bold text-on-surface">No Properties Found</h3>
+        <p class="text-sm text-on-surface-variant mt-1">Try adjusting your filters or search criteria</p>
+        <a href="{% url 'property_list' %}" class="mt-4 px-5 py-2.5 bg-primary-container text-on-primary-fixed-variant text-sm font-bold rounded-lg hover:bg-primary hover:text-on-primary transition-colors">
+            Clear Filters
+        </a>
+    </div>
 {% endfor %}
 
 <!-- PAGINATION -->
 {% if page_obj.has_other_pages %}
-<div class="flex justify-center items-center gap-2 mt-8">
-
+<div class="col-span-full flex justify-center items-center gap-2 mt-10">
     {% if page_obj.has_previous %}
-        <a href="?page={{ page_obj.previous_page_number }}"
-           class="px-4 py-2 bg-white border rounded-lg text-sm font-semibold hover:bg-gray-100">
-            ← Previous
+        <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.location %}&location={{ request.GET.location }}{% endif %}{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}{% if request.GET.min_price %}&min_price={{ request.GET.min_price }}{% endif %}{% if request.GET.max_price %}&max_price={{ request.GET.max_price }}{% endif %}"
+           class="inline-flex items-center gap-1 px-4 py-2.5 bg-surface-container text-on-surface font-semibold text-sm rounded-lg border border-outline-variant hover:bg-surface-variant hover:border-primary transition-all duration-200">
+            <span class="material-symbols-outlined text-base">arrow_back</span>
+            Previous
         </a>
+    {% else %}
+        <span class="inline-flex items-center gap-1 px-4 py-2.5 bg-surface-container-low text-on-surface-variant font-semibold text-sm rounded-lg border border-outline-variant/50 cursor-not-allowed">
+            <span class="material-symbols-outlined text-base">arrow_back</span>
+            Previous
+        </span>
     {% endif %}
 
-    <span class="px-4 py-2 text-sm font-semibold text-gray-600">
-        Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
-    </span>
+    <div class="flex items-center gap-1">
+        {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+                <span class="w-10 h-10 flex items-center justify-center bg-primary text-on-primary font-bold text-sm rounded-lg shadow-sm">
+                    {{ num }}
+                </span>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                <a href="?page={{ num }}{% if request.GET.location %}&location={{ request.GET.location }}{% endif %}{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}{% if request.GET.min_price %}&min_price={{ request.GET.min_price }}{% endif %}{% if request.GET.max_price %}&max_price={{ request.GET.max_price }}{% endif %}"
+                   class="w-10 h-10 flex items-center justify-center bg-surface-container text-on-surface font-semibold text-sm rounded-lg border border-outline-variant hover:bg-primary-container hover:text-on-primary-fixed-variant hover:border-primary transition-all duration-200">
+                    {{ num }}
+                </a>
+            {% endif %}
+        {% endfor %}
+    </div>
 
     {% if page_obj.has_next %}
-        <a href="?page={{ page_obj.next_page_number }}"
-           class="px-4 py-2 bg-white border rounded-lg text-sm font-semibold hover:bg-gray-100">
-            Next →
+        <a href="?page={{ page_obj.next_page_number }}{% if request.GET.location %}&location={{ request.GET.location }}{% endif %}{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}{% if request.GET.min_price %}&min_price={{ request.GET.min_price }}{% endif %}{% if request.GET.max_price %}&max_price={{ request.GET.max_price }}{% endif %}"
+           class="inline-flex items-center gap-1 px-4 py-2.5 bg-surface-container text-on-surface font-semibold text-sm rounded-lg border border-outline-variant hover:bg-surface-variant hover:border-primary transition-all duration-200">
+            Next
+            <span class="material-symbols-outlined text-base">arrow_forward</span>
         </a>
+    {% else %}
+        <span class="inline-flex items-center gap-1 px-4 py-2.5 bg-surface-container-low text-on-surface-variant font-semibold text-sm rounded-lg border border-outline-variant/50 cursor-not-allowed">
+            Next
+            <span class="material-symbols-outlined text-base">arrow_forward</span>
+        </span>
     {% endif %}
-
 </div>
 {% endif %}
+<script>
+function toggleWishlist(propertyId) {
+    fetch(`/wishlist/add/${propertyId}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/json'
+        },
+    })
+    .then(res => res.json())
+    .then(data => {
+        const btn = document.getElementById(`wishlist-btn-${propertyId}`).querySelector('span');
+        if (data.created) {
+            btn.classList.add('active-icon');
+        } else {
+            btn.classList.remove('active-icon');
+        }
+    });
+}
+</script>
