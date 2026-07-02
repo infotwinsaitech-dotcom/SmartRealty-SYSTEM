@@ -576,3 +576,6 @@ def _auto_setup_site_and_socialapp():
             
     except Exception as e:
         logger.error(f"[AUTO-SETUP] Error: {e}")
+
+# settings.py
+GOOGLE_MAPS_API_KEY = os.getenv('GOOGLE_MAPS_API_KEY', '')

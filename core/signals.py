@@ -270,3 +270,24 @@ def connect_all_signals():
 # PART 5: AUTO-CREATE SOCIALAPP (Called from apps.py ready())
 # =============================================================================
 #
+# core/signals.py
+from django.db.models.signals import pre_save
+from django.dispatch import receiver
+from .models import Property
+
+@receiver(pre_save, sender=Property)
+def geocode_property(sender, instance, **kwargs):
+    """Auto-fill lat/lng from location name using Nominatim (free)"""
+    if not instance.latitude or not instance.longitude:
+        if instance.location:
+            try:
+                import requests
+                url = f"https://nominatim.openstreetmap.org/search?q={instance.location},India&format=json&limit=1"
+                headers = {'User-Agent': 'SmartRealty/1.0'}
+                resp = requests.get(url, headers=headers, timeout=5)
+                data = resp.json()
+                if data:
+                    instance.latitude = float(data[0]['lat'])
+                    instance.longitude = float(data[0]['lon'])
+            except Exception:
+                pass  # Fail silently, user can add manually

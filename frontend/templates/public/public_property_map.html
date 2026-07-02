@@ -1,0 +1,299 @@
+{% extends "public/base.html" %}
+{% block content %}
+
+<!-- Leaflet CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+
+<main class="min-h-screen bg-gray-50">
+
+  <!-- Hero Section -->
+  <div class="bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-8 md:py-12">
+    <div class="max-w-7xl mx-auto px-4 md:px-8">
+      <h1 class="text-3xl md:text-5xl font-extrabold mb-2">🗺️ Explore Properties on Map</h1>
+      <p class="text-blue-100 text-base md:text-lg max-w-2xl">
+        Discover your dream property anywhere in India. Browse all available listings on an interactive, free map powered by OpenStreetMap.
+      </p>
+      <div class="flex gap-3 mt-4">
+        <span class="px-3 py-1 bg-white/20 backdrop-blur rounded-full text-xs font-medium">🍃 100% Free</span>
+        <span class="px-3 py-1 bg-white/20 backdrop-blur rounded-full text-xs font-medium">🌍 No API Key</span>
+        <span class="px-3 py-1 bg-white/20 backdrop-blur rounded-full text-xs font-medium">⚡ Fast Loading</span>
+      </div>
+    </div>
+  </div>
+
+  <section class="p-4 md:p-8 max-w-7xl mx-auto">
+
+    <!-- Stats Bar -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+      <div class="bg-white rounded-xl p-4 shadow-sm text-center">
+        <p class="text-2xl font-extrabold text-blue-600">{{ properties|length }}</p>
+        <p class="text-xs text-gray-500 font-medium">Total Properties</p>
+      </div>
+      <div class="bg-white rounded-xl p-4 shadow-sm text-center">
+        <p class="text-2xl font-extrabold text-green-600" id="availableCount">—</p>
+        <p class="text-xs text-gray-500 font-medium">Available</p>
+      </div>
+      <div class="bg-white rounded-xl p-4 shadow-sm text-center">
+        <p class="text-2xl font-extrabold text-yellow-600" id="upcomingCount">—</p>
+        <p class="text-xs text-gray-500 font-medium">Coming Soon</p>
+      </div>
+      <div class="bg-white rounded-xl p-4 shadow-sm text-center">
+        <p class="text-2xl font-extrabold text-purple-600" id="cityCount">—</p>
+        <p class="text-xs text-gray-500 font-medium">Cities</p>
+      </div>
+    </div>
+
+    <!-- Map Container -->
+    <div class="bg-white rounded-xl shadow-lg overflow-hidden mb-8">
+      <div id="publicMap" style="height: 65vh; width: 100%; z-index: 1;"></div>
+    </div>
+
+    <!-- Filter Chips -->
+    <div class="flex flex-wrap gap-2 mb-6">
+      <button onclick="filterProperties('all')" class="filter-btn active px-4 py-2 rounded-full text-sm font-semibold bg-blue-600 text-white transition" data-filter="all">
+        All Properties
+      </button>
+      <button onclick="filterProperties('Available')" class="filter-btn px-4 py-2 rounded-full text-sm font-semibold bg-gray-100 text-gray-700 hover:bg-green-100 hover:text-green-700 transition" data-filter="Available">
+        🟢 Available
+      </button>
+      <button onclick="filterProperties('Coming Soon')" class="filter-btn px-4 py-2 rounded-full text-sm font-semibold bg-gray-100 text-gray-700 hover:bg-yellow-100 hover:text-yellow-700 transition" data-filter="Coming Soon">
+        🟡 Coming Soon
+      </button>
+      <button onclick="filterProperties('Under Construction')" class="filter-btn px-4 py-2 rounded-full text-sm font-semibold bg-gray-100 text-gray-700 hover:bg-orange-100 hover:text-orange-700 transition" data-filter="Under Construction">
+        🟠 Under Construction
+      </button>
+    </div>
+
+    <!-- Property Grid -->
+    <h3 class="text-xl font-bold text-gray-800 mb-4">🏘️ All Listings</h3>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4" id="propertyGrid">
+      {% for property in properties %}
+      <div class="property-card bg-white rounded-xl shadow hover:shadow-lg transition overflow-hidden group" data-status="{{ property.status }}" data-lat="{{ property.latitude|default:'' }}" data-lng="{{ property.longitude|default:'' }}">
+        <a href="{% url 'property_detail' property.id %}">
+          <div class="relative overflow-hidden">
+            {% if property.thumbnail %}
+            <img src="{{ property.thumbnail.url }}" class="w-full h-44 object-cover group-hover:scale-110 transition duration-500" alt="{{ property.title }}" onerror="this.src='https://via.placeholder.com/400x300?text=No+Image'">
+            {% else %}
+            <img src="https://via.placeholder.com/400x300?text=No+Image" class="w-full h-44 object-cover" alt="No image">
+            {% endif %}
+            <span class="absolute top-2 right-2 px-2 py-1 rounded-full text-xs font-bold
+              {% if property.status == 'Available' %}bg-green-500 text-white{% elif property.status == 'Sold Out' %}bg-red-500 text-white{% else %}bg-yellow-500 text-white{% endif %}">
+              {{ property.status }}
+            </span>
+          </div>
+          <div class="p-4">
+            <h4 class="font-bold text-gray-800 truncate">{{ property.title }}</h4>
+            <p class="text-sm text-gray-500 truncate">📍 {{ property.location }}</p>
+            <p class="text-blue-600 font-bold mt-1">₹{{ property.price }} {{ property.price_unit }}</p>
+            <div class="flex gap-2 mt-2 text-xs text-gray-500">
+              {% if property.beds %}<span>🛏️ {{ property.beds }} BHK</span>{% endif %}
+              {% if property.sqft %}<span>📐 {{ property.sqft }} sqft</span>{% endif %}
+            </div>
+            {% if property.latitude and property.longitude %}
+            <button type="button" onclick="event.preventDefault(); flyToMap({{ property.latitude }}, {{ property.longitude }});"
+                    class="mt-3 w-full py-2 bg-blue-50 text-blue-600 text-xs font-bold rounded-lg hover:bg-blue-100 transition flex items-center justify-center gap-1">
+              📍 View on Map
+            </button>
+            {% endif %}
+          </div>
+        </a>
+      </div>
+      {% empty %}
+      <div class="col-span-full text-center py-12">
+        <p class="text-gray-400 text-lg">No properties available on the map yet.</p>
+        <a href="{% url 'property_list' %}" class="mt-2 inline-block text-blue-600 hover:underline">Browse all properties →</a>
+      </div>
+      {% endfor %}
+    </div>
+
+  </section>
+</main>
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+<script>
+  // Initialize map
+  const map = L.map('publicMap').setView([20.5937, 78.9629], 5);
+
+  // OpenStreetMap tiles (FREE forever!)
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    maxZoom: 19,
+  }).addTo(map);
+
+  // Marker cluster group (optional — can add leaflet.markercluster later)
+  const markers = [];
+  let activeFilter = 'all';
+
+  // Status-based colors
+  const statusColors = {
+    'Available': '#22c55e',
+    'Sold Out': '#ef4444',
+    'Coming Soon': '#eab308',
+    'Under Construction': '#f97316'
+  };
+
+  const statusIcons = {
+    'Available': '🏠',
+    'Sold Out': '🏠',
+    'Coming Soon': '🏗️',
+    'Under Construction': '🏗️'
+  };
+
+  // Property data
+  const properties = [
+    {% for property in properties %}
+    {% if property.latitude and property.longitude %}
+    {
+      id: {{ property.id }},
+      title: "{{ property.title|escapejs }}",
+      location: "{{ property.location|escapejs }}",
+      price: "₹{{ property.price }} {{ property.price_unit }}",
+      status: "{{ property.status|escapejs }}",
+      type: "{{ property.property_type|escapejs }}",
+      lat: {{ property.latitude }},
+      lng: {{ property.longitude }},
+      thumbnail: "{% if property.thumbnail %}{{ property.thumbnail.url }}{% else %}https://via.placeholder.com/300x200?text=No+Image{% endif %}",
+      url: "{% url 'property_detail' property.id %}",
+      beds: {{ property.beds|default:'null' }},
+      sqft: {{ property.sqft|default:'null' }},
+      builder: "{{ property.builder.get_full_name|default:property.builder.username|escapejs }}"
+    },
+    {% endif %}
+    {% endfor %}
+  ];
+
+  // Create markers
+  function createMarkers() {
+    markers.forEach(m => map.removeLayer(m.marker));
+    markers.length = 0;
+
+    const filtered = activeFilter === 'all'
+      ? properties
+      : properties.filter(p => p.status === activeFilter);
+
+    filtered.forEach(prop => {
+      const color = statusColors[prop.status] || '#6b7280';
+      const icon = statusIcons[prop.status] || '🏠';
+
+      const customIcon = L.divIcon({
+        className: 'custom-marker',
+        html: `<div style="background:${color};width:32px;height:32px;border-radius:50%;border:3px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.25);display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;">${icon}</div>`,
+        iconSize: [32, 32],
+        iconAnchor: [16, 16],
+        popupAnchor: [0, -16]
+      });
+
+      const marker = L.marker([prop.lat, prop.lng], { icon: customIcon }).addTo(map);
+
+      const popupContent = `
+        <div style="min-width:240px;font-family:system-ui,sans-serif;">
+          <a href="${prop.url}" style="text-decoration:none;color:inherit;">
+            <img src="${prop.thumbnail}" style="width:100%;height:130px;object-fit:cover;border-radius:10px;margin-bottom:10px;" alt="${prop.title}">
+            <h3 style="font-size:16px;font-weight:800;color:#111827;margin:0 0 4px;">${prop.title}</h3>
+            <p style="font-size:12px;color:#6b7280;margin:0 0 4px;">📍 ${prop.location}</p>
+            <p style="font-size:14px;font-weight:700;color:#2563eb;margin:0 0 6px;">${prop.price}</p>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;">
+              <span style="background:${color}20;color:${color};padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;border:1px solid ${color}40;">${prop.status}</span>
+              <span style="background:#f3f4f6;color:#374151;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:500;">${prop.type}</span>
+              ${prop.beds ? `<span style="background:#fef3c7;color:#92400e;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:500;">${prop.beds} BHK</span>` : ''}
+            </div>
+            <p style="font-size:11px;color:#9ca3af;margin-top:6px;">by ${prop.builder}</p>
+          </a>
+        </div>
+      `;
+
+      marker.bindPopup(popupContent, {
+        maxWidth: 280,
+        className: 'custom-popup'
+      });
+
+      markers.push({ marker, lat: prop.lat, lng: prop.lng, status: prop.status });
+    });
+
+    // Fit bounds
+    if (markers.length > 0) {
+      const group = new L.featureGroup(markers.map(m => m.marker));
+      map.fitBounds(group.getBounds().pad(0.15));
+    }
+
+    // Update stats
+    document.getElementById('availableCount').textContent = properties.filter(p => p.status === 'Available').length;
+    document.getElementById('upcomingCount').textContent = properties.filter(p => p.status === 'Coming Soon').length;
+
+    // Unique cities count
+    const cities = new Set(properties.map(p => p.location.split(',')[0].trim()));
+    document.getElementById('cityCount').textContent = cities.size;
+  }
+
+  createMarkers();
+
+  // Filter function
+  function filterProperties(status) {
+    activeFilter = status;
+
+    // Update buttons
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      if (btn.dataset.filter === status) {
+        btn.classList.remove('bg-gray-100', 'text-gray-700');
+        btn.classList.add('bg-blue-600', 'text-white');
+      } else {
+        btn.classList.remove('bg-blue-600', 'text-white');
+        btn.classList.add('bg-gray-100', 'text-gray-700');
+      }
+    });
+
+    // Filter cards
+    document.querySelectorAll('.property-card').forEach(card => {
+      if (status === 'all' || card.dataset.status === status) {
+        card.style.display = '';
+      } else {
+        card.style.display = 'none';
+      }
+    });
+
+    // Recreate markers
+    createMarkers();
+  }
+
+  // Fly to map from card
+  function flyToMap(lat, lng) {
+    map.flyTo([lat, lng], 17, { duration: 1.2 });
+    const found = markers.find(m => m.lat === lat && m.lng === lng);
+    if (found) {
+      setTimeout(() => found.marker.openPopup(), 1400);
+    }
+    // Scroll to map
+    document.getElementById('publicMap').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+</script>
+
+<style>
+  .custom-popup .leaflet-popup-content-wrapper {
+    border-radius: 14px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.18);
+    padding: 0;
+    overflow: hidden;
+  }
+  .custom-popup .leaflet-popup-content {
+    margin: 0;
+    padding: 0;
+  }
+  .custom-popup .leaflet-popup-tip {
+    background: white;
+  }
+  .leaflet-container {
+    font-family: system-ui, -apple-system, sans-serif;
+  }
+  .custom-marker div {
+    transition: transform 0.2s ease;
+  }
+  .custom-marker:hover div {
+    transform: scale(1.15);
+  }
+</style>
+
+{% endblock %}

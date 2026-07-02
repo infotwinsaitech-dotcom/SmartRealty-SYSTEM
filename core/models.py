@@ -107,6 +107,12 @@ class Property(models.Model):
 
     thumbnail = CloudinaryField('image', blank=True, null=True)
     video = models.FileField(upload_to='videos/', blank=True, null=True)
+    # Property class ke andar add karo:
+    latitude = models.DecimalField(max_digits=10, decimal_places=8, null=True, blank=True)
+    longitude = models.DecimalField(max_digits=11, decimal_places=8, null=True, blank=True)
+
+# Meta.indexes mein add karo:
+    Index(fields=['latitude', 'longitude']),
 
     agent_name = models.CharField(max_length=100, default="Agent")
     agent_role = models.CharField(max_length=100, default="Advisor")

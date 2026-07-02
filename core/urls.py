@@ -148,6 +148,9 @@ path('accounts/', include('allauth.urls')),
     path("update-lead-status/", views.update_lead_status, name="update_lead_status"),
     path("add-note/", views.add_note, name="add_note"),
     path("update-priority/", views.update_priority, name="update_priority"),
+    path("builder/property-map/", views.property_map, name="property_map"),
+    # urls.py
+    path("property-map/", views.property_map_public, name="property_map_public"),
 ]
 
 if settings.DEBUG:

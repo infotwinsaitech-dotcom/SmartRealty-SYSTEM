@@ -4467,3 +4467,36 @@ def property_leads(request, property_id):
         "property": property_obj,
         "leads": leads,
     })
+
+@builder_required
+def property_map(request):
+    properties = Property.objects.filter(
+        builder=request.user
+    ).select_related('builder').prefetch_related('images').annotate(
+        wishlist_count=Count('wishlisted_by', distinct=True)
+    ).order_by('-created_at')
+    
+    return render(request, "builder/property_map.html", {
+        'properties': properties,
+        'google_maps_api_key': getattr(settings, 'GOOGLE_MAPS_API_KEY', ''),
+        'builder_name': request.user.get_full_name() or request.user.username,
+    })
+# views.py mein add karo (NO login_required - public hai!)
+
+def property_map_public(request):
+    """
+    PUBLIC Property Map - Sab users dekh sakte hain bina login ke.
+    Sab builders ki properties map pe dikhengi.
+    """
+    properties = Property.objects.filter(
+        status='Available'
+    ).select_related('builder').prefetch_related('images').annotate(
+        wishlist_count=Count('wishlisted_by', distinct=True)
+    ).order_by('-created_at')
+    
+    google_maps_api_key = getattr(settings, 'GOOGLE_MAPS_API_KEY', '')
+    
+    return render(request, "public/property_map.html", {
+        'properties': properties,
+        'google_maps_api_key': google_maps_api_key,
+    })
