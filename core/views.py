@@ -4496,7 +4496,7 @@ def property_map_public(request):
     
     google_maps_api_key = getattr(settings, 'GOOGLE_MAPS_API_KEY', '')
     
-    return render(request, "public/property_map.html", {
+    return render(request, "public/public_property_map.html", {
         'properties': properties,
         'google_maps_api_key': google_maps_api_key,
     })
