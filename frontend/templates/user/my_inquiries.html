@@ -51,9 +51,11 @@
             <div class="shrink-0 text-left md:text-right">
                 {% if inquiry.agent %}
                 <span class="inline-flex items-center gap-1.5 bg-green-500/10 text-green-400 text-xs font-semibold px-3 py-1.5 rounded-full">
-                    ✅ Agent Assigned: {{ inquiry.agent.username }}
+                    ✅ Agent Assigned: {{ inquiry.agent.agent_profile.name|default:inquiry.agent.username }}
                 </span>
-                {% if inquiry.agent.phone %}
+                {% if inquiry.agent.agent_profile.phone %}
+                <p class="text-xs text-gray-500 mt-1.5">📞 {{ inquiry.agent.agent_profile.phone }}</p>
+                {% elif inquiry.agent.phone %}
                 <p class="text-xs text-gray-500 mt-1.5">📞 {{ inquiry.agent.phone }}</p>
                 {% endif %}
                 {% else %}
