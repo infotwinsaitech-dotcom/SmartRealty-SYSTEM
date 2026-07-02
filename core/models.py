@@ -241,6 +241,14 @@ class Inquiry(models.Model):
         related_name="inquiries",
         db_index=True
     )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='my_inquiries',
+        help_text="Agar user login karke inquiry dala tha toh yaha link hota hai"
+    )
     name = models.CharField(max_length=100)
     email = models.EmailField(db_index=True)
     message = models.TextField()

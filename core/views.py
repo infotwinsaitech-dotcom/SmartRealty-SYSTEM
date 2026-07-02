@@ -351,6 +351,7 @@ def property_detail(request, id):
 
             Inquiry.objects.create(
                 property=property,
+                user=request.user if request.user.is_authenticated else None,
                 name=name,
                 email=email,
                 phone=phone,
@@ -918,10 +919,10 @@ def my_properties(request):
 
 @login_required
 def my_inquiries(request):
-    """User inquiries"""
+    """User inquiries - sirf isi logged-in user ki, chahe purani email-based ho ya nayi user-linked"""
     inquiries = Inquiry.objects.filter(
-        email=request.user.email
-    ).select_related('property').order_by('-created_at')
+        Q(user=request.user) | Q(email=request.user.email)
+    ).select_related('property', 'agent').order_by('-created_at')
     page_obj = get_paginated_queryset(inquiries, request)
     return render(request, "user/my_inquiries.html", {"inquiries": page_obj, "page_obj": page_obj})
 
