@@ -414,6 +414,18 @@
     cursor: pointer;
   }
 
+  /* Area dropdown ka structure alag hai (search box + full-width list),
+     isliye ye generic 2-column grid override karke single column banate hain */
+  #areaFilterDropdown {
+    display: flex !important;
+    flex-direction: column;
+    min-width: 260px;
+  }
+  #areaFilterDropdown #areaCheckboxList {
+    display: flex;
+    flex-direction: column;
+  }
+
   /* ===== HOVER EFFECTS ===== */
   .property-link:hover .property-card {
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(251, 191, 36, 0.1) !important;
@@ -579,15 +591,23 @@ function toggleDropdown(id, event) {
 // OUTSIDE CLICK = CLOSE
 // =========================
 document.addEventListener('click', function(e) {
+    const rDrop = document.getElementById('residentialDropdown');
     const cDrop = document.getElementById('commercialDropdown');
     const lDrop = document.getElementById('landDropdown');
+    const aDrop = document.getElementById('areaFilterDropdown');
+    const rBtn = document.getElementById('residentialBtn');
     const cBtn = document.getElementById('commercialBtn');
     const lBtn = document.getElementById('landBtn');
+    const aBtn = document.getElementById('areaFilterBtn');
 
-    const inside = (cDrop && cDrop.contains(e.target)) ||
+    const inside = (rDrop && rDrop.contains(e.target)) ||
+                   (cDrop && cDrop.contains(e.target)) ||
                    (lDrop && lDrop.contains(e.target)) ||
+                   (aDrop && aDrop.contains(e.target)) ||
+                   (rBtn && rBtn.contains(e.target)) ||
                    (cBtn && cBtn.contains(e.target)) ||
-                   (lBtn && lBtn.contains(e.target));
+                   (lBtn && lBtn.contains(e.target)) ||
+                   (aBtn && aBtn.contains(e.target));
 
     if (!inside) closeAllDropdowns();
 });
