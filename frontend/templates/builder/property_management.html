@@ -134,8 +134,9 @@ class="absolute top-2 right-3 text-gray-500 text-xl hover:text-gray-800">✕</bu
 Add Property
 </h2>
 
-<form method="POST" action="{% url 'add_property' %}" enctype="multipart/form-data" id="propertyForm" onsubmit="return confirmPropertySubmit()">
+<form method="POST" action="{% url 'add_property' %}" enctype="multipart/form-data" id="propertyForm">
 {% csrf_token %}
+<input type="hidden" name="form_token" value="{{ form_token }}">
 
 <input name="title" placeholder="Title" required
 class="w-full mb-3 border p-2 rounded text-sm">
@@ -479,7 +480,7 @@ name="sales_head_number"
 placeholder="Sales Head Number"
 class="w-full mb-3 border p-2 rounded text-sm">
 
-<button type="submit"
+<button type="button" onclick="openSaveConfirmModal()"
 class="w-full mt-5 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold rounded-lg">
 Save Property
 </button>
@@ -488,6 +489,46 @@ Save Property
 
 </div>
 </div>
+
+<!-- ===================== SAVE PROPERTY CONFIRMATION / PROCESSING MODAL ===================== -->
+<div id="saveConfirmModal" class="hidden fixed inset-0 bg-black/60 z-[100] flex items-center justify-center p-4">
+  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 text-center">
+
+    <!-- STEP 1: Confirmation -->
+    <div id="saveConfirmStep">
+        <div class="w-14 h-14 mx-auto rounded-full bg-blue-100 flex items-center justify-center mb-4">
+            <svg class="w-7 h-7 text-blue-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        </div>
+        <h3 class="text-lg font-bold text-gray-800 mb-2">Property Save Karein?</h3>
+        <p class="text-sm text-gray-500 mb-5">Ek baar save hone ke baad property list mein turant dikhegi. Kripya details check kar li hain.</p>
+        <div class="flex gap-3">
+            <button type="button" onclick="closeSaveConfirmModal()"
+                class="flex-1 py-2.5 rounded-lg border border-gray-300 text-gray-600 font-semibold hover:bg-gray-50">
+                Cancel
+            </button>
+            <button type="button" onclick="proceedSaveProperty()"
+                class="flex-1 py-2.5 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold">
+                Yes, Save
+            </button>
+        </div>
+    </div>
+
+    <!-- STEP 2: Processing (submit hone ke baad ye dikhta hai) -->
+    <div id="saveProcessingStep" class="hidden">
+        <div class="w-14 h-14 mx-auto rounded-full bg-blue-50 flex items-center justify-center mb-4">
+            <svg class="w-7 h-7 text-blue-600 animate-spin" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+            </svg>
+        </div>
+        <h3 class="text-lg font-bold text-gray-800 mb-2">Property Save Ho Rahi Hai...</h3>
+        <p class="text-sm text-gray-500">Photos/video upload ho rahe hain, isme thoda time lag sakta hai.<br>
+        <span class="font-semibold text-red-500">Is window ko band ya refresh mat kariye.</span></p>
+    </div>
+
+  </div>
+</div>
+
 
 <!-- JS -->
 <script>
@@ -1019,31 +1060,37 @@ document.getElementById('propertyForm').addEventListener('submit', function(e) {
     alert('Upload failed. Please try again.');
   });
 });
-// ===================== CONFIRMATION POPUP =====================
+// ===================== SAVE PROPERTY CONFIRMATION / PROCESSING MODAL =====================
 let isSubmitting = false;
 
-function confirmPropertySubmit() {
-    // Agar already submit ho raha hai, toh rok do
-    if (isSubmitting) {
-        return false;
-    }
-    
-    // Confirmation popup
-    const confirmed = confirm("Kya aap is property ko save karna chahte hain?\n\n⚠️ 'OK' = Save Property\n❌ 'Cancel' = Go Back");
-    
-    if (confirmed) {
-        isSubmitting = true;
-        // Button ko disable kar do
-        const submitBtn = document.querySelector('button[type="submit"]');
-        if (submitBtn) {
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '⏳ Saving Property...';
-            submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
-        }
-        return true; // Form submit hoga
-    } else {
-        return false; // Form submit nahi hoga
-    }
+function openSaveConfirmModal() {
+    if (isSubmitting) return; // already submit ho chuka hai, dobara mat kholo
+
+    // HTML5 required-field validation pehle chalao (jaise normal submit karta)
+    const form = document.getElementById('propertyForm');
+    if (!form.reportValidity()) return;
+
+    document.getElementById('saveConfirmModal').classList.remove('hidden');
+    document.getElementById('saveConfirmStep').classList.remove('hidden');
+    document.getElementById('saveProcessingStep').classList.add('hidden');
+}
+
+function closeSaveConfirmModal() {
+    if (isSubmitting) return; // processing shuru ho chuki hai to band mat karne do
+    document.getElementById('saveConfirmModal').classList.add('hidden');
+}
+
+function proceedSaveProperty() {
+    if (isSubmitting) return;
+    isSubmitting = true;
+
+    // Confirmation step ko hide karke processing step dikhao
+    document.getElementById('saveConfirmStep').classList.add('hidden');
+    document.getElementById('saveProcessingStep').classList.remove('hidden');
+
+    // Form ko actual submit karo (form.submit() onsubmit event trigger nahi karta,
+    // isliye double-guard collision nahi hoga)
+    document.getElementById('propertyForm').submit();
 }
 </script>
 

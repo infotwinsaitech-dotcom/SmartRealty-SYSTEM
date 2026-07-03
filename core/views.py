@@ -5,6 +5,7 @@ All features preserved with security & performance fixes
 
 import os
 import re
+import uuid
 import json
 import csv
 import secrets
@@ -1035,6 +1036,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 @builder_required
 def add_property(request):
     """Add new property with proper validation and error handling"""
@@ -1146,6 +1148,23 @@ def add_property(request):
                     "icon": sanitize_input(nearby_icons[i]) if i < len(nearby_icons) else ""
                 })
 
+        # ===== DUPLICATE SUBMIT GUARD (server-side, token-based) =====
+        # Builder jaan-boojh kar similar/same-title properties dobara add kar sakta hai
+        # (jaise same project ke multiple units) — isliye title/location se block nahi karte.
+        # Iske bajaye har form-load ko ek unique token milta hai; agar wahi EXACT
+        # submission dobara aaye (double-click / resubmit), tabhi usse duplicate maana jaata hai.
+        form_token = request.POST.get('form_token', '')
+        used_tokens = request.session.get('used_property_tokens', [])
+
+        if form_token and form_token in used_tokens:
+            messages.info(request, "Ye submission already process ho chuki hai (duplicate click rok diya gaya).")
+            return redirect("my_property")
+
+        if form_token:
+            used_tokens.append(form_token)
+            request.session['used_property_tokens'] = used_tokens[-20:]  # sirf recent 20 yaad rakho
+            request.session.modified = True
+
         try:
             with transaction.atomic():
                 # FIXED: 'prop' instead of 'property' (reserved keyword)
@@ -1185,24 +1204,26 @@ def add_property(request):
                     **files
                 )
 
-                # Handle gallery images
-                # Handle gallery images
-                images = request.FILES.getlist("images")
-                logger.info(f"DEBUG: Received {len(images)} gallery image(s) in request.FILES for property '{prop.title}'")
-                saved_count = 0
-                for img in images:
-                    logger.info(f"DEBUG: Processing gallery file: name={img.name}, size={img.size} bytes")
-                    valid, msg = validate_file_upload(img, ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.avif'], 10)
-                    if valid:
-                        try:
-                            pi = PropertyImage.objects.create(property=prop, image=img)
-                            saved_count += 1
-                            logger.info(f"DEBUG: Gallery image saved successfully -> id={pi.id}, url={pi.image.url}")
-                        except Exception as img_err:
-                            logger.error(f"DEBUG: Gallery image FAILED to save (likely Cloudinary upload error): {img_err}")
-                    else:
-                        logger.warning(f"Gallery image skipped: {msg}")
-                logger.info(f"DEBUG: Gallery upload complete -> {saved_count}/{len(images)} images saved for property '{prop.title}'")
+            # Gallery images ko atomic transaction ke BAHAR upload karte hain (performance fix):
+            # Cloudinary upload calls slow network operations hain, DB transaction ko itni der
+            # tak khula rakhna DB connection ko block karta hai. Har image apne aap mein
+            # ek independent save hai, isliye alag rakhna safe hai.
+            images = request.FILES.getlist("images")
+            logger.info(f"DEBUG: Received {len(images)} gallery image(s) in request.FILES for property '{prop.title}'")
+            saved_count = 0
+            for img in images:
+                logger.info(f"DEBUG: Processing gallery file: name={img.name}, size={img.size} bytes")
+                valid, msg = validate_file_upload(img, ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.avif'], 10)
+                if valid:
+                    try:
+                        pi = PropertyImage.objects.create(property=prop, image=img)
+                        saved_count += 1
+                        logger.info(f"DEBUG: Gallery image saved successfully -> id={pi.id}, url={pi.image.url}")
+                    except Exception as img_err:
+                        logger.error(f"DEBUG: Gallery image FAILED to save (likely Cloudinary upload error): {img_err}")
+                else:
+                    logger.warning(f"Gallery image skipped: {msg}")
+            logger.info(f"DEBUG: Gallery upload complete -> {saved_count}/{len(images)} images saved for property '{prop.title}'")
 
             messages.success(request, f"Property '{prop.title}' added successfully!")
             logger.info(f"Property created: {prop.title} by {request.user.username}")
@@ -1213,8 +1234,7 @@ def add_property(request):
             messages.error(request, f"Failed to create property: {str(e)}")
             return redirect("add_property")
 
-    return render(request, "builder/property_management.html")
-
+    return render(request, "builder/property_management.html", {"form_token": str(uuid.uuid4())})
 @builder_required
 def property_management(request):
     """Show builder's properties with gallery - N+1 FIXED"""
@@ -1236,6 +1256,7 @@ def property_management(request):
     return render(request, "builder/property_management.html", {
         "properties": page_obj,
         "page_obj": page_obj,
+        "form_token": str(uuid.uuid4()),
     })
 
 @builder_required
