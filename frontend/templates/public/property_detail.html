@@ -379,21 +379,129 @@
             {% endif %}
 
             <!-- Location Map -->
-            {% if property.map_link %}
-    {% if "maps/embed" in property.map_link or "output=embed" in property.map_link %}
-        <!-- Already embed URL hai — directly use karo -->
-        <iframe src="{{ property.map_link }}"
-                width="100%" height="400" style="border:0;" allowfullscreen loading="lazy">
-        </iframe>
-    {% else %}
-        <!-- Normal link ya coordinates — Google se auto-embed banao -->
-        <iframe src="https://maps.google.com/maps?q={{ property.map_link|urlencode }}&output=embed&zoom=17"
-                width="100%" height="400" style="border:0;" allowfullscreen loading="lazy">
-        </iframe>
-    {% endif %}
-{% else %}
-    <p class="text-gray-400 text-sm text-center py-8">📍 {{ property.location }}</p>
-{% endif %}
+            <!-- ====== LOCATION MAP (Leaflet - Free & No API Key) ====== -->
+<div class="reveal">
+    <div class="flex items-center gap-3 mb-6">
+        <div class="w-1 h-8 bg-yellow-400 rounded-full"></div>
+        <h2 class="text-3xl font-bold text-white">Location</h2>
+    </div>
+
+    <!-- Map Container -->
+    <div class="rounded-2xl overflow-hidden border border-white/10 shadow-2xl">
+        <div id="propertyDetailMap" style="height: 420px; width: 100%; z-index: 1;"></div>
+    </div>
+
+    <!-- Location Label -->
+    <p class="text-gray-400 text-sm mt-3 flex items-center gap-2">
+        <svg class="w-4 h-4 text-yellow-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+        </svg>
+        {{ property.location }}
+    </p>
+</div>
+
+<!-- Leaflet CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+<script>
+(function() {
+    // Property data from Django
+    var propLat  = {{ property.latitude|default:"null" }};
+    var propLng  = {{ property.longitude|default:"null" }};
+    var propName = "{{ property.project_name|default:property.title|escapejs }}";
+    var propLoc  = "{{ property.location|escapejs }}";
+    var propPrice= "₹{{ property.price }} {{ property.price_unit }}";
+    var mapLink  = "{{ property.map_link|default:''|escapejs }}";
+
+    function initMap(lat, lng) {
+        var map = L.map('propertyDetailMap', {
+            center: [lat, lng],
+            zoom: 16,
+            scrollWheelZoom: false
+        });
+
+        // OpenStreetMap tiles
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+            maxZoom: 19
+        }).addTo(map);
+
+        // Custom marker
+        var markerIcon = L.divIcon({
+            className: 'custom-prop-marker',
+            html: '<div style="background:#facc15;width:44px;height:44px;border-radius:50%;border:4px solid white;box-shadow:0 4px 12px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;font-size:20px;">🏠</div>',
+            iconSize: [44, 44],
+            iconAnchor: [22, 22],
+            popupAnchor: [0, -24]
+        });
+
+        var marker = L.marker([lat, lng], { icon: markerIcon }).addTo(map);
+
+        // Popup
+        marker.bindPopup(
+            '<div style="font-family:system-ui,sans-serif;min-width:200px;">' +
+            '<h3 style="font-size:15px;font-weight:800;color:#111827;margin:0 0 4px;">' + propName + '</h3>' +
+            '<p style="font-size:12px;color:#6b7280;margin:0 0 6px;">📍 ' + propLoc + '</p>' +
+            '<p style="font-size:14px;font-weight:700;color:#d97706;margin:0;">' + propPrice + '</p>' +
+            '</div>',
+            { maxWidth: 240 }
+        ).openPopup();
+
+        // Enable scroll zoom on click
+        map.on('click', function() { map.scrollWheelZoom.enable(); });
+        map.on('mouseout', function() { map.scrollWheelZoom.disable(); });
+    }
+
+    // Priority 1: lat/lng fields from model
+    if (propLat && propLng) {
+        initMap(propLat, propLng);
+        return;
+    }
+
+    // Priority 2: parse coordinates from map_link field
+    // Supports: "23.0821, 72.4979" or "23°04'55.8\"N 72°29'52.4\"E"
+    if (mapLink) {
+        // Try decimal coords
+        var decMatch = mapLink.match(/(-?\d+\.?\d*)[,\s]+(-?\d+\.?\d*)/);
+        if (decMatch) {
+            initMap(parseFloat(decMatch[1]), parseFloat(decMatch[2]));
+            return;
+        }
+        // Try DMS coords like 23°04'55.8"N 72°29'52.4"E
+        var dmsMatch = mapLink.match(/(\d+)[°\s](\d+)['\s](\d+\.?\d*)["']?\s*([NS])[,\s]+(\d+)[°\s](\d+)['\s](\d+\.?\d*)["']?\s*([EW])/i);
+        if (dmsMatch) {
+            var lat = parseFloat(dmsMatch[1]) + parseFloat(dmsMatch[2])/60 + parseFloat(dmsMatch[3])/3600;
+            if (dmsMatch[4].toUpperCase() === 'S') lat = -lat;
+            var lng = parseFloat(dmsMatch[5]) + parseFloat(dmsMatch[6])/60 + parseFloat(dmsMatch[7])/3600;
+            if (dmsMatch[8].toUpperCase() === 'W') lng = -lng;
+            initMap(lat, lng);
+            return;
+        }
+    }
+
+    // Priority 3: geocode using location text (Nominatim — free, no API key)
+    var query = mapLink || propLoc;
+    if (query) {
+        fetch('https://nominatim.openstreetmap.org/search?q=' + encodeURIComponent(query) + '&format=json&limit=1')
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            if (data && data.length > 0) {
+                initMap(parseFloat(data[0].lat), parseFloat(data[0].lon));
+            } else {
+                // Fallback: India center
+                initMap(20.5937, 78.9629);
+            }
+        })
+        .catch(function() { initMap(20.5937, 78.9629); });
+    }
+})();
+</script>
 
             <!-- Similar Properties -->
             {% if similar_properties %}
