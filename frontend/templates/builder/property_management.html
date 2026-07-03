@@ -134,7 +134,7 @@ class="absolute top-2 right-3 text-gray-500 text-xl hover:text-gray-800">✕</bu
 Add Property
 </h2>
 
-<form method="POST" action="{% url 'add_property' %}" enctype="multipart/form-data" id="propertyForm">
+<form method="POST" action="{% url 'add_property' %}" enctype="multipart/form-data" id="propertyForm" onsubmit="return confirmPropertySubmit()">
 {% csrf_token %}
 
 <input name="title" placeholder="Title" required
@@ -1019,6 +1019,32 @@ document.getElementById('propertyForm').addEventListener('submit', function(e) {
     alert('Upload failed. Please try again.');
   });
 });
+// ===================== CONFIRMATION POPUP =====================
+let isSubmitting = false;
+
+function confirmPropertySubmit() {
+    // Agar already submit ho raha hai, toh rok do
+    if (isSubmitting) {
+        return false;
+    }
+    
+    // Confirmation popup
+    const confirmed = confirm("Kya aap is property ko save karna chahte hain?\n\n⚠️ 'OK' = Save Property\n❌ 'Cancel' = Go Back");
+    
+    if (confirmed) {
+        isSubmitting = true;
+        // Button ko disable kar do
+        const submitBtn = document.querySelector('button[type="submit"]');
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '⏳ Saving Property...';
+            submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+        }
+        return true; // Form submit hoga
+    } else {
+        return false; // Form submit nahi hoga
+    }
+}
 </script>
 
 <style>
