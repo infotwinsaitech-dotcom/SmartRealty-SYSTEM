@@ -129,7 +129,7 @@ class Property(models.Model):
 
     map_link = models.TextField(blank=True, null=True)
     configuration = models.CharField(max_length=100, blank=True, null=True)
-    brochure = models.FileField(upload_to='brochures/', null=True, blank=True)
+    brochure = CloudinaryField('raw', resource_type='raw', null=True, blank=True)
     starting_price = models.CharField(max_length=50, blank=True, null=True)
     max_price = models.CharField(max_length=50, blank=True, null=True)
 
