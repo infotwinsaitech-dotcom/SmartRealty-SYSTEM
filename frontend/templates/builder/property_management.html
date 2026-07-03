@@ -140,8 +140,13 @@ Add Property
 <input name="title" placeholder="Title" required
 class="w-full mb-3 border p-2 rounded text-sm">
 
-<input name="location" id="addLocationInput" placeholder="Location" required
-class="w-full mb-3 border p-2 rounded text-sm">
+<div class="relative mb-3">
+    <input name="location" id="addLocationInput" placeholder="Location (e.g. Ahmedabad, Satellite)" required
+    autocomplete="off"
+    class="w-full border p-2 rounded text-sm">
+    <div id="addLocationSuggestions" class="hidden absolute z-50 left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-xl max-h-56 overflow-y-auto"></div>
+    <p class="text-[11px] text-gray-400 mt-1">Type karke Ahmedabad ke popular areas mein se search kar sakte ho</p>
+</div>
 
 <!-- MAP COORDINATES (needed for Property Map page) -->
 <div class="mb-3 border border-gray-200 rounded-lg p-3 bg-gray-50">
@@ -486,6 +491,72 @@ Save Property
 
 <!-- JS -->
 <script>
+// ===================== AHMEDABAD AREA AUTOCOMPLETE =====================
+const AHMEDABAD_AREAS = [
+  "Satellite", "Vastrapur", "Bodakdev", "Thaltej", "SG Highway", "Prahlad Nagar",
+  "Navrangpura", "Ellisbridge", "Paldi", "Vasna", "Maninagar", "Isanpur",
+  "Ghatlodia", "Naranpura", "Ranip", "Chandkheda", "Motera", "Sabarmati",
+  "Gota", "Chandlodia", "Vejalpur", "Jodhpur", "Ambawadi", "Shahibaug",
+  "Naroda", "Nikol", "Vastral", "Bapunagar", "Odhav", "Kubernagar",
+  "Rakhial", "Amraiwadi", "Gomtipur", "Khokhra", "Kankaria", "Danilimda",
+  "Vatva", "Lambha", "Narol", "Sarkhej", "Juhapura", "Makarba",
+  "Ghuma", "South Bopal", "Bopal", "Shela", "Shilaj", "Science City",
+  "Chharodi", "Nava Vadaj", "Vadaj", "Usmanpura", "Memnagar", "Gulbai Tekra",
+  "Panjrapole", "C.G. Road", "Law Garden", "Navjivan", "Income Tax", "Stadium",
+  "Nehru Nagar", "Judges Bungalow Road", "Iscon", "Anand Nagar", "Manekbaug",
+  "Jivraj Park", "Vishala", "Nirnaynagar", "Chenpur", "Sughad", "Zundal",
+  "Gandhinagar Road", "Adalaj", "Koba", "Randesan", "Kudasan", "New CG Road",
+  "Bhat", "Sarangpur", "Kalupur", "Raikhad", "Dariapur", "Jamalpur",
+  "Khadia", "Shahpur", "Dudheshwar", "Saraspur", "Rajpur", "Meghaninagar"
+];
+
+function setupLocationAutocomplete(inputId, boxId) {
+  const input = document.getElementById(inputId);
+  const box = document.getElementById(boxId);
+  if (!input || !box) return;
+
+  input.addEventListener('input', function() {
+    const val = input.value.trim().toLowerCase();
+    box.innerHTML = '';
+
+    let matches = [];
+    if (val === '' || val.includes('ahmedabad') || val.includes('ahemdabad') || val.length < 3) {
+      matches = AHMEDABAD_AREAS;
+    } else {
+      matches = AHMEDABAD_AREAS.filter(a => a.toLowerCase().includes(val));
+    }
+
+    if (matches.length === 0) {
+      box.classList.add('hidden');
+      return;
+    }
+
+    matches.slice(0, 15).forEach(area => {
+      const item = document.createElement('div');
+      item.className = 'px-3 py-2 text-sm hover:bg-yellow-50 cursor-pointer border-b border-gray-100 last:border-0';
+      item.textContent = 'Ahmedabad, ' + area;
+      item.onclick = function() {
+        input.value = 'Ahmedabad, ' + area;
+        box.classList.add('hidden');
+      };
+      box.appendChild(item);
+    });
+
+    box.classList.remove('hidden');
+  });
+
+  input.addEventListener('focus', function() {
+    if (input.value.trim() === '') input.dispatchEvent(new Event('input'));
+  });
+
+  document.addEventListener('click', function(e) {
+    if (!input.contains(e.target) && !box.contains(e.target)) {
+      box.classList.add('hidden');
+    }
+  });
+}
+setupLocationAutocomplete('addLocationInput', 'addLocationSuggestions');
+
 // ===================== EXTRACT COORDS FROM GOOGLE MAPS LINK =====================
 // Most reliable option — works for complex/informal addresses since it reads the
 // exact coordinates Google Maps already resolved, instead of re-guessing from text.

@@ -399,6 +399,26 @@ def property_list(request):
     """Advanced property search with filters"""
     from django.db.models import Q, Value, IntegerField, Case, When
 
+    # Ahmedabad ke popular areas - Add Property form (builder side) mein bhi yehi list hai,
+    # taaki dono jagah options match karein.
+    AHMEDABAD_AREAS = [
+        "Satellite", "Vastrapur", "Bodakdev", "Thaltej", "SG Highway", "Prahlad Nagar",
+        "Navrangpura", "Ellisbridge", "Paldi", "Vasna", "Maninagar", "Isanpur",
+        "Ghatlodia", "Naranpura", "Ranip", "Chandkheda", "Motera", "Sabarmati",
+        "Gota", "Chandlodia", "Vejalpur", "Jodhpur", "Ambawadi", "Shahibaug",
+        "Naroda", "Nikol", "Vastral", "Bapunagar", "Odhav", "Kubernagar",
+        "Rakhial", "Amraiwadi", "Gomtipur", "Khokhra", "Kankaria", "Danilimda",
+        "Vatva", "Lambha", "Narol", "Sarkhej", "Juhapura", "Makarba",
+        "Ghuma", "South Bopal", "Bopal", "Shela", "Shilaj", "Science City",
+        "Chharodi", "Nava Vadaj", "Vadaj", "Usmanpura", "Memnagar", "Gulbai Tekra",
+        "Panjrapole", "C.G. Road", "Law Garden", "Navjivan", "Income Tax", "Stadium",
+        "Nehru Nagar", "Judges Bungalow Road", "Iscon", "Anand Nagar", "Manekbaug",
+        "Jivraj Park", "Vishala", "Nirnaynagar", "Chenpur", "Sughad", "Zundal",
+        "Gandhinagar Road", "Adalaj", "Koba", "Randesan", "Kudasan", "New CG Road",
+        "Bhat", "Sarangpur", "Kalupur", "Raikhad", "Dariapur", "Jamalpur",
+        "Khadia", "Shahpur", "Dudheshwar", "Saraspur", "Rajpur", "Meghaninagar",
+    ]
+
     # Property type groups — must match the checkbox groups in public/property.html
     CATEGORY_TYPES = {
         'residential': ['Flat', 'Villa', 'Bungalow', 'Duplex', 'Penthouse'],
@@ -409,11 +429,14 @@ def property_list(request):
     properties = Property.objects.select_related('builder').all().order_by('-created_at')
 
     location = sanitize_input(request.GET.get('location', '')).strip()
+    areas = [sanitize_input(a).strip() for a in request.GET.getlist('areas') if a.strip()]
     property_type = sanitize_input(request.GET.get('type', '')).strip()
     category = sanitize_input(request.GET.get('category', '')).strip().lower()
     possession = sanitize_input(request.GET.get('possession', '')).strip()
     min_price = sanitize_input(request.GET.get('min_price', '')).strip()
     max_price = sanitize_input(request.GET.get('max_price', '')).strip()
+    min_price_unit = sanitize_input(request.GET.get('min_price_unit', 'L')).strip()
+    max_price_unit = sanitize_input(request.GET.get('max_price_unit', 'L')).strip()
     beds = sanitize_input(request.GET.get('beds', '')).strip()
     query = sanitize_input(request.GET.get('q', '')).strip()
 
@@ -437,6 +460,13 @@ def property_list(request):
             Q(title__icontains=location) | 
             Q(project_name__icontains=location)
         )
+
+    # Multiple areas select ki ho (jaise Satellite + Bodakdev) to unme se kisi bhi ek se match ho to dikhao
+    if areas:
+        area_query = Q()
+        for a in areas:
+            area_query |= Q(location__icontains=a)
+        filters &= area_query
 
     # HARD FILTER: Category (Residential / Commercial / Land tab).
     # This never falls back to other categories — Commercial tab must never show Residential, and vice versa.
@@ -509,12 +539,12 @@ def property_list(request):
     max_val = None
     if min_price:
         try:
-            min_val = float(min_price)
+            min_val = float(min_price) * (10000000 if min_price_unit == 'Cr' else 100000)
         except ValueError:
             pass
     if max_price:
         try:
-            max_val = float(max_price)
+            max_val = float(max_price) * (10000000 if max_price_unit == 'Cr' else 100000)
         except ValueError:
             pass
 
@@ -560,12 +590,16 @@ def property_list(request):
         "page_obj": page_obj,
         "search_query": query,
         "location_filter": location,
+        "areas_filter": areas,
+        "ahmedabad_areas": AHMEDABAD_AREAS,
         "type_filter": property_type,
         "type_filter_list": [t.strip() for t in property_type.split(',') if t.strip()],
         "category_filter": category if category in CATEGORY_TYPES else "residential",
         "possession_filter": possession,
         "min_price_filter": min_price,
         "max_price_filter": max_price,
+        "min_price_unit": min_price_unit,
+        "max_price_unit": max_price_unit,
         "beds_filter": beds,
         'user_wishlist_ids': user_wishlist_ids,
     })

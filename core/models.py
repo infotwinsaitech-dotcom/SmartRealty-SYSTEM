@@ -164,27 +164,19 @@ class Property(models.Model):
         return self.property_type in ["Flat", "Villa", "Bungalow", "Duplex", "Penthouse"]
 
     def get_price_numeric(self):
-        """Convert price string to numeric value for filtering"""
-        if not self.price:
+        """Price (number) + price_unit (L/Cr) ko actual rupee value mein convert karo, filtering ke liye"""
+        if self.price is None or str(self.price).strip() == '':
             return Decimal('0')
 
-        price_str = str(self.price).lower().replace(",", "").strip()
-
-        if not price_str or price_str in ['', 'none', 'null', 'nan']:
+        try:
+            num = Decimal(str(self.price).replace(",", "").strip())
+        except Exception:
             return Decimal('0')
 
-        numbers = re.findall(r'[\d.]+', price_str)
-        if not numbers:
-            return Decimal('0')
-
-        num = Decimal(numbers[0])
-
-        if "crore" in price_str or "cr" in price_str:
+        if self.price_unit == 'Cr':
             return num * Decimal("10000000")
-        elif "lakh" in price_str or "lac" in price_str or "l" in price_str:
+        else:  # default: Lakh
             return num * Decimal("100000")
-        else:
-            return num
 
     def __str__(self):
         return self.title
