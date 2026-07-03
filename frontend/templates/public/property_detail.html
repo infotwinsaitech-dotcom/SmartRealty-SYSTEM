@@ -296,23 +296,27 @@
                     <h2 class="text-3xl font-bold text-white">Floor Plan</h2>
                 </div>
                 {% if property.brochure %}
-<div class="flex gap-3 flex-wrap">
-    <!-- Browser mein khulega -->
-    <a href="{{ property.brochure.url }}" target="_blank"
-       class="inline-flex items-center gap-3 bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-xl font-bold transition duration-300 shadow-lg shadow-blue-600/30">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-        </svg>
-        View Floor Plan
-    </a>
-    <!-- Direct download button -->
-    <a href="{{ property.brochure.url }}" download
-       class="inline-flex items-center gap-3 bg-gray-700 hover:bg-gray-600 text-white px-6 py-4 rounded-xl font-bold transition duration-300">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
-        </svg>
-        Download
-    </a>
+<div class="reveal">
+    <div class="flex items-center gap-3 mb-6">
+        <div class="w-1 h-8 bg-yellow-400 rounded-full"></div>
+        <h2 class="text-3xl font-bold text-white">Floor Plan</h2>
+    </div>
+    <div class="flex gap-3 flex-wrap">
+        <a href="{{ brochure_pdf_url|default:property.brochure.url }}" target="_blank"
+           class="inline-flex items-center gap-3 bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-xl font-bold transition duration-300 shadow-lg shadow-blue-600/30">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
+            View Floor Plan
+        </a>
+        <a href="{{ property.brochure.url }}" download="brochure.pdf"
+           class="inline-flex items-center gap-3 bg-gray-700 hover:bg-gray-600 text-white px-6 py-4 rounded-xl font-bold transition duration-300">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+            </svg>
+            Download
+        </a>
+    </div>
 </div>
 {% endif %}
             </div>
