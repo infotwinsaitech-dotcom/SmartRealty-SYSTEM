@@ -398,11 +398,19 @@ def property_detail(request, id):
 def property_list(request):
     """Advanced property search with filters"""
     from django.db.models import Q, Value, IntegerField, Case, When
-    
+
+    # Property type groups — must match the checkbox groups in public/property.html
+    CATEGORY_TYPES = {
+        'residential': ['Flat', 'Villa', 'Bungalow', 'Duplex', 'Penthouse'],
+        'commercial': ['Office', 'Shop', 'Showroom', 'Warehouse', 'Industrial'],
+        'land': ['Land', 'Plot', 'Plots', 'Farmhouse'],
+    }
+
     properties = Property.objects.select_related('builder').all().order_by('-created_at')
-    
+
     location = sanitize_input(request.GET.get('location', '')).strip()
     property_type = sanitize_input(request.GET.get('type', '')).strip()
+    category = sanitize_input(request.GET.get('category', '')).strip().lower()
     possession = sanitize_input(request.GET.get('possession', '')).strip()
     min_price = sanitize_input(request.GET.get('min_price', '')).strip()
     max_price = sanitize_input(request.GET.get('max_price', '')).strip()
@@ -411,7 +419,7 @@ def property_list(request):
 
     # Build query filters
     filters = Q()
-    
+
     if query:
         filters &= (
             Q(title__icontains=query) | 
@@ -430,6 +438,12 @@ def property_list(request):
             Q(project_name__icontains=location)
         )
 
+    # HARD FILTER: Category (Residential / Commercial / Land tab).
+    # This never falls back to other categories — Commercial tab must never show Residential, and vice versa.
+    if category in CATEGORY_TYPES:
+        filters &= Q(property_type__in=CATEGORY_TYPES[category])
+
+    # HARD FILTER: specific type checkboxes (Flat, Office, Plot, etc.)
     if property_type:
         types = [t.strip() for t in property_type.split(',') if t.strip()]
         if types:
@@ -440,12 +454,6 @@ def property_list(request):
 
     if possession:
         filters &= Q(possession__icontains=possession)
-
-    if beds:
-        try:
-            filters &= Q(beds__gte=int(beds))
-        except ValueError:
-            pass
 
     properties = properties.filter(filters)
 
@@ -467,26 +475,36 @@ def property_list(request):
             )
         ).order_by('-relevance_score', '-created_at')
 
-    # Fallback if no results
-    if not properties.exists():
-        all_properties = Property.objects.select_related('builder').all().order_by('-created_at')
-        if location:
-            nearest = all_properties.filter(location__icontains=location[:3])
-            properties = nearest if nearest.exists() else all_properties[:10]
-        elif query:
-            nearest = all_properties.filter(
-                Q(title__icontains=query[:3]) | 
-                Q(location__icontains=query[:3]) | 
-                Q(project_name__icontains=query[:3])
-            )
-            properties = nearest if nearest.exists() else all_properties[:10]
-        else:
-            properties = all_properties[:10]
+    properties = list(properties)
 
-    # Price filtering (FIXED): price DB mein text hai ("50 Lakh", "1.2 Cr" jaisa),
-    # isliye DB-level number comparison kabhi sahi kaam nahi karta.
-    # get_price_numeric() se asli numeric value nikaal ke Python mein compare karo.
-    # min/max blank ho to koi filter nahi lagta - saari properties dikhengi (default).
+    # Fallback ONLY broadens location/query matching — category & type stay hard filters.
+    # If a category genuinely has zero properties, we show zero (never leak another category's listings).
+    if not properties and (location or query):
+        base_qs = Property.objects.select_related('builder').all()
+        if category in CATEGORY_TYPES:
+            base_qs = base_qs.filter(property_type__in=CATEGORY_TYPES[category])
+        if property_type:
+            types = [t.strip() for t in property_type.split(',') if t.strip()]
+            if types:
+                type_query = Q()
+                for t in types:
+                    type_query |= Q(property_type__iexact=t) | Q(property_type__icontains=t)
+                base_qs = base_qs.filter(type_query)
+        if possession:
+            base_qs = base_qs.filter(possession__icontains=possession)
+
+        term = (location or query)[:3]
+        nearest = base_qs.filter(
+            Q(title__icontains=term) |
+            Q(location__icontains=term) |
+            Q(project_name__icontains=term)
+        ).order_by('-created_at')
+        properties = list(nearest)
+
+    # PRICE (price is stored as text like "50 Lakh", "1.2 Cr" — compare using get_price_numeric()):
+    #  - Both min & max given  -> hard range filter (a real "between X and Y" search)
+    #  - Only ONE of them given -> treated as a target price: nothing gets excluded, results are
+    #    just sorted by closeness to that price (so "50L" also surfaces 45L/55L etc., nearest first)
     min_val = None
     max_val = None
     if min_price:
@@ -500,17 +518,33 @@ def property_list(request):
         except ValueError:
             pass
 
-    if min_val is not None or max_val is not None:
-        properties = list(properties)
-        filtered = []
-        for p in properties:
-            price_num = float(p.get_price_numeric())
-            if min_val is not None and price_num < min_val:
-                continue
-            if max_val is not None and price_num > max_val:
-                continue
-            filtered.append(p)
-        properties = filtered
+    price_target = None
+    if min_val is not None and max_val is not None:
+        properties = [p for p in properties if min_val <= float(p.get_price_numeric()) <= max_val]
+    elif min_val is not None:
+        price_target = min_val
+    elif max_val is not None:
+        price_target = max_val
+
+    # BEDS (BHK): no longer a hard "beds >= N" cutoff. Selecting "2 BHK" keeps every property
+    # visible, just sorted so 2 BHK comes first, then the next-closest (1 BHK / 3 BHK), etc.
+    beds_target = None
+    if beds:
+        try:
+            beds_target = int(beds)
+        except ValueError:
+            pass
+
+    if beds_target is not None or price_target is not None:
+        def sort_key(p):
+            bed_distance = 0
+            if beds_target is not None:
+                bed_distance = abs(p.beds - beds_target) if p.beds is not None else 999
+            price_distance = 0
+            if price_target is not None:
+                price_distance = abs(float(p.get_price_numeric()) - price_target)
+            return (bed_distance, price_distance)
+        properties = sorted(properties, key=sort_key)
 
     page_obj = get_paginated_queryset(properties, request)
 
@@ -527,6 +561,8 @@ def property_list(request):
         "search_query": query,
         "location_filter": location,
         "type_filter": property_type,
+        "type_filter_list": [t.strip() for t in property_type.split(',') if t.strip()],
+        "category_filter": category if category in CATEGORY_TYPES else "residential",
         "possession_filter": possession,
         "min_price_filter": min_price,
         "max_price_filter": max_price,

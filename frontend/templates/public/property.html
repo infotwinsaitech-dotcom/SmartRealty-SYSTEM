@@ -28,15 +28,15 @@
 <!-- ====== TABS ====== -->
 <div class="flex justify-center mb-8 px-4 reveal">
   <div class="bg-white/5 backdrop-blur-lg border border-white/10 p-1.5 rounded-full flex gap-2 flex-wrap justify-center">
-    <button onclick="switchTab('residential')" id="tab-residential"
-      class="px-6 py-2.5 rounded-full bg-gradient-to-r from-yellow-500 to-yellow-300 text-black font-semibold transition-all duration-300 shadow-lg shadow-yellow-500/20">
+    <button type="button" onclick="switchTab('residential')" id="tab-residential"
+      class="px-6 py-2.5 rounded-full text-white/70 hover:text-white hover:bg-white/10 transition-all duration-300">
       Residential
     </button>
-    <button onclick="switchTab('commercial')" id="tab-commercial"
+    <button type="button" onclick="switchTab('commercial')" id="tab-commercial"
       class="px-6 py-2.5 rounded-full text-white/70 hover:text-white hover:bg-white/10 transition-all duration-300">
       Commercial
     </button>
-    <button onclick="switchTab('land')" id="tab-land"
+    <button type="button" onclick="switchTab('land')" id="tab-land"
       class="px-6 py-2.5 rounded-full text-white/70 hover:text-white hover:bg-white/10 transition-all duration-300">
       Land / Plot
     </button>
@@ -46,24 +46,27 @@
 <!-- ====== FILTER BOX ====== -->
 <section class="max-w-7xl mx-auto px-4 md:px-6 mb-12 reveal" style="position: relative; z-index: 100;">
   <form method="GET" class="backdrop-blur-xl bg-white/5 border border-white/10 rounded-3xl p-5 shadow-2xl shadow-black/50">
+    <!-- Which tab (Residential/Commercial/Land) is active — set by switchTab() JS -->
+    <input type="hidden" name="category" id="categoryInput" value="{{ category_filter|default:'residential' }}">
+
     <div class="flex flex-wrap gap-3 items-center">
 
       <div class="relative flex-1 min-w-[200px]">
         <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
         </svg>
-        <input type="text" name="location" placeholder="Search by area, project, builder..."
+        <input type="text" name="location" value="{{ location_filter|default:'' }}" placeholder="Search by area, project, builder..."
           class="input w-full pl-10">
       </div>
 
       <!-- RESIDENTIAL FILTER -->
-      <div id="residential-filter" class="flex flex-wrap gap-3" style="position: relative;">
+      <div id="residential-filter" class="flex flex-wrap gap-3 hide" style="position: relative;">
         <select name="beds" class="input">
           <option value="">BHK</option>
-          <option value="1">1 BHK</option>
-          <option value="2">2 BHK</option>
-          <option value="3">3 BHK</option>
-          <option value="4">4+ BHK</option>
+          <option value="1" {% if beds_filter == "1" %}selected{% endif %}>1 BHK</option>
+          <option value="2" {% if beds_filter == "2" %}selected{% endif %}>2 BHK</option>
+          <option value="3" {% if beds_filter == "3" %}selected{% endif %}>3 BHK</option>
+          <option value="4" {% if beds_filter == "4" %}selected{% endif %}>4+ BHK</option>
         </select>
 
         <button type="button" id="residentialBtn" onclick="toggleDropdown('residentialDropdown', event)" class="input flex items-center gap-2">
@@ -73,11 +76,11 @@
             </svg>
         </button>
         <div id="residentialDropdown" class="dropdown-box hide">
-          <label><input type="checkbox" name="type" value="Flat"> Flat</label>
-          <label><input type="checkbox" name="type" value="Villa"> Villa</label>
-          <label><input type="checkbox" name="type" value="Bungalow"> Bungalow</label>
-          <label><input type="checkbox" name="type" value="Duplex"> Duplex</label>
-          <label><input type="checkbox" name="type" value="Penthouse"> Penthouse</label>
+          <label><input type="checkbox" name="type" value="Flat" {% if "Flat" in type_filter_list %}checked{% endif %}> Flat</label>
+          <label><input type="checkbox" name="type" value="Villa" {% if "Villa" in type_filter_list %}checked{% endif %}> Villa</label>
+          <label><input type="checkbox" name="type" value="Bungalow" {% if "Bungalow" in type_filter_list %}checked{% endif %}> Bungalow</label>
+          <label><input type="checkbox" name="type" value="Duplex" {% if "Duplex" in type_filter_list %}checked{% endif %}> Duplex</label>
+          <label><input type="checkbox" name="type" value="Penthouse" {% if "Penthouse" in type_filter_list %}checked{% endif %}> Penthouse</label>
         </div>
       </div>
 
@@ -90,11 +93,11 @@
         </svg>
     </button>
     <div id="commercialDropdown" class="dropdown-box hide">
-          <label><input type="checkbox" name="type" value="Office"> Office</label>
-          <label><input type="checkbox" name="type" value="Shop"> Shop</label>
-          <label><input type="checkbox" name="type" value="Showroom"> Showroom</label>
-          <label><input type="checkbox" name="type" value="Warehouse"> Warehouse</label>
-          <label><input type="checkbox" name="type" value="Industrial"> Industrial</label>
+          <label><input type="checkbox" name="type" value="Office" {% if "Office" in type_filter_list %}checked{% endif %}> Office</label>
+          <label><input type="checkbox" name="type" value="Shop" {% if "Shop" in type_filter_list %}checked{% endif %}> Shop</label>
+          <label><input type="checkbox" name="type" value="Showroom" {% if "Showroom" in type_filter_list %}checked{% endif %}> Showroom</label>
+          <label><input type="checkbox" name="type" value="Warehouse" {% if "Warehouse" in type_filter_list %}checked{% endif %}> Warehouse</label>
+          <label><input type="checkbox" name="type" value="Industrial" {% if "Industrial" in type_filter_list %}checked{% endif %}> Industrial</label>
         </div>
       </div>
 
@@ -107,22 +110,22 @@
         </svg>
     </button>
     <div id="landDropdown" class="dropdown-box hide">
-          <label><input type="checkbox" name="type" value="Land"> Land</label>
-          <label><input type="checkbox" name="type" value="Plot"> Plot</label>
-          <label><input type="checkbox" name="type" value="Plots"> Plots</label>
-          <label><input type="checkbox" name="type" value="Farmhouse"> Farmhouse</label>
+          <label><input type="checkbox" name="type" value="Land" {% if "Land" in type_filter_list %}checked{% endif %}> Land</label>
+          <label><input type="checkbox" name="type" value="Plot" {% if "Plot" in type_filter_list %}checked{% endif %}> Plot</label>
+          <label><input type="checkbox" name="type" value="Plots" {% if "Plots" in type_filter_list %}checked{% endif %}> Plots</label>
+          <label><input type="checkbox" name="type" value="Farmhouse" {% if "Farmhouse" in type_filter_list %}checked{% endif %}> Farmhouse</label>
         </div>
       </div>
 
-      <input type="number" name="min_price" placeholder="Min Price" class="input">
-      <input type="number" name="max_price" placeholder="Max Price" class="input">
+      <input type="number" name="min_price" value="{{ min_price_filter|default:'' }}" placeholder="Min Price" class="input">
+      <input type="number" name="max_price" value="{{ max_price_filter|default:'' }}" placeholder="Max Price" class="input">
 
       <select name="possession" class="input">
         <option value="">Possession</option>
-        <option value="Ready to Move">Ready</option>
-        <option value="Upto 1 Year">1 Year</option>
-        <option value="Upto 2 Years">2 Year</option>
-        <option value="2+ Years">2+ Year</option>
+        <option value="Ready to Move" {% if possession_filter == "Ready to Move" %}selected{% endif %}>Ready</option>
+        <option value="Upto 1 Year" {% if possession_filter == "Upto 1 Year" %}selected{% endif %}>1 Year</option>
+        <option value="Upto 2 Years" {% if possession_filter == "Upto 2 Years" %}selected{% endif %}>2 Year</option>
+        <option value="2+ Years" {% if possession_filter == "2+ Years" %}selected{% endif %}>2+ Year</option>
       </select>
 
       <button class="bg-gradient-to-r from-yellow-500 to-yellow-300 text-black px-8 py-2.5 rounded-xl font-bold hover:shadow-lg hover:shadow-yellow-500/30 transition-all duration-300 flex items-center gap-2">
@@ -423,7 +426,13 @@
 // =========================
 // TAB SWITCH
 // =========================
-function switchTab(tab) {
+const CATEGORY_TYPE_IDS = {
+    residential: ['Flat', 'Villa', 'Bungalow', 'Duplex', 'Penthouse'],
+    commercial: ['Office', 'Shop', 'Showroom', 'Warehouse', 'Industrial'],
+    land: ['Land', 'Plot', 'Plots', 'Farmhouse'],
+};
+
+function switchTab(tab, autoSubmit = true) {
     closeAllDropdowns();
 
     // Filters hide/show
@@ -431,6 +440,19 @@ function switchTab(tab) {
     document.getElementById('commercial-filter').classList.add('hide');
     document.getElementById('land-filter').classList.add('hide');
     document.getElementById(tab + '-filter').classList.remove('hide');
+
+    // Tell the server which tab is active — this is what actually restricts results now
+    const categoryInput = document.getElementById('categoryInput');
+    if (categoryInput) categoryInput.value = tab;
+
+    // Uncheck type checkboxes belonging to OTHER categories so a stale selection
+    // from a previous tab never sneaks into this tab's search.
+    Object.keys(CATEGORY_TYPE_IDS).forEach(cat => {
+        if (cat === tab) return;
+        document.querySelectorAll(`input[name="type"]`).forEach(cb => {
+            if (CATEGORY_TYPE_IDS[cat].includes(cb.value)) cb.checked = false;
+        });
+    });
 
     // Active tab style
     ['residential', 'commercial', 'land'].forEach(t => {
@@ -441,7 +463,22 @@ function switchTab(tab) {
             btn.className = 'px-6 py-2.5 rounded-full text-white/70 hover:text-white hover:bg-white/10 transition-all duration-300';
         }
     });
+
+    // Clicking a tab re-filters results immediately (no need to also press Search).
+    // Skip this during the initial page-load restore, or it would reload in a loop.
+    if (autoSubmit) {
+        const form = categoryInput ? categoryInput.closest('form') : null;
+        if (form) form.submit();
+    }
 }
+
+// On page load, restore whichever tab/category the server rendered results for,
+// so the UI doesn't visually reset to "Residential" after a Commercial/Land search.
+document.addEventListener('DOMContentLoaded', function() {
+    const categoryInput = document.getElementById('categoryInput');
+    const activeCategory = (categoryInput && categoryInput.value) ? categoryInput.value : 'residential';
+    switchTab(activeCategory, false);
+});
 
 // =========================
 // DROPDOWN HELPERS
