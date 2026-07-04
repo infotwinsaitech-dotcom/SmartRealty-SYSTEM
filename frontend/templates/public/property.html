@@ -217,6 +217,40 @@
               </svg>
             </button>
 
+            <!-- SHARE -->
+            <div style="position: absolute; top: 60px; right: 12px; z-index: 5;">
+              <button onclick="shareProperty(event, {{ property.id }}, '{% url 'property_detail' property.id %}', '{{ property.project_name|default:property.title|escapejs }}')"
+                style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(4px); width: 40px; height: 40px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2); display: flex; align-items: center; justify-content: center; border: none; cursor: pointer; transition: all 0.2s; padding: 0;">
+                <svg class="w-5 h-5" style="color: #4b5563;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342a3 3 0 100-2.684m0 2.684a3 3 0 000-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
+                </svg>
+              </button>
+
+              <div id="shareMenu-{{ property.id }}" class="hidden" style="position: absolute; top: 46px; right: 0; background: white; border-radius: 12px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.3); padding: 8px; width: 190px; z-index: 20;">
+                <a href="#" onclick="event.preventDefault(); event.stopPropagation(); openShareLink('whatsapp', {{ property.id }}, '{% url 'property_detail' property.id %}', '{{ property.project_name|default:property.title|escapejs }}')"
+                  style="display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 8px; text-decoration: none; color: #1f2937; font-size: 13px; font-weight: 600;">
+                  <span style="color:#22c55e;">●</span> WhatsApp
+                </a>
+                <a href="#" onclick="event.preventDefault(); event.stopPropagation(); openShareLink('facebook', {{ property.id }}, '{% url 'property_detail' property.id %}', '{{ property.project_name|default:property.title|escapejs }}')"
+                  style="display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 8px; text-decoration: none; color: #1f2937; font-size: 13px; font-weight: 600;">
+                  <span style="color:#2563eb;">●</span> Facebook
+                </a>
+                <a href="#" onclick="event.preventDefault(); event.stopPropagation(); openShareLink('telegram', {{ property.id }}, '{% url 'property_detail' property.id %}', '{{ property.project_name|default:property.title|escapejs }}')"
+                  style="display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 8px; text-decoration: none; color: #1f2937; font-size: 13px; font-weight: 600;">
+                  <span style="color:#0ea5e9;">●</span> Telegram
+                </a>
+                <a href="#" onclick="event.preventDefault(); event.stopPropagation(); openShareLink('instagram', {{ property.id }}, '{% url 'property_detail' property.id %}', '{{ property.project_name|default:property.title|escapejs }}')"
+                  style="display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 8px; text-decoration: none; color: #1f2937; font-size: 13px; font-weight: 600;">
+                  <span style="color:#db2777;">●</span> Instagram (copy link)
+                </a>
+                <div style="border-top: 1px solid #f3f4f6; margin: 4px 0;"></div>
+                <a href="#" onclick="event.preventDefault(); event.stopPropagation(); openShareLink('copy', {{ property.id }}, '{% url 'property_detail' property.id %}', '{{ property.project_name|default:property.title|escapejs }}')"
+                  style="display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 8px; text-decoration: none; color: #1f2937; font-size: 13px; font-weight: 600;">
+                  🔗 Copy Link
+                </a>
+              </div>
+            </div>
+
             <!-- POSSESSION BADGE -->
             {% if property.possession %}
             <div style="position: absolute; bottom: 12px; left: 12px; z-index: 5;">
@@ -639,6 +673,63 @@ function toggleWishlist(btn, propertyId) {
         window.location.href = '/login/';
     });
 }
+
+// =========================
+// SHARE PROPERTY
+// =========================
+function shareProperty(event, propertyId, path, title) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const url = window.location.origin + path;
+
+    if (navigator.share) {
+        navigator.share({ title: title, url: url }).catch(() => {});
+        return;
+    }
+
+    document.querySelectorAll('[id^="shareMenu-"]').forEach(menu => {
+        if (menu.id !== `shareMenu-${propertyId}`) menu.classList.add('hidden');
+    });
+    const menu = document.getElementById(`shareMenu-${propertyId}`);
+    if (menu) menu.classList.toggle('hidden');
+}
+
+function openShareLink(platform, propertyId, path, title) {
+    const url = window.location.origin + path;
+    const text = encodeURIComponent(title);
+    const encodedUrl = encodeURIComponent(url);
+    let shareUrl = null;
+
+    if (platform === 'whatsapp') {
+        shareUrl = `https://wa.me/?text=${text}%20${encodedUrl}`;
+    } else if (platform === 'facebook') {
+        shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`;
+    } else if (platform === 'telegram') {
+        shareUrl = `https://t.me/share/url?url=${encodedUrl}&text=${text}`;
+    } else if (platform === 'instagram' || platform === 'copy') {
+        navigator.clipboard.writeText(url).then(() => {
+            alert(platform === 'instagram'
+                ? 'Link copy ho gaya! Ab Instagram DM/Story mein paste kar dijiye.'
+                : 'Link copy ho gaya!');
+        }).catch(() => {
+            prompt('Ye link copy kar lijiye:', url);
+        });
+    }
+
+    if (shareUrl) window.open(shareUrl, '_blank', 'noopener,noreferrer,width=600,height=600');
+
+    const menu = document.getElementById(`shareMenu-${propertyId}`);
+    if (menu) menu.classList.add('hidden');
+}
+
+document.addEventListener('click', function(e) {
+    document.querySelectorAll('[id^="shareMenu-"]').forEach(menu => {
+        if (!menu.classList.contains('hidden') && !menu.contains(e.target) && !e.target.closest('button[onclick^="shareProperty"]')) {
+            menu.classList.add('hidden');
+        }
+    });
+});
 
 // =========================
 // LIVE SEARCH
