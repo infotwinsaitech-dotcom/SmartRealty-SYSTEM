@@ -393,7 +393,7 @@ def property_detail(request, id):
     if property.brochure:
         try:
             raw_url = property.brochure.url
-            brochure_pdf_url = raw_url.replace('/raw/upload/', '/image/upload/fl_attachment:false/')
+            brochure_pdf_url = raw_url.replace('/raw/upload/', '/raw/upload/fl_attachment:false/')
         except Exception:
             brochure_pdf_url = None
 
