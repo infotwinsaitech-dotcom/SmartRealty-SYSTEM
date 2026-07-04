@@ -388,12 +388,10 @@ def property_detail(request, id):
             .values_list('property_id', flat=True)
         )
 
-    # FIX: Cloudinary raw URL ko PDF-friendly URL mein convert karo
     brochure_pdf_url = None
     if property.brochure:
         try:
-            raw_url = property.brochure.url
-            brochure_pdf_url = raw_url.replace('/raw/upload/', '/raw/upload/fl_attachment:false/')
+            brochure_pdf_url = property.brochure.url
         except Exception:
             brochure_pdf_url = None
 
