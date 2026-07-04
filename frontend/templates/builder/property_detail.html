@@ -89,8 +89,14 @@ class="w-full border p-2 rounded text-sm">
 <input type="text" name="project_name" value="{{ property.project_name|default:'' }}" placeholder="Project Name"
 class="border p-2 rounded w-full text-sm">
 
-<input name="price" value="₹{{ property.price }} {{ property.price_unit }}" placeholder="Price"
-class="w-full border p-2 rounded text-sm">
+<div class="flex gap-2">
+    <input name="price" id="editPriceInput" value="{{ property.price }}" placeholder="Price (e.g. 78.5 or 90.1)" type="text" inputmode="decimal" autocomplete="off"
+    class="flex-1 border p-2 rounded text-sm">
+    <select name="price_unit" class="border p-2 rounded text-sm">
+        <option value="L" {% if property.price_unit == "L" %}selected{% endif %}>Lakh (L)</option>
+        <option value="Cr" {% if property.price_unit == "Cr" %}selected{% endif %}>Crore (Cr)</option>
+    </select>
+</div>
 
 <!-- PROPERTY TYPE -->
 <select name="property_type" id="propertyType"
@@ -299,6 +305,28 @@ Update Property
 </main>
 
 <script>
+    // ===================== PRICE INPUT FIX (native number input decimal bug) =====================
+function sanitizePriceInput(input) {
+    const original = input.value;
+    let value = original.replace(/[^0-9.]/g, '');
+    const firstDot = value.indexOf('.');
+    if (firstDot !== -1) {
+        value = value.slice(0, firstDot + 1) + value.slice(firstDot + 1).replace(/\./g, '');
+    }
+    if (value === original) return;
+
+    const cursorFromEnd = original.length - (input.selectionEnd ?? original.length);
+    input.value = value;
+    const newPos = Math.max(0, value.length - cursorFromEnd);
+    input.setSelectionRange(newPos, newPos);
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const priceInput = document.getElementById('editPriceInput');
+    if (priceInput) {
+        priceInput.addEventListener('input', function() { sanitizePriceInput(this); });
+    }
+});
 // ===================== EXTRACT COORDS FROM GOOGLE MAPS LINK =====================
 // Most reliable option — works for complex/informal addresses since it reads the
 // exact coordinates Google Maps already resolved, instead of re-guessing from text.

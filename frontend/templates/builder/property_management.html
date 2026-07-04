@@ -188,7 +188,7 @@ class="w-full mb-3 border p-2 rounded text-sm">
 class="border p-2 rounded w-full mb-2 text-sm">
 
 <div class="flex gap-2 mb-3">
-    <input name="price" placeholder="Price (e.g. 78.5)" type="number" step="0.01" required
+    <input name="price" id="addPriceInput" placeholder="Price (e.g. 78.5 or 90.1)" type="text" inputmode="decimal" autocomplete="off" required
     class="flex-1 border p-2 rounded text-sm">
     <select name="price_unit" class="border p-2 rounded text-sm">
         <option value="L">Lakh (L)</option>
@@ -549,6 +549,29 @@ Save Property
 
 <!-- JS -->
 <script>
+    // ===================== PRICE INPUT FIX (native number input decimal bug) =====================
+function sanitizePriceInput(input) {
+    const original = input.value;
+    let value = original.replace(/[^0-9.]/g, '');
+    const firstDot = value.indexOf('.');
+    if (firstDot !== -1) {
+        value = value.slice(0, firstDot + 1) + value.slice(firstDot + 1).replace(/\./g, '');
+    }
+    if (value === original) return;
+
+    const cursorFromEnd = original.length - (input.selectionEnd ?? original.length);
+    input.value = value;
+    const newPos = Math.max(0, value.length - cursorFromEnd);
+    input.setSelectionRange(newPos, newPos);
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const priceInput = document.getElementById('addPriceInput');
+    if (priceInput) {
+        priceInput.addEventListener('input', function() { sanitizePriceInput(this); });
+    }
+});
+
 // ===================== AHMEDABAD AREA AUTOCOMPLETE =====================
 const AHMEDABAD_AREAS = [
   "Satellite", "Vastrapur", "Bodakdev", "Thaltej", "SG Highway", "Prahlad Nagar",
