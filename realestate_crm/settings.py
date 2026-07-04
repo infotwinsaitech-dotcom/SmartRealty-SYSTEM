@@ -300,7 +300,17 @@ if CLOUDINARY_CLOUD_NAME and CLOUDINARY_API_KEY and CLOUDINARY_API_SECRET:
         cloud_name=CLOUDINARY_CLOUD_NAME,
         api_key=CLOUDINARY_API_KEY,
         api_secret=CLOUDINARY_API_SECRET,
+        secure=True,  # FIX: hamesha https:// URLs generate karo (http:// se Mixed Content
+                      # warning aati thi aur kuch strict browser settings mein images silently
+                      # fail ho jaati thi, jisse cards khaali dikhte the)
     )
+    # Existing CLOUDINARY_STORAGE dict (agar hai) mein bhi yehi enforce karo
+    CLOUDINARY_STORAGE = {
+        "CLOUD_NAME": CLOUDINARY_CLOUD_NAME,
+        "API_KEY": CLOUDINARY_API_KEY,
+        "API_SECRET": CLOUDINARY_API_SECRET,
+        "SECURE": True,
+    }
 else:
     DEFAULT_FILE_STORAGE = "django.core.files.storage.FileSystemStorage"
 
