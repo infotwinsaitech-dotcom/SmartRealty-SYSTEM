@@ -135,6 +135,10 @@ class Property(models.Model):
 
     project_logo = CloudinaryField('image', blank=True, null=True)
     project_video = models.FileField(upload_to='project_videos/', blank=True, null=True)
+    project_video_url = models.URLField(
+        max_length=500, blank=True, null=True,
+        help_text="YouTube (ya kisi bhi) video ka link - file upload ki jagah use kar sakte ho, especially bade/detailed videos ke liye"
+    )
 
     project_status = models.CharField(max_length=100, blank=True, null=True)
     launch_date = models.CharField(max_length=100, blank=True, null=True)
@@ -162,6 +166,35 @@ class Property(models.Model):
 
     def has_bhk(self):
         return self.property_type in ["Flat", "Villa", "Bungalow", "Duplex", "Penthouse"]
+
+    def get_video_embed_url(self):
+        """
+        Kisi bhi YouTube link format (watch?v=, youtu.be/, shorts/) ko
+        embed-ready URL mein convert karta hai, taaki property detail page
+        pe iframe se seedha play ho sake.
+        """
+        url = (self.project_video_url or '').strip()
+        if not url:
+            return None
+
+        video_id = None
+        try:
+            if 'youtu.be/' in url:
+                video_id = url.split('youtu.be/')[1].split('?')[0].split('&')[0]
+            elif 'youtube.com/shorts/' in url:
+                video_id = url.split('youtube.com/shorts/')[1].split('?')[0].split('&')[0]
+            elif 'watch?v=' in url:
+                video_id = url.split('watch?v=')[1].split('&')[0]
+            elif 'youtube.com/embed/' in url:
+                video_id = url.split('youtube.com/embed/')[1].split('?')[0].split('&')[0]
+        except Exception:
+            video_id = None
+
+        if video_id:
+            return f"https://www.youtube.com/embed/{video_id}"
+
+        # YouTube na ho (koi aur video link ho) to jaisa hai waisa hi use karo
+        return url
 
     def get_price_numeric(self):
         """Price (number) + price_unit (L/Cr) ko actual rupee value mein convert karo, filtering ke liye"""

@@ -1068,6 +1068,7 @@ def add_property(request):
             'total_towers': sanitize_input(request.POST.get("total_towers", "")),
             'land_parcel': sanitize_input(request.POST.get("land_parcel", "")),
             'sales_head_number': sanitize_input(request.POST.get("sales_head_number", "")),
+            'project_video_url': sanitize_input(request.POST.get("project_video_url", "")).strip(),
         }
 
         # ===== VALIDATION =====
@@ -1100,7 +1101,7 @@ def add_property(request):
             'thumbnail': (['.jpg', '.jpeg', '.png', '.gif', '.webp', '.avif'], 10),
             'brochure': (['.pdf'], 10),
             'project_logo': (['.jpg', '.jpeg', '.png', '.gif', '.webp', '.avif'], 10),
-            'project_video': (['.mp4', '.mov', '.avi', '.mkv'], 50),
+            'project_video': (['.mp4', '.mov', '.avi', '.mkv'], 20),
         }
 
         for field, (exts, max_size) in file_fields.items():
@@ -1198,6 +1199,7 @@ def add_property(request):
                     land_parcel=data['land_parcel'],
                     nearby_places=nearby_data,
                     sales_head_number=data['sales_head_number'],
+                    project_video_url=data['project_video_url'] or None,
                     latitude=latitude_val,
                     longitude=longitude_val,
                     builder=request.user,
@@ -2011,6 +2013,7 @@ def _update_property(request, property):
         'highlights': 'highlights',
         'map_link': 'map_link',
         'sales_head_number': 'sales_head_number',
+        'project_video_url': 'project_video_url',
     }
 
     for field, post_key in fields.items():
@@ -2058,7 +2061,7 @@ def _update_property(request, property):
     file_fields = {
         'thumbnail': (['.jpg', '.jpeg', '.png', '.gif', '.avif'], 10),
         'project_logo': (['.jpg', '.jpeg', '.png', '.gif', '.avif'], 10),
-        'project_video': (['.mp4', '.mov', '.avi'], 50),
+        'project_video': (['.mp4', '.mov', '.avi'], 20),
         'brochure': (['.pdf'], 10),
     }
 
