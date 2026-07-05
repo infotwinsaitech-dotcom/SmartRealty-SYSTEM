@@ -54,19 +54,19 @@ alt="No image">
 </button>
 
 <div id="builderShareMenu-{{ property.id }}" class="hidden" style="position: absolute; top: 50px; right: 10px; background: white; border-radius: 12px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.3); padding: 8px; width: 180px; z-index: 20;">
-    <a href="#" onclick="event.preventDefault(); event.stopPropagation(); openBuilderShareLink('whatsapp', {{ property.id }}, '{% url 'property_detail' property.id %}', '{{ property.title|escapejs }}')" style="display:flex; align-items:center; gap:10px; padding:8px 10px; border-radius:8px; text-decoration:none; color:#1f2937; font-size:13px; font-weight:600;">
+    <div onclick="event.stopPropagation(); openBuilderShareLink('whatsapp', {{ property.id }}, '{% url 'property_detail' property.id %}', '{{ property.title|escapejs }}')" style="display:flex; align-items:center; gap:10px; padding:8px 10px; border-radius:8px; cursor:pointer; color:#1f2937; font-size:13px; font-weight:600;">
         <span style="color:#22c55e;">●</span> WhatsApp
-    </a>
-    <a href="#" onclick="event.preventDefault(); event.stopPropagation(); openBuilderShareLink('facebook', {{ property.id }}, '{% url 'property_detail' property.id %}', '{{ property.title|escapejs }}')" style="display:flex; align-items:center; gap:10px; padding:8px 10px; border-radius:8px; text-decoration:none; color:#1f2937; font-size:13px; font-weight:600;">
+    </div>
+    <div onclick="event.stopPropagation(); openBuilderShareLink('facebook', {{ property.id }}, '{% url 'property_detail' property.id %}', '{{ property.title|escapejs }}')" style="display:flex; align-items:center; gap:10px; padding:8px 10px; border-radius:8px; cursor:pointer; color:#1f2937; font-size:13px; font-weight:600;">
         <span style="color:#2563eb;">●</span> Facebook
-    </a>
-    <a href="#" onclick="event.preventDefault(); event.stopPropagation(); openBuilderShareLink('telegram', {{ property.id }}, '{% url 'property_detail' property.id %}', '{{ property.title|escapejs }}')" style="display:flex; align-items:center; gap:10px; padding:8px 10px; border-radius:8px; text-decoration:none; color:#1f2937; font-size:13px; font-weight:600;">
+    </div>
+    <div onclick="event.stopPropagation(); openBuilderShareLink('telegram', {{ property.id }}, '{% url 'property_detail' property.id %}', '{{ property.title|escapejs }}')" style="display:flex; align-items:center; gap:10px; padding:8px 10px; border-radius:8px; cursor:pointer; color:#1f2937; font-size:13px; font-weight:600;">
         <span style="color:#0ea5e9;">●</span> Telegram
-    </a>
+    </div>
     <div style="border-top: 1px solid #f3f4f6; margin: 4px 0;"></div>
-    <a href="#" onclick="event.preventDefault(); event.stopPropagation(); openBuilderShareLink('copy', {{ property.id }}, '{% url 'property_detail' property.id %}', '{{ property.title|escapejs }}')" style="display:flex; align-items:center; gap:10px; padding:8px 10px; border-radius:8px; text-decoration:none; color:#1f2937; font-size:13px; font-weight:600;">
+    <div onclick="event.stopPropagation(); openBuilderShareLink('copy', {{ property.id }}, '{% url 'property_detail' property.id %}', '{{ property.title|escapejs }}')" style="display:flex; align-items:center; gap:10px; padding:8px 10px; border-radius:8px; cursor:pointer; color:#1f2937; font-size:13px; font-weight:600;">
         🔗 Copy Link
-    </a>
+    </div>
 </div>
 </div>
 
