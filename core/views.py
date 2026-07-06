@@ -212,26 +212,38 @@ def log_activity(user, action, details=""):
 
 
 def builder_required(view_func):
-    """Decorator to ensure user is builder"""
+    """Decorator to ensure user is builder AND has an active subscription"""
     def wrapper(request, *args, **kwargs):
         if not request.user.is_authenticated:
             return redirect("login")
         if request.user.role != "builder":
             messages.error(request, "Builder access required")
             return redirect("login")
+
+        from subscriptions.utils import get_active_subscription
+        if get_active_subscription(request.user) is None:
+            messages.warning(request, "Panel dekhne ke liye pehle ek subscription plan choose karo.")
+            return redirect("subscriptions:pricing")
+
         return view_func(request, *args, **kwargs)
     wrapper.__name__ = view_func.__name__
     return wrapper
 
 
 def agent_required(view_func):
-    """Decorator to ensure user is agent"""
+    """Decorator to ensure user is agent AND has an active subscription"""
     def wrapper(request, *args, **kwargs):
         if not request.user.is_authenticated:
             return redirect("login")
         if request.user.role != "agent":
             messages.error(request, "Agent access required")
             return redirect("login")
+
+        from subscriptions.utils import get_active_subscription
+        if get_active_subscription(request.user) is None:
+            messages.warning(request, "Panel dekhne ke liye pehle ek subscription plan choose karo.")
+            return redirect("subscriptions:pricing")
+
         return view_func(request, *args, **kwargs)
     wrapper.__name__ = view_func.__name__
     return wrapper
