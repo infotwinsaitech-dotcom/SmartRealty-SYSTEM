@@ -1,0 +1,21 @@
+{% extends "builder/base.html" %}
+
+{% block content %}
+<div class="container py-5">
+  <h2>My Subscription</h2>
+  {% if subscription %}
+    <p><strong>Plan:</strong> {{ limits.plan_name }}</p>
+    <p><strong>Valid till:</strong> {{ subscription.end_date }}</p>
+    <p><strong>Payment status:</strong> {{ subscription.payment_status }}</p>
+  {% else %}
+    <p class="text-warning">Koi active subscription nahi hai. <a href="{% url 'subscriptions:pricing' %}">Plan choose karo</a>.</p>
+  {% endif %}
+
+  <hr>
+  <h5>Usage</h5>
+  <ul>
+    <li>Properties: {{ properties_used }} / {{ limits.max_properties }}</li>
+    <li>Agents: {{ agents_used }} / {{ limits.max_agents }}</li>
+  </ul>
+</div>
+{% endblock %}

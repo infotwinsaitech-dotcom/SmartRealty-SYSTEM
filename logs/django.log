@@ -25,3 +25,9 @@ INFO 2026-07-03 16:12:55,931 views views.py loaded successfully
 INFO 2026-07-03 16:13:02,475 views views.py loaded successfully
 INFO 2026-07-04 15:17:54,209 views views.py loaded successfully
 INFO 2026-07-04 15:18:00,631 views views.py loaded successfully
+WARNING 2026-07-06 19:09:28,654 apps [AUTO-SETUP] Google credentials not set!
+INFO 2026-07-06 19:09:28,897 views views.py loaded successfully
+WARNING 2026-07-06 19:12:20,679 apps [AUTO-SETUP] Google credentials not set!
+INFO 2026-07-06 19:12:20,775 views views.py loaded successfully
+WARNING 2026-07-07 00:05:39,217 apps [AUTO-SETUP] Google credentials not set!
+INFO 2026-07-07 00:05:39,369 views views.py loaded successfully

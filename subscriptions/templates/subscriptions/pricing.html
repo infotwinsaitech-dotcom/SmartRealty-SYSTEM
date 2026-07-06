@@ -1,0 +1,62 @@
+{% extends "builder/base.html" %}
+{% load humanize %}
+
+{% block content %}
+<div class="container py-5">
+  <h1 class="text-center mb-2">Plans & Pricing</h1>
+  <p class="text-center text-muted mb-5">Apne business ke hisaab se plan chuno.</p>
+
+  <h3 class="mb-3">Builder Plans</h3>
+  <div class="row mb-5">
+    {% for plan in builder_plans %}
+    <div class="col-md-3 mb-4">
+      <div class="card h-100 shadow-sm">
+        <div class="card-body d-flex flex-column">
+          <h5 class="card-title">{{ plan.name }}</h5>
+          <p class="text-muted small">{{ plan.description }}</p>
+          <h2 class="mb-0">₹{{ plan.price_monthly|intcomma }}<small class="text-muted">/mo</small></h2>
+          <p class="text-muted small">or ₹{{ plan.price_yearly|intcomma }}/year</p>
+          <ul class="list-unstyled mt-3 mb-4">
+            <li>🏠 {{ plan.max_properties }} Properties</li>
+            <li>👤 {{ plan.max_agents }} Agents</li>
+            <li>📋 {{ plan.max_leads }} Leads</li>
+            {% for f in plan.features %}
+            <li>✅ {{ f|title }}</li>
+            {% endfor %}
+          </ul>
+          <a href="#" class="btn btn-primary mt-auto">Choose Plan</a>
+        </div>
+      </div>
+    </div>
+    {% empty %}
+    <p class="text-muted">Koi builder plan configure nahi hai. Run: <code>python manage.py sync_plans</code></p>
+    {% endfor %}
+  </div>
+
+  <h3 class="mb-3">Agent Plans</h3>
+  <div class="row">
+    {% for plan in agent_plans %}
+    <div class="col-md-4 mb-4">
+      <div class="card h-100 shadow-sm">
+        <div class="card-body d-flex flex-column">
+          <h5 class="card-title">{{ plan.name }}</h5>
+          <p class="text-muted small">{{ plan.description }}</p>
+          <h2 class="mb-0">₹{{ plan.price_monthly|intcomma }}<small class="text-muted">/mo</small></h2>
+          <p class="text-muted small">or ₹{{ plan.price_yearly|intcomma }}/year</p>
+          <ul class="list-unstyled mt-3 mb-4">
+            <li>🏠 {{ plan.max_properties }} Properties</li>
+            <li>📋 {{ plan.max_leads }} Leads</li>
+            {% for f in plan.features %}
+            <li>✅ {{ f|title }}</li>
+            {% endfor %}
+          </ul>
+          <a href="#" class="btn btn-outline-primary mt-auto">Choose Plan</a>
+        </div>
+      </div>
+    </div>
+    {% empty %}
+    <p class="text-muted">Koi agent plan configure nahi hai. Run: <code>python manage.py sync_plans</code></p>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

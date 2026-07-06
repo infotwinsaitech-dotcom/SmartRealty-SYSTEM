@@ -35,6 +35,7 @@ from django.conf import settings
 from django.utils import timezone
 from django.utils.timezone import now
 from django.core.cache import cache
+from subscriptions.utils import check_property_limit, check_agent_limit, LimitExceeded
 from django.views.decorators.cache import cache_page
 
 # BUG FIX: Hard import band karo — agar package nahi to server crash hoga
@@ -1039,6 +1040,11 @@ logger = logging.getLogger(__name__)
 def add_property(request):
     """Add new property with proper validation and error handling"""
     if request.method == "POST":
+        try:
+            check_property_limit(request.user)
+        except LimitExceeded as e:
+            messages.error(request, str(e))
+            return redirect('add_property')
         # Collect data
         data = {
             'title': sanitize_input(request.POST.get("title", "")),
@@ -2157,6 +2163,13 @@ def builder_root(request):
 def create_agent(request):
     """Create new agent"""
     if request.method == "POST" and not request.POST.get("search_query") and not request.POST.get("agent_id"):
+        try:
+            check_agent_limit(request.user)
+        except LimitExceeded as e:
+            messages.error(request, str(e))
+            return redirect('create_agent')
+
+        name = sanitize_input(request.POST.get("name"))
         name = sanitize_input(request.POST.get("name"))
         username = sanitize_input(request.POST.get("username"))
         password = request.POST.get("password")

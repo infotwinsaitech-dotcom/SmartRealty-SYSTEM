@@ -22,6 +22,9 @@ urlpatterns = [
     ),
     path('auth/redirect/', views.google_login_redirect, name='google_redirect'),
      path('accounts/', include('allauth.urls')),
+     path('admin/', admin.site.urls),
+    path('', include('core.urls')),
+    path('plans/', include('subscriptions.urls')), 
 ]
 
 if settings.DEBUG:

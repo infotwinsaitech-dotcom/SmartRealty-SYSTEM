@@ -151,6 +151,7 @@ path('accounts/', include('allauth.urls')),
     path("builder/property-map/", views.property_map, name="property_map"),
     # urls.py
     path("property-map/", views.property_map_public, name="property_map_public"),
+    
 ]
 
 if settings.DEBUG:
