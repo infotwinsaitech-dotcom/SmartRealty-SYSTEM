@@ -235,3 +235,19 @@ WARNING 2026-07-07 10:52:31,920 middleware SLOW REQUEST: GET / took 2.86s User: 
 ERROR 2026-07-07 10:52:31,921 basehttp "GET / HTTP/1.1" 500 221569
 WARNING 2026-07-07 10:52:32,068 log Not Found: /favicon.ico
 WARNING 2026-07-07 10:52:32,068 basehttp "GET /favicon.ico HTTP/1.1" 404 62285
+INFO 2026-07-07 10:58:30,458 autoreload Watching for file changes with StatReloader
+INFO 2026-07-07 10:58:30,508 views views.py loaded successfully
+WARNING 2026-07-07 10:58:51,103 middleware SLOW REQUEST: GET / took 5.50s User: Anonymous
+INFO 2026-07-07 10:58:51,104 basehttp "GET / HTTP/1.1" 200 29145
+WARNING 2026-07-07 10:58:51,493 basehttp "GET /static/images/hero.jpg HTTP/1.1" 404 1859
+WARNING 2026-07-07 10:58:51,502 basehttp "GET /static/images/logo.png HTTP/1.1" 404 1859
+INFO 2026-07-07 10:58:51,689 basehttp "GET /static/images/about.jpg HTTP/1.1" 200 2738045
+INFO 2026-07-07 11:04:31,612 autoreload Watching for file changes with StatReloader
+INFO 2026-07-07 11:04:31,742 views views.py loaded successfully
+WARNING 2026-07-07 11:04:44,455 middleware SLOW REQUEST: GET / took 6.17s User: Anonymous
+INFO 2026-07-07 11:04:44,456 basehttp "GET / HTTP/1.1" 200 29145
+WARNING 2026-07-07 11:04:44,858 basehttp "GET /static/images/hero.jpg HTTP/1.1" 404 1859
+INFO 2026-07-07 11:04:44,888 basehttp "GET /static/images/logo.png HTTP/1.1" 200 336652
+INFO 2026-07-07 11:04:45,790 basehttp "GET /static/images/about.jpg HTTP/1.1" 200 2738045
+WARNING 2026-07-07 11:15:04,578 middleware SLOW REQUEST: GET /properties/ took 3.01s User: Anonymous
+INFO 2026-07-07 11:15:04,581 basehttp "GET /properties/ HTTP/1.1" 200 187053
