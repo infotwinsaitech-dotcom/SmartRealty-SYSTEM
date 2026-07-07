@@ -31,3 +31,207 @@ WARNING 2026-07-06 19:12:20,679 apps [AUTO-SETUP] Google credentials not set!
 INFO 2026-07-06 19:12:20,775 views views.py loaded successfully
 WARNING 2026-07-07 00:05:39,217 apps [AUTO-SETUP] Google credentials not set!
 INFO 2026-07-07 00:05:39,369 views views.py loaded successfully
+INFO 2026-07-07 10:51:58,157 autoreload Watching for file changes with StatReloader
+INFO 2026-07-07 10:51:58,305 views views.py loaded successfully
+ERROR 2026-07-07 10:52:14,139 log Internal Server Error: /
+Traceback (most recent call last):
+  File "C:\Users\DELL-PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL-PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL-PC\Desktop\Builder\SmartRealty-SYSTEM\core\views.py", line 265, in home
+    return render(request, "public/index.html", {"properties": properties})
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL-PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL-PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL-PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\backends\django.py", line 107, in render
+    return self.template.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL-PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\base.py", line 172, in render
+    return self._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL-PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\base.py", line 164, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL-PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL-PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL-PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL-PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\loader_tags.py", line 159, in render
+    return compiled_parent._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL-PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\base.py", line 164, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL-PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL-PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL-PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL-PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\loader_tags.py", line 65, in render
+    result = block.nodelist.render(context)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL-PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL-PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL-PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL-PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\defaulttags.py", line 243, in render
+    nodelist.append(node.render_annotated(context))
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL-PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL-PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\defaulttags.py", line 327, in render
+    return nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL-PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL-PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL-PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL-PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\library.py", line 324, in render
+    output = self.func(*resolved_args, **resolved_kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL-PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\cloudinary\templatetags\cloudinary.py", line 29, in cloudinary_url
+    return source.build_url(**options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL-PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\cloudinary\__init__.py", line 320, in build_url
+    return self.__build_url(**options)[0]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL-PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\cloudinary\__init__.py", line 317, in __build_url
+    return utils.cloudinary_url(public_id, **combined_options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL-PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\cloudinary\utils.py", line 893, in cloudinary_url
+    prefix = build_distribution_domain(options)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL-PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\cloudinary\utils.py", line 802, in build_distribution_domain
+    raise ValueError("Must supply cloud_name in tag or in configuration")
+ValueError: Must supply cloud_name in tag or in configuration
+WARNING 2026-07-07 10:52:14,139 middleware SLOW REQUEST: GET / took 5.22s User: Anonymous
+ERROR 2026-07-07 10:52:14,139 basehttp "GET / HTTP/1.1" 500 221059
+ERROR 2026-07-07 10:52:31,916 log Internal Server Error: /
+Traceback (most recent call last):
+  File "C:\Users\DELL-PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL-PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL-PC\Desktop\Builder\SmartRealty-SYSTEM\core\views.py", line 265, in home
+    return render(request, "public/index.html", {"properties": properties})
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL-PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL-PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL-PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\backends\django.py", line 107, in render
+    return self.template.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL-PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\base.py", line 172, in render
+    return self._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL-PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\base.py", line 164, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL-PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL-PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL-PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL-PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\loader_tags.py", line 159, in render
+    return compiled_parent._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL-PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\base.py", line 164, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL-PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL-PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL-PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL-PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\loader_tags.py", line 65, in render
+    result = block.nodelist.render(context)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL-PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL-PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL-PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL-PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\defaulttags.py", line 243, in render
+    nodelist.append(node.render_annotated(context))
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL-PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL-PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\defaulttags.py", line 327, in render
+    return nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL-PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL-PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL-PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL-PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\library.py", line 324, in render
+    output = self.func(*resolved_args, **resolved_kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL-PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\cloudinary\templatetags\cloudinary.py", line 29, in cloudinary_url
+    return source.build_url(**options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL-PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\cloudinary\__init__.py", line 320, in build_url
+    return self.__build_url(**options)[0]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL-PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\cloudinary\__init__.py", line 317, in __build_url
+    return utils.cloudinary_url(public_id, **combined_options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL-PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\cloudinary\utils.py", line 893, in cloudinary_url
+    prefix = build_distribution_domain(options)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL-PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\cloudinary\utils.py", line 802, in build_distribution_domain
+    raise ValueError("Must supply cloud_name in tag or in configuration")
+ValueError: Must supply cloud_name in tag or in configuration
+WARNING 2026-07-07 10:52:31,920 middleware SLOW REQUEST: GET / took 2.86s User: Anonymous
+ERROR 2026-07-07 10:52:31,921 basehttp "GET / HTTP/1.1" 500 221569
+WARNING 2026-07-07 10:52:32,068 log Not Found: /favicon.ico
+WARNING 2026-07-07 10:52:32,068 basehttp "GET /favicon.ico HTTP/1.1" 404 62285
