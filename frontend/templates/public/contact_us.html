@@ -7,63 +7,63 @@
 <div class="bg-gradient-to-br from-[#020617] via-[#0f172a] to-[#020617] text-white">
 
 <!-- HERO -->
-<section class="py-24 px-6 text-center">
-    <h1 class="text-5xl md:text-6xl font-extrabold mb-4">
+<section class="py-16 sm:py-24 px-5 sm:px-6 text-center">
+    <h1 class="font-display text-4xl sm:text-5xl md:text-6xl font-extrabold mb-3 sm:mb-4 leading-[1.1]">
         Get in Touch
     </h1>
-    <p class="text-gray-400 text-lg">
+    <p class="text-[#9aa3ba] text-base sm:text-lg">
         Premium Real Estate Assistance — We're Here to Help
     </p>
 </section>
 
 <!-- MAIN -->
-<section class="max-w-7xl mx-auto grid md:grid-cols-2 gap-12 px-6 pb-20">
+<section class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 sm:gap-12 px-5 sm:px-6 pb-16 sm:pb-20">
 
     <!-- LEFT: FORM -->
-    <div class="backdrop-blur-xl bg-white/5 border border-white/10 p-10 rounded-3xl shadow-2xl">
+    <div class="backdrop-blur-xl bg-white/[0.04] border border-[#d4af37]/15 p-6 sm:p-10 rounded-2xl sm:rounded-3xl shadow-2xl">
 
-        <h2 class="text-3xl font-bold mb-8">
+        <h2 class="font-display text-2xl sm:text-3xl font-bold mb-6 sm:mb-8 text-[#ece7d8]">
             Send Inquiry
         </h2>
 
-        <form method="POST" class="space-y-6">
+        <form method="POST" class="space-y-5 sm:space-y-6">
             {% csrf_token %}
 
-            <div class="grid md:grid-cols-2 gap-6">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6">
 
                 <!-- NAME -->
                 <div>
-                    <label class="text-sm text-gray-400">Full Name</label>
+                    <label class="text-sm text-[#9aa3ba]">Full Name</label>
                     <input name="name" required
-                        class="w-full mt-2 px-4 py-3 rounded-lg bg-white/10 border border-white/20 focus:outline-none focus:ring-2 focus:ring-yellow-400">
+                        class="w-full mt-2 min-h-[50px] px-4 py-3 rounded-lg bg-white/[0.06] border border-white/15 text-[#ece7d8] text-base focus:outline-none focus:ring-2 focus:ring-[#d4af37] focus:border-[#d4af37]/50">
                 </div>
 
                 <!-- PHONE -->
                 <div>
-                    <label class="text-sm text-gray-400">Phone</label>
-                    <input name="phone" required
-                        class="w-full mt-2 px-4 py-3 rounded-lg bg-white/10 border border-white/20 focus:outline-none focus:ring-2 focus:ring-yellow-400">
+                    <label class="text-sm text-[#9aa3ba]">Phone</label>
+                    <input name="phone" type="tel" required
+                        class="w-full mt-2 min-h-[50px] px-4 py-3 rounded-lg bg-white/[0.06] border border-white/15 text-[#ece7d8] text-base focus:outline-none focus:ring-2 focus:ring-[#d4af37] focus:border-[#d4af37]/50">
                 </div>
 
             </div>
 
             <!-- EMAIL -->
             <div>
-                <label class="text-sm text-gray-400">Email</label>
+                <label class="text-sm text-[#9aa3ba]">Email</label>
                 <input type="email" name="email" required
-                    class="w-full mt-2 px-4 py-3 rounded-lg bg-white/10 border border-white/20 focus:outline-none focus:ring-2 focus:ring-yellow-400">
+                    class="w-full mt-2 min-h-[50px] px-4 py-3 rounded-lg bg-white/[0.06] border border-white/15 text-[#ece7d8] text-base focus:outline-none focus:ring-2 focus:ring-[#d4af37] focus:border-[#d4af37]/50">
             </div>
 
             <!-- MESSAGE -->
             <div>
-                <label class="text-sm text-gray-400">Message</label>
+                <label class="text-sm text-[#9aa3ba]">Message</label>
                 <textarea name="message" rows="5" required
-                    class="w-full mt-2 px-4 py-3 rounded-lg bg-white/10 border border-white/20 focus:outline-none focus:ring-2 focus:ring-yellow-400"></textarea>
+                    class="w-full mt-2 px-4 py-3 rounded-lg bg-white/[0.06] border border-white/15 text-[#ece7d8] text-base focus:outline-none focus:ring-2 focus:ring-[#d4af37] focus:border-[#d4af37]/50"></textarea>
             </div>
 
             <!-- BUTTON -->
             <button type="submit"
-                class="w-full bg-gradient-to-r from-yellow-500 to-yellow-300 text-black font-bold py-3 rounded-lg hover:scale-105 transition duration-300">
+                class="w-full min-h-[52px] bg-gradient-to-r from-[#d4af37] to-[#f5e6a8] text-[#0a0f1f] font-bold py-3 rounded-lg active:scale-[0.98] sm:hover:scale-105 transition duration-300">
                 Send Message
             </button>
 
@@ -72,38 +72,38 @@
     </div>
 
     <!-- RIGHT: CONTACT INFO -->
-    <div class="space-y-8">
+    <div class="space-y-6 sm:space-y-8">
 
         <!-- CARD -->
-        <div class="backdrop-blur-xl bg-white/5 border border-white/10 p-8 rounded-3xl shadow-xl">
+        <div class="backdrop-blur-xl bg-white/[0.04] border border-[#d4af37]/15 p-6 sm:p-8 rounded-2xl sm:rounded-3xl shadow-xl">
 
-            <h2 class="text-2xl font-bold mb-6">
+            <h2 class="font-display text-xl sm:text-2xl font-bold mb-5 sm:mb-6 text-[#ece7d8]">
                 Contact Information
             </h2>
 
-            <div class="space-y-4 text-gray-300">
+            <div class="space-y-4 text-[#c7cede] text-sm sm:text-base">
 
                 <p>
-                    <span class="text-yellow-400 font-semibold">Company:</span><br>
+                    <span class="text-[#e9c66b] font-semibold">Company:</span><br>
                     {{ site.company_name }}
                 </p>
 
                 <p>
-                    <span class="text-yellow-400 font-semibold">Phone:</span><br>
-                    <a href="tel:{{ site.phone }}" class="hover:text-yellow-400 transition">
+                    <span class="text-[#e9c66b] font-semibold">Phone:</span><br>
+                    <a href="tel:{{ site.phone }}" class="hover:text-[#e9c66b] transition inline-block py-1">
                         {{ site.phone }}
                     </a>
                 </p>
 
                 <p>
-                    <span class="text-yellow-400 font-semibold">Email:</span><br>
-                    <a href="mailto:{{ site.email }}" class="hover:text-yellow-400 transition">
+                    <span class="text-[#e9c66b] font-semibold">Email:</span><br>
+                    <a href="mailto:{{ site.email }}" class="hover:text-[#e9c66b] transition inline-block py-1 break-all">
                         {{ site.email }}
                     </a>
                 </p>
 
                 <p>
-                    <span class="text-yellow-400 font-semibold">Location:</span><br>
+                    <span class="text-[#e9c66b] font-semibold">Location:</span><br>
                     {{ site.location }}
                 </p>
 
@@ -112,8 +112,8 @@
         </div>
 
         <!-- EXTRA CARD -->
-        <div class="bg-gradient-to-r from-yellow-500 to-yellow-300 text-black p-8 rounded-3xl shadow-xl">
-            <h3 class="text-xl font-bold mb-2">
+        <div class="bg-gradient-to-r from-[#d4af37] to-[#f5e6a8] text-[#0a0f1f] p-6 sm:p-8 rounded-2xl sm:rounded-3xl shadow-xl">
+            <h3 class="font-display text-lg sm:text-xl font-bold mb-2">
                 Need Immediate Help?
             </h3>
             <p class="text-sm mb-4">
@@ -121,7 +121,7 @@
             </p>
 
             <a href="https://wa.me/919876543210"
-               class="inline-block bg-black text-white px-6 py-2 rounded-lg font-bold hover:scale-105 transition">
+               class="inline-flex items-center justify-center w-full sm:w-auto min-h-[48px] bg-[#0a0f1f] text-white px-6 py-2 rounded-lg font-bold active:scale-[0.97] sm:hover:scale-105 transition">
                WhatsApp Now
             </a>
         </div>

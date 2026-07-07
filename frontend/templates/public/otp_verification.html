@@ -3,32 +3,32 @@
 
 {% block content %}
 
-<section class="min-h-screen flex items-center justify-center luxury-bg px-6">
+<section class="min-h-[100dvh] flex items-center justify-center luxury-bg px-4 sm:px-6 py-10">
 
-<div class="max-w-md w-full backdrop-blur-xl bg-white/5 border border-white/10 p-10 rounded-3xl shadow-2xl text-center reveal">
+<div class="max-w-md w-full backdrop-blur-xl bg-white/[0.04] border border-[#d4af37]/15 p-6 sm:p-10 rounded-3xl shadow-2xl text-center reveal">
 
-    <h2 class="text-3xl font-bold gold mb-2">Verify Identity</h2>
-    <p class="text-gray-400 mb-8 text-sm">
+    <h2 class="text-2xl sm:text-3xl font-display gold mb-2">Verify Identity</h2>
+    <p class="text-[#9aa3ba] mb-8 text-sm">
         Enter the 6-digit code sent to your email
     </p>
 
     {% if error %}
-    <p class="text-red-400 mb-4">{{ error }}</p>
+    <p class="text-red-400 mb-4 text-sm">{{ error }}</p>
     {% endif %}
 
-    <form method="POST" class="space-y-8">
+    <form method="POST" class="space-y-7 sm:space-y-8">
         {% csrf_token %}
         <input type="hidden" name="otp" id="finalOtp">
 
         <!-- OTP BOXES -->
-        <div class="flex justify-center gap-3">
+        <div class="flex justify-center gap-2 sm:gap-3">
             {% for i in "123456" %}
-            <input class="otp-input w-12 h-14 text-center text-xl font-bold rounded-xl bg-white/10 border border-white/20 text-white focus:ring-2 focus:ring-yellow-400"
-                   maxlength="1" type="text"/>
+            <input class="otp-input w-11 h-13 sm:w-12 sm:h-14 text-center text-xl font-bold rounded-xl bg-white/[0.06] border border-white/15 text-[#ece7d8] focus:ring-2 focus:ring-[#d4af37] focus:border-[#d4af37]/50 outline-none"
+                   maxlength="1" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code"/>
             {% endfor %}
         </div>
 
-        <button class="w-full py-3 bg-gradient-to-r from-yellow-500 to-yellow-300 text-black font-bold rounded-xl hover:scale-105 transition">
+        <button class="w-full min-h-[52px] py-3 bg-gradient-to-r from-[#d4af37] to-[#f5e6a8] text-[#0a0f1f] font-bold rounded-xl active:scale-[0.98] transition">
             Verify OTP
         </button>
     </form>
