@@ -1,21 +1,30 @@
-{% extends "builder/base.html" %}
+{% extends "public/base.html" %}
+
+{% block title %}My Subscription{% endblock %}
 
 {% block content %}
-<div class="container py-5">
-  <h2>My Subscription</h2>
-  {% if subscription %}
-    <p><strong>Plan:</strong> {{ limits.plan_name }}</p>
-    <p><strong>Valid till:</strong> {{ subscription.end_date }}</p>
-    <p><strong>Payment status:</strong> {{ subscription.payment_status }}</p>
-  {% else %}
-    <p class="text-warning">Koi active subscription nahi hai. <a href="{% url 'subscriptions:pricing' %}">Plan choose karo</a>.</p>
-  {% endif %}
+<div class="min-h-screen bg-black text-white px-4 md:px-10 py-16">
+  <div class="max-w-xl mx-auto">
+    <h1 class="text-2xl font-bold mb-8">My Subscription</h1>
 
-  <hr>
-  <h5>Usage</h5>
-  <ul>
-    <li>Properties: {{ properties_used }} / {{ limits.max_properties }}</li>
-    <li>Agents: {{ agents_used }} / {{ limits.max_agents }}</li>
-  </ul>
+    {% if subscription %}
+      <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6 mb-8">
+        <p class="mb-2"><span class="text-gray-500">Plan:</span> <span class="text-yellow-400 font-semibold">{{ limits.plan_name }}</span></p>
+        <p class="mb-2"><span class="text-gray-500">Valid till:</span> {{ subscription.end_date }}</p>
+        <p><span class="text-gray-500">Payment status:</span> {{ subscription.payment_status }}</p>
+      </div>
+    {% else %}
+      <div class="bg-yellow-400/10 border border-yellow-400/30 text-yellow-300 rounded-lg px-4 py-3 mb-8">
+        Koi active subscription nahi hai.
+        <a href="{% url 'subscriptions:pricing' %}" class="underline">Plan choose karo</a>.
+      </div>
+    {% endif %}
+
+    <h2 class="text-lg font-semibold mb-4 text-gray-300">Usage</h2>
+    <ul class="space-y-2 text-gray-300">
+      <li>Properties: {{ properties_used }} / {{ limits.max_properties }}</li>
+      <li>Agents: {{ agents_used }} / {{ limits.max_agents }}</li>
+    </ul>
+  </div>
 </div>
 {% endblock %}

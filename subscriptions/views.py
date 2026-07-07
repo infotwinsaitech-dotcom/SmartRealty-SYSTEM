@@ -1,7 +1,10 @@
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import render
+from datetime import date, timedelta
 
-from core.models import SubscriptionPlan
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect, get_object_or_404
+
+from core.models import SubscriptionPlan, UserSubscription
 from .plans_config import BUILDER_PLANS, AGENT_PLANS
 
 
@@ -47,3 +50,41 @@ def my_subscription(request):
         "agents_used": Agent.objects.filter(builders=request.user).count(),
     }
     return render(request, "subscriptions/my_subscription.html", context)
+
+
+@login_required
+def subscribe(request, plan_id):
+    """
+    Activates a plan for the logged-in user.
+
+    NOTE: Abhi koi payment gateway connected nahi hai, isliye plan
+    select karte hi turant activate ho jata hai. Jab Razorpay (ya koi
+    aur gateway) integrate karo, tab ye view sirf "PENDING" order create
+    kare aur payment-success webhook/callback me is_active=True set kare
+    — filhaal free-flow hai taaki panel access test kar sako.
+    """
+    if request.method != "POST":
+        return redirect("subscriptions:pricing")
+
+    plan = get_object_or_404(SubscriptionPlan, id=plan_id, is_active=True)
+
+    today = date.today()
+    UserSubscription.objects.update_or_create(
+        user=request.user,
+        defaults={
+            "plan": plan,
+            "start_date": today,
+            "end_date": today + timedelta(days=30),
+            "is_active": True,
+            "auto_renew": True,
+            "payment_status": "PAID" if plan.price_monthly == 0 else "PENDING",
+        },
+    )
+
+    messages.success(request, f"'{plan.name}' plan activate ho gaya! Ab aap apna panel use kar sakte ho.")
+
+    if request.user.role == "builder":
+        return redirect("builder_dashboard")
+    elif request.user.role == "agent":
+        return redirect("agent_dashboard")
+    return redirect("subscriptions:pricing")
