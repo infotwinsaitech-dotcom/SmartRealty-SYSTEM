@@ -31,7 +31,14 @@ class InquiryAdmin(admin.ModelAdmin):
 class SiteSettingsAdmin(admin.ModelAdmin):
     fieldsets = (
         ('Company Info', {
-            'fields': ('company_name', 'phone', 'email', 'location')
+            'fields': ('company_name', 'phone', 'email', 'location', 'about_text')
+        }),
+        ('Branding', {
+            'fields': ('logo', 'favicon')
+        }),
+        ('Social Links', {
+            'fields': ('facebook_url', 'twitter_url', 'instagram_url', 'linkedin_url', 'whatsapp_number'),
+            'classes': ('collapse',),
         }),
         ('Feature Flags', {
             'fields': ('enable_scheduler', 'enable_site_visits'),

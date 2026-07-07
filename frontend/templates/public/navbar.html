@@ -1,9 +1,13 @@
 <nav class="bg-gray-900 shadow-lg shadow-gray-900/50 px-4 md:px-8 py-4 flex justify-between items-center sticky top-0 z-50 border-b border-gray-800">
 
     <!-- LOGO -->
-    <div class="text-2xl font-extrabold text-yellow-400">
-        {{ site.site_name|default:"Uma Realty" }}
-    </div>
+<a href="/" class="flex items-center gap-2">
+    {% if site.logo %}
+        <img src="{{ site.logo.url }}" alt="{{ site.company_name }}" class="h-10 w-auto object-contain">
+    {% else %}
+        <span class="text-2xl font-extrabold text-yellow-400">{{ site.company_name|default:"REAL SHRI" }}</span>
+    {% endif %}
+</a>
 
     <!-- DESKTOP MENU -->
     <div class="hidden md:flex gap-6 font-medium text-gray-300 items-center">
