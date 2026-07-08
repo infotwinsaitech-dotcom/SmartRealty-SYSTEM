@@ -13,7 +13,7 @@ core.models.SubscriptionPlan table ko usi ke hisaab se update karta hai.
 from django.core.management.base import BaseCommand
 from django.db import transaction
 
-from core.models import SubscriptionPlan
+from subscriptions.models import SubscriptionPlan
 from subscriptions.plans_config import ALL_PLANS
 
 
@@ -31,6 +31,7 @@ class Command(BaseCommand):
             configured_names.add(name)
 
             defaults = {
+                "plan_type": plan_data.get("audience", "builder"),
                 "description": plan_data.get("description", ""),
                 "price_monthly": plan_data["price_monthly"],
                 "price_yearly": plan_data["price_yearly"],

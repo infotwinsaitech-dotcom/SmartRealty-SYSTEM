@@ -307,3 +307,10 @@ INFO 2026-07-08 21:40:03,285 apps  PostgreSQL optimized
 INFO 2026-07-08 21:40:03,285 apps  Core app initialized
 INFO 2026-07-08 21:40:03,368 autoreload Watching for file changes with StatReloader
 INFO 2026-07-08 21:40:03,607 views views.py loaded successfully
+INFO 2026-07-08 22:02:18,142 apps  PostgreSQL optimized
+INFO 2026-07-08 22:02:18,142 apps  Core app initialized
+INFO 2026-07-08 22:02:18,221 views views.py loaded successfully
+INFO 2026-07-08 22:02:43,982 apps  PostgreSQL optimized
+WARNING 2026-07-08 22:02:44,315 apps [AUTO-SETUP] Google credentials not set!
+INFO 2026-07-08 22:02:44,315 apps  Core app initialized
+INFO 2026-07-08 22:02:44,397 views views.py loaded successfully
