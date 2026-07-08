@@ -5,6 +5,7 @@ All admin-customizable via Django Admin
 
 import json
 import logging
+import time
 from datetime import date, timedelta
 from decimal import Decimal
 
@@ -193,7 +194,7 @@ def create_razorpay_order(request):
         razorpay_order_data = {
             'amount': amount_in_paise,
             'currency': 'INR',
-            'receipt': f"order_{request.user.id}_{plan.id}_{int(date.today().timestamp())}",
+            'receipt': f"order_{request.user.id}_{plan.id}_{int(time.time())}",
             'notes': {
                 'user_id': request.user.id,
                 'plan_id': plan.id,
