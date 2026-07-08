@@ -29,7 +29,7 @@
                 {{ property.title }}
             </h1>
 
-            <p class="text-sm sm:text-lg md:text-xl text-[#c7cede] flex items-center gap-2 mb-3 sm:mb-4">
+            <p class="text-sm sm:text-lg md:text-xl text-[#e2e5ee] flex items-center gap-2 mb-3 sm:mb-4">
                 <svg class="w-4 h-4 sm:w-5 sm:h-5 text-[#d4af37] shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
@@ -153,26 +153,26 @@
             </div>
 
             <!-- RIGHT: Price Box -->
-            <div class="bg-gradient-to-br from-[#0b1224] to-[#020617] text-white p-6 sm:p-8 md:p-10 flex flex-col justify-center">
-                <p class="text-[#9aa3ba] text-xs sm:text-sm uppercase tracking-wider font-semibold mb-2">Starting Price</p>
-                <h3 class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-[#f5e6a8] mb-3 sm:mb-4">
+            <div class="bg-gradient-to-br from-[#f7f4ec] to-white text-[#0b1440] p-6 sm:p-8 md:p-10 flex flex-col justify-center border-t lg:border-t-0 lg:border-l border-[#d4af37]/20">
+                <p class="text-[#6b7280] text-xs sm:text-sm uppercase tracking-wider font-semibold mb-2">Starting Price</p>
+                <h3 class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-[#c9922a] mb-3 sm:mb-4">
                     ₹{{ property.starting_price|default:property.price|format_price }}
                 </h3>
                 {% if property.max_price %}
-                <p class="text-base sm:text-lg text-[#c7cede] mb-5 sm:mb-6">Upto ₹{{ property.max_price|format_price }}</p>
+                <p class="text-base sm:text-lg text-[#33395a] mb-5 sm:mb-6">Upto ₹{{ property.max_price|format_price }}</p>
                 {% endif %}
 
-                <div class="space-y-3 sm:space-y-4 border-t border-white/10 pt-5 sm:pt-6">
+                <div class="space-y-3 sm:space-y-4 border-t border-black/10 pt-5 sm:pt-6">
                     <div class="flex justify-between items-center text-sm sm:text-base">
-                        <span class="text-[#9aa3ba]">Configuration</span>
+                        <span class="text-[#6b7280]">Configuration</span>
                         <span class="font-semibold">{{ property.configuration|default:"N/A" }}</span>
                     </div>
                     <div class="flex justify-between items-center text-sm sm:text-base">
-                        <span class="text-[#9aa3ba]">Property Type</span>
+                        <span class="text-[#6b7280]">Property Type</span>
                         <span class="font-semibold">{{ property.property_type|default:"N/A" }}</span>
                     </div>
                     <div class="flex justify-between items-center text-sm sm:text-base">
-                        <span class="text-[#9aa3ba]">RERA</span>
+                        <span class="text-[#6b7280]">RERA</span>
                         <span class="font-semibold">{{ property.rera_number|default:"N/A" }}</span>
                     </div>
                 </div>
@@ -198,10 +198,10 @@
             <div class="reveal">
                 <div class="flex items-center gap-3 mb-4 sm:mb-6">
                     <div class="w-1 h-7 sm:h-8 bg-gradient-to-b from-[#d4af37] to-[#f5e6a8] rounded-full"></div>
-                    <h2 class="font-display text-2xl sm:text-3xl font-bold text-white">About Project</h2>
+                    <h2 class="font-display text-2xl sm:text-3xl font-bold text-[#0b1440]">About Project</h2>
                 </div>
-                <div class="bg-white/[0.04] backdrop-blur-sm rounded-2xl p-5 sm:p-8 border border-[#d4af37]/15">
-                    <p class="text-[#c7cede] leading-relaxed text-base sm:text-lg">
+                <div class="bg-white rounded-2xl p-5 sm:p-8 border border-[#d4af37]/20 shadow-md shadow-black/5">
+                    <p class="text-[#33395a] leading-relaxed text-base sm:text-lg">
                         {{ property.description|default:"No description available." }}
                     </p>
                 </div>
@@ -212,7 +212,7 @@
             <div class="reveal">
                 <div class="flex items-center gap-3 mb-4 sm:mb-6">
                     <div class="w-1 h-7 sm:h-8 bg-gradient-to-b from-[#d4af37] to-[#f5e6a8] rounded-full"></div>
-                    <h2 class="font-display text-2xl sm:text-3xl font-bold text-white">Highlights</h2>
+                    <h2 class="font-display text-2xl sm:text-3xl font-bold text-[#0b1440]">Highlights</h2>
                 </div>
                 <div class="flex flex-wrap gap-2.5 sm:gap-3">
                     {% for h in highlights_list %}
@@ -228,17 +228,17 @@
             <div class="reveal">
                 <div class="flex items-center gap-3 mb-4 sm:mb-6">
                     <div class="w-1 h-7 sm:h-8 bg-gradient-to-b from-[#d4af37] to-[#f5e6a8] rounded-full"></div>
-                    <h2 class="font-display text-2xl sm:text-3xl font-bold text-white">Amenities</h2>
+                    <h2 class="font-display text-2xl sm:text-3xl font-bold text-[#0b1440]">Amenities</h2>
                 </div>
                 <div class="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
                     {% for item in property.amenities %}
-                    <div class="bg-white/[0.04] p-3.5 sm:p-4 rounded-xl flex items-center gap-2.5 sm:gap-3 hover:bg-white/[0.08] transition duration-300 border border-[#d4af37]/15 group">
-                        <span class="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-[#d4af37]/15 flex items-center justify-center text-[#e9c66b] group-hover:bg-[#d4af37] group-hover:text-[#0a0f1f] transition duration-300 shrink-0">
+                    <div class="bg-white p-3.5 sm:p-4 rounded-xl flex items-center gap-2.5 sm:gap-3 hover:bg-[#f7f4ec] transition duration-300 border border-[#d4af37]/20 shadow-sm shadow-black/5 group">
+                        <span class="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-[#d4af37]/15 flex items-center justify-center text-[#c9922a] group-hover:bg-[#d4af37] group-hover:text-[#0a0f1f] transition duration-300 shrink-0">
                             <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
                             </svg>
                         </span>
-                        <span class="text-[#c7cede] font-medium text-sm sm:text-base">{{ item }}</span>
+                        <span class="text-[#33395a] font-medium text-sm sm:text-base">{{ item }}</span>
                     </div>
                     {% empty %}
                     <p class="text-gray-500 col-span-full">No amenities listed.</p>
@@ -251,7 +251,7 @@
             <div class="reveal">
                 <div class="flex items-center gap-3 mb-4 sm:mb-6">
                     <div class="w-1 h-7 sm:h-8 bg-gradient-to-b from-[#d4af37] to-[#f5e6a8] rounded-full"></div>
-                    <h2 class="font-display text-2xl sm:text-3xl font-bold text-white">Gallery</h2>
+                    <h2 class="font-display text-2xl sm:text-3xl font-bold text-[#0b1440]">Gallery</h2>
                 </div>
 
                 <!-- Main Gallery Grid -->
@@ -277,9 +277,9 @@
             <div class="reveal">
                 <div class="flex items-center gap-3 mb-4 sm:mb-6">
                     <div class="w-1 h-7 sm:h-8 bg-gradient-to-b from-[#d4af37] to-[#f5e6a8] rounded-full"></div>
-                    <h2 class="font-display text-2xl sm:text-3xl font-bold text-white">Project Video</h2>
+                    <h2 class="font-display text-2xl sm:text-3xl font-bold text-[#0b1440]">Project Video</h2>
                 </div>
-                <div class="rounded-2xl overflow-hidden shadow-2xl border border-[#d4af37]/15" style="position:relative; padding-top:56.25%;">
+                <div class="rounded-2xl overflow-hidden shadow-2xl border border-[#d4af37]/20" style="position:relative; padding-top:56.25%;">
                     <iframe src="{{ property.get_video_embed_url }}"
                         style="position:absolute; top:0; left:0; width:100%; height:100%;"
                         frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen>
@@ -290,9 +290,9 @@
             <div class="reveal">
                 <div class="flex items-center gap-3 mb-4 sm:mb-6">
                     <div class="w-1 h-7 sm:h-8 bg-gradient-to-b from-[#d4af37] to-[#f5e6a8] rounded-full"></div>
-                    <h2 class="font-display text-2xl sm:text-3xl font-bold text-white">Project Video</h2>
+                    <h2 class="font-display text-2xl sm:text-3xl font-bold text-[#0b1440]">Project Video</h2>
                 </div>
-                <div class="rounded-2xl overflow-hidden shadow-2xl border border-[#d4af37]/15">
+                <div class="rounded-2xl overflow-hidden shadow-2xl border border-[#d4af37]/20">
                     <video controls class="w-full">
                         <source src="{{ property.project_video.url }}">
                         Your browser does not support video.
@@ -306,7 +306,7 @@
             <div class="reveal">
                 <div class="flex items-center gap-3 mb-4 sm:mb-6">
                     <div class="w-1 h-7 sm:h-8 bg-gradient-to-b from-[#d4af37] to-[#f5e6a8] rounded-full"></div>
-                    <h2 class="font-display text-2xl sm:text-3xl font-bold text-white">Floor Plan</h2>
+                    <h2 class="font-display text-2xl sm:text-3xl font-bold text-[#0b1440]">Floor Plan</h2>
                 </div>
                 <div class="flex gap-3 flex-wrap">
                     <a href="{{ brochure_pdf_url|default:property.brochure.url }}" target="_blank"
@@ -331,33 +331,33 @@
             <div class="reveal">
                 <div class="flex items-center gap-3 mb-4 sm:mb-6">
                     <div class="w-1 h-7 sm:h-8 bg-gradient-to-b from-[#d4af37] to-[#f5e6a8] rounded-full"></div>
-                    <h2 class="font-display text-2xl sm:text-3xl font-bold text-white">Overview</h2>
+                    <h2 class="font-display text-2xl sm:text-3xl font-bold text-[#0b1440]">Overview</h2>
                 </div>
-                <div class="bg-white/[0.04] rounded-2xl p-5 sm:p-8 border border-[#d4af37]/15">
-                    <div class="grid grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 text-[#c7cede]">
+                <div class="bg-white rounded-2xl p-5 sm:p-8 border border-[#d4af37]/20 shadow-md shadow-black/5">
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 text-[#33395a]">
                         <div class="flex flex-col gap-1">
-                            <span class="text-[#8891a5] text-xs sm:text-sm">Project</span>
-                            <span class="font-semibold text-white text-sm sm:text-base">{{ property.project_name|default:"N/A" }}</span>
+                            <span class="text-[#6b7280] text-xs sm:text-sm">Project</span>
+                            <span class="font-semibold text-[#0b1440] text-sm sm:text-base">{{ property.project_name|default:"N/A" }}</span>
                         </div>
                         <div class="flex flex-col gap-1">
-                            <span class="text-[#8891a5] text-xs sm:text-sm">Type</span>
-                            <span class="font-semibold text-white text-sm sm:text-base">{{ property.property_type|default:"N/A" }}</span>
+                            <span class="text-[#6b7280] text-xs sm:text-sm">Type</span>
+                            <span class="font-semibold text-[#0b1440] text-sm sm:text-base">{{ property.property_type|default:"N/A" }}</span>
                         </div>
                         <div class="flex flex-col gap-1">
-                            <span class="text-[#8891a5] text-xs sm:text-sm">Status</span>
-                            <span class="font-semibold text-white text-sm sm:text-base">{{ property.status|default:"N/A" }}</span>
+                            <span class="text-[#6b7280] text-xs sm:text-sm">Status</span>
+                            <span class="font-semibold text-[#0b1440] text-sm sm:text-base">{{ property.status|default:"N/A" }}</span>
                         </div>
                         <div class="flex flex-col gap-1">
-                            <span class="text-[#8891a5] text-xs sm:text-sm">RERA</span>
-                            <span class="font-semibold text-white text-sm sm:text-base">{{ property.rera_number|default:"N/A" }}</span>
+                            <span class="text-[#6b7280] text-xs sm:text-sm">RERA</span>
+                            <span class="font-semibold text-[#0b1440] text-sm sm:text-base">{{ property.rera_number|default:"N/A" }}</span>
                         </div>
                         <div class="flex flex-col gap-1">
-                            <span class="text-[#8891a5] text-xs sm:text-sm">Configuration</span>
-                            <span class="font-semibold text-white text-sm sm:text-base">{{ property.configuration|default:"N/A" }}</span>
+                            <span class="text-[#6b7280] text-xs sm:text-sm">Configuration</span>
+                            <span class="font-semibold text-[#0b1440] text-sm sm:text-base">{{ property.configuration|default:"N/A" }}</span>
                         </div>
                         <div class="flex flex-col gap-1">
-                            <span class="text-[#8891a5] text-xs sm:text-sm">Possession</span>
-                            <span class="font-semibold text-white text-sm sm:text-base">{{ property.possession_date|default:"N/A" }}</span>
+                            <span class="text-[#6b7280] text-xs sm:text-sm">Possession</span>
+                            <span class="font-semibold text-[#0b1440] text-sm sm:text-base">{{ property.possession_date|default:"N/A" }}</span>
                         </div>
                     </div>
                 </div>
@@ -368,11 +368,11 @@
             <div class="reveal">
                 <div class="flex items-center gap-3 mb-4 sm:mb-6">
                     <div class="w-1 h-7 sm:h-8 bg-gradient-to-b from-[#d4af37] to-[#f5e6a8] rounded-full"></div>
-                    <h2 class="font-display text-2xl sm:text-3xl font-bold text-white">What's Nearby</h2>
+                    <h2 class="font-display text-2xl sm:text-3xl font-bold text-[#0b1440]">What's Nearby</h2>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                     {% for place in property.nearby_places %}
-                    <div class="bg-white/[0.04] p-4 sm:p-5 rounded-xl flex items-center justify-between hover:bg-white/[0.08] transition duration-300 border border-[#d4af37]/15">
+                    <div class="bg-white p-4 sm:p-5 rounded-xl flex items-center justify-between hover:bg-[#f7f4ec] transition duration-300 border border-[#d4af37]/20 shadow-sm shadow-black/5">
                         <div class="flex items-center gap-3 sm:gap-4 min-w-0">
                             <span class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-[#d4af37]/15 flex items-center justify-center text-lg sm:text-xl flex-shrink-0">
                                 {% if place.icon == "school" %}🏫
@@ -390,8 +390,8 @@
                                 {% else %}📍{% endif %}
                             </span>
                             <div class="min-w-0">
-                                <span class="font-semibold text-white block truncate text-sm sm:text-base">{{ place.name }}</span>
-                                <span class="text-[#8891a5] text-xs sm:text-sm">{{ place.distance }}</span>
+                                <span class="font-semibold text-[#0b1440] block truncate text-sm sm:text-base">{{ place.name }}</span>
+                                <span class="text-[#6b7280] text-xs sm:text-sm">{{ place.distance }}</span>
                             </div>
                         </div>
                     </div>
@@ -405,16 +405,16 @@
 <div class="reveal">
     <div class="flex items-center gap-3 mb-4 sm:mb-6">
         <div class="w-1 h-7 sm:h-8 bg-gradient-to-b from-[#d4af37] to-[#f5e6a8] rounded-full"></div>
-        <h2 class="font-display text-2xl sm:text-3xl font-bold text-white">Location</h2>
+        <h2 class="font-display text-2xl sm:text-3xl font-bold text-[#0b1440]">Location</h2>
     </div>
 
     <!-- Map Container -->
-    <div class="rounded-2xl overflow-hidden border border-[#d4af37]/15 shadow-2xl">
+    <div class="rounded-2xl overflow-hidden border border-[#d4af37]/20 shadow-xl shadow-black/5">
         <div id="propertyDetailMap" style="height: 280px; width: 100%; z-index: 1;" class="sm:!h-[420px]"></div>
     </div>
 
     <!-- Location Label -->
-    <p class="text-[#9aa3ba] text-sm mt-3 flex items-center gap-2">
+    <p class="text-[#6b7280] text-sm mt-3 flex items-center gap-2">
         <svg class="w-4 h-4 text-[#d4af37] shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
             <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
@@ -530,7 +530,7 @@
             <div class="reveal">
                 <div class="flex items-center gap-3 mb-4 sm:mb-6">
                     <div class="w-1 h-7 sm:h-8 bg-gradient-to-b from-[#d4af37] to-[#f5e6a8] rounded-full"></div>
-                    <h2 class="font-display text-2xl sm:text-3xl font-bold text-white">Similar Properties</h2>
+                    <h2 class="font-display text-2xl sm:text-3xl font-bold text-[#0b1440]">Similar Properties</h2>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
                     {% for p in similar_properties %}

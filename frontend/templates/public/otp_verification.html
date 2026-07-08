@@ -5,15 +5,16 @@
 
 <section class="min-h-[100dvh] flex items-center justify-center luxury-bg px-4 sm:px-6 py-10">
 
-<div class="max-w-md w-full backdrop-blur-xl bg-white/[0.04] border border-[#d4af37]/15 p-6 sm:p-10 rounded-3xl shadow-2xl text-center reveal">
+<div class="max-w-md w-full card-luxury text-center reveal">
 
-    <h2 class="text-2xl sm:text-3xl font-display gold mb-2">Verify Identity</h2>
-    <p class="text-[#9aa3ba] mb-8 text-sm">
+    <div class="hex-divider mb-3 mx-auto"></div>
+    <h2 class="text-2xl sm:text-3xl font-display gold mb-2" style="font-family: 'Playfair Display', serif;">Verify Identity</h2>
+    <p class="text-[var(--text-muted)] mb-8 text-sm">
         Enter the 6-digit code sent to your email
     </p>
 
     {% if error %}
-    <p class="text-red-400 mb-4 text-sm">{{ error }}</p>
+    <p class="text-red-600 mb-4 text-sm">{{ error }}</p>
     {% endif %}
 
     <form method="POST" class="space-y-7 sm:space-y-8">
@@ -23,12 +24,12 @@
         <!-- OTP BOXES -->
         <div class="flex justify-center gap-2 sm:gap-3">
             {% for i in "123456" %}
-            <input class="otp-input w-11 h-13 sm:w-12 sm:h-14 text-center text-xl font-bold rounded-xl bg-white/[0.06] border border-white/15 text-[#ece7d8] focus:ring-2 focus:ring-[#d4af37] focus:border-[#d4af37]/50 outline-none"
+            <input class="otp-input w-11 h-13 sm:w-12 sm:h-14 text-center text-xl font-bold rounded-xl bg-[var(--bg-soft)] border border-[var(--border)] text-[var(--navy-deep)] focus:ring-2 focus:ring-[var(--gold-1)] focus:border-[var(--gold-1)] outline-none"
                    maxlength="1" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code"/>
             {% endfor %}
         </div>
 
-        <button class="w-full min-h-[52px] py-3 bg-gradient-to-r from-[#d4af37] to-[#f5e6a8] text-[#0a0f1f] font-bold rounded-xl active:scale-[0.98] transition">
+        <button class="btn-gold w-full min-h-[52px]">
             Verify OTP
         </button>
     </form>
