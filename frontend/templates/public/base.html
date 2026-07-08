@@ -5,9 +5,9 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
-<meta name="theme-color" content="#020617"/>
+<meta name="theme-color" content="#fdfcf9"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="default"/>
 <meta name="mobile-web-app-capable" content="yes"/>
 <meta name="format-detection" content="telephone=no"/>
 
@@ -29,14 +29,27 @@
 
 <style>
 :root{
-    --navy-deep:#020617;
-    --navy:#0b1224;
-    --navy-soft:#0f172a;
-    --gold-1:#d4af37;
-    --gold-2:#f5e6a8;
-    --ivory:#f5f1e8;
-    --slate:#94a3b8;
-    --hairline:rgba(212,175,55,0.18);
+    /* ===== Light theme — RealShri (navy + gold, logo-matched) ===== */
+    --bg:#fdfcf9;
+    --bg-soft:#f7f4ec;
+    --surface:#ffffff;
+    --surface-2:#fbf9f3;
+
+    --navy-deep:#0b1440;
+    --navy:#16224f;
+    --text-body:#33395a;
+    --text-muted:#6b7280;
+
+    --gold-1:#c9922a;
+    --gold-2:#f0cf72;
+    --gold-3:#d4af37;
+    --ivory:#0b1440; /* kept for compatibility, now used where dark text is needed */
+
+    --hairline:rgba(11,20,64,0.10);
+    --border:rgba(11,20,64,0.12);
+    --shadow-soft:0 4px 20px rgba(11,20,64,0.06);
+    --shadow-card:0 6px 24px rgba(11,20,64,0.08);
+
     --radius-lg:18px;
     --radius-md:12px;
     --tap-min:44px;
@@ -53,10 +66,10 @@ html{
 
 body {
     font-family:'Manrope', sans-serif;
-    background:var(--navy-deep);
-    color:var(--ivory);
-    font-size:clamp(15px, 0.95vw + 12px, 16.5px);
-    line-height:1.6;
+    background:var(--bg);
+    color:var(--text-body);
+    font-size:clamp(16px, 0.9vw + 13px, 17px);
+    line-height:1.65;
     padding-top:env(safe-area-inset-top);
     padding-bottom:env(safe-area-inset-bottom);
     overflow-x:hidden;
@@ -65,19 +78,20 @@ body {
 h1,h2,h3,h4,.font-display{
     font-family:'Playfair Display', serif;
     letter-spacing:0.01em;
+    color:var(--navy-deep);
 }
 
 /* Fluid heading scale — mobile pehle, phir bada screen */
-h1{ font-size:clamp(1.9rem, 5vw + 1rem, 3.4rem); line-height:1.15; }
-h2{ font-size:clamp(1.5rem, 3.2vw + 1rem, 2.5rem); line-height:1.2; }
-h3{ font-size:clamp(1.2rem, 2vw + 1rem, 1.6rem); line-height:1.3; }
+h1{ font-size:clamp(1.9rem, 5vw + 1rem, 3.4rem); line-height:1.18; }
+h2{ font-size:clamp(1.5rem, 3.2vw + 1rem, 2.5rem); line-height:1.25; }
+h3{ font-size:clamp(1.2rem, 2vw + 1rem, 1.6rem); line-height:1.35; }
 
-/* Luxury gradient background (sections) */
+/* Section background variant (soft ivory band, replaces old dark gradient) */
 .luxury-bg {
-    background: linear-gradient(135deg, var(--navy-soft), var(--navy-deep));
+    background: linear-gradient(180deg, var(--bg-soft), var(--bg));
 }
 
-/* Gold gradient text — logo match */
+/* Gold gradient text — logo "SHRI" match */
 .gold {
     background: linear-gradient(to right, var(--gold-1), var(--gold-2));
     -webkit-background-clip: text;
@@ -95,9 +109,9 @@ h3{ font-size:clamp(1.2rem, 2vw + 1rem, 1.6rem); line-height:1.3; }
     -webkit-text-fill-color: transparent;
 }
 
-/* Hero overlay */
+/* Hero overlay — image ke upar text readable rakhne ke liye (light theme mein bhi zaroori) */
 .hero-overlay {
-    background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.9));
+    background: linear-gradient(to bottom, rgba(11,20,64,0.15), rgba(11,20,64,0.75));
 }
 
 /* Smooth zoom */
@@ -106,12 +120,13 @@ h3{ font-size:clamp(1.2rem, 2vw + 1rem, 1.6rem); line-height:1.3; }
     100% { transform: scale(1.2); }
 }
 
-/* Reusable luxury card — mobile-friendly padding */
+/* Reusable card — clean white surface, soft shadow instead of dark glass */
 .card-luxury{
-    background:linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.015));
-    border:1px solid var(--hairline);
+    background:var(--surface);
+    border:1px solid var(--border);
     border-radius:var(--radius-lg);
     padding:clamp(1rem, 3vw, 1.75rem);
+    box-shadow:var(--shadow-card);
 }
 
 /* Primary gold button — full-width friendly on mobile, min tap size */
@@ -123,14 +138,15 @@ h3{ font-size:clamp(1.2rem, 2vw + 1rem, 1.6rem); line-height:1.3; }
     min-height:var(--tap-min);
     padding:0.75rem 1.5rem;
     border-radius:999px;
-    font-weight:600;
-    color:var(--navy-deep);
-    background:linear-gradient(to right, var(--gold-1), var(--gold-2));
+    font-weight:700;
+    color:#ffffff;
+    background:linear-gradient(to right, var(--gold-1), var(--gold-3));
+    box-shadow:0 4px 14px rgba(201,146,42,0.30);
     transition:transform 0.2s ease, box-shadow 0.2s ease;
 }
 .btn-gold:active{ transform:scale(0.97); }
 @media(hover:hover){
-    .btn-gold:hover{ box-shadow:0 8px 24px rgba(212,175,55,0.35); }
+    .btn-gold:hover{ box-shadow:0 8px 22px rgba(201,146,42,0.42); }
 }
 
 /* Outline button */
@@ -143,12 +159,15 @@ h3{ font-size:clamp(1.2rem, 2vw + 1rem, 1.6rem); line-height:1.3; }
     padding:0.75rem 1.5rem;
     border-radius:999px;
     font-weight:600;
-    color:var(--gold-2);
-    border:1px solid var(--gold-1);
-    background:transparent;
+    color:var(--navy-deep);
+    border:1.5px solid var(--gold-1);
+    background:var(--surface);
     transition:background 0.2s ease;
 }
-.btn-outline-gold:active{ background:rgba(212,175,55,0.12); }
+.btn-outline-gold:active{ background:var(--bg-soft); }
+@media(hover:hover){
+    .btn-outline-gold:hover{ background:var(--bg-soft); }
+}
 
 /* Hexagon accent divider — logo ke hexagon icon se liya signature motif */
 .hex-divider{
@@ -172,22 +191,22 @@ h3{ font-size:clamp(1.2rem, 2vw + 1rem, 1.6rem); line-height:1.3; }
 }
 
 /* Links inside content */
-a{ text-underline-offset:3px; }
+a{ text-underline-offset:3px; color:var(--navy-deep); }
 
 /* Accessible focus state — keyboard + screen readers */
 a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible{
-    outline:2px solid var(--gold-2);
+    outline:2px solid var(--gold-1);
     outline-offset:2px;
     border-radius:6px;
 }
 
 /* Selection color matches brand */
-::selection{ background:var(--gold-1); color:var(--navy-deep); }
+::selection{ background:var(--gold-2); color:var(--navy-deep); }
 
 /* Slim gold scrollbar (desktop) */
 ::-webkit-scrollbar{ width:8px; height:8px; }
-::-webkit-scrollbar-track{ background:var(--navy-deep); }
-::-webkit-scrollbar-thumb{ background:linear-gradient(var(--gold-1), var(--gold-2)); border-radius:8px; }
+::-webkit-scrollbar-track{ background:var(--bg-soft); }
+::-webkit-scrollbar-thumb{ background:linear-gradient(var(--gold-1), var(--gold-3)); border-radius:8px; }
 
 /* Respect users who prefer less motion */
 @media (prefers-reduced-motion: reduce){
@@ -198,7 +217,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
 <title>{% block title %}{% endblock %}</title>
 </head>
 
-<body class="bg-black text-white">
+<body>
 
 {% include "public/navbar.html" %}
 

@@ -215,6 +215,23 @@ TEMPLATES = [
 ]
 
 # =============================================================================
+# RAZORPAY PAYMENT GATEWAY SETTINGS
+# =============================================================================
+
+# Get from Razorpay Dashboard -> Settings -> API Keys
+RAZORPAY_KEY_ID = os.environ.get('RAZORPAY_KEY_ID', 'rzp_test_YOUR_TEST_KEY_HERE')
+RAZORPAY_KEY_SECRET = os.environ.get('RAZORPAY_KEY_SECRET', 'YOUR_TEST_SECRET_HERE')
+
+# Webhook secret (optional but recommended for production)
+RAZORPAY_WEBHOOK_SECRET = os.environ.get('RAZORPAY_WEBHOOK_SECRET', '')
+
+# =============================================================================
+# SUBSCRIPTION SETTINGS
+# =============================================================================
+SUBSCRIPTION_GRACE_PERIOD_DAYS = 3
+SUBSCRIPTION_TRIAL_DAYS = 0
+
+# =============================================================================
 # DATABASE
 # =============================================================================
 

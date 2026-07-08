@@ -22,7 +22,7 @@ class CoreConfig(AppConfig):
         # 3. Auto-create Google SocialApp
         self._init_social_app()
         
-        logger.info("✅ Core app initialized")
+        logger.info(" Core app initialized")
 
     def _is_management_command(self):
         """Detect if running management command"""
@@ -46,7 +46,7 @@ class CoreConfig(AppConfig):
         try:
             from django.core.management import call_command
             call_command('createcachetable', verbosity=0)
-            logger.info("✅ Cache table auto-created")
+            logger.info(" Cache table auto-created")
         except Exception as e:
             logger.warning(f"⚠️ Cache table: {e}")
 
@@ -57,7 +57,7 @@ class CoreConfig(AppConfig):
                 cursor.execute("SET SESSION idle_in_transaction_session_timeout = '30s';")
                 cursor.execute("SET SESSION statement_timeout = '30s';")
                 cursor.execute("SET SESSION work_mem = '8MB';")
-                logger.info("✅ PostgreSQL optimized")
+                logger.info(" PostgreSQL optimized")
         except Exception as e:
             logger.debug(f"PG optimize: {e}")
 

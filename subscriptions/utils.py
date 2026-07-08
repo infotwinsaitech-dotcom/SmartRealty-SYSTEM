@@ -1,12 +1,13 @@
 """
-Ye helper functions core/views.py me import karke use karo, taaki limit-check
-logic ek hi jagah rahe. Plan ke price/limits badalne ke liye is file ko touch
-karne ki zaroorat NAHI — sirf plans_config.py edit karo.
+Ye helper functions core/views.py me import karke use karo.
+Admin se directly DB me plans customize hote hain — no code deploy needed.
 """
 
 from datetime import date
 
 from django.core.exceptions import PermissionDenied
+from core.models import UserSubscription
+from .models import SubscriptionPlan, CouponCode
 
 
 class LimitExceeded(Exception):
@@ -34,9 +35,6 @@ def get_active_subscription(user):
 def get_plan_limits(user):
     """
     Returns a dict of limits for the user's current plan.
-    Agar koi active subscription nahi hai, to ek safe default (free-tier
-    jaisa) limit return karta hai — isse purane users bhi block nahi honge
-    jab tak tum khud unko migrate na karo.
     """
     sub = get_active_subscription(user)
     if sub is None or sub.plan is None:
@@ -63,12 +61,7 @@ def has_feature(user, feature_flag):
 
 
 def check_property_limit(user):
-    """
-    Call this BEFORE creating a new Property for this builder.
-    Raises LimitExceeded if the builder is already at their plan's cap.
-    """
-    from core.models import Property  # local import avoids circular import
-
+    from core.models import Property
     limits = get_plan_limits(user)
     current_count = Property.objects.filter(builder=user).count()
     if current_count >= limits["max_properties"]:
@@ -82,9 +75,7 @@ def check_property_limit(user):
 
 
 def check_agent_limit(user):
-    """Call this BEFORE linking a new Agent to this builder."""
-    from core.models import Agent  # local import avoids circular import
-
+    from core.models import Agent
     limits = get_plan_limits(user)
     current_count = Agent.objects.filter(builders=user).count()
     if current_count >= limits["max_agents"]:
@@ -97,9 +88,7 @@ def check_agent_limit(user):
 
 
 def check_lead_limit(user):
-    """Call this BEFORE creating a new Lead under this builder/agent."""
-    from core.models import Lead  # adjust related_name if different
-
+    from core.models import Lead
     limits = get_plan_limits(user)
     current_count = Lead.objects.filter(properties__builder=user).distinct().count()
     if current_count >= limits["max_leads"]:

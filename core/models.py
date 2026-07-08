@@ -1158,9 +1158,14 @@ class AIInsight(models.Model):
         return self.title
 
     def is_expired(self):
-        if self.expires_at:
-            return timezone.now() > self.expires_at
-        return False
+        from datetime import date
+        return self.end_date < date.today()
+    
+    def days_remaining(self):
+        from datetime import date
+        if self.end_date < date.today():
+            return 0
+        return (self.end_date - date.today()).days
 
 
 # =============================================================================
@@ -1751,11 +1756,21 @@ class UserSubscription(models.Model):
         related_name='subscription'
     )
     plan = models.ForeignKey(
-        SubscriptionPlan,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True
-    )
+    'subscriptions.SubscriptionPlan',  # <-- YEH CHANGE KARO (was 'SubscriptionPlan' only)
+    on_delete=models.SET_NULL,
+    null=True,
+    blank=True
+)
+    current_order = models.ForeignKey(
+    'subscriptions.RazorpayOrder',
+    on_delete=models.SET_NULL,
+    null=True,
+    blank=True,
+    related_name='active_subscription'
+)
+    razorpay_subscription_id = models.CharField(max_length=100, blank=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
     start_date = models.DateField()
     end_date = models.DateField()
     is_active = models.BooleanField(default=True)
@@ -1776,6 +1791,14 @@ class UserSubscription(models.Model):
         indexes = [
             Index(fields=['user', 'is_active']),
         ]
+    def is_expired(self):
+        from datetime import date
+        return self.end_date < date.today()
+    def days_remaining(self):
+            from datetime import date
+            if self.end_date < date.today():
+                return 0
+            return (self.end_date - date.today()).days
 
     def __str__(self):
         return f"{self.user.username} - {self.plan.name if self.plan else 'No Plan'}"
