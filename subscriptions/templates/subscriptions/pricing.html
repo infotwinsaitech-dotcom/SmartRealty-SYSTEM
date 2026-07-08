@@ -141,7 +141,7 @@
         <li>👤 {{ plan.max_agents }} Agents</li>
         <li>📋 {{ plan.max_leads }} Leads</li>
         {% for feature in plan.features %}
-        <li class="text-gray-400">✅ {{ feature|title|replace:"_"," " }}</li>
+        <li class="text-gray-400">✅ {{ feature|feature_label }}</li>
         {% endfor %}
       </ul>
 
@@ -202,7 +202,7 @@
         <li>🏠 {{ plan.max_properties }} Properties</li>
         <li>📋 {{ plan.max_leads }} Leads</li>
         {% for feature in plan.features %}
-        <li class="text-gray-400">✅ {{ feature|title|replace:"_"," " }}</li>
+        <li class="text-gray-400">✅ {{ feature|feature_label }}</li>
         {% endfor %}
       </ul>
 

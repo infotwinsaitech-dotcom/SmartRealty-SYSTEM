@@ -24,6 +24,20 @@ def div(value, arg):
     except (ValueError, ZeroDivisionError, TypeError):
         return 0
     
+@register.filter(name='feature_label')
+def feature_label(value):
+    """
+    Turns a feature flag like 'whatsapp_alerts' into 'Whatsapp Alerts'.
+    Django filters can only take ONE argument, so a Python-style
+    `|replace:"_"," "` is invalid syntax (that's what was crashing pricing.html
+    with 'Invalid filter: replace'). Use this instead: {{ feature|feature_label }}
+    """
+    try:
+        return str(value).replace('_', ' ').title()
+    except Exception:
+        return value
+
+
 @register.filter
 def get_item(dictionary, key):
     """Dictionary se key se value nikalo: {{ mydict|get_item:plan.id }}"""

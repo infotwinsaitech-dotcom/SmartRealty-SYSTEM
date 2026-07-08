@@ -294,3 +294,16 @@ INFO 2026-07-08 13:47:38,492 views views.py loaded successfully
 INFO 2026-07-08 13:47:43,774 apps  PostgreSQL optimized
 INFO 2026-07-08 13:47:43,777 apps  Core app initialized
 INFO 2026-07-08 13:47:43,880 views views.py loaded successfully
+INFO 2026-07-08 21:21:58,131 apps  PostgreSQL optimized
+INFO 2026-07-08 21:21:58,133 apps  Core app initialized
+INFO 2026-07-08 21:22:02,498 apps  PostgreSQL optimized
+INFO 2026-07-08 21:22:02,498 apps  Core app initialized
+INFO 2026-07-08 21:22:02,531 autoreload Watching for file changes with StatReloader
+INFO 2026-07-08 21:22:02,660 views views.py loaded successfully
+WARNING 2026-07-08 21:23:00,163 middleware SLOW REQUEST: GET / took 27.62s User: Anonymous
+INFO 2026-07-08 21:23:00,169 basehttp - Broken pipe from ('127.0.0.1', 55204)
+INFO 2026-07-08 21:39:57,510 autoreload C:\Users\DELL-PC\Desktop\Builder\SmartRealty-SYSTEM\core\templatetags\custom_filters.py changed, reloading.
+INFO 2026-07-08 21:40:03,285 apps  PostgreSQL optimized
+INFO 2026-07-08 21:40:03,285 apps  Core app initialized
+INFO 2026-07-08 21:40:03,368 autoreload Watching for file changes with StatReloader
+INFO 2026-07-08 21:40:03,607 views views.py loaded successfully
