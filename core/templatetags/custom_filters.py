@@ -23,3 +23,13 @@ def div(value, arg):
         return float(value) / float(arg)
     except (ValueError, ZeroDivisionError, TypeError):
         return 0
+    
+@register.filter
+def get_item(dictionary, key):
+    """Dictionary se key se value nikalo: {{ mydict|get_item:plan.id }}"""
+    if dictionary is None:
+        return None
+    try:
+        return dictionary.get(key)
+    except (AttributeError, TypeError):
+        return None
