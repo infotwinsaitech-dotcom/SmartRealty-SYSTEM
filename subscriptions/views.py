@@ -189,6 +189,78 @@ def create_razorpay_order(request):
             except CouponCode.DoesNotExist:
                 request.session.pop('applied_coupon', None)
 
+        # ---------------------------------------------------------------
+        # FREE PLAN HANDLING (e.g. 100% discount coupon)
+        # Razorpay doesn't allow ₹0 orders, so if the final amount is
+        # zero or less, activate the subscription directly without
+        # ever calling Razorpay.
+        # ---------------------------------------------------------------
+        if base_amount <= 0:
+            with transaction.atomic():
+                order = RazorpayOrder.objects.create(
+                    user=request.user,
+                    plan=plan,
+                    razorpay_order_id=f"FREE_{request.user.id}_{plan.id}_{int(time.time())}",
+                    razorpay_payment_id="FREE_COUPON",
+                    original_amount=plan.price_monthly if billing_cycle == 'monthly' else plan.price_yearly,
+                    discount_amount=discount_amount,
+                    final_amount=Decimal('0'),
+                    coupon=coupon,
+                    billing_cycle=billing_cycle,
+                    status='paid',
+                    notes={
+                        'user_id': request.user.id,
+                        'plan_id': plan.id,
+                        'plan_name': plan.name,
+                        'billing_cycle': billing_cycle,
+                        'coupon_code': coupon.code if coupon else None,
+                        'free_via_coupon': True,
+                    }
+                )
+
+                today = date.today()
+                end_date = today + timedelta(days=365 if billing_cycle == 'yearly' else 30)
+
+                UserSubscription.objects.update_or_create(
+                    user=request.user,
+                    defaults={
+                        'plan': plan,
+                        'current_order': order,
+                        'start_date': today,
+                        'end_date': end_date,
+                        'is_active': True,
+                        'auto_renew': True,
+                        'payment_status': 'PAID',
+                    }
+                )
+
+                if coupon:
+                    CouponUsage.objects.create(
+                        coupon=coupon,
+                        user=request.user,
+                        order=order,
+                        discount_amount=discount_amount
+                    )
+                    coupon.used_count += 1
+                    coupon.save(update_fields=['used_count'])
+
+                request.session.pop('applied_coupon', None)
+
+            from django.urls import reverse
+            if request.user.role == 'builder':
+                redirect_url = reverse('builder_dashboard')
+            elif request.user.role == 'agent':
+                redirect_url = reverse('agent_dashboard')
+            else:
+                redirect_url = reverse('subscriptions:pricing')
+
+            return JsonResponse({
+                "success": True,
+                "free": True,
+                "message": f"'{plan.name}' activated for free!",
+                "redirect_url": redirect_url,
+            })
+
         amount_in_paise = int(base_amount * 100)
 
         razorpay_order_data = {

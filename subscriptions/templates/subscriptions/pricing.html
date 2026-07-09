@@ -302,6 +302,13 @@ function payNow(planId) {
       btn.disabled = false;
       return;
     }
+
+    if (data.free) {
+      btn.innerHTML = '✅ Activated!';
+      alert(data.message || 'Plan activated for free!');
+      window.location.href = data.redirect_url || '{% url "subscriptions:pricing" %}';
+      return;
+    }
     
     const options = {
       key: data.key_id,
