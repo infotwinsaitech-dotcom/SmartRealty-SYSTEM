@@ -151,6 +151,14 @@ path('accounts/', include('allauth.urls')),
     path("builder/property-map/", views.property_map, name="property_map"),
     # urls.py
     path("property-map/", views.property_map_public, name="property_map_public"),
+    path('', views.home, name='home'),
+    path('properties/', views.property_list, name='property_list'),
+    path('property/<int:id>/', views.property_detail, name='property_detail'),
+    path('login/', views.login_view, name='login'),
+    path('register/', views.register_view, name='register'),
+    path('contact/', views.contact, name='contact'),
+    path('wishlist/', views.wishlist, name='wishlist'),
+    path('profile/', views.profile, name='profile'),
     
 ]
 

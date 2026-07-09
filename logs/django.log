@@ -314,3 +314,122 @@ INFO 2026-07-08 22:02:43,982 apps  PostgreSQL optimized
 WARNING 2026-07-08 22:02:44,315 apps [AUTO-SETUP] Google credentials not set!
 INFO 2026-07-08 22:02:44,315 apps  Core app initialized
 INFO 2026-07-08 22:02:44,397 views views.py loaded successfully
+INFO 2026-07-09 21:21:08,223 apps  PostgreSQL optimized
+INFO 2026-07-09 21:21:08,223 apps  Core app initialized
+INFO 2026-07-09 21:21:12,212 apps  PostgreSQL optimized
+INFO 2026-07-09 21:21:12,229 apps  Core app initialized
+INFO 2026-07-09 21:21:12,251 autoreload Watching for file changes with StatReloader
+INFO 2026-07-09 21:21:12,428 views views.py loaded successfully
+ERROR 2026-07-09 21:21:44,072 log Internal Server Error: /
+Traceback (most recent call last):
+  File "C:\Users\DELL-PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL-PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL-PC\Desktop\Builder\SmartRealty-SYSTEM\core\views.py", line 266, in home
+    return render(request, "public/index.html", {"properties": properties})
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL-PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL-PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL-PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\backends\django.py", line 107, in render
+    return self.template.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL-PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\base.py", line 172, in render
+    return self._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL-PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\base.py", line 164, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL-PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL-PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL-PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL-PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\loader_tags.py", line 159, in render
+    return compiled_parent._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL-PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\base.py", line 164, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL-PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL-PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL-PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL-PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\loader_tags.py", line 210, in render
+    return template.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL-PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\base.py", line 174, in render
+    return self._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL-PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\base.py", line 164, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL-PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL-PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL-PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL-PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\defaulttags.py", line 480, in render
+    url = reverse(view_name, args=args, kwargs=kwargs, current_app=current_app)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL-PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\urls\base.py", line 98, in reverse
+    resolved_url = resolver._reverse_with_prefix(view, prefix, *args, **kwargs)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL-PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\urls\resolvers.py", line 831, in _reverse_with_prefix
+    raise NoReverseMatch(msg)
+django.urls.exceptions.NoReverseMatch: Reverse for 'home' not found. 'home' is not a valid view function or pattern name.
+WARNING 2026-07-09 21:21:44,076 middleware SLOW REQUEST: GET / took 5.70s User: Anonymous
+ERROR 2026-07-09 21:21:44,079 basehttp "GET / HTTP/1.1" 500 196546
+WARNING 2026-07-09 21:21:44,221 log Not Found: /favicon.ico
+WARNING 2026-07-09 21:21:44,222 basehttp "GET /favicon.ico HTTP/1.1" 404 62285
+INFO 2026-07-09 21:29:12,968 autoreload C:\Users\DELL-PC\Desktop\Builder\SmartRealty-SYSTEM\core\urls.py changed, reloading.
+INFO 2026-07-09 21:29:17,512 apps  PostgreSQL optimized
+INFO 2026-07-09 21:29:17,513 apps  Core app initialized
+INFO 2026-07-09 21:29:17,556 autoreload Watching for file changes with StatReloader
+INFO 2026-07-09 21:29:17,673 views views.py loaded successfully
+INFO 2026-07-09 21:29:55,151 apps  PostgreSQL optimized
+INFO 2026-07-09 21:29:55,151 apps  Core app initialized
+INFO 2026-07-09 21:29:58,500 apps  PostgreSQL optimized
+INFO 2026-07-09 21:29:58,500 apps  Core app initialized
+INFO 2026-07-09 21:29:58,541 autoreload Watching for file changes with StatReloader
+INFO 2026-07-09 21:29:58,591 views views.py loaded successfully
+WARNING 2026-07-09 21:30:15,249 middleware SLOW REQUEST: GET / took 5.12s User: Anonymous
+INFO 2026-07-09 21:30:15,250 basehttp "GET / HTTP/1.1" 200 104270
+INFO 2026-07-09 21:30:15,351 basehttp "GET /static/images/logo.png HTTP/1.1" 200 336652
+WARNING 2026-07-09 21:30:16,686 log Not Found: /favicon.ico
+WARNING 2026-07-09 21:30:16,687 basehttp "GET /favicon.ico HTTP/1.1" 404 66441
+WARNING 2026-07-09 21:30:36,921 middleware SLOW REQUEST: GET /properties/ took 1.43s User: Anonymous
+INFO 2026-07-09 21:30:36,922 basehttp "GET /properties/ HTTP/1.1" 200 148350
+WARNING 2026-07-09 21:31:07,555 middleware SLOW REQUEST: GET /property-map/ took 3.43s User: Anonymous
+INFO 2026-07-09 21:31:07,557 basehttp "GET /property-map/ HTTP/1.1" 200 86276
+INFO 2026-07-09 21:31:21,470 basehttp "GET /about/ HTTP/1.1" 200 75764
+INFO 2026-07-09 21:31:21,533 basehttp "GET /static/images/about.jpg HTTP/1.1" 200 2738045
+WARNING 2026-07-09 21:31:31,146 middleware SLOW REQUEST: GET /contact/ took 1.05s User: Anonymous
+INFO 2026-07-09 21:31:31,149 basehttp "GET /contact/ HTTP/1.1" 200 75583
+WARNING 2026-07-09 21:31:44,759 middleware SLOW REQUEST: GET / took 1.43s User: Anonymous
+INFO 2026-07-09 21:31:44,761 basehttp "GET / HTTP/1.1" 200 104270
+WARNING 2026-07-09 21:32:44,928 middleware SLOW REQUEST: GET /properties/ took 1.40s User: Anonymous
+INFO 2026-07-09 21:32:44,931 basehttp "GET /properties/ HTTP/1.1" 200 148350
+WARNING 2026-07-09 21:33:05,904 middleware SLOW REQUEST: GET /properties/ took 1.16s User: Anonymous
+INFO 2026-07-09 21:33:05,906 basehttp "GET /properties/?category=commercial&location=&beds=&min_price=&min_price_unit=L&max_price=&max_price_unit=L&possession= HTTP/1.1" 200 106987
+WARNING 2026-07-09 21:33:09,202 middleware SLOW REQUEST: GET /properties/ took 1.24s User: Anonymous
+INFO 2026-07-09 21:33:09,203 basehttp "GET /properties/?category=land&location=&beds=&min_price=&min_price_unit=L&max_price=&max_price_unit=L&possession= HTTP/1.1" 200 106981
