@@ -1,5 +1,4 @@
-
-property_list_html = '''{% extends "public/base.html" %}
+{% extends "public/base.html" %}
 {% load static cloudinary custom_filters %}
 {% block title %}Properties - RealShri{% endblock %}
 
@@ -523,10 +522,4 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
-{% endblock %}'''
-
-with open('/mnt/agents/output/property_list.html', 'w', encoding='utf-8') as f:
-    f.write(property_list_html)
-
-print("property_list.html saved successfully!")
-print(f"File size: {len(property_list_html)} characters")
+{% endblock %}

@@ -1,5 +1,4 @@
-
-property_detail_html = '''{% extends "public/base.html" %}
+{% extends "public/base.html" %}
 {% load static cloudinary custom_filters %}
 {% block title %}{{ property.project_name|default:property.title }} | RealShri{% endblock %}
 
@@ -585,10 +584,4 @@ document.addEventListener('keydown', e => {
 })();
 </script>
 
-{% endblock %}'''
-
-with open('/mnt/agents/output/property_detail.html', 'w', encoding='utf-8') as f:
-    f.write(property_detail_html)
-
-print("property_detail.html saved successfully!")
-print(f"File size: {len(property_detail_html)} characters")
+{% endblock %}

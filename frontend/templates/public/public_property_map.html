@@ -1,5 +1,4 @@
-
-property_map_html = '''{% extends "public/base.html" %}
+{% extends "public/base.html" %}
 {% load static cloudinary custom_filters %}
 {% block title %}Property Map - RealShri{% endblock %}
 
@@ -327,10 +326,4 @@ createMarkers();
 }
 </style>
 
-{% endblock %}'''
-
-with open('/mnt/agents/output/public_property_map.html', 'w', encoding='utf-8') as f:
-    f.write(property_map_html)
-
-print("public_property_map.html saved successfully!")
-print(f"File size: {len(property_map_html)} characters")
+{% endblock %}

@@ -1,478 +1,216 @@
+{% extends "public/base.html" %}
+{% load static %}
 
-navbar_html = '''{% load static %}
+{% block title %}Privacy Policy{% endblock %}
+
+{% block content %}
 
 <!-- ============================================
-   REALSHRI NAVBAR - Mobile First
-   Sticky, clean, thumb-friendly
-   ============================================ -->
-<nav id="mainNavbar" class="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b border-[rgba(15,23,42,0.08)] transition-transform duration-300" style="padding-top: env(safe-area-inset-top);">
-    <div class="container-app">
-        <div class="flex items-center justify-between h-14 md:h-16">
-            
-            <!-- LOGO -->
-            <a href="{% url 'home' %}" class="flex items-center gap-2 shrink-0">
-                <img src="{% static 'images/logo.png' %}" alt="RealShri" class="h-8 md:h-10 w-auto object-contain">
-            </a>
-            
-            <!-- DESKTOP MENU -->
-            <div class="hidden lg:flex items-center gap-1">
-                <a href="{% url 'home' %}" class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}">
-                    <span class="material-icons-round" style="font-size:18px">home</span>
-                    Home
-                </a>
-                <a href="{% url 'property_list' %}" class="nav-link {% if request.resolver_match.url_name == 'property_list' %}active{% endif %}">
-                    <span class="material-icons-round" style="font-size:18px">apartment</span>
-                    Properties
-                </a>
-                <a href="{% url 'property_map_public' %}" class="nav-link {% if request.resolver_match.url_name == 'property_map_public' %}active{% endif %}">
-                    <span class="material-icons-round" style="font-size:18px">map</span>
-                    Map
-                </a>
-                
-                <!-- Calculators Dropdown -->
-                <div class="relative group">
-                    <button class="nav-link">
-                        <span class="material-icons-round" style="font-size:18px">calculate</span>
-                        Calculators
-                        <span class="material-icons-round" style="font-size:16px;transition:transform 0.2s">expand_more</span>
-                    </button>
-                    <div class="absolute top-full left-0 mt-1 bg-white rounded-xl shadow-lg border border-[rgba(15,23,42,0.08)] py-2 min-w-[200px] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-                        <a href="{% url 'emi_calculator' %}" class="dropdown-item">
-                            <span class="material-icons-round" style="font-size:18px;color:var(--color-gold)">credit_card</span>
-                            EMI Calculator
+     PRIVACY POLICY - RealShri
+     Mobile-first, clean, content-rich
+     ============================================ -->
+
+<!-- Hero Section -->
+<section class="hero-section" style="min-height: 25vh; max-height: 32vh;">
+    <div class="hero-content" style="max-width: 700px;">
+        <div style="display: inline-flex; align-items: center; gap: 8px; background: rgba(212,175,55,0.15); padding: 6px 16px; border-radius: 9999px; margin-bottom: 16px;">
+            <span class="material-icons-round" style="font-size: 18px; color: var(--color-gold);">privacy_tip</span>
+            <span style="font-size: 0.85rem; font-weight: 600; color: var(--color-gold);">Legal</span>
+        </div>
+        <h1 class="hero-title" style="font-size: clamp(1.5rem, 4vw, 2.25rem);">Privacy Policy</h1>
+        <p class="hero-subtitle" style="font-size: clamp(0.9rem, 2vw, 1.05rem);">
+            Your privacy is important to us. This policy explains how we collect, use, and protect your information.
+        </p>
+    </div>
+</section>
+
+<!-- Content -->
+<div class="container-app section-pad" style="padding-top: clamp(1.5rem, 4vw, 2.5rem);">
+
+    <!-- Last Updated -->
+    <div style="text-align: center; margin-bottom: var(--space-xl);">
+        <div style="display: inline-flex; align-items: center; gap: 8px; background: var(--color-bg-soft); padding: 8px 20px; border-radius: var(--radius-full); border: 1px solid var(--color-border);">
+            <span class="material-icons-round" style="font-size: 16px; color: var(--color-text-muted);">update</span>
+            <span style="font-size: 0.8rem; color: var(--color-text-muted); font-weight: 500;">Last Updated: July 2026</span>
+        </div>
+    </div>
+
+    <!-- Sections -->
+    <div style="display: flex; flex-direction: column; gap: var(--space-lg); max-width: 800px; margin-inline: auto;">
+
+        <!-- Section 1 -->
+        <div class="card" style="padding: var(--space-lg); border-radius: var(--radius-xl);">
+            <div style="display: flex; align-items: flex-start; gap: var(--space-md);">
+                <div style="width: 40px; height: 40px; border-radius: var(--radius-md); background: linear-gradient(135deg, rgba(212,175,55,0.12), rgba(212,175,55,0.04)); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--color-gold);">
+                    <span class="material-icons-round" style="font-size: 20px;">inventory_2</span>
+                </div>
+                <div style="flex: 1;">
+                    <h2 style="font-size: 1.1rem; font-weight: 700; color: var(--color-navy); margin-bottom: 8px;">1. Information We Collect</h2>
+                    <p style="font-size: 0.9rem; color: var(--color-text-muted); line-height: 1.7; margin: 0;">
+                        We collect personal information such as your name, email address, phone number, and any details you provide when submitting inquiries or forms on our website. We also collect browsing data to improve your experience.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 2 -->
+        <div class="card" style="padding: var(--space-lg); border-radius: var(--radius-xl);">
+            <div style="display: flex; align-items: flex-start; gap: var(--space-md);">
+                <div style="width: 40px; height: 40px; border-radius: var(--radius-md); background: linear-gradient(135deg, rgba(59,130,246,0.12), rgba(59,130,246,0.04)); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: #3b82f6;">
+                    <span class="material-icons-round" style="font-size: 20px;">build</span>
+                </div>
+                <div style="flex: 1;">
+                    <h2 style="font-size: 1.1rem; font-weight: 700; color: var(--color-navy); margin-bottom: 8px;">2. How We Use Your Information</h2>
+                    <ul style="margin: 0; padding-left: 20px; font-size: 0.9rem; color: var(--color-text-muted); line-height: 1.8;">
+                        <li>To respond to inquiries and provide customer support</li>
+                        <li>To improve our services and user experience</li>
+                        <li>To send updates or promotional offers (if applicable)</li>
+                        <li>To process property bookings and transactions</li>
+                        <li>To verify your identity and prevent fraud</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 3 -->
+        <div class="card" style="padding: var(--space-lg); border-radius: var(--radius-xl);">
+            <div style="display: flex; align-items: flex-start; gap: var(--space-md);">
+                <div style="width: 40px; height: 40px; border-radius: var(--radius-md); background: linear-gradient(135deg, rgba(16,185,129,0.12), rgba(16,185,129,0.04)); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--color-success);">
+                    <span class="material-icons-round" style="font-size: 20px;">security</span>
+                </div>
+                <div style="flex: 1;">
+                    <h2 style="font-size: 1.1rem; font-weight: 700; color: var(--color-navy); margin-bottom: 8px;">3. Data Protection</h2>
+                    <p style="font-size: 0.9rem; color: var(--color-text-muted); line-height: 1.7; margin: 0;">
+                        We implement strict security measures including SSL encryption, firewalls, and regular security audits to protect your personal data. Your information is stored on secure servers with restricted access. However, no method of transmission over the internet is 100% secure.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 4 -->
+        <div class="card" style="padding: var(--space-lg); border-radius: var(--radius-xl);">
+            <div style="display: flex; align-items: flex-start; gap: var(--space-md);">
+                <div style="width: 40px; height: 40px; border-radius: var(--radius-md); background: linear-gradient(135deg, rgba(168,85,247,0.12), rgba(168,85,247,0.04)); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: #a855f7;">
+                    <span class="material-icons-round" style="font-size: 20px;">share</span>
+                </div>
+                <div style="flex: 1;">
+                    <h2 style="font-size: 1.1rem; font-weight: 700; color: var(--color-navy); margin-bottom: 8px;">4. Sharing of Information</h2>
+                    <p style="font-size: 0.9rem; color: var(--color-text-muted); line-height: 1.7; margin: 0;">
+                        We do not sell, trade, or rent your personal information to third parties. Your data may only be shared with trusted partners for operational purposes such as payment processing, property verification, and legal compliance.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 5 -->
+        <div class="card" style="padding: var(--space-lg); border-radius: var(--radius-xl);">
+            <div style="display: flex; align-items: flex-start; gap: var(--space-md);">
+                <div style="width: 40px; height: 40px; border-radius: var(--radius-md); background: linear-gradient(135deg, rgba(245,158,11,0.12), rgba(245,158,11,0.04)); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: #f59e0b;">
+                    <span class="material-icons-round" style="font-size: 20px;">cookie</span>
+                </div>
+                <div style="flex: 1;">
+                    <h2 style="font-size: 1.1rem; font-weight: 700; color: var(--color-navy); margin-bottom: 8px;">5. Cookies</h2>
+                    <p style="font-size: 0.9rem; color: var(--color-text-muted); line-height: 1.7; margin: 0;">
+                        Our website uses cookies to enhance user experience, remember your preferences, and analyze website traffic. You can control cookies through your browser settings. Essential cookies are required for the website to function properly.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 6 -->
+        <div class="card" style="padding: var(--space-lg); border-radius: var(--radius-xl);">
+            <div style="display: flex; align-items: flex-start; gap: var(--space-md);">
+                <div style="width: 40px; height: 40px; border-radius: var(--radius-md); background: linear-gradient(135deg, rgba(239,68,68,0.12), rgba(239,68,68,0.04)); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--color-danger);">
+                    <span class="material-icons-round" style="font-size: 20px;">gavel</span>
+                </div>
+                <div style="flex: 1;">
+                    <h2 style="font-size: 1.1rem; font-weight: 700; color: var(--color-navy); margin-bottom: 8px;">6. Your Rights</h2>
+                    <ul style="margin: 0; padding-left: 20px; font-size: 0.9rem; color: var(--color-text-muted); line-height: 1.8;">
+                        <li>You can request access to your personal data</li>
+                        <li>You can request correction or deletion of your data</li>
+                        <li>You can opt out of marketing communications</li>
+                        <li>You can request a copy of your data in portable format</li>
+                        <li>You can object to certain processing activities</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 7 -->
+        <div class="card" style="padding: var(--space-lg); border-radius: var(--radius-xl);">
+            <div style="display: flex; align-items: flex-start; gap: var(--space-md);">
+                <div style="width: 40px; height: 40px; border-radius: var(--radius-md); background: linear-gradient(135deg, rgba(6,182,212,0.12), rgba(6,182,212,0.04)); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: #06b6d4;">
+                    <span class="material-icons-round" style="font-size: 20px;">handshake</span>
+                </div>
+                <div style="flex: 1;">
+                    <h2 style="font-size: 1.1rem; font-weight: 700; color: var(--color-navy); margin-bottom: 8px;">7. Third-Party Services</h2>
+                    <p style="font-size: 0.9rem; color: var(--color-text-muted); line-height: 1.7; margin: 0;">
+                        We may use third-party services such as Google Analytics, payment gateways, and cloud storage providers. These services have their own privacy policies. We only share the minimum necessary data required for these services to function.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 8 -->
+        <div class="card" style="padding: var(--space-lg); border-radius: var(--radius-xl);">
+            <div style="display: flex; align-items: flex-start; gap: var(--space-md);">
+                <div style="width: 40px; height: 40px; border-radius: var(--radius-md); background: linear-gradient(135deg, rgba(212,175,55,0.12), rgba(212,175,55,0.04)); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--color-gold);">
+                    <span class="material-icons-round" style="font-size: 20px;">update</span>
+                </div>
+                <div style="flex: 1;">
+                    <h2 style="font-size: 1.1rem; font-weight: 700; color: var(--color-navy); margin-bottom: 8px;">8. Changes to This Policy</h2>
+                    <p style="font-size: 0.9rem; color: var(--color-text-muted); line-height: 1.7; margin: 0;">
+                        We may update this privacy policy from time to time to reflect changes in our practices or legal requirements. Any changes will be posted on this page with an updated revision date. We encourage you to review this policy periodically.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 9 -->
+        <div class="card" style="padding: var(--space-lg); border-radius: var(--radius-xl);">
+            <div style="display: flex; align-items: flex-start; gap: var(--space-md);">
+                <div style="width: 40px; height: 40px; border-radius: var(--radius-md); background: linear-gradient(135deg, rgba(59,130,246,0.12), rgba(59,130,246,0.04)); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: #3b82f6;">
+                    <span class="material-icons-round" style="font-size: 20px;">contact_mail</span>
+                </div>
+                <div style="flex: 1;">
+                    <h2 style="font-size: 1.1rem; font-weight: 700; color: var(--color-navy); margin-bottom: 8px;">9. Contact Us</h2>
+                    <p style="font-size: 0.9rem; color: var(--color-text-muted); line-height: 1.7; margin: 0 0 var(--space-md) 0;">
+                        If you have any questions about this Privacy Policy or how we handle your data, feel free to contact us:
+                    </p>
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <a href="mailto:{{ site.email|default:'privacy@realshri.com' }}" style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem; color: var(--color-gold); font-weight: 600; text-decoration: none;">
+                            <span class="material-icons-round" style="font-size: 18px;">email</span>
+                            {{ site.email|default:"privacy@realshri.com" }}
                         </a>
-                        <a href="{% url 'roi_calculator' %}" class="dropdown-item">
-                            <span class="material-icons-round" style="font-size:18px;color:var(--color-gold)">trending_up</span>
-                            ROI Calculator
+                        <a href="tel:{{ site.phone|default:'+919876543210' }}" style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem; color: var(--color-gold); font-weight: 600; text-decoration: none;">
+                            <span class="material-icons-round" style="font-size: 18px;">phone</span>
+                            {{ site.phone|default:"+91 98765 43210" }}
                         </a>
                     </div>
                 </div>
-                
-                <a href="{% url 'about' %}" class="nav-link {% if request.resolver_match.url_name == 'about' %}active{% endif %}">
-                    <span class="material-icons-round" style="font-size:18px">info</span>
-                    About
-                </a>
-                <a href="{% url 'contact' %}" class="nav-link {% if request.resolver_match.url_name == 'contact' %}active{% endif %}">
-                    <span class="material-icons-round" style="font-size:18px">contact_mail</span>
-                    Contact
-                </a>
-            </div>
-            
-            <!-- RIGHT SIDE -->
-            <div class="flex items-center gap-1 md:gap-2">
-                
-                <!-- Wishlist (Desktop + Mobile) -->
-                <a href="{% url 'wishlist' %}" class="icon-btn relative" aria-label="Wishlist">
-                    <span class="material-icons-round" style="font-size:22px">favorite_border</span>
-                    <span id="navWishlistCount" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center hidden">0</span>
-                </a>
-                
-                {% if user.is_authenticated %}
-                    {% if user.role == 'user' %}
-                    <!-- User Profile Dropdown -->
-                    <div class="relative hidden md:block">
-                        <button id="desktopProfileBtn" class="flex items-center gap-2 px-3 py-2 rounded-full hover:bg-[rgba(15,23,42,0.05)] transition">
-                            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-[#d4af37] to-[#b8962f] text-white font-bold flex items-center justify-center text-sm">
-                                {{ request.user.username|slice:":1"|upper }}
-                            </div>
-                            <span class="material-icons-round" style="font-size:18px;color:var(--color-text-muted)">expand_more</span>
-                        </button>
-                        
-                        <div id="desktopProfileMenu" class="hidden absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-[rgba(15,23,42,0.08)] py-2 z-50">
-                            <div class="px-4 py-3 border-b border-[rgba(15,23,42,0.08)]">
-                                <p class="text-sm font-semibold text-[var(--color-navy)] truncate">{{ request.user.get_full_name|default:request.user.username }}</p>
-                                <p class="text-xs text-[var(--color-text-muted)] truncate">{{ request.user.email }}</p>
-                            </div>
-                            <a href="{% url 'profile' %}" class="dropdown-item">
-                                <span class="material-icons-round" style="font-size:18px;color:var(--color-text-muted)">person</span>
-                                My Profile
-                            </a>
-                            <a href="{% url 'edit_profile' %}" class="dropdown-item">
-                                <span class="material-icons-round" style="font-size:18px;color:var(--color-text-muted)">edit</span>
-                                Edit Profile
-                            </a>
-                            <a href="{% url 'wishlist' %}" class="dropdown-item">
-                                <span class="material-icons-round" style="font-size:18px;color:var(--color-text-muted)">favorite</span>
-                                My Wishlist
-                            </a>
-                            <a href="{% url 'my_inquiries' %}" class="dropdown-item">
-                                <span class="material-icons-round" style="font-size:18px;color:var(--color-text-muted)">forum</span>
-                                My Inquiries
-                            </a>
-                            <div class="border-t border-[rgba(15,23,42,0.08)] my-1"></div>
-                            <a href="{% url 'logout' %}" class="dropdown-item text-red-500">
-                                <span class="material-icons-round" style="font-size:18px">logout</span>
-                                Logout
-                            </a>
-                        </div>
-                    </div>
-                    {% else %}
-                    <!-- Builder/Agent - Logout only -->
-                    <a href="{% url 'logout' %}" class="hidden md:flex items-center gap-1.5 text-red-500 hover:text-red-600 font-medium transition px-3 py-2 rounded-lg hover:bg-red-50 text-sm">
-                        <span class="material-icons-round" style="font-size:18px">logout</span>
-                        Logout
-                    </a>
-                    {% endif %}
-                {% else %}
-                    <!-- Not logged in -->
-                    <a href="{% url 'login' %}" class="hidden md:flex items-center gap-1.5 text-[var(--color-text)] hover:text-[var(--color-gold)] font-medium transition px-3 py-2 rounded-lg hover:bg-[rgba(212,175,55,0.1)] text-sm">
-                        <span class="material-icons-round" style="font-size:18px">login</span>
-                        Login
-                    </a>
-                    <a href="{% url 'register' %}" class="hidden md:inline-flex btn btn-gold btn-sm">
-                        Register
-                    </a>
-                {% endif %}
-                
-                <!-- Mobile Menu Toggle -->
-                <button id="mobileMenuToggle" class="icon-btn lg:hidden" aria-label="Menu" aria-expanded="false">
-                    <span class="material-icons-round" style="font-size:24px" id="menuIcon">menu</span>
-                    <span class="material-icons-round hidden" style="font-size:24px" id="closeIcon">close</span>
-                </button>
             </div>
         </div>
-    </div>
-</nav>
 
-<!-- Mobile Menu Overlay -->
-<div id="mobileMenuOverlay" class="fixed inset-0 bg-black/50 z-40 hidden opacity-0 transition-opacity duration-300 lg:hidden" onclick="closeMobileMenu()"></div>
+    </div>
 
-<!-- Mobile Menu Sheet -->
-<div id="mobileMenu" class="fixed top-0 right-0 bottom-0 w-[85vw] max-w-[360px] bg-white z-50 transform translate-x-full transition-transform duration-300 lg:hidden flex flex-col">
-    <!-- Mobile Menu Header -->
-    <div class="flex items-center justify-between p-4 border-b border-[rgba(15,23,42,0.08)]" style="padding-top: calc(1rem + env(safe-area-inset-top));">
-        <img src="{% static 'images/logo.png' %}" alt="RealShri" class="h-8 w-auto object-contain">
-        <button onclick="closeMobileMenu()" class="icon-btn" aria-label="Close menu">
-            <span class="material-icons-round" style="font-size:24px">close</span>
-        </button>
+    <!-- CTA Section -->
+    <div style="margin-top: var(--space-2xl); text-align: center; padding: var(--space-2xl) var(--space-lg); background: linear-gradient(135deg, var(--color-navy) 0%, var(--color-navy-light) 100%); border-radius: var(--radius-xl); color: #fff;">
+        <h2 style="color: #fff; font-size: clamp(1.25rem, 3vw, 1.75rem); margin-bottom: var(--space-sm);">Have Questions About Your Privacy?</h2>
+        <p style="color: rgba(255,255,255,0.8); font-size: 1rem; max-width: 500px; margin: 0 auto var(--space-xl);">Our team is here to help you understand how we protect your data.</p>
+        <a href="{% url 'contact' %}" class="btn btn-gold" style="font-size: 1rem; padding: 14px 36px;">
+            <span class="material-icons-round">chat</span>
+            Contact Us
+        </a>
     </div>
-    
-    <!-- Mobile Menu Content -->
-    <div class="flex-1 overflow-y-auto py-2">
-        {% if user.is_authenticated and user.role == 'user' %}
-        <!-- User Profile Card -->
-        <div class="px-4 py-4 mb-2">
-            <div class="flex items-center gap-3 p-3 bg-[var(--color-bg-soft)] rounded-xl">
-                <div class="w-12 h-12 rounded-full bg-gradient-to-br from-[#d4af37] to-[#b8962f] text-white font-bold flex items-center justify-center text-lg shrink-0">
-                    {{ request.user.username|slice:":1"|upper }}
-                </div>
-                <div class="min-w-0">
-                    <p class="font-semibold text-[var(--color-navy)] truncate">{{ request.user.get_full_name|default:request.user.username }}</p>
-                    <p class="text-xs text-[var(--color-text-muted)] truncate">{{ request.user.email }}</p>
-                </div>
-            </div>
-        </div>
-        {% endif %}
-        
-        <!-- Menu Items -->
-        <div class="px-2 space-y-1">
-            <a href="{% url 'home' %}" class="mobile-nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}">
-                <span class="material-icons-round" style="font-size:22px">home</span>
-                Home
-            </a>
-            <a href="{% url 'property_list' %}" class="mobile-nav-link {% if request.resolver_match.url_name == 'property_list' %}active{% endif %}">
-                <span class="material-icons-round" style="font-size:22px">apartment</span>
-                Properties
-            </a>
-            <a href="{% url 'property_map_public' %}" class="mobile-nav-link {% if request.resolver_match.url_name == 'property_map_public' %}active{% endif %}">
-                <span class="material-icons-round" style="font-size:22px">map</span>
-                Property Map
-            </a>
-            
-            <!-- Calculators Accordion -->
-            <div>
-                <button onclick="toggleMobileAccordion('calcAccordion', 'calcArrow')" class="mobile-nav-link w-full justify-between">
-                    <span class="flex items-center gap-3">
-                        <span class="material-icons-round" style="font-size:22px">calculate</span>
-                        Calculators
-                    </span>
-                    <span class="material-icons-round transition-transform duration-200" style="font-size:20px" id="calcArrow">expand_more</span>
-                </button>
-                <div id="calcAccordion" class="hidden pl-12 pr-2 space-y-1">
-                    <a href="{% url 'emi_calculator' %}" class="mobile-sub-link">
-                        <span class="material-icons-round" style="font-size:18px;color:var(--color-gold)">credit_card</span>
-                        EMI Calculator
-                    </a>
-                    <a href="{% url 'roi_calculator' %}" class="mobile-sub-link">
-                        <span class="material-icons-round" style="font-size:18px;color:var(--color-gold)">trending_up</span>
-                        ROI Calculator
-                    </a>
-                </div>
-            </div>
-            
-            <a href="{% url 'about' %}" class="mobile-nav-link {% if request.resolver_match.url_name == 'about' %}active{% endif %}">
-                <span class="material-icons-round" style="font-size:22px">info</span>
-                About Us
-            </a>
-            <a href="{% url 'contact' %}" class="mobile-nav-link {% if request.resolver_match.url_name == 'contact' %}active{% endif %}">
-                <span class="material-icons-round" style="font-size:22px">contact_mail</span>
-                Contact
-            </a>
-            
-            <div class="h-px bg-[rgba(15,23,42,0.08)] my-3 mx-2"></div>
-            
-            <a href="{% url 'wishlist' %}" class="mobile-nav-link {% if request.resolver_match.url_name == 'wishlist' %}active{% endif %}">
-                <span class="material-icons-round" style="font-size:22px">favorite</span>
-                My Wishlist
-            </a>
-            
-            {% if user.is_authenticated %}
-                {% if user.role == 'user' %}
-                <div class="h-px bg-[rgba(15,23,42,0.08)] my-3 mx-2"></div>
-                <a href="{% url 'profile' %}" class="mobile-nav-link">
-                    <span class="material-icons-round" style="font-size:22px">person</span>
-                    My Profile
-                </a>
-                <a href="{% url 'edit_profile' %}" class="mobile-nav-link">
-                    <span class="material-icons-round" style="font-size:22px">edit</span>
-                    Edit Profile
-                </a>
-                <a href="{% url 'my_inquiries' %}" class="mobile-nav-link">
-                    <span class="material-icons-round" style="font-size:22px">forum</span>
-                    My Inquiries
-                </a>
-                <div class="h-px bg-[rgba(15,23,42,0.08)] my-3 mx-2"></div>
-                <a href="{% url 'logout' %}" class="mobile-nav-link text-red-500">
-                    <span class="material-icons-round" style="font-size:22px">logout</span>
-                    Logout
-                </a>
-                {% else %}
-                <div class="h-px bg-[rgba(15,23,42,0.08)] my-3 mx-2"></div>
-                <a href="{% url 'logout' %}" class="mobile-nav-link text-red-500">
-                    <span class="material-icons-round" style="font-size:22px">logout</span>
-                    Logout
-                </a>
-                {% endif %}
-            {% else %}
-                <div class="h-px bg-[rgba(15,23,42,0.08)] my-3 mx-2"></div>
-                <a href="{% url 'login' %}" class="mobile-nav-link">
-                    <span class="material-icons-round" style="font-size:22px">login</span>
-                    Login
-                </a>
-                <a href="{% url 'register' %}" class="mobile-nav-link text-[var(--color-gold)] font-semibold">
-                    <span class="material-icons-round" style="font-size:22px;color:var(--color-gold)">person_add</span>
-                    Register
-                </a>
-            {% endif %}
-        </div>
+
+    <!-- Footer Note -->
+    <div style="text-align: center; margin-top: var(--space-xl); padding-top: var(--space-lg); border-top: 1px solid var(--color-border);">
+        <p style="font-size: 0.8rem; color: var(--color-text-light); margin: 0;">
+            © 2026 RealShri. All rights reserved. | 
+            <a href="{% url 'terms' %}" style="color: var(--color-gold); text-decoration: none; font-weight: 600;">Terms of Service</a>
+        </p>
     </div>
-    
-    <!-- Mobile Menu Footer -->
-    <div class="p-4 border-t border-[rgba(15,23,42,0.08)]" style="padding-bottom: calc(1rem + env(safe-area-inset-bottom));">
-        <div class="flex items-center justify-center gap-2 text-xs text-[var(--color-text-muted)]">
-            <span class="material-icons-round" style="font-size:14px;color:var(--color-gold)">verified</span>
-            RERA Registered | Trusted Platform
-        </div>
-    </div>
+
 </div>
 
-<style>
-/* Desktop Nav Link */
-.nav-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 8px 14px;
-    border-radius: 999px;
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: var(--color-text-muted);
-    transition: all 0.2s ease;
-    text-decoration: none;
-}
-.nav-link:hover {
-    color: var(--color-gold);
-    background: rgba(212, 175, 55, 0.08);
-}
-.nav-link.active {
-    color: var(--color-gold);
-    background: rgba(212, 175, 55, 0.12);
-    font-weight: 600;
-}
-
-/* Icon Button */
-.icon-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    color: var(--color-text-muted);
-    transition: all 0.2s ease;
-    cursor: pointer;
-    background: transparent;
-    border: none;
-}
-.icon-btn:hover {
-    background: rgba(15, 23, 42, 0.05);
-    color: var(--color-gold);
-}
-
-/* Dropdown Item */
-.dropdown-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 16px;
-    font-size: 0.875rem;
-    color: var(--color-text);
-    transition: all 0.15s ease;
-    text-decoration: none;
-}
-.dropdown-item:hover {
-    background: var(--color-bg-soft);
-    color: var(--color-gold);
-}
-
-/* Mobile Nav Link */
-.mobile-nav-link {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 14px 16px;
-    border-radius: 12px;
-    font-size: 0.95rem;
-    font-weight: 500;
-    color: var(--color-text);
-    transition: all 0.2s ease;
-    text-decoration: none;
-    min-height: 48px;
-}
-.mobile-nav-link:hover,
-.mobile-nav-link.active {
-    background: var(--color-bg-soft);
-    color: var(--color-gold);
-}
-.mobile-nav-link.active {
-    font-weight: 600;
-}
-
-/* Mobile Sub Link */
-.mobile-sub-link {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 12px 16px;
-    border-radius: 10px;
-    font-size: 0.875rem;
-    color: var(--color-text-muted);
-    transition: all 0.15s ease;
-    text-decoration: none;
-}
-.mobile-sub-link:hover {
-    background: var(--color-bg-soft);
-    color: var(--color-gold);
-}
-</style>
-
-<script>
-// Mobile Menu Functions
-function openMobileMenu() {
-    const menu = document.getElementById('mobileMenu');
-    const overlay = document.getElementById('mobileMenuOverlay');
-    const menuIcon = document.getElementById('menuIcon');
-    const closeIcon = document.getElementById('closeIcon');
-    const toggle = document.getElementById('mobileMenuToggle');
-    
-    menu.classList.remove('translate-x-full');
-    overlay.classList.remove('hidden');
-    setTimeout(() => overlay.classList.remove('opacity-0'), 10);
-    menuIcon.classList.add('hidden');
-    closeIcon.classList.remove('hidden');
-    toggle.setAttribute('aria-expanded', 'true');
-    document.body.style.overflow = 'hidden';
-}
-
-function closeMobileMenu() {
-    const menu = document.getElementById('mobileMenu');
-    const overlay = document.getElementById('mobileMenuOverlay');
-    const menuIcon = document.getElementById('menuIcon');
-    const closeIcon = document.getElementById('closeIcon');
-    const toggle = document.getElementById('mobileMenuToggle');
-    
-    menu.classList.add('translate-x-full');
-    overlay.classList.add('opacity-0');
-    setTimeout(() => overlay.classList.add('hidden'), 300);
-    menuIcon.classList.remove('hidden');
-    closeIcon.classList.add('hidden');
-    toggle.setAttribute('aria-expanded', 'false');
-    document.body.style.overflow = '';
-}
-
-function toggleMobileAccordion(contentId, arrowId) {
-    const content = document.getElementById(contentId);
-    const arrow = document.getElementById(arrowId);
-    content.classList.toggle('hidden');
-    arrow.style.transform = content.classList.contains('hidden') ? '' : 'rotate(180deg)';
-}
-
-// Toggle mobile menu on button click
-document.getElementById('mobileMenuToggle').addEventListener('click', function() {
-    const isOpen = this.getAttribute('aria-expanded') === 'true';
-    if (isOpen) {
-        closeMobileMenu();
-    } else {
-        openMobileMenu();
-    }
-});
-
-// Desktop Profile Dropdown
-const desktopProfileBtn = document.getElementById('desktopProfileBtn');
-const desktopProfileMenu = document.getElementById('desktopProfileMenu');
-
-if (desktopProfileBtn && desktopProfileMenu) {
-    desktopProfileBtn.addEventListener('click', function(e) {
-        e.stopPropagation();
-        desktopProfileMenu.classList.toggle('hidden');
-    });
-    
-    document.addEventListener('click', function(e) {
-        if (!desktopProfileBtn.contains(e.target) && !desktopProfileMenu.contains(e.target)) {
-            desktopProfileMenu.classList.add('hidden');
-        }
-    });
-}
-
-// Close mobile menu on escape key
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') closeMobileMenu();
-});
-
-// Wishlist count
-function updateNavWishlistCount(count) {
-    const badge = document.getElementById('navWishlistCount');
-    if (badge) {
-        badge.textContent = count;
-        badge.classList.toggle('hidden', !count || count === 0);
-    }
-}
-
-{% if user.is_authenticated %}
-document.addEventListener('DOMContentLoaded', function() {
-    fetch('/wishlist/count/')
-        .then(r => r.json())
-        .then(data => { if (data.count) updateNavWishlistCount(data.count); })
-        .catch(() => {});
-});
-{% endif %}
-
-// Navbar scroll behavior (hide on scroll down, show on scroll up)
-let lastScrollY = 0;
-const navbar = document.getElementById('mainNavbar');
-
-window.addEventListener('scroll', function() {
-    const currentScrollY = window.scrollY;
-    
-    if (window.innerWidth < 1024) {
-        if (currentScrollY > lastScrollY && currentScrollY > 80) {
-            navbar.style.transform = 'translateY(-100%)';
-        } else {
-            navbar.style.transform = 'translateY(0)';
-        }
-    }
-    
-    lastScrollY = currentScrollY;
-}, { passive: true });
-</script>'''
-
+{% endblock %}

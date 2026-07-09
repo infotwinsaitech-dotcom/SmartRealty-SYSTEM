@@ -433,3 +433,16 @@ WARNING 2026-07-09 21:33:05,904 middleware SLOW REQUEST: GET /properties/ took 1
 INFO 2026-07-09 21:33:05,906 basehttp "GET /properties/?category=commercial&location=&beds=&min_price=&min_price_unit=L&max_price=&max_price_unit=L&possession= HTTP/1.1" 200 106987
 WARNING 2026-07-09 21:33:09,202 middleware SLOW REQUEST: GET /properties/ took 1.24s User: Anonymous
 INFO 2026-07-09 21:33:09,203 basehttp "GET /properties/?category=land&location=&beds=&min_price=&min_price_unit=L&max_price=&max_price_unit=L&possession= HTTP/1.1" 200 106981
+INFO 2026-07-09 21:34:56,190 apps  PostgreSQL optimized
+INFO 2026-07-09 21:34:56,204 apps  Core app initialized
+INFO 2026-07-09 21:34:59,873 apps  PostgreSQL optimized
+INFO 2026-07-09 21:34:59,873 apps  Core app initialized
+INFO 2026-07-09 21:34:59,906 autoreload Watching for file changes with StatReloader
+INFO 2026-07-09 21:34:59,965 views views.py loaded successfully
+WARNING 2026-07-09 21:35:08,509 middleware SLOW REQUEST: GET / took 2.91s User: Anonymous
+INFO 2026-07-09 21:35:08,511 basehttp "GET / HTTP/1.1" 200 104270
+INFO 2026-07-09 21:35:08,581 basehttp "GET /static/images/logo.png HTTP/1.1" 200 336652
+WARNING 2026-07-09 21:35:09,729 log Not Found: /favicon.ico
+WARNING 2026-07-09 21:35:09,731 basehttp "GET /favicon.ico HTTP/1.1" 404 66441
+WARNING 2026-07-09 21:35:36,571 middleware SLOW REQUEST: GET /properties/ took 1.34s User: Anonymous
+INFO 2026-07-09 21:35:36,573 basehttp "GET /properties/?type=Office HTTP/1.1" 200 106995

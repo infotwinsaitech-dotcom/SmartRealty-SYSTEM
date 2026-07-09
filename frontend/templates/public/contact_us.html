@@ -1,340 +1,519 @@
-
-contact_html = '''{% extends "public/base.html" %}
+{% extends "public/base.html" %}
 {% load static %}
-{% block title %}Contact Us - RealShri{% endblock %}
+
+{% block title %}EMI Calculator{% endblock %}
 
 {% block content %}
 
 <!-- ============================================
-   CONTACT HERO - Simple, Clean
-   ============================================ -->
-<section class="hero-section" style="min-height: 30vh;">
-    <div class="hero-content">
-        <span class="label" style="color: rgba(255,255,255,0.7); border-color: rgba(255,255,255,0.2);">
-            <span class="material-icons-round" style="font-size:16px">contact_mail</span>
-            Get in Touch
-        </span>
-        <h1 class="hero-title" style="font-size: clamp(1.75rem, 5vw, 2.5rem);">
-            We're Here to <span style="color: #d4af37;">Help You</span>
-        </h1>
-        <p class="hero-subtitle" style="font-size: 1rem;">
-            Have questions? We'd love to hear from you. Send us a message and we'll respond as soon as possible.
+     EMI CALCULATOR - RealShri
+     Mobile-first, clean, content-rich
+     ============================================ -->
+
+<!-- Hero Section -->
+<section class="hero-section" style="min-height: 30vh; max-height: 38vh;">
+    <div class="hero-content" style="max-width: 700px;">
+        <div style="display: inline-flex; align-items: center; gap: 8px; background: rgba(212,175,55,0.15); padding: 6px 16px; border-radius: 9999px; margin-bottom: 16px;">
+            <span class="material-icons-round" style="font-size: 18px; color: var(--color-gold);">calculate</span>
+            <span style="font-size: 0.85rem; font-weight: 600; color: var(--color-gold);">Financial Planning</span>
+        </div>
+        <h1 class="hero-title" style="font-size: clamp(1.5rem, 4vw, 2.25rem);">EMI Calculator</h1>
+        <p class="hero-subtitle" style="font-size: clamp(0.9rem, 2vw, 1.05rem);">
+            Plan your dream home with precise monthly installment calculations. Know exactly what you pay before you buy.
         </p>
     </div>
 </section>
 
-<!-- ============================================
-   CONTACT SECTION - Form + Info
-   ============================================ -->
-<section class="section-pad bg-white">
-    <div class="container-app">
-        <div class="grid grid-cols-1 lg:grid-cols-5 gap-8 lg:gap-12">
-            
-            <!-- LEFT: Contact Form (3 cols) -->
-            <div class="lg:col-span-3 reveal">
-                <div class="card p-6 md:p-8">
-                    <h2 class="text-xl md:text-2xl font-bold text-[var(--color-navy)] mb-2">Send us a Message</h2>
-                    <p class="text-sm text-[var(--color-text-muted)] mb-6">Fill out the form below and we'll get back to you within 24 hours.</p>
-                    
-                    <form method="POST" class="space-y-5">
-                        {% csrf_token %}
-                        
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                            <!-- Name -->
-                            <div>
-                                <label class="block text-sm font-medium text-[var(--color-text)] mb-2">
-                                    Full Name <span class="text-red-500">*</span>
-                                </label>
-                                <input type="text" name="name" required
-                                    class="w-full px-4 py-3 rounded-xl bg-[var(--color-bg)] border border-[var(--color-border)] text-[var(--color-text)] text-sm focus:outline-none focus:border-[var(--color-gold)] focus:ring-2 focus:ring-[var(--color-gold)]/20 transition-all"
-                                    placeholder="Enter your full name">
-                            </div>
-                            
-                            <!-- Phone -->
-                            <div>
-                                <label class="block text-sm font-medium text-[var(--color-text)] mb-2">
-                                    Phone Number <span class="text-red-500">*</span>
-                                </label>
-                                <input type="tel" name="phone" required
-                                    class="w-full px-4 py-3 rounded-xl bg-[var(--color-bg)] border border-[var(--color-border)] text-[var(--color-text)] text-sm focus:outline-none focus:border-[var(--color-gold)] focus:ring-2 focus:ring-[var(--color-gold)]/20 transition-all"
-                                    placeholder="+91 XXXXX XXXXX">
-                            </div>
-                        </div>
-                        
-                        <!-- Email -->
-                        <div>
-                            <label class="block text-sm font-medium text-[var(--color-text)] mb-2">
-                                Email Address <span class="text-red-500">*</span>
-                            </label>
-                            <input type="email" name="email" required
-                                class="w-full px-4 py-3 rounded-xl bg-[var(--color-bg)] border border-[var(--color-border)] text-[var(--color-text)] text-sm focus:outline-none focus:border-[var(--color-gold)] focus:ring-2 focus:ring-[var(--color-gold)]/20 transition-all"
-                                placeholder="your@email.com">
-                        </div>
-                        
-                        <!-- Subject -->
-                        <div>
-                            <label class="block text-sm font-medium text-[var(--color-text)] mb-2">
-                                Subject
-                            </label>
-                            <select name="subject"
-                                class="w-full px-4 py-3 rounded-xl bg-[var(--color-bg)] border border-[var(--color-border)] text-[var(--color-text)] text-sm focus:outline-none focus:border-[var(--color-gold)] focus:ring-2 focus:ring-[var(--color-gold)]/20 transition-all appearance-none cursor-pointer">
-                                <option value="">Select a subject</option>
-                                <option value="property_inquiry">Property Inquiry</option>
-                                <option value="site_visit">Schedule Site Visit</option>
-                                <option value="price_quote">Get Price Quote</option>
-                                <option value="general">General Question</option>
-                                <option value="feedback">Feedback</option>
-                            </select>
-                        </div>
-                        
-                        <!-- Message -->
-                        <div>
-                            <label class="block text-sm font-medium text-[var(--color-text)] mb-2">
-                                Message <span class="text-red-500">*</span>
-                            </label>
-                            <textarea name="message" rows="5" required
-                                class="w-full px-4 py-3 rounded-xl bg-[var(--color-bg)] border border-[var(--color-border)] text-[var(--color-text)] text-sm focus:outline-none focus:border-[var(--color-gold)] focus:ring-2 focus:ring-[var(--color-gold)]/20 transition-all resize-none"
-                                placeholder="Tell us about your requirements..."></textarea>
-                        </div>
-                        
-                        <!-- Submit Button -->
-                        <button type="submit" class="btn btn-gold w-full" style="min-height:48px;">
-                            <span class="material-icons-round" style="font-size:18px">send</span>
-                            Send Message
-                        </button>
-                        
-                        <!-- Trust Note -->
-                        <p class="text-xs text-[var(--color-text-muted)] text-center flex items-center justify-center gap-1">
-                            <span class="material-icons-round" style="font-size:14px;color:var(--color-success)">lock</span>
-                            Your information is secure and will never be shared with third parties.
-                        </p>
-                    </form>
+<!-- Calculator Content -->
+<div class="container-app section-pad" style="padding-top: clamp(1.5rem, 4vw, 2.5rem);">
+    <div style="display: grid; grid-template-columns: 1fr; gap: var(--space-lg);">
+
+        {% if request.user.is_authenticated %}
+        <!-- INPUT FORM -->
+        <div class="card" style="border-radius: var(--radius-xl); overflow: hidden;">
+            <div style="display: flex; align-items: center; gap: 12px; padding: var(--space-lg); border-bottom: 1px solid var(--color-border); background: var(--color-bg-soft);">
+                <div style="width: 44px; height: 44px; border-radius: var(--radius-md); background: linear-gradient(135deg, rgba(212,175,55,0.15), rgba(212,175,55,0.05)); display: flex; align-items: center; justify-content: center; color: var(--color-gold); border: 1px solid rgba(212,175,55,0.2); flex-shrink: 0;">
+                    <span class="material-icons-round" style="font-size: 22px;">calculate</span>
+                </div>
+                <div>
+                    <h2 style="font-size: 1.1rem; font-weight: 700; color: var(--color-navy); margin: 0;">Loan Details</h2>
+                    <p style="font-size: 0.8rem; color: var(--color-text-muted); margin: 2px 0 0 0;">Adjust values to see your EMI</p>
                 </div>
             </div>
-            
-            <!-- RIGHT: Contact Info (2 cols) -->
-            <div class="lg:col-span-2 space-y-6">
-                
-                <!-- Contact Cards -->
-                <div class="card p-6 reveal">
-                    <h3 class="text-lg font-bold text-[var(--color-navy)] mb-5">Contact Information</h3>
-                    
-                    <div class="space-y-4">
-                        <div class="flex items-start gap-4">
-                            <div class="w-10 h-10 rounded-xl bg-[rgba(212,175,55,0.1)] flex items-center justify-center shrink-0">
-                                <span class="material-icons-round text-[var(--color-gold)]" style="font-size:20px">business</span>
-                            </div>
-                            <div>
-                                <p class="text-xs text-[var(--color-text-muted)] uppercase tracking-wider font-medium">Company</p>
-                                <p class="text-sm font-semibold text-[var(--color-navy)]">{{ site.company_name|default:"RealShri Properties" }}</p>
-                            </div>
+
+            <div style="padding: var(--space-lg);">
+                <!-- Property Price -->
+                <div style="margin-bottom: var(--space-lg);">
+                    <label style="display: block; font-size: 0.75rem; font-weight: 600; color: var(--color-text-muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em;">Property Price (₹)</label>
+                    <div style="display: flex; align-items: center; background: var(--color-bg-soft); border: 1.5px solid var(--color-border); border-radius: var(--radius-lg); padding: 12px 16px; transition: all 0.25s ease; gap: 8px;" onfocusin="this.style.borderColor='var(--color-gold)';this.style.boxShadow='0 0 0 4px rgba(212,175,55,0.12)'" onfocusout="this.style.borderColor='var(--color-border)';this.style.boxShadow='none'">
+                        <span style="color: var(--color-text-muted); font-weight: 600; font-size: 0.9rem; flex-shrink: 0;">₹</span>
+                        <input type="number" id="propertyPrice" value="5000000" style="background: transparent; border: none; outline: none; color: var(--color-navy); font-size: 1rem; font-weight: 700; width: 100%; font-family: inherit;" inputmode="numeric" oninput="calculateEMI()">
+                    </div>
+                    <input type="range" id="propertyPriceRange" min="1000000" max="100000000" step="100000" value="5000000" style="width: 100%; margin-top: 10px; -webkit-appearance: none; height: 6px; border-radius: 3px; background: var(--color-border); outline: none;" oninput="syncRange('propertyPrice', this.value); calculateEMI()">
+                </div>
+
+                <!-- Down Payment -->
+                <div style="margin-bottom: var(--space-lg);">
+                    <label style="display: block; font-size: 0.75rem; font-weight: 600; color: var(--color-text-muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em;">Down Payment (₹)</label>
+                    <div style="display: flex; align-items: center; background: var(--color-bg-soft); border: 1.5px solid var(--color-border); border-radius: var(--radius-lg); padding: 12px 16px; transition: all 0.25s ease; gap: 8px;" onfocusin="this.style.borderColor='var(--color-gold)';this.style.boxShadow='0 0 0 4px rgba(212,175,55,0.12)'" onfocusout="this.style.borderColor='var(--color-border)';this.style.boxShadow='none'">
+                        <span style="color: var(--color-text-muted); font-weight: 600; font-size: 0.9rem; flex-shrink: 0;">₹</span>
+                        <input type="number" id="downPayment" value="1000000" style="background: transparent; border: none; outline: none; color: var(--color-navy); font-size: 1rem; font-weight: 700; width: 100%; font-family: inherit;" inputmode="numeric" oninput="calculateEMI()">
+                    </div>
+                    <div style="display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap;">
+                        <span class="dp-tag" onclick="setDownPayment(10)" style="background: var(--color-bg-soft); border: 1.5px solid var(--color-border); color: var(--color-text-muted); padding: 8px 16px; min-height: 36px; display: inline-flex; align-items: center; border-radius: var(--radius-full); font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; user-select: none;">10%</span>
+                        <span class="dp-tag" onclick="setDownPayment(20)" style="background: var(--color-bg-soft); border: 1.5px solid var(--color-border); color: var(--color-text-muted); padding: 8px 16px; min-height: 36px; display: inline-flex; align-items: center; border-radius: var(--radius-full); font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; user-select: none;">20%</span>
+                        <span class="dp-tag active" onclick="setDownPayment(25)" style="background: linear-gradient(135deg, rgba(212,175,55,0.15), rgba(212,175,55,0.05)); border: 1.5px solid var(--color-gold); color: var(--color-gold-dark); padding: 8px 16px; min-height: 36px; display: inline-flex; align-items: center; border-radius: var(--radius-full); font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; user-select: none;">25%</span>
+                        <span class="dp-tag" onclick="setDownPayment(30)" style="background: var(--color-bg-soft); border: 1.5px solid var(--color-border); color: var(--color-text-muted); padding: 8px 16px; min-height: 36px; display: inline-flex; align-items: center; border-radius: var(--radius-full); font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; user-select: none;">30%</span>
+                        <span class="dp-tag" onclick="setDownPayment(50)" style="background: var(--color-bg-soft); border: 1.5px solid var(--color-border); color: var(--color-text-muted); padding: 8px 16px; min-height: 36px; display: inline-flex; align-items: center; border-radius: var(--radius-full); font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; user-select: none;">50%</span>
+                    </div>
+                </div>
+
+                <!-- Interest Rate -->
+                <div style="margin-bottom: var(--space-lg);">
+                    <label style="display: block; font-size: 0.75rem; font-weight: 600; color: var(--color-text-muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em;">Interest Rate (% per annum)</label>
+                    <div style="display: flex; align-items: center; background: var(--color-bg-soft); border: 1.5px solid var(--color-border); border-radius: var(--radius-lg); padding: 12px 16px; transition: all 0.25s ease; gap: 8px;" onfocusin="this.style.borderColor='var(--color-gold)';this.style.boxShadow='0 0 0 4px rgba(212,175,55,0.12)'" onfocusout="this.style.borderColor='var(--color-border)';this.style.boxShadow='none'">
+                        <input type="number" id="interestRate" value="8.5" step="0.1" style="background: transparent; border: none; outline: none; color: var(--color-navy); font-size: 1rem; font-weight: 700; width: 100%; font-family: inherit;" inputmode="decimal" oninput="calculateEMI()">
+                        <span style="color: var(--color-text-muted); font-weight: 600; font-size: 0.9rem; flex-shrink: 0;">%</span>
+                    </div>
+                    <input type="range" id="interestRateRange" min="5" max="20" step="0.1" value="8.5" style="width: 100%; margin-top: 10px; -webkit-appearance: none; height: 6px; border-radius: 3px; background: var(--color-border); outline: none;" oninput="syncRange('interestRate', this.value); calculateEMI()">
+                </div>
+
+                <!-- Loan Tenure -->
+                <div>
+                    <label style="display: block; font-size: 0.75rem; font-weight: 600; color: var(--color-text-muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em;">Loan Tenure</label>
+                    <div style="display: flex; align-items: center; background: var(--color-bg-soft); border: 1.5px solid var(--color-border); border-radius: var(--radius-lg); padding: 12px 16px; transition: all 0.25s ease; gap: 8px;" onfocusin="this.style.borderColor='var(--color-gold)';this.style.boxShadow='0 0 0 4px rgba(212,175,55,0.12)'" onfocusout="this.style.borderColor='var(--color-border)';this.style.boxShadow='none'">
+                        <input type="number" id="loanTenure" value="20" style="background: transparent; border: none; outline: none; color: var(--color-navy); font-size: 1rem; font-weight: 700; width: 100%; font-family: inherit;" inputmode="numeric" oninput="calculateEMI()">
+                        <span style="color: var(--color-text-muted); font-weight: 600; font-size: 0.9rem; flex-shrink: 0;">Years</span>
+                    </div>
+                    <div style="display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap;">
+                        <span class="tenure-tag" onclick="setTenure(10)" style="background: var(--color-bg-soft); border: 1.5px solid var(--color-border); color: var(--color-text-muted); padding: 8px 16px; min-height: 36px; display: inline-flex; align-items: center; border-radius: var(--radius-full); font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; user-select: none;">10Y</span>
+                        <span class="tenure-tag" onclick="setTenure(15)" style="background: var(--color-bg-soft); border: 1.5px solid var(--color-border); color: var(--color-text-muted); padding: 8px 16px; min-height: 36px; display: inline-flex; align-items: center; border-radius: var(--radius-full); font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; user-select: none;">15Y</span>
+                        <span class="tenure-tag active" onclick="setTenure(20)" style="background: linear-gradient(135deg, rgba(212,175,55,0.15), rgba(212,175,55,0.05)); border: 1.5px solid var(--color-gold); color: var(--color-gold-dark); padding: 8px 16px; min-height: 36px; display: inline-flex; align-items: center; border-radius: var(--radius-full); font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; user-select: none;">20Y</span>
+                        <span class="tenure-tag" onclick="setTenure(25)" style="background: var(--color-bg-soft); border: 1.5px solid var(--color-border); color: var(--color-text-muted); padding: 8px 16px; min-height: 36px; display: inline-flex; align-items: center; border-radius: var(--radius-full); font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; user-select: none;">25Y</span>
+                        <span class="tenure-tag" onclick="setTenure(30)" style="background: var(--color-bg-soft); border: 1.5px solid var(--color-border); color: var(--color-text-muted); padding: 8px 16px; min-height: 36px; display: inline-flex; align-items: center; border-radius: var(--radius-full); font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; user-select: none;">30Y</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RESULTS -->
+        <div class="card" style="border-radius: var(--radius-xl); overflow: hidden;">
+            <div style="display: flex; align-items: center; gap: 12px; padding: var(--space-lg); border-bottom: 1px solid var(--color-border); background: var(--color-bg-soft);">
+                <div style="width: 44px; height: 44px; border-radius: var(--radius-md); background: linear-gradient(135deg, rgba(59,130,246,0.15), rgba(59,130,246,0.05)); display: flex; align-items: center; justify-content: center; color: #3b82f6; border: 1px solid rgba(59,130,246,0.2); flex-shrink: 0;">
+                    <span class="material-icons-round" style="font-size: 22px;">pie_chart</span>
+                </div>
+                <div>
+                    <h2 style="font-size: 1.1rem; font-weight: 700; color: var(--color-navy); margin: 0;">EMI Breakdown</h2>
+                    <p style="font-size: 0.8rem; color: var(--color-text-muted); margin: 2px 0 0 0;">Your monthly payment summary</p>
+                </div>
+            </div>
+
+            <div style="padding: var(--space-lg);">
+                <!-- EMI Amount -->
+                <div style="text-align: center; padding: var(--space-md) 0 var(--space-xl); border-bottom: 1px solid var(--color-border); margin-bottom: var(--space-lg);">
+                    <p style="font-size: 0.75rem; font-weight: 600; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px;">Monthly EMI</p>
+                    <h3 id="emiAmount" style="font-size: clamp(1.75rem, 5vw, 2.5rem); font-weight: 800; color: var(--color-gold); margin: 0; line-height: 1.2; letter-spacing: -0.02em;">₹37,966</h3>
+                    <p style="font-size: 0.85rem; color: var(--color-text-muted); margin-top: 8px;">per month for <span id="tenureDisplay" style="color: var(--color-gold); font-weight: 600;">20</span> years</p>
+                </div>
+
+                <!-- Chart -->
+                <div style="display: flex; align-items: center; gap: var(--space-lg); margin-bottom: var(--space-lg); padding: var(--space-md); background: var(--color-bg-soft); border-radius: var(--radius-lg); border: 1px solid var(--color-border); flex-direction: column; text-align: center;">
+                    <canvas id="emiChart" width="160" height="160" style="max-width: 160px; max-height: 160px;"></canvas>
+                    <div style="display: flex; flex-direction: column; gap: 10px; flex: 1; width: 100%;">
+                        <div style="display: flex; align-items: center; gap: 10px; justify-content: center;">
+                            <span style="width: 12px; height: 12px; border-radius: 50%; background: var(--color-gold); flex-shrink: 0;"></span>
+                            <span style="font-size: 0.85rem; color: var(--color-text-muted);">Principal: <strong id="principalDisplay" style="color: var(--color-navy); font-weight: 700;">₹40L</strong></span>
                         </div>
-                        
-                        <div class="flex items-start gap-4">
-                            <div class="w-10 h-10 rounded-xl bg-[rgba(212,175,55,0.1)] flex items-center justify-center shrink-0">
-                                <span class="material-icons-round text-[var(--color-gold)]" style="font-size:20px">phone</span>
-                            </div>
-                            <div>
-                                <p class="text-xs text-[var(--color-text-muted)] uppercase tracking-wider font-medium">Phone</p>
-                                <a href="tel:{{ site.phone|default:'+91-XXXXXXXXXX' }}" class="text-sm font-semibold text-[var(--color-navy)] hover:text-[var(--color-gold)] transition">
-                                    {{ site.phone|default:"+91-XXXXXXXXXX" }}
-                                </a>
-                            </div>
-                        </div>
-                        
-                        <div class="flex items-start gap-4">
-                            <div class="w-10 h-10 rounded-xl bg-[rgba(212,175,55,0.1)] flex items-center justify-center shrink-0">
-                                <span class="material-icons-round text-[var(--color-gold)]" style="font-size:20px">email</span>
-                            </div>
-                            <div>
-                                <p class="text-xs text-[var(--color-text-muted)] uppercase tracking-wider font-medium">Email</p>
-                                <a href="mailto:{{ site.email|default:'info@realshri.com' }}" class="text-sm font-semibold text-[var(--color-navy)] hover:text-[var(--color-gold)] transition break-all">
-                                    {{ site.email|default:"info@realshri.com" }}
-                                </a>
-                            </div>
-                        </div>
-                        
-                        <div class="flex items-start gap-4">
-                            <div class="w-10 h-10 rounded-xl bg-[rgba(212,175,55,0.1)] flex items-center justify-center shrink-0">
-                                <span class="material-icons-round text-[var(--color-gold)]" style="font-size:20px">location_on</span>
-                            </div>
-                            <div>
-                                <p class="text-xs text-[var(--color-text-muted)] uppercase tracking-wider font-medium">Address</p>
-                                <p class="text-sm font-semibold text-[var(--color-navy)]">{{ site.location|default:"Ahmedabad, Gujarat, India" }}</p>
-                            </div>
+                        <div style="display: flex; align-items: center; gap: 10px; justify-content: center;">
+                            <span style="width: 12px; height: 12px; border-radius: 50%; background: #3b82f6; flex-shrink: 0;"></span>
+                            <span style="font-size: 0.85rem; color: var(--color-text-muted);">Interest: <strong id="interestDisplay" style="color: var(--color-navy); font-weight: 700;">₹51.1L</strong></span>
                         </div>
                     </div>
                 </div>
-                
-                <!-- Quick Response Promise -->
-                <div class="card p-6 reveal" style="background: linear-gradient(135deg, var(--color-navy) 0%, #1e3a5f 100%); border: none;">
-                    <div class="flex items-center gap-3 mb-3">
-                        <span class="material-icons-round text-[var(--color-gold)]" style="font-size:24px">schedule</span>
-                        <h3 class="text-lg font-bold text-white">Quick Response</h3>
+
+                <!-- Stats Grid -->
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: var(--space-lg);">
+                    <div style="background: var(--color-bg-soft); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: var(--space-md); text-align: center;">
+                        <p style="font-size: 0.7rem; font-weight: 600; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">Loan Amount</p>
+                        <p id="loanAmountDisplay" style="font-size: 0.95rem; font-weight: 800; color: var(--color-navy); margin: 0;">₹40,00,000</p>
                     </div>
-                    <p class="text-sm text-white/80 mb-4">We typically respond within 2 hours during business hours (9 AM - 7 PM).</p>
-                    <div class="flex items-center gap-2 text-xs text-white/60">
-                        <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
-                        <span>Currently Online</span>
+                    <div style="background: var(--color-bg-soft); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: var(--space-md); text-align: center;">
+                        <p style="font-size: 0.7rem; font-weight: 600; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">Total Interest</p>
+                        <p id="totalInterestDisplay" style="font-size: 0.95rem; font-weight: 800; color: #3b82f6; margin: 0;">₹51,11,920</p>
+                    </div>
+                    <div style="background: var(--color-bg-soft); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: var(--space-md); text-align: center;">
+                        <p style="font-size: 0.7rem; font-weight: 600; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">Total Payment</p>
+                        <p id="totalPaymentDisplay" style="font-size: 0.95rem; font-weight: 800; color: var(--color-gold); margin: 0;">₹91,11,920</p>
+                    </div>
+                    <div style="background: var(--color-bg-soft); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: var(--space-md); text-align: center;">
+                        <p style="font-size: 0.7rem; font-weight: 600; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">Interest Ratio</p>
+                        <p id="interestRatio" style="font-size: 0.95rem; font-weight: 800; color: var(--color-success); margin: 0;">56.1%</p>
                     </div>
                 </div>
-                
-                <!-- WhatsApp CTA -->
-                <a href="https://wa.me/{{ site.whatsapp_number|default:'919876543210' }}?text=Hi%20RealShri,%20I'm%20interested%20in%20buying%20a%20property."
-                   target="_blank"
-                   class="card p-6 flex items-center gap-4 hover:shadow-lg transition-all reveal"
-                   style="background: linear-gradient(135deg, #25d366 0%, #128c7e 100%); border: none; color: white;">
-                    <div class="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center shrink-0">
-                        <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-                        </svg>
-                    </div>
-                    <div>
-                        <p class="font-semibold">Chat on WhatsApp</p>
-                        <p class="text-xs text-white/80">Get instant replies</p>
-                    </div>
-                    <span class="material-icons-round ml-auto" style="font-size:20px">arrow_forward</span>
+
+                <!-- CTA -->
+                <a href="{% url 'property_list' %}" class="btn btn-gold" style="width: 100%; min-height: 50px; font-size: 0.95rem;">
+                    <span class="material-icons-round" style="font-size: 20px;">search</span>
+                    Explore Properties in this Budget
                 </a>
-                
-                <!-- Business Hours -->
-                <div class="card p-6 reveal">
-                    <h3 class="text-lg font-bold text-[var(--color-navy)] mb-4">Business Hours</h3>
-                    <div class="space-y-3 text-sm">
-                        <div class="flex justify-between items-center">
-                            <span class="text-[var(--color-text-muted)]">Monday - Saturday</span>
-                            <span class="font-semibold text-[var(--color-navy)]">9:00 AM - 7:00 PM</span>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <span class="text-[var(--color-text-muted)]">Sunday</span>
-                            <span class="font-semibold text-[var(--color-navy)]">10:00 AM - 4:00 PM</span>
-                        </div>
-                        <div class="h-px bg-[var(--color-border)] my-2"></div>
-                        <div class="flex justify-between items-center">
-                            <span class="text-[var(--color-text-muted)]">Emergency Support</span>
-                            <span class="font-semibold text-[var(--color-gold)]">24/7 Available</span>
-                        </div>
-                    </div>
-                </div>
-                
             </div>
         </div>
-    </div>
-</section>
+        {% else %}
+        <!-- Login Prompt -->
+        <div style="text-align: center; padding: clamp(3rem, 10vw, 5rem) var(--space-md); max-width: 500px; margin-inline: auto;">
+            <div style="width: 80px; height: 80px; background: linear-gradient(135deg, var(--color-bg-soft) 0%, var(--color-border) 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto var(--space-xl);">
+                <span class="material-icons-round" style="font-size: 36px; color: var(--color-text-light);">lock</span>
+            </div>
+            <h2 style="font-size: 1.35rem; color: var(--color-navy); margin-bottom: var(--space-sm);">Login to Use EMI Calculator</h2>
+            <p style="color: var(--color-text-muted); margin-bottom: var(--space-xl); font-size: 0.95rem;">
+                Create an account or login to access our EMI calculator and plan your dream home purchase.
+            </p>
+            <a href="{% url 'login' %}?next={{ request.path }}" class="btn btn-gold" style="font-size: 1rem; padding: 14px 36px;">
+                <span class="material-icons-round">login</span>
+                Login / Register
+            </a>
 
-<!-- ============================================
-   MAP SECTION - Location Map
-   ============================================ -->
-<section class="section-pad bg-[var(--color-bg)]">
-    <div class="container-app">
-        <div class="section-header mb-8">
+            <!-- Trust Stats -->
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-md); margin-top: var(--space-2xl); padding-top: var(--space-xl); border-top: 1px solid var(--color-border);">
+                <div>
+                    <div style="font-size: 1.35rem; font-weight: 800; color: var(--color-gold);">100%</div>
+                    <div style="font-size: 0.75rem; color: var(--color-text-muted);">Free Tool</div>
+                </div>
+                <div>
+                    <div style="font-size: 1.35rem; font-weight: 800; color: var(--color-gold);">Instant</div>
+                    <div style="font-size: 0.75rem; color: var(--color-text-muted);">Results</div>
+                </div>
+                <div>
+                    <div style="font-size: 1.35rem; font-weight: 800; color: var(--color-gold);">Accurate</div>
+                    <div style="font-size: 0.75rem; color: var(--color-text-muted);">Calculations</div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    {% if request.user.is_authenticated %}
+    <!-- Amortization Table -->
+    <div class="card" style="border-radius: var(--radius-xl); overflow: hidden; margin-top: var(--space-lg);">
+        <div style="display: flex; align-items: center; gap: 12px; padding: var(--space-lg); border-bottom: 1px solid var(--color-border); background: var(--color-bg-soft);">
+            <div style="width: 44px; height: 44px; border-radius: var(--radius-md); background: linear-gradient(135deg, rgba(16,185,129,0.15), rgba(16,185,129,0.05)); display: flex; align-items: center; justify-content: center; color: var(--color-success); border: 1px solid rgba(16,185,129,0.2); flex-shrink: 0;">
+                <span class="material-icons-round" style="font-size: 22px;">table_chart</span>
+            </div>
+            <div>
+                <h2 style="font-size: 1.1rem; font-weight: 700; color: var(--color-navy); margin: 0;">Year-wise Breakdown</h2>
+                <p style="font-size: 0.8rem; color: var(--color-text-muted); margin: 2px 0 0 0;">Track your loan repayment schedule</p>
+            </div>
+        </div>
+        <div style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
+            <table style="width: 100%; border-collapse: collapse; min-width: 500px;">
+                <thead>
+                    <tr>
+                        <th style="text-align: left; padding: 12px 16px; font-size: 0.7rem; font-weight: 700; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid var(--color-border); background: var(--color-bg-soft); white-space: nowrap;">Year</th>
+                        <th style="text-align: left; padding: 12px 16px; font-size: 0.7rem; font-weight: 700; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid var(--color-border); background: var(--color-bg-soft); white-space: nowrap;">Principal</th>
+                        <th style="text-align: left; padding: 12px 16px; font-size: 0.7rem; font-weight: 700; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid var(--color-border); background: var(--color-bg-soft); white-space: nowrap;">Interest</th>
+                        <th style="text-align: left; padding: 12px 16px; font-size: 0.7rem; font-weight: 700; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid var(--color-border); background: var(--color-bg-soft); white-space: nowrap;">Balance</th>
+                        <th style="text-align: left; padding: 12px 16px; font-size: 0.7rem; font-weight: 700; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid var(--color-border); background: var(--color-bg-soft); white-space: nowrap;">Progress</th>
+                    </tr>
+                </thead>
+                <tbody id="amortizationBody">
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Trust Section -->
+    <div style="margin-top: var(--space-2xl); text-align: center;">
+        <div class="section-header" style="margin-bottom: var(--space-xl);">
             <span class="label">
-                <span class="material-icons-round" style="font-size:16px">map</span>
-                Visit Us
+                <span class="material-icons-round" style="font-size: 16px;">verified</span>
+                Why Trust Our Calculator
             </span>
-            <h2>Our Location</h2>
-            <p>Come visit our office for a personal consultation</p>
-            <div class="gold-line"></div>
+            <h2>Accurate & Transparent</h2>
+            <p>Our EMI calculator uses standard amortization formulas used by all major banks in India.</p>
         </div>
-        
-        <div class="card overflow-hidden reveal">
-            <div class="w-full h-[300px] md:h-[400px] bg-[var(--color-bg-soft)] flex items-center justify-center">
-                <iframe 
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d235013.70717427065!2d72.439654122987!3d23.020497541367155!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x395e848aba5bd449%3A0x4fcedd11614f6516!2sAhmedabad%2C%20Gujarat!5e0!3m2!1sen!2sin!4v1700000000000!5m2!1sen!2sin"
-                    width="100%" 
-                    height="100%" 
-                    style="border:0;" 
-                    allowfullscreen="" 
-                    loading="lazy" 
-                    referrerpolicy="no-referrer-when-downgrade">
-                </iframe>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--space-lg);">
+            <div class="card" style="padding: var(--space-xl); text-align: center;">
+                <div style="width: 56px; height: 56px; border-radius: var(--radius-lg); background: linear-gradient(135deg, rgba(212,175,55,0.12), rgba(212,175,55,0.04)); display: flex; align-items: center; justify-content: center; margin: 0 auto var(--space-md); color: var(--color-gold);">
+                    <span class="material-icons-round" style="font-size: 28px;">calculate</span>
+                </div>
+                <h4 style="font-size: 1rem; color: var(--color-navy); margin-bottom: 6px;">Standard Formula</h4>
+                <p style="font-size: 0.85rem; color: var(--color-text-muted); line-height: 1.6;">Uses the same reducing balance method as SBI, HDFC, ICICI & all major banks</p>
+            </div>
+            <div class="card" style="padding: var(--space-xl); text-align: center;">
+                <div style="width: 56px; height: 56px; border-radius: var(--radius-lg); background: linear-gradient(135deg, rgba(59,130,246,0.12), rgba(59,130,246,0.04)); display: flex; align-items: center; justify-content: center; margin: 0 auto var(--space-md); color: #3b82f6;">
+                    <span class="material-icons-round" style="font-size: 28px;">update</span>
+                </div>
+                <h4 style="font-size: 1rem; color: var(--color-navy); margin-bottom: 6px;">Real-time Updates</h4>
+                <p style="font-size: 0.85rem; color: var(--color-text-muted); line-height: 1.6;">Adjust any value and see results instantly. No page reload needed</p>
+            </div>
+            <div class="card" style="padding: var(--space-xl); text-align: center;">
+                <div style="width: 56px; height: 56px; border-radius: var(--radius-lg); background: linear-gradient(135deg, rgba(16,185,129,0.12), rgba(16,185,129,0.04)); display: flex; align-items: center; justify-content: center; margin: 0 auto var(--space-md); color: var(--color-success);">
+                    <span class="material-icons-round" style="font-size: 28px;">security</span>
+                </div>
+                <h4 style="font-size: 1rem; color: var(--color-navy); margin-bottom: 6px;">100% Secure</h4>
+                <p style="font-size: 0.85rem; color: var(--color-text-muted); line-height: 1.6;">No data is stored or shared. All calculations happen in your browser</p>
+            </div>
+            <div class="card" style="padding: var(--space-xl); text-align: center;">
+                <div style="width: 56px; height: 56px; border-radius: var(--radius-lg); background: linear-gradient(135deg, rgba(168,85,247,0.12), rgba(168,85,247,0.04)); display: flex; align-items: center; justify-content: center; margin: 0 auto var(--space-md); color: #a855f7;">
+                    <span class="material-icons-round" style="font-size: 28px;">table_chart</span>
+                </div>
+                <h4 style="font-size: 1rem; color: var(--color-navy); margin-bottom: 6px;">Full Schedule</h4>
+                <p style="font-size: 0.85rem; color: var(--color-text-muted); line-height: 1.6;">Year-wise breakdown with principal, interest, balance & progress bar</p>
             </div>
         </div>
     </div>
-</section>
 
-<!-- ============================================
-   FAQ SECTION - Common Questions
-   ============================================ -->
-<section class="section-pad bg-white">
-    <div class="container-app max-w-3xl">
-        <div class="section-header mb-10">
+    <!-- FAQ Section -->
+    <div style="margin-top: var(--space-2xl);">
+        <div class="section-header" style="margin-bottom: var(--space-xl);">
             <span class="label">
-                <span class="material-icons-round" style="font-size:16px">help</span>
-                FAQ
+                <span class="material-icons-round" style="font-size: 16px;">help_outline</span>
+                Common Questions
             </span>
-            <h2>Frequently Asked Questions</h2>
-            <p>Quick answers to common questions</p>
-            <div class="gold-line"></div>
+            <h2>EMI Calculator FAQs</h2>
         </div>
-        
-        <div class="space-y-4">
-            <div class="card p-5 reveal">
-                <button onclick="toggleFaq(this)" class="w-full flex items-center justify-between text-left">
-                    <span class="font-semibold text-[var(--color-navy)] text-sm md:text-base">How do I schedule a site visit?</span>
-                    <span class="material-icons-round text-[var(--color-gold)] transition-transform duration-200" style="font-size:20px">expand_more</span>
-                </button>
-                <div class="hidden mt-3 text-sm text-[var(--color-text-muted)] leading-relaxed">
-                    You can schedule a site visit directly from the property detail page by clicking "Schedule Visit" or by contacting us via WhatsApp or phone. Our team will confirm the appointment within 2 hours.
+        <div style="max-width: 800px; margin-inline: auto;">
+            {% for faq in faqs|default:'' %}
+            <details style="background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); margin-bottom: var(--space-md); overflow: hidden;">
+                <summary style="padding: var(--space-md) var(--space-lg); font-weight: 600; color: var(--color-navy); font-size: 0.95rem; cursor: pointer; list-style: none; display: flex; align-items: center; justify-content: space-between;" onclick="this.querySelector('.faq-icon').style.transform=this.parentElement.open?'rotate(0deg)':'rotate(180deg)'">
+                    <span>{{ faq.question }}</span>
+                    <span class="faq-icon material-icons-round" style="color: var(--color-gold); transition: transform 0.3s ease;">expand_more</span>
+                </summary>
+                <div style="padding: 0 var(--space-lg) var(--space-md); color: var(--color-text-muted); font-size: 0.9rem; line-height: 1.7;">
+                    {{ faq.answer }}
                 </div>
-            </div>
-            
-            <div class="card p-5 reveal">
-                <button onclick="toggleFaq(this)" class="w-full flex items-center justify-between text-left">
-                    <span class="font-semibold text-[var(--color-navy)] text-sm md:text-base">Are all properties RERA registered?</span>
-                    <span class="material-icons-round text-[var(--color-gold)] transition-transform duration-200" style="font-size:20px">expand_more</span>
-                </button>
-                <div class="hidden mt-3 text-sm text-[var(--color-text-muted)] leading-relaxed">
-                    Yes, we only list properties that are RERA registered or have valid legal documentation. Each property page displays the RERA number for verification.
+            </details>
+            {% empty %}
+            <details style="background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); margin-bottom: var(--space-md); overflow: hidden;">
+                <summary style="padding: var(--space-md) var(--space-lg); font-weight: 600; color: var(--color-navy); font-size: 0.95rem; cursor: pointer; list-style: none; display: flex; align-items: center; justify-content: space-between;">
+                    <span>What is EMI and how is it calculated?</span>
+                    <span class="material-icons-round" style="color: var(--color-gold);">expand_more</span>
+                </summary>
+                <div style="padding: 0 var(--space-lg) var(--space-md); color: var(--color-text-muted); font-size: 0.9rem; line-height: 1.7;">
+                    EMI (Equated Monthly Installment) is the fixed payment amount made by a borrower to a lender at a specified date each month. It includes both principal and interest components. We use the standard reducing balance method: EMI = [P × R × (1+R)^N] / [(1+R)^N - 1], where P is principal, R is monthly interest rate, and N is number of months.
                 </div>
-            </div>
-            
-            <div class="card p-5 reveal">
-                <button onclick="toggleFaq(this)" class="w-full flex items-center justify-between text-left">
-                    <span class="font-semibold text-[var(--color-navy)] text-sm md:text-base">Do you charge any brokerage fees?</span>
-                    <span class="material-icons-round text-[var(--color-gold)] transition-transform duration-200" style="font-size:20px">expand_more</span>
-                </button>
-                <div class="hidden mt-3 text-sm text-[var(--color-text-muted)] leading-relaxed">
-                    No, we do not charge any brokerage fees to buyers. Our services are completely free for property seekers. Builders pay us a small commission only after successful deal closure.
+            </details>
+            <details style="background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); margin-bottom: var(--space-md); overflow: hidden;">
+                <summary style="padding: var(--space-md) var(--space-lg); font-weight: 600; color: var(--color-navy); font-size: 0.95rem; cursor: pointer; list-style: none; display: flex; align-items: center; justify-content: space-between;">
+                    <span>How much down payment should I make?</span>
+                    <span class="material-icons-round" style="color: var(--color-gold);">expand_more</span>
+                </summary>
+                <div style="padding: 0 var(--space-lg) var(--space-md); color: var(--color-text-muted); font-size: 0.9rem; line-height: 1.7;">
+                    Most banks in India require a minimum down payment of 10-20% of the property value. However, putting down 25-30% can significantly reduce your EMI burden and total interest paid over the loan tenure. Use our calculator to see the difference.
                 </div>
-            </div>
-            
-            <div class="card p-5 reveal">
-                <button onclick="toggleFaq(this)" class="w-full flex items-center justify-between text-left">
-                    <span class="font-semibold text-[var(--color-navy)] text-sm md:text-base">Can I get home loan assistance?</span>
-                    <span class="material-icons-round text-[var(--color-gold)] transition-transform duration-200" style="font-size:20px">expand_more</span>
-                </button>
-                <div class="hidden mt-3 text-sm text-[var(--color-text-muted)] leading-relaxed">
-                    Absolutely! We have partnerships with leading banks and NBFCs. Our team can help you get the best home loan rates and guide you through the entire documentation process.
+            </details>
+            <details style="background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); margin-bottom: var(--space-md); overflow: hidden;">
+                <summary style="padding: var(--space-md) var(--space-lg); font-weight: 600; color: var(--color-navy); font-size: 0.95rem; cursor: pointer; list-style: none; display: flex; align-items: center; justify-content: space-between;">
+                    <span>What is the current home loan interest rate?</span>
+                    <span class="material-icons-round" style="color: var(--color-gold);">expand_more</span>
+                </summary>
+                <div style="padding: 0 var(--space-lg) var(--space-md); color: var(--color-text-muted); font-size: 0.9rem; line-height: 1.7;">
+                    As of 2026, home loan interest rates in India range from 8.30% to 9.50% per annum depending on the bank, your credit score, and loan amount. SBI, HDFC, ICICI, and Axis Bank are among the top lenders. We recommend checking with multiple banks for the best rate.
                 </div>
-            </div>
-            
-            <div class="card p-5 reveal">
-                <button onclick="toggleFaq(this)" class="w-full flex items-center justify-between text-left">
-                    <span class="font-semibold text-[var(--color-navy)] text-sm md:text-base">What is your refund policy?</span>
-                    <span class="material-icons-round text-[var(--color-gold)] transition-transform duration-200" style="font-size:20px">expand_more</span>
-                </button>
-                <div class="hidden mt-3 text-sm text-[var(--color-text-muted)] leading-relaxed">
-                    For builders, we offer a 7-day money-back guarantee on subscription plans if you're not satisfied. For buyers, since our services are free, there are no refunds applicable.
+            </details>
+            <details style="background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); margin-bottom: var(--space-md); overflow: hidden;">
+                <summary style="padding: var(--space-md) var(--space-lg); font-weight: 600; color: var(--color-navy); font-size: 0.95rem; cursor: pointer; list-style: none; display: flex; align-items: center; justify-content: space-between;">
+                    <span>Can I prepay my home loan?</span>
+                    <span class="material-icons-round" style="color: var(--color-gold);">expand_more</span>
+                </summary>
+                <div style="padding: 0 var(--space-lg) var(--space-md); color: var(--color-text-muted); font-size: 0.9rem; line-height: 1.7;">
+                    Yes, most banks allow partial or full prepayment of home loans. For floating rate loans, there are typically no prepayment charges. For fixed-rate loans, charges may apply. Prepaying can significantly reduce your total interest outgo.
                 </div>
-            </div>
+            </details>
+            {% endfor %}
         </div>
     </div>
-</section>
 
+    <!-- CTA Section -->
+    <div style="margin-top: var(--space-2xl); text-align: center; padding: var(--space-2xl) var(--space-lg); background: linear-gradient(135deg, var(--color-navy) 0%, var(--color-navy-light) 100%); border-radius: var(--radius-xl); color: #fff;">
+        <h2 style="color: #fff; font-size: clamp(1.25rem, 3vw, 1.75rem); margin-bottom: var(--space-sm);">Ready to Find Your Dream Home?</h2>
+        <p style="color: rgba(255,255,255,0.8); font-size: 1rem; max-width: 500px; margin: 0 auto var(--space-xl);">Browse 5000+ verified properties across 50+ cities. All listings are RERA registered.</p>
+        <a href="{% url 'property_list' %}" class="btn btn-gold" style="font-size: 1rem; padding: 14px 36px;">
+            <span class="material-icons-round">search</span>
+            Browse Properties
+        </a>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
 <script>
-// FAQ Toggle
-function toggleFaq(btn) {
-    const content = btn.nextElementSibling;
-    const arrow = btn.querySelector('.material-icons-round');
-    
-    if (content.classList.contains('hidden')) {
-        content.classList.remove('hidden');
-        arrow.style.transform = 'rotate(180deg)';
-    } else {
-        content.classList.add('hidden');
-        arrow.style.transform = '';
+// ============================================
+// EMI CALCULATOR SCRIPTS
+// ============================================
+
+function calculateEMI() {
+    const propertyPrice = parseFloat(document.getElementById('propertyPrice').value) || 0;
+    const downPayment = parseFloat(document.getElementById('downPayment').value) || 0;
+    const interestRate = parseFloat(document.getElementById('interestRate').value) || 0;
+    const loanTenure = parseFloat(document.getElementById('loanTenure').value) || 0;
+
+    const loanAmount = propertyPrice - downPayment;
+    const monthlyRate = interestRate / 12 / 100;
+    const months = loanTenure * 12;
+
+    let emi = 0;
+    if (loanAmount > 0 && monthlyRate > 0 && months > 0) {
+        emi = loanAmount * monthlyRate * Math.pow(1 + monthlyRate, months) / (Math.pow(1 + monthlyRate, months) - 1);
+    }
+
+    const totalPayment = emi * months;
+    const totalInterest = totalPayment - loanAmount;
+    const interestRatio = totalPayment > 0 ? (totalInterest / totalPayment * 100).toFixed(1) : 0;
+
+    // Update displays
+    document.getElementById('emiAmount').textContent = '₹' + formatNumber(emi);
+    document.getElementById('tenureDisplay').textContent = loanTenure;
+    document.getElementById('loanAmountDisplay').textContent = '₹' + formatNumber(loanAmount);
+    document.getElementById('totalInterestDisplay').textContent = '₹' + formatNumber(totalInterest);
+    document.getElementById('totalPaymentDisplay').textContent = '₹' + formatNumber(totalPayment);
+    document.getElementById('interestRatio').textContent = interestRatio + '%';
+    document.getElementById('principalDisplay').textContent = '₹' + formatNumberCompact(loanAmount);
+    document.getElementById('interestDisplay').textContent = '₹' + formatNumberCompact(totalInterest);
+
+    // Draw chart
+    drawChart(loanAmount, totalInterest);
+
+    // Update table
+    updateAmortizationTable(loanAmount, monthlyRate, months, emi);
+}
+
+function formatNumber(num) {
+    return Math.round(num).toLocaleString('en-IN');
+}
+
+function formatNumberCompact(num) {
+    if (num >= 10000000) return (num / 10000000).toFixed(1) + 'Cr';
+    if (num >= 100000) return (num / 100000).toFixed(1) + 'L';
+    if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+    return num.toString();
+}
+
+function syncRange(inputId, value) {
+    document.getElementById(inputId).value = value;
+}
+
+function setDownPayment(percent) {
+    const price = parseFloat(document.getElementById('propertyPrice').value) || 0;
+    document.getElementById('downPayment').value = Math.round(price * percent / 100);
+
+    document.querySelectorAll('.dp-tag').forEach(t => {
+        t.style.background = 'var(--color-bg-soft)';
+        t.style.borderColor = 'var(--color-border)';
+        t.style.color = 'var(--color-text-muted)';
+    });
+    event.target.style.background = 'linear-gradient(135deg, rgba(212,175,55,0.15), rgba(212,175,55,0.05))';
+    event.target.style.borderColor = 'var(--color-gold)';
+    event.target.style.color = 'var(--color-gold-dark)';
+    calculateEMI();
+}
+
+function setTenure(years) {
+    document.getElementById('loanTenure').value = years;
+    document.querySelectorAll('.tenure-tag').forEach(t => {
+        t.style.background = 'var(--color-bg-soft)';
+        t.style.borderColor = 'var(--color-border)';
+        t.style.color = 'var(--color-text-muted)';
+    });
+    event.target.style.background = 'linear-gradient(135deg, rgba(212,175,55,0.15), rgba(212,175,55,0.05))';
+    event.target.style.borderColor = 'var(--color-gold)';
+    event.target.style.color = 'var(--color-gold-dark)';
+    calculateEMI();
+}
+
+// ===== CANVAS CHART =====
+function drawChart(principal, interest) {
+    const canvas = document.getElementById('emiChart');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const total = principal + interest;
+    const principalAngle = (principal / total) * 2 * Math.PI;
+
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+    const radius = Math.min(centerX, centerY) - 10;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Principal slice
+    ctx.beginPath();
+    ctx.moveTo(centerX, centerY);
+    ctx.arc(centerX, centerY, radius, -Math.PI / 2, -Math.PI / 2 + principalAngle);
+    ctx.closePath();
+    ctx.fillStyle = '#d4af37';
+    ctx.fill();
+
+    // Interest slice
+    ctx.beginPath();
+    ctx.moveTo(centerX, centerY);
+    ctx.arc(centerX, centerY, radius, -Math.PI / 2 + principalAngle, -Math.PI / 2 + 2 * Math.PI);
+    ctx.closePath();
+    ctx.fillStyle = '#3b82f6';
+    ctx.fill();
+
+    // Inner circle (donut)
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, radius * 0.6, 0, 2 * Math.PI);
+    ctx.fillStyle = '#ffffff';
+    ctx.fill();
+
+    // Center text
+    ctx.fillStyle = '#0f172a';
+    ctx.font = 'bold 13px Inter, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('EMI', centerX, centerY - 8);
+    ctx.fillStyle = '#d4af37';
+    ctx.font = 'bold 11px Inter, sans-serif';
+    ctx.fillText('Breakdown', centerX, centerY + 8);
+}
+
+// ===== AMORTIZATION TABLE =====
+function updateAmortizationTable(loanAmount, monthlyRate, months, emi) {
+    const tbody = document.getElementById('amortizationBody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+
+    let balance = loanAmount;
+    const years = Math.ceil(months / 12);
+    const originalLoan = loanAmount;
+
+    for (let year = 1; year <= years; year++) {
+        let yearlyPrincipal = 0;
+        let yearlyInterest = 0;
+        const monthsInYear = Math.min(12, months - (year - 1) * 12);
+
+        for (let m = 0; m < monthsInYear; m++) {
+            if (balance <= 0) break;
+            const interest = balance * monthlyRate;
+            const principal = emi - interest;
+            yearlyInterest += interest;
+            yearlyPrincipal += principal;
+            balance -= principal;
+            if (balance < 0) balance = 0;
+        }
+
+        const progress = ((originalLoan - balance) / originalLoan * 100).toFixed(1);
+
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td style="padding: 12px 16px; font-size: 0.85rem; color: var(--color-gold); font-weight: 700; border-bottom: 1px solid var(--color-border);">Year ${year}</td>
+            <td style="padding: 12px 16px; font-size: 0.85rem; color: var(--color-text); border-bottom: 1px solid var(--color-border);">₹${formatNumber(yearlyPrincipal)}</td>
+            <td style="padding: 12px 16px; font-size: 0.85rem; color: var(--color-text); border-bottom: 1px solid var(--color-border);">₹${formatNumber(yearlyInterest)}</td>
+            <td style="padding: 12px 16px; font-size: 0.85rem; color: var(--color-text); border-bottom: 1px solid var(--color-border);">₹${formatNumber(balance)}</td>
+            <td style="padding: 12px 16px; border-bottom: 1px solid var(--color-border);">
+                <div style="width: 100%; min-width: 80px; height: 6px; background: var(--color-border); border-radius: 3px; overflow: hidden;">
+                    <div style="height: 100%; background: linear-gradient(90deg, var(--color-gold), var(--color-gold-light)); border-radius: 3px; transition: width 0.5s ease; width: ${progress}%;"></div>
+                </div>
+            </td>
+        `;
+        tbody.appendChild(row);
     }
 }
-</script>
 
+// Initialize
+calculateEMI();
+</script>
 {% endblock %}
