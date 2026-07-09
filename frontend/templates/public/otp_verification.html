@@ -1,67 +1,262 @@
 {% extends "public/base.html" %}
+{% load static %}
+
 {% block title %}Verify OTP{% endblock %}
 
 {% block content %}
 
-<section class="min-h-[100dvh] flex items-center justify-center luxury-bg px-4 sm:px-6 py-10">
+<!-- ============================================
+     VERIFY OTP - RealShri
+     Mobile-first, clean, content-rich
+     ============================================ -->
 
-<div class="max-w-md w-full card-luxury text-center reveal">
+<section style="min-height: 100dvh; display: flex; align-items: center; justify-content: center; padding: var(--space-xl) var(--space-md); background: linear-gradient(135deg, var(--color-navy) 0%, var(--color-navy-light) 100%);">
 
-    <div class="hex-divider mb-3 mx-auto"></div>
-    <h2 class="text-2xl sm:text-3xl font-display gold mb-2" style="font-family: 'Playfair Display', serif;">Verify Identity</h2>
-    <p class="text-[var(--text-muted)] mb-8 text-sm">
-        Enter the 6-digit code sent to your email
-    </p>
+    <div class="card" style="width: 100%; max-width: 440px; border-radius: var(--radius-xl); overflow: hidden; animation: fadeInUp 0.5s ease;">
 
-    {% if error %}
-    <p class="text-red-600 mb-4 text-sm">{{ error }}</p>
-    {% endif %}
-
-    <form method="POST" class="space-y-7 sm:space-y-8">
-        {% csrf_token %}
-        <input type="hidden" name="otp" id="finalOtp">
-
-        <!-- OTP BOXES -->
-        <div class="flex justify-center gap-2 sm:gap-3">
-            {% for i in "123456" %}
-            <input class="otp-input w-11 h-13 sm:w-12 sm:h-14 text-center text-xl font-bold rounded-xl bg-[var(--bg-soft)] border border-[var(--border)] text-[var(--navy-deep)] focus:ring-2 focus:ring-[var(--gold-1)] focus:border-[var(--gold-1)] outline-none"
-                   maxlength="1" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code"/>
-            {% endfor %}
+        <!-- Header -->
+        <div style="text-align: center; padding: var(--space-xl) var(--space-lg) var(--space-md);">
+            <div style="width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, rgba(212,175,55,0.15), rgba(212,175,55,0.05)); display: flex; align-items: center; justify-content: center; margin: 0 auto var(--space-md); border: 1.5px solid rgba(212,175,55,0.2);">
+                <span class="material-icons-round" style="font-size: 28px; color: var(--color-gold);">verified_user</span>
+            </div>
+            <div class="gold-line" style="margin-bottom: var(--space-md);"></div>
+            <h1 style="font-size: clamp(1.5rem, 4vw, 1.75rem); font-weight: 800; color: var(--color-navy); margin-bottom: 8px;">Verify Identity</h1>
+            <p style="font-size: 0.9rem; color: var(--color-text-muted); margin: 0; line-height: 1.6;">
+                Enter the 6-digit code sent to your email
+            </p>
         </div>
 
-        <button class="btn-gold w-full min-h-[52px]">
-            Verify OTP
-        </button>
-    </form>
+        <!-- Error Message -->
+        {% if error %}
+        <div style="margin: 0 var(--space-lg) var(--space-md); padding: var(--space-md); border-radius: var(--radius-lg); background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2); color: var(--color-danger); font-size: 0.85rem; font-weight: 500; display: flex; align-items: center; gap: 8px;">
+            <span class="material-icons-round" style="font-size: 18px;">error</span>
+            {{ error }}
+        </div>
+        {% endif %}
 
-</div>
+        <!-- Success Message -->
+        {% if success %}
+        <div style="margin: 0 var(--space-lg) var(--space-md); padding: var(--space-md); border-radius: var(--radius-lg); background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.2); color: var(--color-success); font-size: 0.85rem; font-weight: 500; display: flex; align-items: center; gap: 8px;">
+            <span class="material-icons-round" style="font-size: 18px;">check_circle</span>
+            {{ success }}
+        </div>
+        {% endif %}
+
+        <!-- Timer -->
+        <div style="margin: 0 var(--space-lg) var(--space-md); text-align: center;">
+            <p style="font-size: 0.85rem; color: var(--color-text-muted); margin: 0;">
+                Code expires in <span id="timer" style="font-weight: 700; color: var(--color-gold);">05:00</span>
+            </p>
+        </div>
+
+        <!-- Form -->
+        <form method="POST" style="padding: 0 var(--space-lg) var(--space-lg);" id="otpForm">
+            {% csrf_token %}
+            <input type="hidden" name="otp" id="finalOtp">
+
+            <!-- OTP Boxes -->
+            <div style="display: flex; justify-content: center; gap: 8px; margin-bottom: var(--space-xl);">
+                <input class="otp-input" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code" style="width: 48px; height: 56px; text-align: center; font-size: 1.25rem; font-weight: 800; border-radius: var(--radius-md); background: var(--color-bg-soft); border: 1.5px solid var(--color-border); color: var(--color-navy); outline: none; transition: all 0.2s ease; caret-color: var(--color-gold);" onfocus="this.style.borderColor='var(--color-gold)';this.style.boxShadow='0 0 0 4px rgba(212,175,55,0.15)'" onblur="this.style.borderColor='var(--color-border)';this.style.boxShadow='none'">
+                <input class="otp-input" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]*" style="width: 48px; height: 56px; text-align: center; font-size: 1.25rem; font-weight: 800; border-radius: var(--radius-md); background: var(--color-bg-soft); border: 1.5px solid var(--color-border); color: var(--color-navy); outline: none; transition: all 0.2s ease; caret-color: var(--color-gold);" onfocus="this.style.borderColor='var(--color-gold)';this.style.boxShadow='0 0 0 4px rgba(212,175,55,0.15)'" onblur="this.style.borderColor='var(--color-border)';this.style.boxShadow='none'">
+                <input class="otp-input" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]*" style="width: 48px; height: 56px; text-align: center; font-size: 1.25rem; font-weight: 800; border-radius: var(--radius-md); background: var(--color-bg-soft); border: 1.5px solid var(--color-border); color: var(--color-navy); outline: none; transition: all 0.2s ease; caret-color: var(--color-gold);" onfocus="this.style.borderColor='var(--color-gold)';this.style.boxShadow='0 0 0 4px rgba(212,175,55,0.15)'" onblur="this.style.borderColor='var(--color-border)';this.style.boxShadow='none'">
+                <input class="otp-input" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]*" style="width: 48px; height: 56px; text-align: center; font-size: 1.25rem; font-weight: 800; border-radius: var(--radius-md); background: var(--color-bg-soft); border: 1.5px solid var(--color-border); color: var(--color-navy); outline: none; transition: all 0.2s ease; caret-color: var(--color-gold);" onfocus="this.style.borderColor='var(--color-gold)';this.style.boxShadow='0 0 0 4px rgba(212,175,55,0.15)'" onblur="this.style.borderColor='var(--color-border)';this.style.boxShadow='none'">
+                <input class="otp-input" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]*" style="width: 48px; height: 56px; text-align: center; font-size: 1.25rem; font-weight: 800; border-radius: var(--radius-md); background: var(--color-bg-soft); border: 1.5px solid var(--color-border); color: var(--color-navy); outline: none; transition: all 0.2s ease; caret-color: var(--color-gold);" onfocus="this.style.borderColor='var(--color-gold)';this.style.boxShadow='0 0 0 4px rgba(212,175,55,0.15)'" onblur="this.style.borderColor='var(--color-border)';this.style.boxShadow='none'">
+                <input class="otp-input" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]*" style="width: 48px; height: 56px; text-align: center; font-size: 1.25rem; font-weight: 800; border-radius: var(--radius-md); background: var(--color-bg-soft); border: 1.5px solid var(--color-border); color: var(--color-navy); outline: none; transition: all 0.2s ease; caret-color: var(--color-gold);" onfocus="this.style.borderColor='var(--color-gold)';this.style.boxShadow='0 0 0 4px rgba(212,175,55,0.15)'" onblur="this.style.borderColor='var(--color-border)';this.style.boxShadow='none'">
+            </div>
+
+            <!-- Submit -->
+            <button type="submit" id="submitBtn" class="btn btn-gold" style="width: 100%; min-height: 52px; font-size: 1rem;">
+                <span class="material-icons-round" style="font-size: 20px;">verified</span>
+                Verify OTP
+            </button>
+
+        </form>
+
+        <!-- Resend -->
+        <div style="text-align: center; padding: var(--space-md) var(--space-lg) var(--space-xl); border-top: 1px solid var(--color-border);">
+            <p style="font-size: 0.9rem; color: var(--color-text-muted); margin: 0 0 var(--space-sm) 0;">
+                Didn't receive the code?
+            </p>
+            <button id="resendBtn" onclick="resendOTP()" style="background: none; border: none; color: var(--color-gold); font-weight: 700; font-size: 0.9rem; cursor: pointer; font-family: inherit; display: inline-flex; align-items: center; gap: 6px;" disabled>
+                <span class="material-icons-round" style="font-size: 18px;">refresh</span>
+                Resend OTP
+            </button>
+            <p id="resendTimer" style="font-size: 0.8rem; color: var(--color-text-light); margin: 4px 0 0 0;">Wait 60s</p>
+        </div>
+
+    </div>
+
+    <!-- Trust Note -->
+    <div style="position: absolute; bottom: var(--space-xl); left: 50%; transform: translateX(-50%); text-align: center; max-width: 400px; padding: 0 var(--space-md);">
+        <div style="display: flex; align-items: center; justify-content: center; gap: 6px; color: rgba(255,255,255,0.6); font-size: 0.8rem;">
+            <span class="material-icons-round" style="font-size: 16px;">security</span>
+            <span>Your verification is encrypted and secure</span>
+        </div>
+    </div>
 
 </section>
 
+{% endblock %}
+
+{% block extra_js %}
 <script>
+// ============================================
+// OTP VERIFICATION SCRIPTS
+// ============================================
+
 const inputs = document.querySelectorAll(".otp-input");
 const hiddenInput = document.getElementById("finalOtp");
+const submitBtn = document.getElementById("submitBtn");
+const resendBtn = document.getElementById("resendBtn");
+const resendTimer = document.getElementById("resendTimer");
+const timerDisplay = document.getElementById("timer");
 
+// Auto-focus and navigation
 inputs.forEach((input, index) => {
-    input.addEventListener("input", () => {
-        if (input.value.length === 1 && index < inputs.length - 1) {
-            inputs[index + 1].focus();
+    // Input handling
+    input.addEventListener("input", (e) => {
+        // Only allow numbers
+        input.value = input.value.replace(/[^0-9]/g, '');
+
+        if (input.value.length === 1) {
+            if (index < inputs.length - 1) {
+                inputs[index + 1].focus();
+            } else {
+                input.blur();
+                // Auto-submit when all filled
+                if (getOTP().length === 6) {
+                    document.getElementById("otpForm").submit();
+                }
+            }
         }
         updateOTP();
     });
 
+    // Backspace handling
     input.addEventListener("keydown", (e) => {
         if (e.key === "Backspace" && input.value === "" && index > 0) {
             inputs[index - 1].focus();
         }
+        // Allow arrow key navigation
+        if (e.key === "ArrowLeft" && index > 0) {
+            inputs[index - 1].focus();
+        }
+        if (e.key === "ArrowRight" && index < inputs.length - 1) {
+            inputs[index + 1].focus();
+        }
+    });
+
+    // Paste handling
+    input.addEventListener("paste", (e) => {
+        e.preventDefault();
+        const pasteData = e.clipboardData.getData("text").replace(/[^0-9]/g, '').slice(0, 6);
+
+        pasteData.split("").forEach((char, i) => {
+            if (inputs[i]) {
+                inputs[i].value = char;
+            }
+        });
+
+        // Focus next empty or last filled
+        const nextEmpty = Array.from(inputs).findIndex(inp => !inp.value);
+        if (nextEmpty !== -1) {
+            inputs[nextEmpty].focus();
+        } else {
+            inputs[inputs.length - 1].focus();
+        }
+
+        updateOTP();
+
+        // Auto-submit if all filled
+        if (getOTP().length === 6) {
+            setTimeout(() => document.getElementById("otpForm").submit(), 200);
+        }
     });
 });
 
-function updateOTP() {
+function getOTP() {
     let otp = "";
     inputs.forEach(input => otp += input.value);
-    hiddenInput.value = otp;
+    return otp;
 }
-</script>
 
+function updateOTP() {
+    hiddenInput.value = getOTP();
+}
+
+// Countdown Timer (5 minutes)
+let timeLeft = 300; // 5 minutes in seconds
+
+function updateTimer() {
+    const minutes = Math.floor(timeLeft / 60);
+    const seconds = timeLeft % 60;
+    timerDisplay.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+
+    if (timeLeft <= 60) {
+        timerDisplay.style.color = 'var(--color-danger)';
+    }
+
+    if (timeLeft > 0) {
+        timeLeft--;
+        setTimeout(updateTimer, 1000);
+    } else {
+        timerDisplay.textContent = "Expired";
+        timerDisplay.style.color = 'var(--color-danger)';
+        submitBtn.disabled = true;
+        submitBtn.style.opacity = '0.5';
+    }
+}
+
+// Resend Timer (60 seconds)
+let resendTimeLeft = 60;
+
+function updateResendTimer() {
+    if (resendTimeLeft > 0) {
+        resendTimer.textContent = `Wait ${resendTimeLeft}s`;
+        resendTimeLeft--;
+        setTimeout(updateResendTimer, 1000);
+    } else {
+        resendBtn.disabled = false;
+        resendBtn.style.opacity = '1';
+        resendTimer.textContent = '';
+    }
+}
+
+function resendOTP() {
+    resendBtn.disabled = true;
+    resendBtn.style.opacity = '0.5';
+    resendTimeLeft = 60;
+    updateResendTimer();
+
+    // Reset OTP timer
+    timeLeft = 300;
+    timerDisplay.style.color = 'var(--color-gold)';
+    submitBtn.disabled = false;
+    submitBtn.style.opacity = '1';
+
+    // Clear inputs
+    inputs.forEach(input => input.value = '');
+    inputs[0].focus();
+    updateOTP();
+
+    // Show toast
+    showToast('OTP resent to your email', 'success');
+
+    // Call backend API
+    fetch('/api/resend-otp/', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken'),
+            'Content-Type': 'application/json'
+        }
+    }).catch(() => {});
+}
+
+// Initialize
+document.addEventListener('DOMContentLoaded', () => {
+    inputs[0].focus();
+    updateTimer();
+    updateResendTimer();
+});
+</script>
 {% endblock %}

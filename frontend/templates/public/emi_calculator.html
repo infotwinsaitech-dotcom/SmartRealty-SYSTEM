@@ -1,757 +1,519 @@
 {% extends "public/base.html" %}
 {% load static %}
 
-{% block title %}EMI Calculator | Luxury Properties{% endblock %}
+{% block title %}EMI Calculator{% endblock %}
+
 {% block content %}
 
-<!-- ====== HERO ====== -->
-<section class="relative py-10 sm:py-14 md:py-20 text-center overflow-hidden">
-  <div class="absolute inset-0 luxury-bg"></div>
-  <div class="relative z-10 px-4">
-    <div class="hex-divider mb-3"></div>
-    <h1 class="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-extrabold tracking-tight gold mb-3 sm:mb-4 leading-[1.15]" style="font-family: 'Playfair Display', serif;">
-      EMI Calculator
-    </h1>
-    <p class="text-[var(--text-muted)] max-w-xl mx-auto text-sm sm:text-base md:text-lg font-light">
-      Plan your dream home with precise monthly installment calculations.
-    </p>
-  </div>
+<!-- ============================================
+     EMI CALCULATOR - RealShri
+     Mobile-first, clean, content-rich
+     ============================================ -->
+
+<!-- Hero Section -->
+<section class="hero-section" style="min-height: 30vh; max-height: 38vh;">
+    <div class="hero-content" style="max-width: 700px;">
+        <div style="display: inline-flex; align-items: center; gap: 8px; background: rgba(212,175,55,0.15); padding: 6px 16px; border-radius: 9999px; margin-bottom: 16px;">
+            <span class="material-icons-round" style="font-size: 18px; color: var(--color-gold);">calculate</span>
+            <span style="font-size: 0.85rem; font-weight: 600; color: var(--color-gold);">Financial Planning</span>
+        </div>
+        <h1 class="hero-title" style="font-size: clamp(1.5rem, 4vw, 2.25rem);">EMI Calculator</h1>
+        <p class="hero-subtitle" style="font-size: clamp(0.9rem, 2vw, 1.05rem);">
+            Plan your dream home with precise monthly installment calculations. Know exactly what you pay before you buy.
+        </p>
+    </div>
 </section>
 
-<!-- ====== CALCULATOR ====== -->
-<section class="max-w-6xl mx-auto px-4 md:px-6 pb-16 sm:pb-20">
-  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
+<!-- Calculator Content -->
+<div class="container-app section-pad" style="padding-top: clamp(1.5rem, 4vw, 2.5rem);">
+    <div style="display: grid; grid-template-columns: 1fr; gap: var(--space-lg);">
 
-    <!-- INPUT FORM -->
-    <div class="calc-card">
-      <div class="calc-header">
-        <div class="calc-icon">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
-          </svg>
-        </div>
-        <h2 class="calc-title">Loan Details</h2>
-      </div>
+        {% if request.user.is_authenticated %}
+        <!-- INPUT FORM -->
+        <div class="card" style="border-radius: var(--radius-xl); overflow: hidden;">
+            <div style="display: flex; align-items: center; gap: 12px; padding: var(--space-lg); border-bottom: 1px solid var(--color-border); background: var(--color-bg-soft);">
+                <div style="width: 44px; height: 44px; border-radius: var(--radius-md); background: linear-gradient(135deg, rgba(212,175,55,0.15), rgba(212,175,55,0.05)); display: flex; align-items: center; justify-content: center; color: var(--color-gold); border: 1px solid rgba(212,175,55,0.2); flex-shrink: 0;">
+                    <span class="material-icons-round" style="font-size: 22px;">calculate</span>
+                </div>
+                <div>
+                    <h2 style="font-size: 1.1rem; font-weight: 700; color: var(--color-navy); margin: 0;">Loan Details</h2>
+                    <p style="font-size: 0.8rem; color: var(--color-text-muted); margin: 2px 0 0 0;">Adjust values to see your EMI</p>
+                </div>
+            </div>
 
-      <div class="calc-body">
-        <!-- Loan Amount -->
-        <div class="input-group">
-          <label class="input-label">Property Price (₹)</label>
-          <div class="input-wrapper">
-            <span class="input-prefix">₹</span>
-            <input type="number" id="propertyPrice" value="5000000" class="calc-input" inputmode="numeric" oninput="calculateEMI()">
-          </div>
-          <input type="range" id="propertyPriceRange" min="1000000" max="100000000" step="100000" value="5000000" class="range-slider" oninput="syncRange('propertyPrice', this.value); calculateEMI()">
+            <div style="padding: var(--space-lg);">
+                <!-- Property Price -->
+                <div style="margin-bottom: var(--space-lg);">
+                    <label style="display: block; font-size: 0.75rem; font-weight: 600; color: var(--color-text-muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em;">Property Price (₹)</label>
+                    <div style="display: flex; align-items: center; background: var(--color-bg-soft); border: 1.5px solid var(--color-border); border-radius: var(--radius-lg); padding: 12px 16px; transition: all 0.25s ease; gap: 8px;" onfocusin="this.style.borderColor='var(--color-gold)';this.style.boxShadow='0 0 0 4px rgba(212,175,55,0.12)'" onfocusout="this.style.borderColor='var(--color-border)';this.style.boxShadow='none'">
+                        <span style="color: var(--color-text-muted); font-weight: 600; font-size: 0.9rem; flex-shrink: 0;">₹</span>
+                        <input type="number" id="propertyPrice" value="5000000" style="background: transparent; border: none; outline: none; color: var(--color-navy); font-size: 1rem; font-weight: 700; width: 100%; font-family: inherit;" inputmode="numeric" oninput="calculateEMI()">
+                    </div>
+                    <input type="range" id="propertyPriceRange" min="1000000" max="100000000" step="100000" value="5000000" style="width: 100%; margin-top: 10px; -webkit-appearance: none; height: 6px; border-radius: 3px; background: var(--color-border); outline: none;" oninput="syncRange('propertyPrice', this.value); calculateEMI()">
+                </div>
+
+                <!-- Down Payment -->
+                <div style="margin-bottom: var(--space-lg);">
+                    <label style="display: block; font-size: 0.75rem; font-weight: 600; color: var(--color-text-muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em;">Down Payment (₹)</label>
+                    <div style="display: flex; align-items: center; background: var(--color-bg-soft); border: 1.5px solid var(--color-border); border-radius: var(--radius-lg); padding: 12px 16px; transition: all 0.25s ease; gap: 8px;" onfocusin="this.style.borderColor='var(--color-gold)';this.style.boxShadow='0 0 0 4px rgba(212,175,55,0.12)'" onfocusout="this.style.borderColor='var(--color-border)';this.style.boxShadow='none'">
+                        <span style="color: var(--color-text-muted); font-weight: 600; font-size: 0.9rem; flex-shrink: 0;">₹</span>
+                        <input type="number" id="downPayment" value="1000000" style="background: transparent; border: none; outline: none; color: var(--color-navy); font-size: 1rem; font-weight: 700; width: 100%; font-family: inherit;" inputmode="numeric" oninput="calculateEMI()">
+                    </div>
+                    <div style="display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap;">
+                        <span class="dp-tag" onclick="setDownPayment(10)" style="background: var(--color-bg-soft); border: 1.5px solid var(--color-border); color: var(--color-text-muted); padding: 8px 16px; min-height: 36px; display: inline-flex; align-items: center; border-radius: var(--radius-full); font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; user-select: none;">10%</span>
+                        <span class="dp-tag" onclick="setDownPayment(20)" style="background: var(--color-bg-soft); border: 1.5px solid var(--color-border); color: var(--color-text-muted); padding: 8px 16px; min-height: 36px; display: inline-flex; align-items: center; border-radius: var(--radius-full); font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; user-select: none;">20%</span>
+                        <span class="dp-tag active" onclick="setDownPayment(25)" style="background: linear-gradient(135deg, rgba(212,175,55,0.15), rgba(212,175,55,0.05)); border: 1.5px solid var(--color-gold); color: var(--color-gold-dark); padding: 8px 16px; min-height: 36px; display: inline-flex; align-items: center; border-radius: var(--radius-full); font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; user-select: none;">25%</span>
+                        <span class="dp-tag" onclick="setDownPayment(30)" style="background: var(--color-bg-soft); border: 1.5px solid var(--color-border); color: var(--color-text-muted); padding: 8px 16px; min-height: 36px; display: inline-flex; align-items: center; border-radius: var(--radius-full); font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; user-select: none;">30%</span>
+                        <span class="dp-tag" onclick="setDownPayment(50)" style="background: var(--color-bg-soft); border: 1.5px solid var(--color-border); color: var(--color-text-muted); padding: 8px 16px; min-height: 36px; display: inline-flex; align-items: center; border-radius: var(--radius-full); font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; user-select: none;">50%</span>
+                    </div>
+                </div>
+
+                <!-- Interest Rate -->
+                <div style="margin-bottom: var(--space-lg);">
+                    <label style="display: block; font-size: 0.75rem; font-weight: 600; color: var(--color-text-muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em;">Interest Rate (% per annum)</label>
+                    <div style="display: flex; align-items: center; background: var(--color-bg-soft); border: 1.5px solid var(--color-border); border-radius: var(--radius-lg); padding: 12px 16px; transition: all 0.25s ease; gap: 8px;" onfocusin="this.style.borderColor='var(--color-gold)';this.style.boxShadow='0 0 0 4px rgba(212,175,55,0.12)'" onfocusout="this.style.borderColor='var(--color-border)';this.style.boxShadow='none'">
+                        <input type="number" id="interestRate" value="8.5" step="0.1" style="background: transparent; border: none; outline: none; color: var(--color-navy); font-size: 1rem; font-weight: 700; width: 100%; font-family: inherit;" inputmode="decimal" oninput="calculateEMI()">
+                        <span style="color: var(--color-text-muted); font-weight: 600; font-size: 0.9rem; flex-shrink: 0;">%</span>
+                    </div>
+                    <input type="range" id="interestRateRange" min="5" max="20" step="0.1" value="8.5" style="width: 100%; margin-top: 10px; -webkit-appearance: none; height: 6px; border-radius: 3px; background: var(--color-border); outline: none;" oninput="syncRange('interestRate', this.value); calculateEMI()">
+                </div>
+
+                <!-- Loan Tenure -->
+                <div>
+                    <label style="display: block; font-size: 0.75rem; font-weight: 600; color: var(--color-text-muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em;">Loan Tenure</label>
+                    <div style="display: flex; align-items: center; background: var(--color-bg-soft); border: 1.5px solid var(--color-border); border-radius: var(--radius-lg); padding: 12px 16px; transition: all 0.25s ease; gap: 8px;" onfocusin="this.style.borderColor='var(--color-gold)';this.style.boxShadow='0 0 0 4px rgba(212,175,55,0.12)'" onfocusout="this.style.borderColor='var(--color-border)';this.style.boxShadow='none'">
+                        <input type="number" id="loanTenure" value="20" style="background: transparent; border: none; outline: none; color: var(--color-navy); font-size: 1rem; font-weight: 700; width: 100%; font-family: inherit;" inputmode="numeric" oninput="calculateEMI()">
+                        <span style="color: var(--color-text-muted); font-weight: 600; font-size: 0.9rem; flex-shrink: 0;">Years</span>
+                    </div>
+                    <div style="display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap;">
+                        <span class="tenure-tag" onclick="setTenure(10)" style="background: var(--color-bg-soft); border: 1.5px solid var(--color-border); color: var(--color-text-muted); padding: 8px 16px; min-height: 36px; display: inline-flex; align-items: center; border-radius: var(--radius-full); font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; user-select: none;">10Y</span>
+                        <span class="tenure-tag" onclick="setTenure(15)" style="background: var(--color-bg-soft); border: 1.5px solid var(--color-border); color: var(--color-text-muted); padding: 8px 16px; min-height: 36px; display: inline-flex; align-items: center; border-radius: var(--radius-full); font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; user-select: none;">15Y</span>
+                        <span class="tenure-tag active" onclick="setTenure(20)" style="background: linear-gradient(135deg, rgba(212,175,55,0.15), rgba(212,175,55,0.05)); border: 1.5px solid var(--color-gold); color: var(--color-gold-dark); padding: 8px 16px; min-height: 36px; display: inline-flex; align-items: center; border-radius: var(--radius-full); font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; user-select: none;">20Y</span>
+                        <span class="tenure-tag" onclick="setTenure(25)" style="background: var(--color-bg-soft); border: 1.5px solid var(--color-border); color: var(--color-text-muted); padding: 8px 16px; min-height: 36px; display: inline-flex; align-items: center; border-radius: var(--radius-full); font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; user-select: none;">25Y</span>
+                        <span class="tenure-tag" onclick="setTenure(30)" style="background: var(--color-bg-soft); border: 1.5px solid var(--color-border); color: var(--color-text-muted); padding: 8px 16px; min-height: 36px; display: inline-flex; align-items: center; border-radius: var(--radius-full); font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; user-select: none;">30Y</span>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <!-- Down Payment -->
-        <div class="input-group">
-          <label class="input-label">Down Payment (₹)</label>
-          <div class="input-wrapper">
-            <span class="input-prefix">₹</span>
-            <input type="number" id="downPayment" value="1000000" class="calc-input" inputmode="numeric" oninput="calculateEMI()">
-          </div>
-          <div class="down-payment-tags">
-            <span class="dp-tag" onclick="setDownPayment(10)">10%</span>
-            <span class="dp-tag" onclick="setDownPayment(20)">20%</span>
-            <span class="dp-tag active" onclick="setDownPayment(25)">25%</span>
-            <span class="dp-tag" onclick="setDownPayment(30)">30%</span>
-            <span class="dp-tag" onclick="setDownPayment(50)">50%</span>
-          </div>
-        </div>
+        <!-- RESULTS -->
+        <div class="card" style="border-radius: var(--radius-xl); overflow: hidden;">
+            <div style="display: flex; align-items: center; gap: 12px; padding: var(--space-lg); border-bottom: 1px solid var(--color-border); background: var(--color-bg-soft);">
+                <div style="width: 44px; height: 44px; border-radius: var(--radius-md); background: linear-gradient(135deg, rgba(59,130,246,0.15), rgba(59,130,246,0.05)); display: flex; align-items: center; justify-content: center; color: #3b82f6; border: 1px solid rgba(59,130,246,0.2); flex-shrink: 0;">
+                    <span class="material-icons-round" style="font-size: 22px;">pie_chart</span>
+                </div>
+                <div>
+                    <h2 style="font-size: 1.1rem; font-weight: 700; color: var(--color-navy); margin: 0;">EMI Breakdown</h2>
+                    <p style="font-size: 0.8rem; color: var(--color-text-muted); margin: 2px 0 0 0;">Your monthly payment summary</p>
+                </div>
+            </div>
 
-        <!-- Interest Rate -->
-        <div class="input-group">
-          <label class="input-label">Interest Rate (% per annum)</label>
-          <div class="input-wrapper">
-            <input type="number" id="interestRate" value="8.5" step="0.1" class="calc-input" inputmode="decimal" oninput="calculateEMI()">
-            <span class="input-suffix">%</span>
-          </div>
-          <input type="range" id="interestRateRange" min="5" max="20" step="0.1" value="8.5" class="range-slider" oninput="syncRange('interestRate', this.value); calculateEMI()">
-        </div>
+            <div style="padding: var(--space-lg);">
+                <!-- EMI Amount -->
+                <div style="text-align: center; padding: var(--space-md) 0 var(--space-xl); border-bottom: 1px solid var(--color-border); margin-bottom: var(--space-lg);">
+                    <p style="font-size: 0.75rem; font-weight: 600; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px;">Monthly EMI</p>
+                    <h3 id="emiAmount" style="font-size: clamp(1.75rem, 5vw, 2.5rem); font-weight: 800; color: var(--color-gold); margin: 0; line-height: 1.2; letter-spacing: -0.02em;">₹37,966</h3>
+                    <p style="font-size: 0.85rem; color: var(--color-text-muted); margin-top: 8px;">per month for <span id="tenureDisplay" style="color: var(--color-gold); font-weight: 600;">20</span> years</p>
+                </div>
 
-        <!-- Loan Tenure -->
-        <div class="input-group">
-          <label class="input-label">Loan Tenure</label>
-          <div class="input-wrapper">
-            <input type="number" id="loanTenure" value="20" class="calc-input" inputmode="numeric" oninput="calculateEMI()">
-            <span class="input-suffix">Years</span>
-          </div>
-          <div class="tenure-tags">
-            <span class="tenure-tag" onclick="setTenure(10)">10Y</span>
-            <span class="tenure-tag" onclick="setTenure(15)">15Y</span>
-            <span class="tenure-tag active" onclick="setTenure(20)">20Y</span>
-            <span class="tenure-tag" onclick="setTenure(25)">25Y</span>
-            <span class="tenure-tag" onclick="setTenure(30)">30Y</span>
-          </div>
+                <!-- Chart -->
+                <div style="display: flex; align-items: center; gap: var(--space-lg); margin-bottom: var(--space-lg); padding: var(--space-md); background: var(--color-bg-soft); border-radius: var(--radius-lg); border: 1px solid var(--color-border); flex-direction: column; text-align: center;">
+                    <canvas id="emiChart" width="160" height="160" style="max-width: 160px; max-height: 160px;"></canvas>
+                    <div style="display: flex; flex-direction: column; gap: 10px; flex: 1; width: 100%;">
+                        <div style="display: flex; align-items: center; gap: 10px; justify-content: center;">
+                            <span style="width: 12px; height: 12px; border-radius: 50%; background: var(--color-gold); flex-shrink: 0;"></span>
+                            <span style="font-size: 0.85rem; color: var(--color-text-muted);">Principal: <strong id="principalDisplay" style="color: var(--color-navy); font-weight: 700;">₹40L</strong></span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 10px; justify-content: center;">
+                            <span style="width: 12px; height: 12px; border-radius: 50%; background: #3b82f6; flex-shrink: 0;"></span>
+                            <span style="font-size: 0.85rem; color: var(--color-text-muted);">Interest: <strong id="interestDisplay" style="color: var(--color-navy); font-weight: 700;">₹51.1L</strong></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stats Grid -->
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: var(--space-lg);">
+                    <div style="background: var(--color-bg-soft); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: var(--space-md); text-align: center;">
+                        <p style="font-size: 0.7rem; font-weight: 600; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">Loan Amount</p>
+                        <p id="loanAmountDisplay" style="font-size: 0.95rem; font-weight: 800; color: var(--color-navy); margin: 0;">₹40,00,000</p>
+                    </div>
+                    <div style="background: var(--color-bg-soft); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: var(--space-md); text-align: center;">
+                        <p style="font-size: 0.7rem; font-weight: 600; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">Total Interest</p>
+                        <p id="totalInterestDisplay" style="font-size: 0.95rem; font-weight: 800; color: #3b82f6; margin: 0;">₹51,11,920</p>
+                    </div>
+                    <div style="background: var(--color-bg-soft); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: var(--space-md); text-align: center;">
+                        <p style="font-size: 0.7rem; font-weight: 600; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">Total Payment</p>
+                        <p id="totalPaymentDisplay" style="font-size: 0.95rem; font-weight: 800; color: var(--color-gold); margin: 0;">₹91,11,920</p>
+                    </div>
+                    <div style="background: var(--color-bg-soft); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: var(--space-md); text-align: center;">
+                        <p style="font-size: 0.7rem; font-weight: 600; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">Interest Ratio</p>
+                        <p id="interestRatio" style="font-size: 0.95rem; font-weight: 800; color: var(--color-success); margin: 0;">56.1%</p>
+                    </div>
+                </div>
+
+                <!-- CTA -->
+                <a href="{% url 'property_list' %}" class="btn btn-gold" style="width: 100%; min-height: 50px; font-size: 0.95rem;">
+                    <span class="material-icons-round" style="font-size: 20px;">search</span>
+                    Explore Properties in this Budget
+                </a>
+            </div>
         </div>
-      </div>
+        {% else %}
+        <!-- Login Prompt -->
+        <div style="text-align: center; padding: clamp(3rem, 10vw, 5rem) var(--space-md); max-width: 500px; margin-inline: auto;">
+            <div style="width: 80px; height: 80px; background: linear-gradient(135deg, var(--color-bg-soft) 0%, var(--color-border) 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto var(--space-xl);">
+                <span class="material-icons-round" style="font-size: 36px; color: var(--color-text-light);">lock</span>
+            </div>
+            <h2 style="font-size: 1.35rem; color: var(--color-navy); margin-bottom: var(--space-sm);">Login to Use EMI Calculator</h2>
+            <p style="color: var(--color-text-muted); margin-bottom: var(--space-xl); font-size: 0.95rem;">
+                Create an account or login to access our EMI calculator and plan your dream home purchase.
+            </p>
+            <a href="{% url 'login' %}?next={{ request.path }}" class="btn btn-gold" style="font-size: 1rem; padding: 14px 36px;">
+                <span class="material-icons-round">login</span>
+                Login / Register
+            </a>
+
+            <!-- Trust Stats -->
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-md); margin-top: var(--space-2xl); padding-top: var(--space-xl); border-top: 1px solid var(--color-border);">
+                <div>
+                    <div style="font-size: 1.35rem; font-weight: 800; color: var(--color-gold);">100%</div>
+                    <div style="font-size: 0.75rem; color: var(--color-text-muted);">Free Tool</div>
+                </div>
+                <div>
+                    <div style="font-size: 1.35rem; font-weight: 800; color: var(--color-gold);">Instant</div>
+                    <div style="font-size: 0.75rem; color: var(--color-text-muted);">Results</div>
+                </div>
+                <div>
+                    <div style="font-size: 1.35rem; font-weight: 800; color: var(--color-gold);">Accurate</div>
+                    <div style="font-size: 0.75rem; color: var(--color-text-muted);">Calculations</div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
     </div>
 
-    <!-- RESULTS -->
-    <div class="calc-card">
-      <div class="calc-header">
-        <div class="calc-icon result-icon">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"/>
-            <path stroke-linecap="round" stroke-linejoin="round" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"/>
-          </svg>
-        </div>
-        <h2 class="calc-title">EMI Breakdown</h2>
-      </div>
-
-      <div class="calc-body">
-        <!-- EMI Amount -->
-        <div class="emi-hero">
-          <p class="emi-label">Monthly EMI</p>
-          <h3 class="emi-amount" id="emiAmount">₹37,966</h3>
-          <p class="emi-sub">per month for <span id="tenureDisplay">20</span> years</p>
-        </div>
-
-        <!-- Chart -->
-        <div class="chart-container">
-          <canvas id="emiChart" width="300" height="200"></canvas>
-          <div class="chart-legend">
-            <div class="legend-item">
-              <span class="legend-dot" style="background: #c9922a;"></span>
-              <span class="legend-text">Principal: <strong id="principalDisplay">₹40L</strong></span>
+    {% if request.user.is_authenticated %}
+    <!-- Amortization Table -->
+    <div class="card" style="border-radius: var(--radius-xl); overflow: hidden; margin-top: var(--space-lg);">
+        <div style="display: flex; align-items: center; gap: 12px; padding: var(--space-lg); border-bottom: 1px solid var(--color-border); background: var(--color-bg-soft);">
+            <div style="width: 44px; height: 44px; border-radius: var(--radius-md); background: linear-gradient(135deg, rgba(16,185,129,0.15), rgba(16,185,129,0.05)); display: flex; align-items: center; justify-content: center; color: var(--color-success); border: 1px solid rgba(16,185,129,0.2); flex-shrink: 0;">
+                <span class="material-icons-round" style="font-size: 22px;">table_chart</span>
             </div>
-            <div class="legend-item">
-              <span class="legend-dot" style="background: #3b82f6;"></span>
-              <span class="legend-text">Interest: <strong id="interestDisplay">₹51.1L</strong></span>
+            <div>
+                <h2 style="font-size: 1.1rem; font-weight: 700; color: var(--color-navy); margin: 0;">Year-wise Breakdown</h2>
+                <p style="font-size: 0.8rem; color: var(--color-text-muted); margin: 2px 0 0 0;">Track your loan repayment schedule</p>
             </div>
-          </div>
         </div>
-
-        <!-- Stats Grid -->
-        <div class="stats-grid">
-          <div class="stat-box">
-            <p class="stat-label">Loan Amount</p>
-            <p class="stat-value" id="loanAmountDisplay">₹40,00,000</p>
-          </div>
-          <div class="stat-box">
-            <p class="stat-label">Total Interest</p>
-            <p class="stat-value interest" id="totalInterestDisplay">₹51,11,920</p>
-          </div>
-          <div class="stat-box">
-            <p class="stat-label">Total Payment</p>
-            <p class="stat-value total" id="totalPaymentDisplay">₹91,11,920</p>
-          </div>
-          <div class="stat-box">
-            <p class="stat-label">Interest Ratio</p>
-            <p class="stat-value ratio" id="interestRatio">56.1%</p>
-          </div>
+        <div style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
+            <table style="width: 100%; border-collapse: collapse; min-width: 500px;">
+                <thead>
+                    <tr>
+                        <th style="text-align: left; padding: 12px 16px; font-size: 0.7rem; font-weight: 700; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid var(--color-border); background: var(--color-bg-soft); white-space: nowrap;">Year</th>
+                        <th style="text-align: left; padding: 12px 16px; font-size: 0.7rem; font-weight: 700; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid var(--color-border); background: var(--color-bg-soft); white-space: nowrap;">Principal</th>
+                        <th style="text-align: left; padding: 12px 16px; font-size: 0.7rem; font-weight: 700; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid var(--color-border); background: var(--color-bg-soft); white-space: nowrap;">Interest</th>
+                        <th style="text-align: left; padding: 12px 16px; font-size: 0.7rem; font-weight: 700; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid var(--color-border); background: var(--color-bg-soft); white-space: nowrap;">Balance</th>
+                        <th style="text-align: left; padding: 12px 16px; font-size: 0.7rem; font-weight: 700; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid var(--color-border); background: var(--color-bg-soft); white-space: nowrap;">Progress</th>
+                    </tr>
+                </thead>
+                <tbody id="amortizationBody">
+                </tbody>
+            </table>
         </div>
+    </div>
+    {% endif %}
 
-        <!-- CTA -->
-        <a href="/properties/" class="explore-btn">          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-          </svg>
-          Explore Properties in this Budget
+    <!-- Trust Section -->
+    <div style="margin-top: var(--space-2xl); text-align: center;">
+        <div class="section-header" style="margin-bottom: var(--space-xl);">
+            <span class="label">
+                <span class="material-icons-round" style="font-size: 16px;">verified</span>
+                Why Trust Our Calculator
+            </span>
+            <h2>Accurate & Transparent</h2>
+            <p>Our EMI calculator uses standard amortization formulas used by all major banks in India.</p>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--space-lg);">
+            <div class="card" style="padding: var(--space-xl); text-align: center;">
+                <div style="width: 56px; height: 56px; border-radius: var(--radius-lg); background: linear-gradient(135deg, rgba(212,175,55,0.12), rgba(212,175,55,0.04)); display: flex; align-items: center; justify-content: center; margin: 0 auto var(--space-md); color: var(--color-gold);">
+                    <span class="material-icons-round" style="font-size: 28px;">calculate</span>
+                </div>
+                <h4 style="font-size: 1rem; color: var(--color-navy); margin-bottom: 6px;">Standard Formula</h4>
+                <p style="font-size: 0.85rem; color: var(--color-text-muted); line-height: 1.6;">Uses the same reducing balance method as SBI, HDFC, ICICI & all major banks</p>
+            </div>
+            <div class="card" style="padding: var(--space-xl); text-align: center;">
+                <div style="width: 56px; height: 56px; border-radius: var(--radius-lg); background: linear-gradient(135deg, rgba(59,130,246,0.12), rgba(59,130,246,0.04)); display: flex; align-items: center; justify-content: center; margin: 0 auto var(--space-md); color: #3b82f6;">
+                    <span class="material-icons-round" style="font-size: 28px;">update</span>
+                </div>
+                <h4 style="font-size: 1rem; color: var(--color-navy); margin-bottom: 6px;">Real-time Updates</h4>
+                <p style="font-size: 0.85rem; color: var(--color-text-muted); line-height: 1.6;">Adjust any value and see results instantly. No page reload needed</p>
+            </div>
+            <div class="card" style="padding: var(--space-xl); text-align: center;">
+                <div style="width: 56px; height: 56px; border-radius: var(--radius-lg); background: linear-gradient(135deg, rgba(16,185,129,0.12), rgba(16,185,129,0.04)); display: flex; align-items: center; justify-content: center; margin: 0 auto var(--space-md); color: var(--color-success);">
+                    <span class="material-icons-round" style="font-size: 28px;">security</span>
+                </div>
+                <h4 style="font-size: 1rem; color: var(--color-navy); margin-bottom: 6px;">100% Secure</h4>
+                <p style="font-size: 0.85rem; color: var(--color-text-muted); line-height: 1.6;">No data is stored or shared. All calculations happen in your browser</p>
+            </div>
+            <div class="card" style="padding: var(--space-xl); text-align: center;">
+                <div style="width: 56px; height: 56px; border-radius: var(--radius-lg); background: linear-gradient(135deg, rgba(168,85,247,0.12), rgba(168,85,247,0.04)); display: flex; align-items: center; justify-content: center; margin: 0 auto var(--space-md); color: #a855f7;">
+                    <span class="material-icons-round" style="font-size: 28px;">table_chart</span>
+                </div>
+                <h4 style="font-size: 1rem; color: var(--color-navy); margin-bottom: 6px;">Full Schedule</h4>
+                <p style="font-size: 0.85rem; color: var(--color-text-muted); line-height: 1.6;">Year-wise breakdown with principal, interest, balance & progress bar</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- FAQ Section -->
+    <div style="margin-top: var(--space-2xl);">
+        <div class="section-header" style="margin-bottom: var(--space-xl);">
+            <span class="label">
+                <span class="material-icons-round" style="font-size: 16px;">help_outline</span>
+                Common Questions
+            </span>
+            <h2>EMI Calculator FAQs</h2>
+        </div>
+        <div style="max-width: 800px; margin-inline: auto;">
+            {% for faq in faqs|default:'' %}
+            <details style="background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); margin-bottom: var(--space-md); overflow: hidden;">
+                <summary style="padding: var(--space-md) var(--space-lg); font-weight: 600; color: var(--color-navy); font-size: 0.95rem; cursor: pointer; list-style: none; display: flex; align-items: center; justify-content: space-between;" onclick="this.querySelector('.faq-icon').style.transform=this.parentElement.open?'rotate(0deg)':'rotate(180deg)'">
+                    <span>{{ faq.question }}</span>
+                    <span class="faq-icon material-icons-round" style="color: var(--color-gold); transition: transform 0.3s ease;">expand_more</span>
+                </summary>
+                <div style="padding: 0 var(--space-lg) var(--space-md); color: var(--color-text-muted); font-size: 0.9rem; line-height: 1.7;">
+                    {{ faq.answer }}
+                </div>
+            </details>
+            {% empty %}
+            <details style="background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); margin-bottom: var(--space-md); overflow: hidden;">
+                <summary style="padding: var(--space-md) var(--space-lg); font-weight: 600; color: var(--color-navy); font-size: 0.95rem; cursor: pointer; list-style: none; display: flex; align-items: center; justify-content: space-between;">
+                    <span>What is EMI and how is it calculated?</span>
+                    <span class="material-icons-round" style="color: var(--color-gold);">expand_more</span>
+                </summary>
+                <div style="padding: 0 var(--space-lg) var(--space-md); color: var(--color-text-muted); font-size: 0.9rem; line-height: 1.7;">
+                    EMI (Equated Monthly Installment) is the fixed payment amount made by a borrower to a lender at a specified date each month. It includes both principal and interest components. We use the standard reducing balance method: EMI = [P × R × (1+R)^N] / [(1+R)^N - 1], where P is principal, R is monthly interest rate, and N is number of months.
+                </div>
+            </details>
+            <details style="background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); margin-bottom: var(--space-md); overflow: hidden;">
+                <summary style="padding: var(--space-md) var(--space-lg); font-weight: 600; color: var(--color-navy); font-size: 0.95rem; cursor: pointer; list-style: none; display: flex; align-items: center; justify-content: space-between;">
+                    <span>How much down payment should I make?</span>
+                    <span class="material-icons-round" style="color: var(--color-gold);">expand_more</span>
+                </summary>
+                <div style="padding: 0 var(--space-lg) var(--space-md); color: var(--color-text-muted); font-size: 0.9rem; line-height: 1.7;">
+                    Most banks in India require a minimum down payment of 10-20% of the property value. However, putting down 25-30% can significantly reduce your EMI burden and total interest paid over the loan tenure. Use our calculator to see the difference.
+                </div>
+            </details>
+            <details style="background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); margin-bottom: var(--space-md); overflow: hidden;">
+                <summary style="padding: var(--space-md) var(--space-lg); font-weight: 600; color: var(--color-navy); font-size: 0.95rem; cursor: pointer; list-style: none; display: flex; align-items: center; justify-content: space-between;">
+                    <span>What is the current home loan interest rate?</span>
+                    <span class="material-icons-round" style="color: var(--color-gold);">expand_more</span>
+                </summary>
+                <div style="padding: 0 var(--space-lg) var(--space-md); color: var(--color-text-muted); font-size: 0.9rem; line-height: 1.7;">
+                    As of 2026, home loan interest rates in India range from 8.30% to 9.50% per annum depending on the bank, your credit score, and loan amount. SBI, HDFC, ICICI, and Axis Bank are among the top lenders. We recommend checking with multiple banks for the best rate.
+                </div>
+            </details>
+            <details style="background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); margin-bottom: var(--space-md); overflow: hidden;">
+                <summary style="padding: var(--space-md) var(--space-lg); font-weight: 600; color: var(--color-navy); font-size: 0.95rem; cursor: pointer; list-style: none; display: flex; align-items: center; justify-content: space-between;">
+                    <span>Can I prepay my home loan?</span>
+                    <span class="material-icons-round" style="color: var(--color-gold);">expand_more</span>
+                </summary>
+                <div style="padding: 0 var(--space-lg) var(--space-md); color: var(--color-text-muted); font-size: 0.9rem; line-height: 1.7;">
+                    Yes, most banks allow partial or full prepayment of home loans. For floating rate loans, there are typically no prepayment charges. For fixed-rate loans, charges may apply. Prepaying can significantly reduce your total interest outgo.
+                </div>
+            </details>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- CTA Section -->
+    <div style="margin-top: var(--space-2xl); text-align: center; padding: var(--space-2xl) var(--space-lg); background: linear-gradient(135deg, var(--color-navy) 0%, var(--color-navy-light) 100%); border-radius: var(--radius-xl); color: #fff;">
+        <h2 style="color: #fff; font-size: clamp(1.25rem, 3vw, 1.75rem); margin-bottom: var(--space-sm);">Ready to Find Your Dream Home?</h2>
+        <p style="color: rgba(255,255,255,0.8); font-size: 1rem; max-width: 500px; margin: 0 auto var(--space-xl);">Browse 5000+ verified properties across 50+ cities. All listings are RERA registered.</p>
+        <a href="{% url 'property_list' %}" class="btn btn-gold" style="font-size: 1rem; padding: 14px 36px;">
+            <span class="material-icons-round">search</span>
+            Browse Properties
         </a>
-      </div>
     </div>
-  </div>
+</div>
 
-  <!-- Amortization Table -->
-  <div class="calc-card mt-6 sm:mt-8">
-    <div class="calc-header">
-      <div class="calc-icon">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-        </svg>
-      </div>
-      <h2 class="calc-title">Year-wise Breakdown</h2>
-    </div>
-    <div class="table-wrapper">
-      <table class="amortization-table" id="amortizationTable">
-        <thead>
-          <tr>
-            <th>Year</th>
-            <th>Principal</th>
-            <th>Interest</th>
-            <th>Balance</th>
-            <th>Progress</th>
-          </tr>
-        </thead>
-        <tbody id="amortizationBody">
-        </tbody>
-      </table>
-    </div>
-  </div>
-</section>
+{% endblock %}
 
-<style>
-/* ===== CALC CARD ===== */
-.calc-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  overflow: hidden;
-  box-shadow: var(--shadow-card);
-}
-.calc-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 16px 18px;
-  border-bottom: 1px solid var(--hairline);
-}
-.calc-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 12px;
-  background: linear-gradient(135deg, rgba(201,146,42, 0.16), rgba(201,146,42, 0.04));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--gold-1);
-  border: 1px solid rgba(201,146,42, 0.2);
-  flex-shrink: 0;
-}
-.calc-icon.result-icon {
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(59, 130, 246, 0.04));
-  color: #3b82f6;
-  border-color: rgba(59, 130, 246, 0.2);
-}
-.calc-title {
-  font-size: 16px;
-  font-weight: 700;
-  color: var(--navy-deep);
-  margin: 0;
-}
-.calc-body {
-  padding: 18px;
-}
-
-/* ===== INPUT GROUP ===== */
-.input-group {
-  margin-bottom: 22px;
-}
-.input-group:last-child {
-  margin-bottom: 0;
-}
-.input-label {
-  display: block;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text-muted);
-  margin-bottom: 8px;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-.input-wrapper {
-  display: flex;
-  align-items: center;
-  background: var(--bg-soft);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 13px 16px;
-  transition: all 0.3s ease;
-  gap: 8px;
-}
-.input-wrapper:focus-within {
-  border-color: var(--gold-1);
-  background: var(--surface);
-  box-shadow: 0 0 0 3px rgba(201,146,42, 0.12);
-}
-.input-prefix, .input-suffix {
-  color: var(--text-muted);
-  font-weight: 600;
-  font-size: 14px;
-  flex-shrink: 0;
-}
-.calc-input {
-  background: transparent;
-  border: none;
-  outline: none;
-  color: var(--navy-deep);
-  font-size: 16px;
-  font-weight: 700;
-  width: 100%;
-  font-family: inherit;
-}
-.calc-input::-webkit-outer-spin-button,
-.calc-input::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
-/* ===== RANGE SLIDER ===== */
-.range-slider {
-  width: 100%;
-  margin-top: 10px;
-  -webkit-appearance: none;
-  height: 6px;
-  border-radius: 3px;
-  background: var(--border);
-  outline: none;
-}
-.range-slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--gold-1), var(--gold-2));
-  cursor: pointer;
-  box-shadow: 0 2px 10px rgba(201,146,42, 0.35);
-  border: 2px solid #ffffff;
-}
-.range-slider::-moz-range-thumb {
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--gold-1), var(--gold-2));
-  cursor: pointer;
-  border: 2px solid #ffffff;
-  box-shadow: 0 2px 10px rgba(201,146,42, 0.35);
-}
-
-/* ===== TAGS ===== */
-.down-payment-tags, .tenure-tags {
-  display: flex;
-  gap: 8px;
-  margin-top: 10px;
-  flex-wrap: wrap;
-}
-.dp-tag, .tenure-tag {
-  background: var(--bg-soft);
-  border: 1px solid var(--border);
-  color: var(--text-muted);
-  padding: 8px 14px;
-  min-height: 34px;
-  display: inline-flex;
-  align-items: center;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  user-select: none;
-}
-.dp-tag:active, .tenure-tag:active {
-  background: rgba(201,146,42, 0.1);
-  border-color: rgba(201,146,42, 0.3);
-  color: var(--gold-1);
-}
-.dp-tag.active, .tenure-tag.active {
-  background: linear-gradient(135deg, rgba(201,146,42, 0.18), rgba(201,146,42, 0.08));
-  border-color: var(--gold-1);
-  color: #a3701f;
-}
-
-/* ===== EMI HERO ===== */
-.emi-hero {
-  text-align: center;
-  padding: 16px 0 24px;
-  border-bottom: 1px solid var(--hairline);
-  margin-bottom: 20px;
-}
-.emi-label {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  margin-bottom: 8px;
-}
-.emi-amount {
-  font-size: 32px;
-  font-weight: 900;
-  color: var(--gold-1);
-  margin: 0;
-  line-height: 1.2;
-  letter-spacing: -0.02em;
-}
-.emi-sub {
-  font-size: 13px;
-  color: var(--text-muted);
-  margin-top: 8px;
-}
-.emi-sub span {
-  color: var(--gold-1);
-  font-weight: 600;
-}
-
-/* ===== CHART ===== */
-.chart-container {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin-bottom: 20px;
-  padding: 14px;
-  background: var(--bg-soft);
-  border-radius: 16px;
-  border: 1px solid var(--border);
-  flex-direction: column;
-  text-align: center;
-}
-#emiChart {
-  max-width: 150px;
-  max-height: 150px;
-}
-.chart-legend {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  flex: 1;
-  width: 100%;
-}
-.legend-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  justify-content: center;
-}
-.legend-dot {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-.legend-text {
-  font-size: 13px;
-  color: var(--text-muted);
-}
-.legend-text strong {
-  color: var(--navy-deep);
-  font-weight: 700;
-}
-
-/* ===== STATS GRID ===== */
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
-  margin-bottom: 20px;
-}
-.stat-box {
-  background: var(--bg-soft);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 14px;
-  text-align: center;
-  transition: all 0.3s ease;
-}
-.stat-label {
-  font-size: 10.5px;
-  font-weight: 600;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-bottom: 6px;
-}
-.stat-value {
-  font-size: 15px;
-  font-weight: 800;
-  color: var(--navy-deep);
-  margin: 0;
-}
-.stat-value.interest {
-  color: #3b82f6;
-}
-.stat-value.total {
-  color: var(--gold-1);
-}
-.stat-value.ratio {
-  color: #16a34a;
-}
-
-/* ===== EXPLORE BUTTON ===== */
-.explore-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  width: 100%;
-  min-height: 50px;
-  background: linear-gradient(135deg, var(--gold-1) 0%, var(--gold-3) 100%);
-  color: #ffffff;
-  padding: 14px 20px;
-  border-radius: 16px;
-  font-weight: 700;
-  font-size: 14px;
-  text-decoration: none;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(201,146,42, 0.3);
-  border: none;
-  cursor: pointer;
-}
-.explore-btn:active {
-  transform: scale(0.98);
-}
-@media (hover: hover) {
-  .explore-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(201,146,42, 0.4);
-  }
-}
-
-/* ===== TABLE ===== */
-.table-wrapper {
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-}
-.amortization-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-.amortization-table th {
-  text-align: left;
-  padding: 12px 14px;
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  border-bottom: 1px solid var(--hairline);
-  background: var(--bg-soft);
-  white-space: nowrap;
-}
-.amortization-table td {
-  padding: 12px 14px;
-  font-size: 13px;
-  color: var(--text-body);
-  border-bottom: 1px solid var(--hairline);
-  white-space: nowrap;
-}
-.amortization-table tr:hover td {
-  background: var(--bg-soft);
-}
-.amortization-table td:first-child {
-  font-weight: 700;
-  color: var(--gold-1);
-}
-.progress-bar {
-  width: 100%;
-  min-width: 80px;
-  height: 6px;
-  background: var(--border);
-  border-radius: 3px;
-  overflow: hidden;
-}
-.progress-fill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--gold-1), var(--gold-2));
-  border-radius: 3px;
-  transition: width 0.5s ease;
-}
-
-/* ===== RESPONSIVE ===== */
-@media (min-width: 640px) {
-  .chart-container {
-    flex-direction: row;
-    text-align: left;
-  }
-  .legend-item {
-    justify-content: flex-start;
-  }
-  .stats-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  .emi-amount {
-    font-size: 42px;
-  }
-  .calc-header {
-    padding: 20px 24px;
-  }
-  .calc-body {
-    padding: 24px;
-  }
-}
-@media (max-width: 768px) {
-  .calc-body {
-    padding: 16px;
-  }
-  .emi-amount {
-    font-size: 32px;
-  }
-  .chart-container {
-    flex-direction: column;
-    text-align: center;
-  }
-  .stats-grid {
-    grid-template-columns: 1fr;
-  }
-  .amortization-table {
-    font-size: 12px;
-  }
-  .amortization-table th,
-  .amortization-table td {
-    padding: 10px 12px;
-  }
-}
-@media (max-width: 480px) {
-  .calc-card {
-    border-radius: 16px;
-  }
-  .calc-header {
-    padding: 16px;
-  }
-  .emi-amount {
-    font-size: 28px;
-  }
-}
-</style>
-
+{% block extra_js %}
 <script>
-// ===== EMI CALCULATION =====
+// ============================================
+// EMI CALCULATOR SCRIPTS
+// ============================================
+
 function calculateEMI() {
-  const propertyPrice = parseFloat(document.getElementById('propertyPrice').value) || 0;
-  const downPayment = parseFloat(document.getElementById('downPayment').value) || 0;
-  const interestRate = parseFloat(document.getElementById('interestRate').value) || 0;
-  const loanTenure = parseFloat(document.getElementById('loanTenure').value) || 0;
+    const propertyPrice = parseFloat(document.getElementById('propertyPrice').value) || 0;
+    const downPayment = parseFloat(document.getElementById('downPayment').value) || 0;
+    const interestRate = parseFloat(document.getElementById('interestRate').value) || 0;
+    const loanTenure = parseFloat(document.getElementById('loanTenure').value) || 0;
 
-  const loanAmount = propertyPrice - downPayment;
-  const monthlyRate = interestRate / 12 / 100;
-  const months = loanTenure * 12;
+    const loanAmount = propertyPrice - downPayment;
+    const monthlyRate = interestRate / 12 / 100;
+    const months = loanTenure * 12;
 
-  let emi = 0;
-  if (loanAmount > 0 && monthlyRate > 0 && months > 0) {
-    emi = loanAmount * monthlyRate * Math.pow(1 + monthlyRate, months) / (Math.pow(1 + monthlyRate, months) - 1);
-  }
+    let emi = 0;
+    if (loanAmount > 0 && monthlyRate > 0 && months > 0) {
+        emi = loanAmount * monthlyRate * Math.pow(1 + monthlyRate, months) / (Math.pow(1 + monthlyRate, months) - 1);
+    }
 
-  const totalPayment = emi * months;
-  const totalInterest = totalPayment - loanAmount;
-  const interestRatio = totalPayment > 0 ? (totalInterest / totalPayment * 100).toFixed(1) : 0;
+    const totalPayment = emi * months;
+    const totalInterest = totalPayment - loanAmount;
+    const interestRatio = totalPayment > 0 ? (totalInterest / totalPayment * 100).toFixed(1) : 0;
 
-  // Update displays
-  document.getElementById('emiAmount').textContent = '₹' + formatNumber(emi);
-  document.getElementById('tenureDisplay').textContent = loanTenure;
-  document.getElementById('loanAmountDisplay').textContent = '₹' + formatNumber(loanAmount);
-  document.getElementById('totalInterestDisplay').textContent = '₹' + formatNumber(totalInterest);
-  document.getElementById('totalPaymentDisplay').textContent = '₹' + formatNumber(totalPayment);
-  document.getElementById('interestRatio').textContent = interestRatio + '%';
-  document.getElementById('principalDisplay').textContent = '₹' + formatNumberCompact(loanAmount);
-  document.getElementById('interestDisplay').textContent = '₹' + formatNumberCompact(totalInterest);
+    // Update displays
+    document.getElementById('emiAmount').textContent = '₹' + formatNumber(emi);
+    document.getElementById('tenureDisplay').textContent = loanTenure;
+    document.getElementById('loanAmountDisplay').textContent = '₹' + formatNumber(loanAmount);
+    document.getElementById('totalInterestDisplay').textContent = '₹' + formatNumber(totalInterest);
+    document.getElementById('totalPaymentDisplay').textContent = '₹' + formatNumber(totalPayment);
+    document.getElementById('interestRatio').textContent = interestRatio + '%';
+    document.getElementById('principalDisplay').textContent = '₹' + formatNumberCompact(loanAmount);
+    document.getElementById('interestDisplay').textContent = '₹' + formatNumberCompact(totalInterest);
 
-  // Draw chart
-  drawChart(loanAmount, totalInterest);
+    // Draw chart
+    drawChart(loanAmount, totalInterest);
 
-  // Update table
-  updateAmortizationTable(loanAmount, monthlyRate, months, emi);
+    // Update table
+    updateAmortizationTable(loanAmount, monthlyRate, months, emi);
 }
 
 function formatNumber(num) {
-  return Math.round(num).toLocaleString('en-IN');
+    return Math.round(num).toLocaleString('en-IN');
 }
 
 function formatNumberCompact(num) {
-  if (num >= 10000000) return (num / 10000000).toFixed(1) + 'Cr';
-  if (num >= 100000) return (num / 100000).toFixed(1) + 'L';
-  if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
-  return num.toString();
+    if (num >= 10000000) return (num / 10000000).toFixed(1) + 'Cr';
+    if (num >= 100000) return (num / 100000).toFixed(1) + 'L';
+    if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+    return num.toString();
 }
 
 function syncRange(inputId, value) {
-  document.getElementById(inputId).value = value;
+    document.getElementById(inputId).value = value;
 }
 
 function setDownPayment(percent) {
-  const price = parseFloat(document.getElementById('propertyPrice').value) || 0;
-  document.getElementById('downPayment').value = Math.round(price * percent / 100);
+    const price = parseFloat(document.getElementById('propertyPrice').value) || 0;
+    document.getElementById('downPayment').value = Math.round(price * percent / 100);
 
-  document.querySelectorAll('.dp-tag').forEach(t => t.classList.remove('active'));
-  event.target.classList.add('active');
-  calculateEMI();
+    document.querySelectorAll('.dp-tag').forEach(t => {
+        t.style.background = 'var(--color-bg-soft)';
+        t.style.borderColor = 'var(--color-border)';
+        t.style.color = 'var(--color-text-muted)';
+    });
+    event.target.style.background = 'linear-gradient(135deg, rgba(212,175,55,0.15), rgba(212,175,55,0.05))';
+    event.target.style.borderColor = 'var(--color-gold)';
+    event.target.style.color = 'var(--color-gold-dark)';
+    calculateEMI();
 }
 
 function setTenure(years) {
-  document.getElementById('loanTenure').value = years;
-  document.querySelectorAll('.tenure-tag').forEach(t => t.classList.remove('active'));
-  event.target.classList.add('active');
-  calculateEMI();
+    document.getElementById('loanTenure').value = years;
+    document.querySelectorAll('.tenure-tag').forEach(t => {
+        t.style.background = 'var(--color-bg-soft)';
+        t.style.borderColor = 'var(--color-border)';
+        t.style.color = 'var(--color-text-muted)';
+    });
+    event.target.style.background = 'linear-gradient(135deg, rgba(212,175,55,0.15), rgba(212,175,55,0.05))';
+    event.target.style.borderColor = 'var(--color-gold)';
+    event.target.style.color = 'var(--color-gold-dark)';
+    calculateEMI();
 }
 
 // ===== CANVAS CHART =====
 function drawChart(principal, interest) {
-  const canvas = document.getElementById('emiChart');
-  const ctx = canvas.getContext('2d');
-  const total = principal + interest;
-  const principalAngle = (principal / total) * 2 * Math.PI;
+    const canvas = document.getElementById('emiChart');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const total = principal + interest;
+    const principalAngle = (principal / total) * 2 * Math.PI;
 
-  const centerX = canvas.width / 2;
-  const centerY = canvas.height / 2;
-  const radius = Math.min(centerX, centerY) - 10;
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+    const radius = Math.min(centerX, centerY) - 10;
 
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // Principal slice
-  ctx.beginPath();
-  ctx.moveTo(centerX, centerY);
-  ctx.arc(centerX, centerY, radius, -Math.PI / 2, -Math.PI / 2 + principalAngle);
-  ctx.closePath();
-  ctx.fillStyle = '#c9922a';
-  ctx.fill();
+    // Principal slice
+    ctx.beginPath();
+    ctx.moveTo(centerX, centerY);
+    ctx.arc(centerX, centerY, radius, -Math.PI / 2, -Math.PI / 2 + principalAngle);
+    ctx.closePath();
+    ctx.fillStyle = '#d4af37';
+    ctx.fill();
 
-  // Interest slice
-  ctx.beginPath();
-  ctx.moveTo(centerX, centerY);
-  ctx.arc(centerX, centerY, radius, -Math.PI / 2 + principalAngle, -Math.PI / 2 + 2 * Math.PI);
-  ctx.closePath();
-  ctx.fillStyle = '#3b82f6';
-  ctx.fill();
+    // Interest slice
+    ctx.beginPath();
+    ctx.moveTo(centerX, centerY);
+    ctx.arc(centerX, centerY, radius, -Math.PI / 2 + principalAngle, -Math.PI / 2 + 2 * Math.PI);
+    ctx.closePath();
+    ctx.fillStyle = '#3b82f6';
+    ctx.fill();
 
-  // Inner circle (donut)
-  ctx.beginPath();
-  ctx.arc(centerX, centerY, radius * 0.6, 0, 2 * Math.PI);
-  ctx.fillStyle = '#ffffff';
-  ctx.fill();
+    // Inner circle (donut)
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, radius * 0.6, 0, 2 * Math.PI);
+    ctx.fillStyle = '#ffffff';
+    ctx.fill();
 
-  // Center text
-  ctx.fillStyle = '#16224f';
-  ctx.font = 'bold 14px sans-serif';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText('EMI', centerX, centerY - 8);
-  ctx.fillStyle = '#c9922a';
-  ctx.font = 'bold 12px sans-serif';
-  ctx.fillText('Breakdown', centerX, centerY + 8);
+    // Center text
+    ctx.fillStyle = '#0f172a';
+    ctx.font = 'bold 13px Inter, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('EMI', centerX, centerY - 8);
+    ctx.fillStyle = '#d4af37';
+    ctx.font = 'bold 11px Inter, sans-serif';
+    ctx.fillText('Breakdown', centerX, centerY + 8);
 }
 
 // ===== AMORTIZATION TABLE =====
 function updateAmortizationTable(loanAmount, monthlyRate, months, emi) {
-  const tbody = document.getElementById('amortizationBody');
-  tbody.innerHTML = '';
+    const tbody = document.getElementById('amortizationBody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
 
-  let balance = loanAmount;
-  const years = Math.ceil(months / 12);
+    let balance = loanAmount;
+    const years = Math.ceil(months / 12);
+    const originalLoan = loanAmount;
 
-  for (let year = 1; year <= years; year++) {
-    let yearlyPrincipal = 0;
-    let yearlyInterest = 0;
-    const monthsInYear = Math.min(12, months - (year - 1) * 12);
+    for (let year = 1; year <= years; year++) {
+        let yearlyPrincipal = 0;
+        let yearlyInterest = 0;
+        const monthsInYear = Math.min(12, months - (year - 1) * 12);
 
-    for (let m = 0; m < monthsInYear; m++) {
-      if (balance <= 0) break;
-      const interest = balance * monthlyRate;
-      const principal = emi - interest;
-      yearlyInterest += interest;
-      yearlyPrincipal += principal;
-      balance -= principal;
-      if (balance < 0) balance = 0;
+        for (let m = 0; m < monthsInYear; m++) {
+            if (balance <= 0) break;
+            const interest = balance * monthlyRate;
+            const principal = emi - interest;
+            yearlyInterest += interest;
+            yearlyPrincipal += principal;
+            balance -= principal;
+            if (balance < 0) balance = 0;
+        }
+
+        const progress = ((originalLoan - balance) / originalLoan * 100).toFixed(1);
+
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td style="padding: 12px 16px; font-size: 0.85rem; color: var(--color-gold); font-weight: 700; border-bottom: 1px solid var(--color-border);">Year ${year}</td>
+            <td style="padding: 12px 16px; font-size: 0.85rem; color: var(--color-text); border-bottom: 1px solid var(--color-border);">₹${formatNumber(yearlyPrincipal)}</td>
+            <td style="padding: 12px 16px; font-size: 0.85rem; color: var(--color-text); border-bottom: 1px solid var(--color-border);">₹${formatNumber(yearlyInterest)}</td>
+            <td style="padding: 12px 16px; font-size: 0.85rem; color: var(--color-text); border-bottom: 1px solid var(--color-border);">₹${formatNumber(balance)}</td>
+            <td style="padding: 12px 16px; border-bottom: 1px solid var(--color-border);">
+                <div style="width: 100%; min-width: 80px; height: 6px; background: var(--color-border); border-radius: 3px; overflow: hidden;">
+                    <div style="height: 100%; background: linear-gradient(90deg, var(--color-gold), var(--color-gold-light)); border-radius: 3px; transition: width 0.5s ease; width: ${progress}%;"></div>
+                </div>
+            </td>
+        `;
+        tbody.appendChild(row);
     }
-
-    const progress = ((loanAmount - balance) / loanAmount * 100).toFixed(1);
-
-    const row = document.createElement('tr');
-    row.innerHTML = `
-      <td>Year ${year}</td>
-      <td>₹${formatNumber(yearlyPrincipal)}</td>
-      <td>₹${formatNumber(yearlyInterest)}</td>
-      <td>₹${formatNumber(balance)}</td>
-      <td>
-        <div class="progress-bar">
-          <div class="progress-fill" style="width: ${progress}%"></div>
-        </div>
-      </td>
-    `;
-    tbody.appendChild(row);
-  }
 }
 
 // Initialize
 calculateEMI();
 </script>
-
 {% endblock %}

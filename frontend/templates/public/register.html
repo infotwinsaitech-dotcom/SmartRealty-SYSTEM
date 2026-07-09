@@ -1,102 +1,147 @@
 {% extends "public/base.html" %}
 {% load static %}
-{% block title %}Register{% endblock %}
+
+{% block title %}Create Account{% endblock %}
 
 {% block content %}
 
-<section class="min-h-[100dvh] flex items-center justify-center luxury-bg px-4 sm:px-6 py-10">
+<!-- ============================================
+     REGISTER PAGE - RealShri
+     Mobile-first, clean, content-rich
+     ============================================ -->
 
-    <div class="max-w-md w-full card-luxury reveal">
+<section style="min-height: 100dvh; display: flex; align-items: center; justify-content: center; padding: var(--space-xl) var(--space-md); background: linear-gradient(135deg, var(--color-navy) 0%, var(--color-navy-light) 100%);">
 
-        <div class="hex-divider mb-3 mx-auto"></div>
+    <div class="card" style="width: 100%; max-width: 440px; border-radius: var(--radius-xl); overflow: hidden; animation: fadeInUp 0.5s ease;">
 
-        <h2 class="text-2xl sm:text-3xl font-display mb-2 gold text-center" style="font-family: 'Playfair Display', serif;">
-            Create Account
-        </h2>
+        <!-- Header -->
+        <div style="text-align: center; padding: var(--space-xl) var(--space-lg) var(--space-md);">
+            <div style="display: inline-flex; align-items: center; gap: 8px; background: rgba(212,175,55,0.15); padding: 6px 16px; border-radius: 9999px; margin-bottom: var(--space-md);">
+                <span class="material-icons-round" style="font-size: 18px; color: var(--color-gold);">person_add</span>
+                <span style="font-size: 0.8rem; font-weight: 600; color: var(--color-gold);">New User</span>
+            </div>
+            <h2 style="font-size: clamp(1.5rem, 4vw, 1.75rem); font-weight: 800; color: var(--color-navy); margin-bottom: 6px;">Create Account</h2>
+            <p style="font-size: 0.9rem; color: var(--color-text-muted); margin: 0;">Join 1000+ families who found their dream home</p>
+        </div>
 
-        <p class="text-[var(--text-muted)] text-sm sm:text-base mb-6 text-center">
-            Join the future of real estate management
-        </p>
-
+        <!-- Messages -->
         {% if messages %}
             {% for message in messages %}
-                <div class="mb-4 p-3 rounded-xl bg-green-50 text-green-700 border border-green-200 text-sm">
+                <div style="margin: 0 var(--space-lg) var(--space-md); padding: var(--space-md); border-radius: var(--radius-lg); background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.2); color: var(--color-success); font-size: 0.85rem; font-weight: 500; display: flex; align-items: center; gap: 8px;">
+                    <span class="material-icons-round" style="font-size: 18px;">check_circle</span>
                     {{ message }}
                 </div>
             {% endfor %}
         {% endif %}
 
         {% if error %}
-            <div class="mb-4 p-3 rounded-xl bg-red-50 text-red-600 border border-red-200 text-sm">
+            <div style="margin: 0 var(--space-lg) var(--space-md); padding: var(--space-md); border-radius: var(--radius-lg); background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2); color: var(--color-danger); font-size: 0.85rem; font-weight: 500; display: flex; align-items: center; gap: 8px;">
+                <span class="material-icons-round" style="font-size: 18px;">error</span>
                 {{ error }}
             </div>
         {% endif %}
 
-        <!-- GOOGLE BUTTON — Direct URL (no template tag, no database query) -->
-        <a href="/accounts/google/login/?process=login"
-           class="w-full flex items-center justify-center gap-3 min-h-[50px] py-3 bg-white text-[#1f2937] font-semibold rounded-xl hover:bg-gray-50 active:scale-[0.98] transition mb-4 border border-gray-300 shadow-sm">
-            <svg class="w-5 h-5" viewBox="0 0 24 24">
-                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-            </svg>
-            Continue with Google
-        </a>
-
-        <div class="flex items-center gap-4 mb-4">
-            <div class="flex-1 h-px" style="background:var(--hairline);"></div>
-            <span class="text-[var(--text-muted)] text-xs sm:text-sm whitespace-nowrap">or register with email</span>
-            <div class="flex-1 h-px" style="background:var(--hairline);"></div>
+        <!-- Google Sign Up -->
+        <div style="padding: 0 var(--space-lg) var(--space-md);">
+            <a href="/accounts/google/login/?process=login" class="btn" style="width: 100%; min-height: 50px; background: #ffffff; color: var(--color-navy); border: 1.5px solid var(--color-border); font-size: 0.9rem; font-weight: 600; gap: 10px; box-shadow: var(--shadow-sm);">
+                <span class="material-icons-round" style="font-size: 20px; color: #4285F4;">login</span>
+                Continue with Google
+            </a>
         </div>
 
-        <form method="POST" class="space-y-4" id="registerForm">
+        <!-- Divider -->
+        <div style="display: flex; align-items: center; gap: var(--space-md); padding: 0 var(--space-lg) var(--space-md);">
+            <div style="flex: 1; height: 1px; background: var(--color-border);"></div>
+            <span style="font-size: 0.8rem; color: var(--color-text-muted); font-weight: 500; white-space: nowrap;">or register with email</span>
+            <div style="flex: 1; height: 1px; background: var(--color-border);"></div>
+        </div>
+
+        <!-- Form -->
+        <form method="POST" style="padding: 0 var(--space-lg) var(--space-lg);" id="registerForm">
             {% csrf_token %}
 
-            <div>
-                <input name="full_name" type="text" placeholder="Full Name" required
-                    class="w-full min-h-[50px] p-3 rounded-xl bg-[var(--bg-soft)] border border-[var(--border)] text-[var(--navy-deep)] placeholder-gray-400 focus:ring-2 focus:ring-[var(--gold-1)] focus:border-[var(--gold-1)] outline-none text-base">
+            <!-- Full Name -->
+            <div style="margin-bottom: var(--space-md);">
+                <label style="display: block; font-size: 0.75rem; font-weight: 600; color: var(--color-text-muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em;">Full Name</label>
+                <div style="display: flex; align-items: center; background: var(--color-bg-soft); border: 1.5px solid var(--color-border); border-radius: var(--radius-lg); padding: 12px 14px; transition: all 0.25s ease; gap: 10px;" onfocusin="this.style.borderColor='var(--color-gold)';this.style.boxShadow='0 0 0 4px rgba(212,175,55,0.12)'" onfocusout="this.style.borderColor='var(--color-border)';this.style.boxShadow='none'">
+                    <span class="material-icons-round" style="font-size: 20px; color: var(--color-text-light); flex-shrink: 0;">person</span>
+                    <input name="full_name" type="text" placeholder="Enter your full name" required style="background: transparent; border: none; outline: none; color: var(--color-navy); font-size: 0.95rem; font-weight: 500; width: 100%; font-family: inherit;" autocomplete="name">
+                </div>
             </div>
 
-            <div>
-                <input name="email" type="email" placeholder="Email Address" required
-                    class="w-full min-h-[50px] p-3 rounded-xl bg-[var(--bg-soft)] border border-[var(--border)] text-[var(--navy-deep)] placeholder-gray-400 focus:ring-2 focus:ring-[var(--gold-1)] focus:border-[var(--gold-1)] outline-none text-base">
+            <!-- Email -->
+            <div style="margin-bottom: var(--space-md);">
+                <label style="display: block; font-size: 0.75rem; font-weight: 600; color: var(--color-text-muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em;">Email Address</label>
+                <div style="display: flex; align-items: center; background: var(--color-bg-soft); border: 1.5px solid var(--color-border); border-radius: var(--radius-lg); padding: 12px 14px; transition: all 0.25s ease; gap: 10px;" onfocusin="this.style.borderColor='var(--color-gold)';this.style.boxShadow='0 0 0 4px rgba(212,175,55,0.12)'" onfocusout="this.style.borderColor='var(--color-border)';this.style.boxShadow='none'">
+                    <span class="material-icons-round" style="font-size: 20px; color: var(--color-text-light); flex-shrink: 0;">email</span>
+                    <input name="email" type="email" placeholder="Enter your email" required style="background: transparent; border: none; outline: none; color: var(--color-navy); font-size: 0.95rem; font-weight: 500; width: 100%; font-family: inherit;" autocomplete="email">
+                </div>
             </div>
 
-            <div>
-                <input name="phone" type="tel" placeholder="Phone Number" required
-                    class="w-full min-h-[50px] p-3 rounded-xl bg-[var(--bg-soft)] border border-[var(--border)] text-[var(--navy-deep)] placeholder-gray-400 focus:ring-2 focus:ring-[var(--gold-1)] focus:border-[var(--gold-1)] outline-none text-base">
+            <!-- Phone -->
+            <div style="margin-bottom: var(--space-md);">
+                <label style="display: block; font-size: 0.75rem; font-weight: 600; color: var(--color-text-muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em;">Phone Number</label>
+                <div style="display: flex; align-items: center; background: var(--color-bg-soft); border: 1.5px solid var(--color-border); border-radius: var(--radius-lg); padding: 12px 14px; transition: all 0.25s ease; gap: 10px;" onfocusin="this.style.borderColor='var(--color-gold)';this.style.boxShadow='0 0 0 4px rgba(212,175,55,0.12)'" onfocusout="this.style.borderColor='var(--color-border)';this.style.boxShadow='none'">
+                    <span class="material-icons-round" style="font-size: 20px; color: var(--color-text-light); flex-shrink: 0;">phone</span>
+                    <input name="phone" type="tel" placeholder="Enter your phone number" required style="background: transparent; border: none; outline: none; color: var(--color-navy); font-size: 0.95rem; font-weight: 500; width: 100%; font-family: inherit;" autocomplete="tel">
+                </div>
             </div>
 
-            <div>
-                <input name="username" type="text" placeholder="Username" required autocomplete="off"
-                    class="w-full min-h-[50px] p-3 rounded-xl bg-[var(--bg-soft)] border border-[var(--border)] text-[var(--navy-deep)] placeholder-gray-400 focus:ring-2 focus:ring-[var(--gold-1)] focus:border-[var(--gold-1)] outline-none text-base">
-                <div id="usernameStatus" class="text-sm mt-1 h-5 transition-all duration-200"></div>
+            <!-- Username -->
+            <div style="margin-bottom: var(--space-md);">
+                <label style="display: block; font-size: 0.75rem; font-weight: 600; color: var(--color-text-muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em;">Username</label>
+                <div style="display: flex; align-items: center; background: var(--color-bg-soft); border: 1.5px solid var(--color-border); border-radius: var(--radius-lg); padding: 12px 14px; transition: all 0.25s ease; gap: 10px;" onfocusin="this.style.borderColor='var(--color-gold)';this.style.boxShadow='0 0 0 4px rgba(212,175,55,0.12)'" onfocusout="this.style.borderColor='var(--color-border)';this.style.boxShadow='none'">
+                    <span class="material-icons-round" style="font-size: 20px; color: var(--color-text-light); flex-shrink: 0;">account_circle</span>
+                    <input name="username" type="text" placeholder="Choose a username" required autocomplete="off" style="background: transparent; border: none; outline: none; color: var(--color-navy); font-size: 0.95rem; font-weight: 500; width: 100%; font-family: inherit;">
+                </div>
+                <div id="usernameStatus" style="font-size: 0.8rem; margin-top: 4px; min-height: 20px; transition: all 0.2s ease;"></div>
             </div>
 
-            <div>
-                <input name="password" type="password" placeholder="Password" required
-                    class="w-full min-h-[50px] p-3 rounded-xl bg-[var(--bg-soft)] border border-[var(--border)] text-[var(--navy-deep)] placeholder-gray-400 focus:ring-2 focus:ring-[var(--gold-1)] focus:border-[var(--gold-1)] outline-none text-base">
+            <!-- Password -->
+            <div style="margin-bottom: var(--space-lg);">
+                <label style="display: block; font-size: 0.75rem; font-weight: 600; color: var(--color-text-muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em;">Password</label>
+                <div style="display: flex; align-items: center; background: var(--color-bg-soft); border: 1.5px solid var(--color-border); border-radius: var(--radius-lg); padding: 12px 14px; transition: all 0.25s ease; gap: 10px;" onfocusin="this.style.borderColor='var(--color-gold)';this.style.boxShadow='0 0 0 4px rgba(212,175,55,0.12)'" onfocusout="this.style.borderColor='var(--color-border)';this.style.boxShadow='none'">
+                    <span class="material-icons-round" style="font-size: 20px; color: var(--color-text-light); flex-shrink: 0;">lock</span>
+                    <input name="password" type="password" placeholder="Create a password" required style="background: transparent; border: none; outline: none; color: var(--color-navy); font-size: 0.95rem; font-weight: 500; width: 100%; font-family: inherit;" autocomplete="new-password">
+                </div>
             </div>
 
-            <button type="submit" id="submitBtn" class="btn-gold w-full min-h-[52px]">
+            <!-- Terms -->
+            <div style="margin-bottom: var(--space-lg); display: flex; align-items: flex-start; gap: 8px;">
+                <input type="checkbox" id="terms" required style="width: 18px; height: 18px; accent-color: var(--color-gold); margin-top: 2px; flex-shrink: 0; cursor: pointer;">
+                <label for="terms" style="font-size: 0.8rem; color: var(--color-text-muted); line-height: 1.5; cursor: pointer;">
+                    I agree to the <a href="/terms/" style="color: var(--color-gold); font-weight: 600; text-decoration: none;">Terms of Service</a> and <a href="/privacy/" style="color: var(--color-gold); font-weight: 600; text-decoration: none;">Privacy Policy</a>
+                </label>
+            </div>
+
+            <!-- Submit -->
+            <button type="submit" id="submitBtn" class="btn btn-gold" style="width: 100%; min-height: 52px; font-size: 1rem;">
+                <span class="material-icons-round" style="font-size: 20px;">person_add</span>
                 Create Account
             </button>
 
         </form>
 
-        <p class="text-center text-[var(--text-muted)] text-sm mt-6">
-            Already have an account?
-            <a href="{% url 'login' %}" class="text-[var(--gold-1)] hover:underline font-medium">
-                Login
-            </a>
-        </p>
+        <!-- Login Link -->
+        <div style="text-align: center; padding: var(--space-md) var(--space-lg) var(--space-xl); border-top: 1px solid var(--color-border);">
+            <p style="font-size: 0.9rem; color: var(--color-text-muted); margin: 0;">
+                Already have an account?
+                <a href="{% url 'login' %}" style="color: var(--color-gold); font-weight: 700; text-decoration: none;">Login</a>
+            </p>
+        </div>
 
     </div>
 
 </section>
 
+{% endblock %}
+
+{% block extra_js %}
 <script>
+// ============================================
+// REGISTER PAGE SCRIPTS
+// ============================================
+
 document.addEventListener('DOMContentLoaded', function() {
     const usernameInput = document.querySelector('input[name="username"]');
     const form = document.getElementById('registerForm');
@@ -112,25 +157,25 @@ document.addEventListener('DOMContentLoaded', function() {
 
     usernameInput.addEventListener('input', function() {
         const username = this.value.trim();
-        
+
         clearTimeout(debounceTimer);
-        
+
         if (!username) {
             statusDiv.textContent = '';
-            statusDiv.className = 'text-sm mt-1 h-5 transition-all duration-200';
+            statusDiv.style.color = '';
             submitBtn.disabled = false;
             return;
         }
 
         if (username.length < 3) {
             statusDiv.textContent = 'Username must be at least 3 characters';
-            statusDiv.className = 'text-sm mt-1 h-5 text-[#a3701f]';
+            statusDiv.style.color = 'var(--color-gold-dark)';
             submitBtn.disabled = true;
             return;
         }
 
         statusDiv.textContent = 'Checking...';
-        statusDiv.className = 'text-sm mt-1 h-5 text-[var(--text-muted)]';
+        statusDiv.style.color = 'var(--color-text-muted)';
 
         debounceTimer = setTimeout(() => {
             fetch(`/api/check-username/?username=${encodeURIComponent(username)}`)
@@ -138,11 +183,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 .then(data => {
                     if (data.available) {
                         statusDiv.textContent = '✓ Username available';
-                        statusDiv.className = 'text-sm mt-1 h-5 text-emerald-600';
+                        statusDiv.style.color = 'var(--color-success)';
                         submitBtn.disabled = false;
                     } else {
                         statusDiv.textContent = '✗ ' + data.message;
-                        statusDiv.className = 'text-sm mt-1 h-5 text-red-600';
+                        statusDiv.style.color = 'var(--color-danger)';
                         submitBtn.disabled = true;
                     }
                 })
@@ -161,5 +206,4 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
-
 {% endblock %}

@@ -1,238 +1,527 @@
-{% extends "public/base.html" %}
+
+index_html = '''{% extends "public/base.html" %}
 {% load static cloudinary custom_filters %}
+{% block title %}RealShri - Find Your Dream Property{% endblock %}
+
 {% block content %}
-<style>
-@keyframes zoom {
-    0% { transform: scale(1); }
-    100% { transform: scale(1.15); }
-}
 
-/* SAFE ANIMATION */
-.reveal {
-    opacity: 1;
-    transform: translateY(40px);
-    transition: all 0.8s ease;
-}
-.reveal.show {
-    transform: translateY(0);
-}
-
-/* LIGHT CARD EFFECT (replaces old dark glass) */
-.glass {
-    background: #ffffff;
-    border: 1px solid rgba(212,175,55,0.20);
-    box-shadow: 0 6px 24px rgba(11,20,64,0.08);
-}
-
-/* FLOATING */
-.floating {
-    animation: float 6s ease-in-out infinite;
-}
-@keyframes float {
-    0%,100% { transform: translateY(0px); }
-    50% { transform: translateY(-15px); }
-}
-</style>
-
-<!-- HERO -->
-<section class="relative min-h-[100dvh] flex items-center justify-center overflow-hidden">
-
-<img src="{% static 'images/hero.jpg' %}"
-     class="absolute w-full h-full object-cover animate-[zoom_25s_linear_infinite] z-0">
-
-<div class="absolute inset-0 bg-gradient-to-b from-black/70 via-black/55 to-[#0b1440] z-10"></div>
-
-<div class="absolute w-[220px] h-[220px] sm:w-[500px] sm:h-[500px] bg-[#d4af37]/10 blur-[60px] sm:blur-[120px] rounded-full top-6 left-4 sm:top-10 sm:left-10 floating z-10"></div>
-<div class="absolute w-[180px] h-[180px] sm:w-[400px] sm:h-[400px] bg-[#d4af37]/10 blur-[50px] sm:blur-[100px] rounded-full bottom-6 right-4 sm:bottom-10 sm:right-10 floating z-10"></div>
-
-<div class="relative z-20 text-center px-5 sm:px-6 max-w-4xl">
-
-<h1 class="font-display text-4xl sm:text-6xl md:text-7xl font-extrabold mb-5 sm:mb-6 leading-[1.1]
-bg-gradient-to-r from-[#d4af37] via-[#f5e6a8] to-[#d4af37] bg-clip-text text-transparent reveal">
-Ultra Luxury Living
-</h1>
-
-<p class="text-[#e2e5ee] text-base sm:text-lg md:text-xl mb-8 sm:mb-10 reveal leading-relaxed">
-Experience elite real estate crafted for prestige, comfort and timeless elegance.
-</p>
-
-<div class="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center reveal px-2 sm:px-0">
-
-<a href="#properties"
-class="w-full sm:w-auto min-h-[52px] flex items-center justify-center px-8 py-4 bg-gradient-to-r from-[#d4af37] to-[#f5e6a8] text-[#0a0f1f] font-semibold rounded-full active:scale-[0.97] sm:hover:scale-105 transition">
-Explore Projects
-</a>
-
-<a href="/contact"
-class="w-full sm:w-auto min-h-[52px] flex items-center justify-center px-8 py-4 border border-white/60 text-white rounded-full active:scale-[0.97] sm:hover:bg-white sm:hover:text-black transition">
-Contact Us
-</a>
-
-</div>
-
-</div>
+<!-- ============================================
+   HERO SECTION - Full Width, ~45vh for Ads
+   ============================================ -->
+<section class="hero-section" style="min-height: 45vh; max-height: 55vh;">
+    <div class="hero-content w-full px-4">
+        
+        <!-- Small Label -->
+        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 mb-6">
+            <span class="material-icons-round text-[#d4af37]" style="font-size:16px">verified</span>
+            <span class="text-white/90 text-sm font-medium">RERA Registered Properties</span>
+        </div>
+        
+        <!-- Main Title -->
+        <h1 class="hero-title mb-4">
+            Find Your<br><span style="color: #d4af37;">Dream Home</span>
+        </h1>
+        
+        <!-- Subtitle -->
+        <p class="hero-subtitle mb-8">
+            Discover verified properties across India. Flats, Villas, Plots & more from trusted builders.
+        </p>
+        
+        <!-- Search Bar -->
+        <div class="search-bar max-w-2xl mx-auto mb-6">
+            <span class="material-icons-round text-[var(--color-text-light)]" style="font-size:20px">search</span>
+            <input type="text" placeholder="Search by location, project name..." id="heroSearch">
+            <button class="search-btn" onclick="handleHeroSearch()">Search</button>
+        </div>
+        
+        <!-- Quick Stats -->
+        <div class="flex items-center justify-center gap-6 text-white/70 text-sm flex-wrap">
+            <span class="flex items-center gap-1.5">
+                <span class="material-icons-round" style="font-size:16px">apartment</span>
+                5000+ Properties
+            </span>
+            <span class="flex items-center gap-1.5">
+                <span class="material-icons-round" style="font-size:16px">location_city</span>
+                50+ Cities
+            </span>
+            <span class="flex items-center gap-1.5">
+                <span class="material-icons-round" style="font-size:16px">groups</span>
+                1000+ Happy Families
+            </span>
+        </div>
+    </div>
 </section>
 
-<!-- TRUST BAR -->
-<section class="bg-[#f7f4ec] text-[#0b1440] py-5 sm:py-6 reveal">
-<div class="max-w-6xl mx-auto grid grid-cols-2 sm:flex sm:flex-wrap sm:justify-center gap-3 sm:gap-10 text-xs sm:text-sm font-semibold px-5 sm:px-6 text-center sm:text-left">
-<span><span class="text-[#c9922a]">✔</span> Trusted by 5000+ Families</span>
-<span><span class="text-[#c9922a]">✔</span> RERA Approved</span>
-<span><span class="text-[#c9922a]">✔</span> 15+ Years Experience</span>
-<span><span class="text-[#c9922a]">✔</span> Premium Locations</span>
-</div>
+<!-- ============================================
+   AD SPACE - Reserved for Banner Ads
+   ============================================ -->
+<section class="bg-[var(--color-bg-soft)] py-4 border-y border-[var(--color-border)]">
+    <div class="container-app">
+        <div class="flex items-center justify-center gap-2 text-xs text-[var(--color-text-light)]">
+            <span class="material-icons-round" style="font-size:14px">ads_click</span>
+            <span>Advertisement Space</span>
+        </div>
+        <!-- Ad banner placeholder - replace with actual ad code -->
+        <div class="w-full h-[90px] bg-[var(--color-border)]/50 rounded-lg mt-2 flex items-center justify-center">
+            <span class="text-sm text-[var(--color-text-light)]">728x90 Banner Ad</span>
+        </div>
+    </div>
 </section>
 
-<!-- STATS -->
-<section class="py-14 sm:py-24 bg-[#fdfcf9] text-center">
-<div class="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-10 max-w-6xl mx-auto px-5 sm:px-6">
-
-<div class="reveal">
-<h2 class="font-display text-3xl sm:text-4xl md:text-5xl font-bold text-[#c9922a]">250+</h2>
-<p class="text-[#6b7280] text-sm sm:text-base mt-1">Projects Delivered</p>
-</div>
-
-<div class="reveal">
-<h2 class="font-display text-3xl sm:text-4xl md:text-5xl font-bold text-[#c9922a]">15+</h2>
-<p class="text-[#6b7280] text-sm sm:text-base mt-1">Years Experience</p>
-</div>
-
-<div class="reveal">
-<h2 class="font-display text-3xl sm:text-4xl md:text-5xl font-bold text-[#c9922a]">5000+</h2>
-<p class="text-[#6b7280] text-sm sm:text-base mt-1">Happy Clients</p>
-</div>
-
-<div class="reveal">
-<h2 class="font-display text-3xl sm:text-4xl md:text-5xl font-bold text-[#c9922a]">20+</h2>
-<p class="text-[#6b7280] text-sm sm:text-base mt-1">Cities</p>
-</div>
-
-</div>
+<!-- ============================================
+   PROPERTY CATEGORIES - Quick Filter Pills
+   ============================================ -->
+<section class="section-pad bg-white">
+    <div class="container-app">
+        <div class="section-header mb-8">
+            <span class="label">
+                <span class="material-icons-round" style="font-size:16px">category</span>
+                Browse by Type
+            </span>
+            <h2>What Are You Looking For?</h2>
+            <div class="gold-line"></div>
+        </div>
+        
+        <div class="filter-pills justify-center mb-8">
+            <a href="{% url 'property_list' %}?category=residential" class="filter-pill">
+                <span class="material-icons-round">home</span>
+                Residential
+            </a>
+            <a href="{% url 'property_list' %}?category=commercial" class="filter-pill">
+                <span class="material-icons-round">business</span>
+                Commercial
+            </a>
+            <a href="{% url 'property_list' %}?category=land" class="filter-pill">
+                <span class="material-icons-round">terrain</span>
+                Land / Plots
+            </a>
+            <a href="{% url 'property_list' %}?type=Flat" class="filter-pill">
+                <span class="material-icons-round">apartment</span>
+                Flats
+            </a>
+            <a href="{% url 'property_list' %}?type=Villa" class="filter-pill">
+                <span class="material-icons-round">villa</span>
+                Villas
+            </a>
+            <a href="{% url 'property_list' %}?type=Office" class="filter-pill">
+                <span class="material-icons-round">corporate_fare</span>
+                Offices
+            </a>
+            <a href="{% url 'property_list' %}?type=Shop" class="filter-pill">
+                <span class="material-icons-round">store</span>
+                Shops
+            </a>
+        </div>
+        
+        <!-- Popular Locations -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+            {% for area in popular_areas|default:"Satellite,Vastrapur,Bodakdev,Thaltej,SG Highway,Prahlad Nagar,Navrangpura,Ellisbridge,Paldi,Vasna,Maninagar,Isanpur,Ghatlodia,Naranpura,Ranip,Chandkheda,Motera,Sabarmati,Gota,Chandlodia"|split:"," %}
+            <a href="{% url 'property_list' %}?location={{ area|urlencode }}" class="flex items-center gap-2 p-3 rounded-xl bg-[var(--color-bg-soft)] hover:bg-[var(--color-navy)] hover:text-white transition-all duration-200 group">
+                <span class="material-icons-round text-[var(--color-gold)] group-hover:text-white transition" style="font-size:18px">location_on</span>
+                <span class="text-sm font-medium truncate">{{ area }}</span>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
 </section>
 
-<!-- PROPERTIES -->
-<section id="properties" class="py-16 sm:py-28 px-5 sm:px-6 max-w-7xl mx-auto bg-[#fdfcf9]">
-
-<h2 class="font-display text-3xl sm:text-4xl md:text-5xl font-bold text-[#0b1440] mb-8 sm:mb-16 reveal">
-Signature Collection
-</h2>
-
-<div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6 sm:gap-10">
-
-{% for property in properties %}
-<div class="group relative rounded-2xl sm:rounded-3xl overflow-hidden glass sm:hover:scale-[1.03] transition duration-500 reveal">
-
-<div class="relative h-[220px] sm:h-[300px] md:h-[350px] overflow-hidden">
-
-{% if property.thumbnail %}
-{% cloudinary_url property.thumbnail width=800 height=600 crop='fill' as img_url %}
-<img src="{{ img_url }}"
-     class="w-full h-full object-cover group-hover:scale-110 transition duration-700">
-{% endif %}
-
-<div class="absolute inset-0 bg-gradient-to-t from-black/85 via-transparent to-transparent"></div>
-
-<div class="absolute top-3 left-3 sm:top-4 sm:left-4">
-<span class="bg-gradient-to-r from-[#d4af37] to-[#f5e6a8] text-[#0a0f1f] px-3 py-1 text-xs rounded-full font-semibold">
-Featured
-</span>
-</div>
-
-<div class="absolute bottom-3 left-3 sm:bottom-4 sm:left-4 text-xl sm:text-2xl font-bold text-[#f5e6a8]">
-₹{{ property.price }} {{ property.price_unit }}
-</div>
-
-</div>
-
-<div class="p-4 sm:p-5">
-<h3 class="text-lg sm:text-xl font-bold text-[#0b1440]">{{ property.title }}</h3>
-<p class="text-[#6b7280] text-sm mb-3">{{ property.location }}</p>
-
-<div class="flex justify-between text-sm text-[#33395a] mb-4">
-<span>🛏 {{ property.beds }}</span>
-<span>🛁 {{ property.baths }}</span>
-<span>📐 {{ property.sqft }}</span>
-</div>
-
-<a href="{% url 'property_detail' property.id %}"
-class="block text-center w-full min-h-[46px] flex items-center justify-center bg-[#0b1440] text-white py-2 rounded-full font-semibold active:scale-[0.97] sm:hover:bg-[#d4af37] sm:hover:text-[#0a0f1f] transition">
-View Details
-</a>
-</div>
-
-</div>
-{% endfor %}
-
-</div>
+<!-- ============================================
+   FEATURED PROPERTIES - Main Content
+   ============================================ -->
+<section class="section-pad bg-[var(--color-bg)]">
+    <div class="container-app">
+        <div class="section-header mb-10">
+            <span class="label">
+                <span class="material-icons-round" style="font-size:16px">star</span>
+                Handpicked for You
+            </span>
+            <h2>Featured Properties</h2>
+            <p>Explore our premium selection of verified properties</p>
+            <div class="gold-line"></div>
+        </div>
+        
+        <div class="grid-properties">
+            {% for property in properties %}
+            <div class="property-card reveal">
+                <div class="card-img">
+                    {% if property.thumbnail %}
+                    {% cloudinary_url property.thumbnail width=600 height=400 crop='fill' as img_url %}
+                    <img src="{{ img_url }}" alt="{{ property.title }}" loading="lazy">
+                    {% else %}
+                    <div class="w-full h-full bg-[var(--color-bg-soft)] flex items-center justify-center">
+                        <span class="material-icons-round text-[var(--color-text-light)]" style="font-size:48px">apartment</span>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Status Badge -->
+                    <span class="badge {% if property.status == 'Sold Out' %}badge-sold{% elif property.status == 'Coming Soon' %}badge-soon{% endif %}">
+                        {{ property.status }}
+                    </span>
+                    
+                    <!-- Wishlist Button -->
+                    <button class="wishlist-btn {% if property.id in user_wishlist_ids %}active{% endif %}" 
+                            onclick="event.preventDefault(); toggleWishlist({{ property.id }}, this)"
+                            aria-label="Add to wishlist">
+                        <span class="material-icons-round">
+                            {% if property.id in user_wishlist_ids %}favorite{% else %}favorite_border{% endif %}
+                        </span>
+                    </button>
+                </div>
+                
+                <div class="card-content">
+                    <!-- Price -->
+                    <div class="price">
+                        ₹{{ property.price }} {{ property.price_unit|default:"L" }}
+                        {% if property.price_unit == 'Cr' %}
+                        <span class="text-sm font-normal text-[var(--color-text-muted)]">Crore</span>
+                        {% else %}
+                        <span class="text-sm font-normal text-[var(--color-text-muted)]">Lakh</span>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Title -->
+                    <h3 class="title">{{ property.title }}</h3>
+                    
+                    <!-- Location -->
+                    <div class="location">
+                        <span class="material-icons-round" style="font-size:14px">location_on</span>
+                        {{ property.location }}
+                    </div>
+                    
+                    <!-- Features -->
+                    <div class="features">
+                        {% if property.beds %}
+                        <div class="feature">
+                            <span class="material-icons-round">bed</span>
+                            {{ property.beds }} BHK
+                        </div>
+                        {% endif %}
+                        {% if property.baths %}
+                        <div class="feature">
+                            <span class="material-icons-round">bathtub</span>
+                            {{ property.baths }} Bath
+                        </div>
+                        {% endif %}
+                        {% if property.sqft %}
+                        <div class="feature">
+                            <span class="material-icons-round">square_foot</span>
+                            {{ property.sqft }} sqft
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- RERA Badge -->
+                    {% if property.rera_number %}
+                    <div class="mt-3">
+                        <span class="rera-badge">
+                            <span class="material-icons-round" style="font-size:12px">verified</span>
+                            RERA: {{ property.rera_number }}
+                        </span>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- CTA Button -->
+                    <a href="{% url 'property_detail' property.id %}" class="btn btn-navy w-full mt-4" style="min-height:44px; padding: 10px 20px; font-size: 0.875rem;">
+                        View Details
+                        <span class="material-icons-round" style="font-size:16px">arrow_forward</span>
+                    </a>
+                </div>
+            </div>
+            {% empty %}
+            <!-- Dummy Content for Empty State -->
+            <div class="col-span-full text-center py-16">
+                <span class="material-icons-round text-[var(--color-text-light)]" style="font-size:64px">apartment</span>
+                <h3 class="text-xl font-semibold text-[var(--color-navy)] mt-4 mb-2">No Properties Yet</h3>
+                <p class="text-[var(--color-text-muted)] mb-6">Be the first to list your property!</p>
+                <a href="{% url 'register' %}" class="btn btn-gold">List Your Property</a>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <!-- View All Button -->
+        <div class="text-center mt-10">
+            <a href="{% url 'property_list' %}" class="btn btn-outline">
+                View All Properties
+                <span class="material-icons-round" style="font-size:18px">arrow_forward</span>
+            </a>
+        </div>
+    </div>
 </section>
 
-<!-- ABOUT -->
-<section class="py-16 sm:py-28 bg-gradient-to-b from-[#fdfcf9] to-[#f7f4ec]">
-
-<div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 sm:gap-16 items-center px-5 sm:px-6">
-
-<div class="reveal">
-<img src="{% static 'images/about.jpg' %}"
-     class="rounded-2xl sm:rounded-3xl shadow-xl shadow-black/10 sm:hover:scale-105 transition duration-500 w-full">
-</div>
-
-<div class="reveal">
-<h2 class="font-display text-3xl sm:text-4xl md:text-5xl font-bold text-[#c9922a] mb-4 sm:mb-6">
-Redefining Luxury Living
-</h2>
-
-<p class="text-[#33395a] leading-relaxed mb-5 sm:mb-6 text-base sm:text-lg">
-We craft experiences, not just homes. Designed for prestige and modern lifestyle.
-</p>
-
-<div class="space-y-2.5 sm:space-y-3 text-[#33395a] text-sm sm:text-base">
-<p><span class="text-[#c9922a]">✔</span> Prime Locations</p>
-<p><span class="text-[#c9922a]">✔</span> Smart Living</p>
-<p><span class="text-[#c9922a]">✔</span> Luxury Amenities</p>
-<p><span class="text-[#c9922a]">✔</span> High ROI</p>
-</div>
-
-</div>
-
-</div>
+<!-- ============================================
+   WHY CHOOSE US - Trust Building Section
+   ============================================ -->
+<section class="section-pad bg-white">
+    <div class="container-app">
+        <div class="section-header mb-10">
+            <span class="label">
+                <span class="material-icons-round" style="font-size:16px">emoji_events</span>
+                Why RealShri
+            </span>
+            <h2>Why Choose Us?</h2>
+            <p>We make property buying simple, secure, and stress-free</p>
+            <div class="gold-line"></div>
+        </div>
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="card p-6 text-center reveal">
+                <div class="w-14 h-14 rounded-2xl bg-[rgba(212,175,55,0.1)] flex items-center justify-center mx-auto mb-4">
+                    <span class="material-icons-round text-[var(--color-gold)]" style="font-size:28px">verified</span>
+                </div>
+                <h3 class="text-lg font-bold text-[var(--color-navy)] mb-2">Verified Properties</h3>
+                <p class="text-sm text-[var(--color-text-muted)]">Every property is verified with proper documentation and RERA registration.</p>
+            </div>
+            
+            <div class="card p-6 text-center reveal">
+                <div class="w-14 h-14 rounded-2xl bg-[rgba(212,175,55,0.1)] flex items-center justify-center mx-auto mb-4">
+                    <span class="material-icons-round text-[var(--color-gold)]" style="font-size:28px">support_agent</span>
+                </div>
+                <h3 class="text-lg font-bold text-[var(--color-navy)] mb-2">Expert Guidance</h3>
+                <p class="text-sm text-[var(--color-text-muted)]">Our experienced agents help you at every step of your property journey.</p>
+            </div>
+            
+            <div class="card p-6 text-center reveal">
+                <div class="w-14 h-14 rounded-2xl bg-[rgba(212,175,55,0.1)] flex items-center justify-center mx-auto mb-4">
+                    <span class="material-icons-round text-[var(--color-gold)]" style="font-size:28px">savings</span>
+                </div>
+                <h3 class="text-lg font-bold text-[var(--color-navy)] mb-2">Best Prices</h3>
+                <p class="text-sm text-[var(--color-text-muted)]">Direct deals with builders ensure you get the best price without hidden costs.</p>
+            </div>
+            
+            <div class="card p-6 text-center reveal">
+                <div class="w-14 h-14 rounded-2xl bg-[rgba(212,175,55,0.1)] flex items-center justify-center mx-auto mb-4">
+                    <span class="material-icons-round text-[var(--color-gold)]" style="font-size:28px">handshake</span>
+                </div>
+                <h3 class="text-lg font-bold text-[var(--color-navy)] mb-2">Trusted Partners</h3>
+                <p class="text-sm text-[var(--color-text-muted)]">We partner with only reputed builders with proven track records.</p>
+            </div>
+        </div>
+    </div>
 </section>
 
-<!-- CTA -->
-<section class="py-16 sm:py-24 md:py-32 text-center bg-gradient-to-r from-[#d4af37] to-[#f5e6a8] text-[#0a0f1f] reveal px-5 sm:px-6">
-
-<h2 class="font-display text-3xl sm:text-4xl md:text-5xl font-bold mb-4 sm:mb-6">
-Find Your Dream Property
-</h2>
-
-<p class="mb-7 sm:mb-8 text-base sm:text-lg">
-Talk to our experts today
-</p>
-
-<a href="/contact"
-class="inline-flex items-center justify-center w-full sm:w-auto min-h-[52px] px-10 py-4 bg-[#0b1440] text-white rounded-full active:scale-[0.97] sm:hover:scale-105 transition">
-Get Consultation
-</a>
-
+<!-- ============================================
+   STATS COUNTER - Social Proof
+   ============================================ -->
+<section class="section-pad" style="background: linear-gradient(135deg, var(--color-navy) 0%, #1e3a5f 100%);">
+    <div class="container-app">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
+            <div class="text-center reveal">
+                <div class="text-3xl md:text-4xl font-bold text-[#d4af37] mb-1">5000+</div>
+                <div class="text-sm text-white/70">Properties Listed</div>
+            </div>
+            <div class="text-center reveal">
+                <div class="text-3xl md:text-4xl font-bold text-[#d4af37] mb-1">1000+</div>
+                <div class="text-sm text-white/70">Happy Families</div>
+            </div>
+            <div class="text-center reveal">
+                <div class="text-3xl md:text-4xl font-bold text-[#d4af37] mb-1">50+</div>
+                <div class="text-sm text-white/70">Cities Covered</div>
+            </div>
+            <div class="text-center reveal">
+                <div class="text-3xl md:text-4xl font-bold text-[#d4af37] mb-1">200+</div>
+                <div class="text-sm text-white/70">Verified Builders</div>
+            </div>
+        </div>
+    </div>
 </section>
 
-<!-- SCRIPT -->
+<!-- ============================================
+   HOW IT WORKS - Simple Steps
+   ============================================ -->
+<section class="section-pad bg-[var(--color-bg)]">
+    <div class="container-app">
+        <div class="section-header mb-10">
+            <span class="label">
+                <span class="material-icons-round" style="font-size:16px">route</span>
+                Simple Process
+            </span>
+            <h2>How It Works</h2>
+            <p>Your dream home is just 3 steps away</p>
+            <div class="gold-line"></div>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 relative">
+            <!-- Connection Lines (Desktop) -->
+            <div class="hidden md:block absolute top-1/2 left-1/3 right-1/3 h-0.5 bg-[var(--color-border)] -translate-y-1/2 z-0"></div>
+            
+            <div class="relative z-10 text-center reveal">
+                <div class="w-16 h-16 rounded-full bg-[var(--color-gold)] text-white flex items-center justify-center mx-auto mb-4 text-2xl font-bold shadow-lg">
+                    1
+                </div>
+                <h3 class="text-lg font-bold text-[var(--color-navy)] mb-2">Search</h3>
+                <p class="text-sm text-[var(--color-text-muted)]">Browse thousands of verified properties by location, type, and budget.</p>
+            </div>
+            
+            <div class="relative z-10 text-center reveal">
+                <div class="w-16 h-16 rounded-full bg-[var(--color-gold)] text-white flex items-center justify-center mx-auto mb-4 text-2xl font-bold shadow-lg">
+                    2
+                </div>
+                <h3 class="text-lg font-bold text-[var(--color-navy)] mb-2">Connect</h3>
+                <p class="text-sm text-[var(--color-text-muted)]">Get in touch with builders or our expert agents for site visits.</p>
+            </div>
+            
+            <div class="relative z-10 text-center reveal">
+                <div class="w-16 h-16 rounded-full bg-[var(--color-gold)] text-white flex items-center justify-center mx-auto mb-4 text-2xl font-bold shadow-lg">
+                    3
+                </div>
+                <h3 class="text-lg font-bold text-[var(--color-navy)] mb-2">Own</h3>
+                <p class="text-sm text-[var(--color-text-muted)]">Complete paperwork with our guidance and move into your dream home.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================
+   TESTIMONIALS - Trust Building
+   ============================================ -->
+<section class="section-pad bg-white">
+    <div class="container-app">
+        <div class="section-header mb-10">
+            <span class="label">
+                <span class="material-icons-round" style="font-size:16px">reviews</span>
+                Client Stories
+            </span>
+            <h2>What Our Clients Say</h2>
+            <p>Real stories from real homeowners</p>
+            <div class="gold-line"></div>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="card p-6 reveal">
+                <div class="flex items-center gap-1 mb-4">
+                    <span class="material-icons-round text-[var(--color-gold)]" style="font-size:18px">star</span>
+                    <span class="material-icons-round text-[var(--color-gold)]" style="font-size:18px">star</span>
+                    <span class="material-icons-round text-[var(--color-gold)]" style="font-size:18px">star</span>
+                    <span class="material-icons-round text-[var(--color-gold)]" style="font-size:18px">star</span>
+                    <span class="material-icons-round text-[var(--color-gold)]" style="font-size:18px">star</span>
+                </div>
+                <p class="text-[var(--color-text)] text-sm leading-relaxed mb-4">"RealShri made our home buying journey incredibly smooth. The verified listings gave us confidence, and the agent was extremely helpful throughout."</p>
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-[var(--color-gold)] to-[var(--color-gold-dark)] text-white flex items-center justify-center font-bold text-sm">
+                        RP
+                    </div>
+                    <div>
+                        <p class="font-semibold text-sm text-[var(--color-navy)]">Rajesh Patel</p>
+                        <p class="text-xs text-[var(--color-text-muted)]">Bought 3 BHK in Satellite</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card p-6 reveal">
+                <div class="flex items-center gap-1 mb-4">
+                    <span class="material-icons-round text-[var(--color-gold)]" style="font-size:18px">star</span>
+                    <span class="material-icons-round text-[var(--color-gold)]" style="font-size:18px">star</span>
+                    <span class="material-icons-round text-[var(--color-gold)]" style="font-size:18px">star</span>
+                    <span class="material-icons-round text-[var(--color-gold)]" style="font-size:18px">star</span>
+                    <span class="material-icons-round text-[var(--color-gold)]" style="font-size:18px">star</span>
+                </div>
+                <p class="text-[var(--color-text)] text-sm leading-relaxed mb-4">"As a builder, RealShri helped me reach genuine buyers. The lead management system is excellent and the ROI has been fantastic."</p>
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-[var(--color-navy)] to-[var(--color-navy-light)] text-white flex items-center justify-center font-bold text-sm">
+                        AS
+                    </div>
+                    <div>
+                        <p class="font-semibold text-sm text-[var(--color-navy)]">Amit Shah</p>
+                        <p class="text-xs text-[var(--color-text-muted)]">Builder, Ahmedabad</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card p-6 reveal">
+                <div class="flex items-center gap-1 mb-4">
+                    <span class="material-icons-round text-[var(--color-gold)]" style="font-size:18px">star</span>
+                    <span class="material-icons-round text-[var(--color-gold)]" style="font-size:18px">star</span>
+                    <span class="material-icons-round text-[var(--color-gold)]" style="font-size:18px">star</span>
+                    <span class="material-icons-round text-[var(--color-gold)]" style="font-size:18px">star</span>
+                    <span class="material-icons-round text-[var(--color-gold)]" style="font-size:18px">star_half</span>
+                </div>
+                <p class="text-[var(--color-text)] text-sm leading-relaxed mb-4">"The EMI calculator and property comparison tools helped us make an informed decision. Highly recommend for first-time buyers!"</p>
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-[var(--color-success)] to-[#059669] text-white flex items-center justify-center font-bold text-sm">
+                        PM
+                    </div>
+                    <div>
+                        <p class="font-semibold text-sm text-[var(--color-navy)]">Priya Mehta</p>
+                        <p class="text-xs text-[var(--color-text-muted)]">First-time Buyer</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================
+   CTA SECTION - Final Call to Action
+   ============================================ -->
+<section class="section-pad" style="background: linear-gradient(135deg, var(--color-gold) 0%, var(--color-gold-light) 100%);">
+    <div class="container-app text-center">
+        <div class="max-w-2xl mx-auto reveal">
+            <h2 class="text-2xl md:text-4xl font-bold text-[var(--color-navy)] mb-4">
+                Ready to Find Your Dream Home?
+            </h2>
+            <p class="text-[var(--color-navy)]/80 mb-8">
+                Join thousands of happy families who found their perfect property with RealShri.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                <a href="{% url 'property_list' %}" class="btn btn-navy" style="min-height:48px;">
+                    <span class="material-icons-round" style="font-size:18px">search</span>
+                    Browse Properties
+                </a>
+                <a href="{% url 'contact' %}" class="btn" style="background: white; color: var(--color-navy); min-height:48px;">
+                    <span class="material-icons-round" style="font-size:18px">phone</span>
+                    Talk to an Expert
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================
+   AD SPACE - Bottom Banner
+   ============================================ -->
+<section class="bg-[var(--color-bg-soft)] py-4 border-y border-[var(--color-border)]">
+    <div class="container-app">
+        <div class="flex items-center justify-center gap-2 text-xs text-[var(--color-text-light)]">
+            <span class="material-icons-round" style="font-size:14px">ads_click</span>
+            <span>Advertisement Space</span>
+        </div>
+        <div class="w-full h-[90px] bg-[var(--color-border)]/50 rounded-lg mt-2 flex items-center justify-center">
+            <span class="text-sm text-[var(--color-text-light)]">728x90 Banner Ad</span>
+        </div>
+    </div>
+</section>
+
 <script>
-document.addEventListener("DOMContentLoaded", function () {
-
-    const elements = document.querySelectorAll(".reveal");
-
-    function showOnScroll() {
-        elements.forEach(el => {
-            const top = el.getBoundingClientRect().top;
-            if (top < window.innerHeight - 80) {
-                el.classList.add("show");
-            }
-        });
+// Hero Search Handler
+function handleHeroSearch() {
+    const query = document.getElementById('heroSearch').value.trim();
+    if (query) {
+        window.location.href = `/properties/?q=${encodeURIComponent(query)}`;
     }
+}
 
-    setTimeout(showOnScroll, 200);
-    window.addEventListener("scroll", showOnScroll);
+// Enter key search
+document.getElementById('heroSearch').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') handleHeroSearch();
+});
 
+// Intersection Observer for animations
+const revealElements = document.querySelectorAll('.reveal');
+const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.style.opacity = '1';
+            entry.target.style.transform = 'translateY(0)';
+            revealObserver.unobserve(entry.target);
+        }
+    });
+}, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+revealElements.forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(20px)';
+    el.style.transition = 'all 0.6s ease';
+    revealObserver.observe(el);
 });
 </script>
 

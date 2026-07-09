@@ -1,127 +1,216 @@
 {% extends "public/base.html" %}
+{% load static %}
+
+{% block title %}Privacy Policy{% endblock %}
 
 {% block content %}
 
-<div class="luxury-bg min-h-screen">
+<!-- ============================================
+     PRIVACY POLICY - RealShri
+     Mobile-first, clean, content-rich
+     ============================================ -->
 
-<div class="max-w-4xl mx-auto px-4 sm:px-6 py-14 sm:py-20">
+<!-- Hero Section -->
+<section class="hero-section" style="min-height: 25vh; max-height: 32vh;">
+    <div class="hero-content" style="max-width: 700px;">
+        <div style="display: inline-flex; align-items: center; gap: 8px; background: rgba(212,175,55,0.15); padding: 6px 16px; border-radius: 9999px; margin-bottom: 16px;">
+            <span class="material-icons-round" style="font-size: 18px; color: var(--color-gold);">privacy_tip</span>
+            <span style="font-size: 0.85rem; font-weight: 600; color: var(--color-gold);">Legal</span>
+        </div>
+        <h1 class="hero-title" style="font-size: clamp(1.5rem, 4vw, 2.25rem);">Privacy Policy</h1>
+        <p class="hero-subtitle" style="font-size: clamp(0.9rem, 2vw, 1.05rem);">
+            Your privacy is important to us. This policy explains how we collect, use, and protect your information.
+        </p>
+    </div>
+</section>
 
-<!-- HEADER -->
-<div class="text-center mb-10 sm:mb-16">
-    <div class="hex-divider mb-3 mx-auto"></div>
-    <h1 class="text-3xl sm:text-4xl md:text-6xl font-extrabold gold mb-4" style="font-family: 'Playfair Display', serif;">
-        Privacy Policy
-    </h1>
-    <p class="text-[var(--text-muted)] max-w-2xl mx-auto text-sm sm:text-base">
-        Your privacy is important to us. This policy explains how we collect, use, and protect your information.
-    </p>
-</div>
+<!-- Content -->
+<div class="container-app section-pad" style="padding-top: clamp(1.5rem, 4vw, 2.5rem);">
 
-<!-- CONTENT -->
-<div class="space-y-5 sm:space-y-8">
+    <!-- Last Updated -->
+    <div style="text-align: center; margin-bottom: var(--space-xl);">
+        <div style="display: inline-flex; align-items: center; gap: 8px; background: var(--color-bg-soft); padding: 8px 20px; border-radius: var(--radius-full); border: 1px solid var(--color-border);">
+            <span class="material-icons-round" style="font-size: 16px; color: var(--color-text-muted);">update</span>
+            <span style="font-size: 0.8rem; color: var(--color-text-muted); font-weight: 500;">Last Updated: July 2026</span>
+        </div>
+    </div>
 
-<!-- SECTION -->
-<div class="card-luxury">
-    <h2 class="text-xl sm:text-2xl font-bold mb-3" style="font-family: 'Playfair Display', serif; color:var(--navy-deep);">
-        1. Information We Collect
-    </h2>
-    <p class="text-[var(--text-body)] leading-relaxed text-sm sm:text-base">
-        We collect personal information such as your name, email address, phone number, and any details you provide when submitting inquiries or forms on our website.
-    </p>
-</div>
+    <!-- Sections -->
+    <div style="display: flex; flex-direction: column; gap: var(--space-lg); max-width: 800px; margin-inline: auto;">
 
-<!-- SECTION -->
-<div class="card-luxury">
-    <h2 class="text-xl sm:text-2xl font-bold mb-3" style="font-family: 'Playfair Display', serif; color:var(--navy-deep);">
-        2. How We Use Your Information
-    </h2>
-    <ul class="list-disc pl-6 text-[var(--text-body)] space-y-2 text-sm sm:text-base">
-        <li>To respond to inquiries and provide customer support</li>
-        <li>To improve our services and user experience</li>
-        <li>To send updates or promotional offers (if applicable)</li>
-    </ul>
-</div>
+        <!-- Section 1 -->
+        <div class="card" style="padding: var(--space-lg); border-radius: var(--radius-xl);">
+            <div style="display: flex; align-items: flex-start; gap: var(--space-md);">
+                <div style="width: 40px; height: 40px; border-radius: var(--radius-md); background: linear-gradient(135deg, rgba(212,175,55,0.12), rgba(212,175,55,0.04)); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--color-gold);">
+                    <span class="material-icons-round" style="font-size: 20px;">inventory_2</span>
+                </div>
+                <div style="flex: 1;">
+                    <h2 style="font-size: 1.1rem; font-weight: 700; color: var(--color-navy); margin-bottom: 8px;">1. Information We Collect</h2>
+                    <p style="font-size: 0.9rem; color: var(--color-text-muted); line-height: 1.7; margin: 0;">
+                        We collect personal information such as your name, email address, phone number, and any details you provide when submitting inquiries or forms on our website. We also collect browsing data to improve your experience.
+                    </p>
+                </div>
+            </div>
+        </div>
 
-<!-- SECTION -->
-<div class="card-luxury">
-    <h2 class="text-xl sm:text-2xl font-bold mb-3" style="font-family: 'Playfair Display', serif; color:var(--navy-deep);">
-        3. Data Protection
-    </h2>
-    <p class="text-[var(--text-body)] leading-relaxed text-sm sm:text-base">
-        We implement strict security measures to protect your personal data. However, no method of transmission over the internet is 100% secure.
-    </p>
-</div>
+        <!-- Section 2 -->
+        <div class="card" style="padding: var(--space-lg); border-radius: var(--radius-xl);">
+            <div style="display: flex; align-items: flex-start; gap: var(--space-md);">
+                <div style="width: 40px; height: 40px; border-radius: var(--radius-md); background: linear-gradient(135deg, rgba(59,130,246,0.12), rgba(59,130,246,0.04)); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: #3b82f6;">
+                    <span class="material-icons-round" style="font-size: 20px;">build</span>
+                </div>
+                <div style="flex: 1;">
+                    <h2 style="font-size: 1.1rem; font-weight: 700; color: var(--color-navy); margin-bottom: 8px;">2. How We Use Your Information</h2>
+                    <ul style="margin: 0; padding-left: 20px; font-size: 0.9rem; color: var(--color-text-muted); line-height: 1.8;">
+                        <li>To respond to inquiries and provide customer support</li>
+                        <li>To improve our services and user experience</li>
+                        <li>To send updates or promotional offers (if applicable)</li>
+                        <li>To process property bookings and transactions</li>
+                        <li>To verify your identity and prevent fraud</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
 
-<!-- SECTION -->
-<div class="card-luxury">
-    <h2 class="text-xl sm:text-2xl font-bold mb-3" style="font-family: 'Playfair Display', serif; color:var(--navy-deep);">
-        4. Sharing of Information
-    </h2>
-    <p class="text-[var(--text-body)] leading-relaxed text-sm sm:text-base">
-        We do not sell, trade, or rent your personal information. Your data may only be shared with trusted partners for operational purposes.
-    </p>
-</div>
+        <!-- Section 3 -->
+        <div class="card" style="padding: var(--space-lg); border-radius: var(--radius-xl);">
+            <div style="display: flex; align-items: flex-start; gap: var(--space-md);">
+                <div style="width: 40px; height: 40px; border-radius: var(--radius-md); background: linear-gradient(135deg, rgba(16,185,129,0.12), rgba(16,185,129,0.04)); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--color-success);">
+                    <span class="material-icons-round" style="font-size: 20px;">security</span>
+                </div>
+                <div style="flex: 1;">
+                    <h2 style="font-size: 1.1rem; font-weight: 700; color: var(--color-navy); margin-bottom: 8px;">3. Data Protection</h2>
+                    <p style="font-size: 0.9rem; color: var(--color-text-muted); line-height: 1.7; margin: 0;">
+                        We implement strict security measures including SSL encryption, firewalls, and regular security audits to protect your personal data. Your information is stored on secure servers with restricted access. However, no method of transmission over the internet is 100% secure.
+                    </p>
+                </div>
+            </div>
+        </div>
 
-<!-- SECTION -->
-<div class="card-luxury">
-    <h2 class="text-xl sm:text-2xl font-bold mb-3" style="font-family: 'Playfair Display', serif; color:var(--navy-deep);">
-        5. Cookies
-    </h2>
-    <p class="text-[var(--text-body)] leading-relaxed text-sm sm:text-base">
-        Our website may use cookies to enhance user experience and analyze website traffic.
-    </p>
-</div>
+        <!-- Section 4 -->
+        <div class="card" style="padding: var(--space-lg); border-radius: var(--radius-xl);">
+            <div style="display: flex; align-items: flex-start; gap: var(--space-md);">
+                <div style="width: 40px; height: 40px; border-radius: var(--radius-md); background: linear-gradient(135deg, rgba(168,85,247,0.12), rgba(168,85,247,0.04)); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: #a855f7;">
+                    <span class="material-icons-round" style="font-size: 20px;">share</span>
+                </div>
+                <div style="flex: 1;">
+                    <h2 style="font-size: 1.1rem; font-weight: 700; color: var(--color-navy); margin-bottom: 8px;">4. Sharing of Information</h2>
+                    <p style="font-size: 0.9rem; color: var(--color-text-muted); line-height: 1.7; margin: 0;">
+                        We do not sell, trade, or rent your personal information to third parties. Your data may only be shared with trusted partners for operational purposes such as payment processing, property verification, and legal compliance.
+                    </p>
+                </div>
+            </div>
+        </div>
 
-<!-- SECTION -->
-<div class="card-luxury">
-    <h2 class="text-xl sm:text-2xl font-bold mb-3" style="font-family: 'Playfair Display', serif; color:var(--navy-deep);">
-        6. Your Rights
-    </h2>
-    <ul class="list-disc pl-6 text-[var(--text-body)] space-y-2 text-sm sm:text-base">
-        <li>You can request access to your data</li>
-        <li>You can request correction or deletion of your data</li>
-        <li>You can opt out of communications</li>
-    </ul>
-</div>
+        <!-- Section 5 -->
+        <div class="card" style="padding: var(--space-lg); border-radius: var(--radius-xl);">
+            <div style="display: flex; align-items: flex-start; gap: var(--space-md);">
+                <div style="width: 40px; height: 40px; border-radius: var(--radius-md); background: linear-gradient(135deg, rgba(245,158,11,0.12), rgba(245,158,11,0.04)); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: #f59e0b;">
+                    <span class="material-icons-round" style="font-size: 20px;">cookie</span>
+                </div>
+                <div style="flex: 1;">
+                    <h2 style="font-size: 1.1rem; font-weight: 700; color: var(--color-navy); margin-bottom: 8px;">5. Cookies</h2>
+                    <p style="font-size: 0.9rem; color: var(--color-text-muted); line-height: 1.7; margin: 0;">
+                        Our website uses cookies to enhance user experience, remember your preferences, and analyze website traffic. You can control cookies through your browser settings. Essential cookies are required for the website to function properly.
+                    </p>
+                </div>
+            </div>
+        </div>
 
-<!-- SECTION -->
-<div class="card-luxury">
-    <h2 class="text-xl sm:text-2xl font-bold mb-3" style="font-family: 'Playfair Display', serif; color:var(--navy-deep);">
-        7. Third-Party Services
-    </h2>
-    <p class="text-[var(--text-body)] leading-relaxed text-sm sm:text-base">
-        We may use third-party services such as analytics tools or payment providers. These services have their own privacy policies.
-    </p>
-</div>
+        <!-- Section 6 -->
+        <div class="card" style="padding: var(--space-lg); border-radius: var(--radius-xl);">
+            <div style="display: flex; align-items: flex-start; gap: var(--space-md);">
+                <div style="width: 40px; height: 40px; border-radius: var(--radius-md); background: linear-gradient(135deg, rgba(239,68,68,0.12), rgba(239,68,68,0.04)); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--color-danger);">
+                    <span class="material-icons-round" style="font-size: 20px;">gavel</span>
+                </div>
+                <div style="flex: 1;">
+                    <h2 style="font-size: 1.1rem; font-weight: 700; color: var(--color-navy); margin-bottom: 8px;">6. Your Rights</h2>
+                    <ul style="margin: 0; padding-left: 20px; font-size: 0.9rem; color: var(--color-text-muted); line-height: 1.8;">
+                        <li>You can request access to your personal data</li>
+                        <li>You can request correction or deletion of your data</li>
+                        <li>You can opt out of marketing communications</li>
+                        <li>You can request a copy of your data in portable format</li>
+                        <li>You can object to certain processing activities</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
 
-<!-- SECTION -->
-<div class="card-luxury">
-    <h2 class="text-xl sm:text-2xl font-bold mb-3" style="font-family: 'Playfair Display', serif; color:var(--navy-deep);">
-        8. Changes to This Policy
-    </h2>
-    <p class="text-[var(--text-body)] leading-relaxed text-sm sm:text-base">
-        We may update this privacy policy from time to time. Any changes will be posted on this page.
-    </p>
-</div>
+        <!-- Section 7 -->
+        <div class="card" style="padding: var(--space-lg); border-radius: var(--radius-xl);">
+            <div style="display: flex; align-items: flex-start; gap: var(--space-md);">
+                <div style="width: 40px; height: 40px; border-radius: var(--radius-md); background: linear-gradient(135deg, rgba(6,182,212,0.12), rgba(6,182,212,0.04)); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: #06b6d4;">
+                    <span class="material-icons-round" style="font-size: 20px;">handshake</span>
+                </div>
+                <div style="flex: 1;">
+                    <h2 style="font-size: 1.1rem; font-weight: 700; color: var(--color-navy); margin-bottom: 8px;">7. Third-Party Services</h2>
+                    <p style="font-size: 0.9rem; color: var(--color-text-muted); line-height: 1.7; margin: 0;">
+                        We may use third-party services such as Google Analytics, payment gateways, and cloud storage providers. These services have their own privacy policies. We only share the minimum necessary data required for these services to function.
+                    </p>
+                </div>
+            </div>
+        </div>
 
-<!-- SECTION -->
-<div class="card-luxury">
-    <h2 class="text-xl sm:text-2xl font-bold mb-3" style="font-family: 'Playfair Display', serif; color:var(--navy-deep);">
-        9. Contact Us
-    </h2>
-    <p class="text-[var(--text-body)] leading-relaxed text-sm sm:text-base">
-        If you have any questions about this Privacy Policy, feel free to contact us through our website.
-    </p>
-</div>
+        <!-- Section 8 -->
+        <div class="card" style="padding: var(--space-lg); border-radius: var(--radius-xl);">
+            <div style="display: flex; align-items: flex-start; gap: var(--space-md);">
+                <div style="width: 40px; height: 40px; border-radius: var(--radius-md); background: linear-gradient(135deg, rgba(212,175,55,0.12), rgba(212,175,55,0.04)); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--color-gold);">
+                    <span class="material-icons-round" style="font-size: 20px;">update</span>
+                </div>
+                <div style="flex: 1;">
+                    <h2 style="font-size: 1.1rem; font-weight: 700; color: var(--color-navy); margin-bottom: 8px;">8. Changes to This Policy</h2>
+                    <p style="font-size: 0.9rem; color: var(--color-text-muted); line-height: 1.7; margin: 0;">
+                        We may update this privacy policy from time to time to reflect changes in our practices or legal requirements. Any changes will be posted on this page with an updated revision date. We encourage you to review this policy periodically.
+                    </p>
+                </div>
+            </div>
+        </div>
 
-</div>
+        <!-- Section 9 -->
+        <div class="card" style="padding: var(--space-lg); border-radius: var(--radius-xl);">
+            <div style="display: flex; align-items: flex-start; gap: var(--space-md);">
+                <div style="width: 40px; height: 40px; border-radius: var(--radius-md); background: linear-gradient(135deg, rgba(59,130,246,0.12), rgba(59,130,246,0.04)); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: #3b82f6;">
+                    <span class="material-icons-round" style="font-size: 20px;">contact_mail</span>
+                </div>
+                <div style="flex: 1;">
+                    <h2 style="font-size: 1.1rem; font-weight: 700; color: var(--color-navy); margin-bottom: 8px;">9. Contact Us</h2>
+                    <p style="font-size: 0.9rem; color: var(--color-text-muted); line-height: 1.7; margin: 0 0 var(--space-md) 0;">
+                        If you have any questions about this Privacy Policy or how we handle your data, feel free to contact us:
+                    </p>
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <a href="mailto:{{ site.email|default:'privacy@realshri.com' }}" style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem; color: var(--color-gold); font-weight: 600; text-decoration: none;">
+                            <span class="material-icons-round" style="font-size: 18px;">email</span>
+                            {{ site.email|default:"privacy@realshri.com" }}
+                        </a>
+                        <a href="tel:{{ site.phone|default:'+919876543210' }}" style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem; color: var(--color-gold); font-weight: 600; text-decoration: none;">
+                            <span class="material-icons-round" style="font-size: 18px;">phone</span>
+                            {{ site.phone|default:"+91 98765 43210" }}
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-<!-- FOOTER -->
-<div class="text-center mt-12 sm:mt-16 text-[var(--text-muted)] text-sm">
-    © 2026 EstateX. All rights reserved.
-</div>
+    </div>
 
-</div>
+    <!-- CTA Section -->
+    <div style="margin-top: var(--space-2xl); text-align: center; padding: var(--space-2xl) var(--space-lg); background: linear-gradient(135deg, var(--color-navy) 0%, var(--color-navy-light) 100%); border-radius: var(--radius-xl); color: #fff;">
+        <h2 style="color: #fff; font-size: clamp(1.25rem, 3vw, 1.75rem); margin-bottom: var(--space-sm);">Have Questions About Your Privacy?</h2>
+        <p style="color: rgba(255,255,255,0.8); font-size: 1rem; max-width: 500px; margin: 0 auto var(--space-xl);">Our team is here to help you understand how we protect your data.</p>
+        <a href="{% url 'contact' %}" class="btn btn-gold" style="font-size: 1rem; padding: 14px 36px;">
+            <span class="material-icons-round">chat</span>
+            Contact Us
+        </a>
+    </div>
+
+    <!-- Footer Note -->
+    <div style="text-align: center; margin-top: var(--space-xl); padding-top: var(--space-lg); border-top: 1px solid var(--color-border);">
+        <p style="font-size: 0.8rem; color: var(--color-text-light); margin: 0;">
+            © 2026 RealShri. All rights reserved. | 
+            <a href="{% url 'terms' %}" style="color: var(--color-gold); text-decoration: none; font-weight: 600;">Terms of Service</a>
+        </p>
+    </div>
+
 </div>
 
 {% endblock %}

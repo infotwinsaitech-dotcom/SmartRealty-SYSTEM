@@ -1,803 +1,604 @@
 {% extends "public/base.html" %}
 {% load static %}
 
-{% block title %}ROI Calculator | Luxury Properties{% endblock %}
+{% block title %}ROI Calculator{% endblock %}
+
 {% block content %}
 
-<!-- ====== HERO ====== -->
-<section class="relative py-12 md:py-24 text-center overflow-hidden">
-  <div class="absolute inset-0 luxury-bg"></div>
-  <div class="relative z-10 px-4">
-    <div class="hex-divider mb-3"></div>
-    <h1 class="text-3xl md:text-5xl lg:text-6xl font-extrabold tracking-tight gold mb-4" style="font-family: 'Playfair Display', serif;">
-      ROI Calculator
-    </h1>
-    <p class="text-[var(--text-muted)] max-w-xl mx-auto text-base md:text-lg font-light">
-      Calculate your property investment returns with precision analytics.
-    </p>
-  </div>
+<!-- ============================================
+     ROI CALCULATOR - RealShri
+     Mobile-first, clean, content-rich
+     ============================================ -->
+
+<!-- Hero Section -->
+<section class="hero-section" style="min-height: 30vh; max-height: 38vh;">
+    <div class="hero-content" style="max-width: 700px;">
+        <div style="display: inline-flex; align-items: center; gap: 8px; background: rgba(212,175,55,0.15); padding: 6px 16px; border-radius: 9999px; margin-bottom: 16px;">
+            <span class="material-icons-round" style="font-size: 18px; color: var(--color-gold);">trending_up</span>
+            <span style="font-size: 0.85rem; font-weight: 600; color: var(--color-gold);">Investment Analysis</span>
+        </div>
+        <h1 class="hero-title" style="font-size: clamp(1.5rem, 4vw, 2.25rem);">ROI Calculator</h1>
+        <p class="hero-subtitle" style="font-size: clamp(0.9rem, 2vw, 1.05rem);">
+            Calculate your property investment returns with precision analytics. Know your profits before you invest.
+        </p>
+    </div>
 </section>
 
-<!-- ====== CALCULATOR ====== -->
-<section class="max-w-6xl mx-auto px-4 md:px-6 pb-20">
-  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+<!-- Calculator Content -->
+<div class="container-app section-pad" style="padding-top: clamp(1.5rem, 4vw, 2.5rem);">
+    <div style="display: grid; grid-template-columns: 1fr; gap: var(--space-lg);">
 
-    <!-- INPUT FORM -->
-    <div class="calc-card">
-      <div class="calc-header">
-        <div class="calc-icon">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
-          </svg>
-        </div>
-        <h2 class="calc-title">Investment Details</h2>
-      </div>
-
-      <div class="calc-body">
-        <!-- Purchase Price -->
-        <div class="input-group">
-          <label class="input-label">Property Purchase Price (₹)</label>
-          <div class="input-wrapper">
-            <span class="input-prefix">₹</span>
-            <input type="number" id="purchasePrice" value="5000000" class="calc-input" oninput="calculateROI()">
-          </div>
-          <input type="range" id="purchasePriceRange" min="1000000" max="100000000" step="100000" value="5000000" class="range-slider" oninput="syncRange('purchasePrice', this.value); calculateROI()">
-        </div>
-
-        <!-- Additional Costs -->
-        <div class="input-group">
-          <label class="input-label">Additional Costs (Registration, Stamp Duty, etc.)</label>
-          <div class="input-wrapper">
-            <span class="input-prefix">₹</span>
-            <input type="number" id="additionalCosts" value="300000" class="calc-input" oninput="calculateROI()">
-          </div>
-          <div class="cost-tags">
-            <span class="cost-tag" onclick="setAdditionalCost(5)">5%</span>
-            <span class="cost-tag active" onclick="setAdditionalCost(6)">6%</span>
-            <span class="cost-tag" onclick="setAdditionalCost(7)">7%</span>
-            <span class="cost-tag" onclick="setAdditionalCost(10)">10%</span>
-          </div>
-        </div>
-
-        <!-- Monthly Rental -->
-        <div class="input-group">
-          <label class="input-label">Monthly Rental Income (₹)</label>
-          <div class="input-wrapper">
-            <span class="input-prefix">₹</span>
-            <input type="number" id="monthlyRental" value="25000" class="calc-input" oninput="calculateROI()">
-          </div>
-          <input type="range" id="monthlyRentalRange" min="5000" max="500000" step="1000" value="25000" class="range-slider" oninput="syncRange('monthlyRental', this.value); calculateROI()">
-        </div>
-
-        <!-- Annual Appreciation -->
-        <div class="input-group">
-          <label class="input-label">Annual Property Appreciation (%)</label>
-          <div class="input-wrapper">
-            <input type="number" id="appreciationRate" value="8" step="0.5" class="calc-input" oninput="calculateROI()">
-            <span class="input-suffix">%</span>
-          </div>
-          <div class="appreciation-tags">
-            <span class="app-tag" onclick="setAppreciation(5)">5%</span>
-            <span class="app-tag" onclick="setAppreciation(6)">6%</span>
-            <span class="app-tag active" onclick="setAppreciation(8)">8%</span>
-            <span class="app-tag" onclick="setAppreciation(10)">10%</span>
-            <span class="app-tag" onclick="setAppreciation(12)">12%</span>
-          </div>
-        </div>
-
-        <!-- Holding Period -->
-        <div class="input-group">
-          <label class="input-label">Holding Period</label>
-          <div class="input-wrapper">
-            <input type="number" id="holdingPeriod" value="10" class="calc-input" oninput="calculateROI()">
-            <span class="input-suffix">Years</span>
-          </div>
-          <div class="holding-tags">
-            <span class="hold-tag" onclick="setHolding(5)">5Y</span>
-            <span class="hold-tag" onclick="setHolding(7)">7Y</span>
-            <span class="hold-tag active" onclick="setHolding(10)">10Y</span>
-            <span class="hold-tag" onclick="setHolding(15)">15Y</span>
-            <span class="hold-tag" onclick="setHolding(20)">20Y</span>
-          </div>
-        </div>
-
-        <!-- Monthly Expenses -->
-        <div class="input-group">
-          <label class="input-label">Monthly Expenses (Maintenance, Tax, etc.)</label>
-          <div class="input-wrapper">
-            <span class="input-prefix">₹</span>
-            <input type="number" id="monthlyExpenses" value="3000" class="calc-input" oninput="calculateROI()">
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- RESULTS -->
-    <div class="calc-card">
-      <div class="calc-header">
-        <div class="calc-icon result-icon">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
-          </svg>
-        </div>
-        <h2 class="calc-title">Investment Analysis</h2>
-      </div>
-
-      <div class="calc-body">
-        <!-- ROI Hero -->
-        <div class="roi-hero">
-          <div class="roi-circle">
-            <svg viewBox="0 0 100 100" class="roi-svg">
-              <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(11,20,64,0.08)" stroke-width="8"/>
-              <circle id="roiCircle" cx="50" cy="50" r="42" fill="none" stroke="#c9922a" stroke-width="8" 
-                stroke-dasharray="264" stroke-dashoffset="100" stroke-linecap="round" 
-                transform="rotate(-90 50 50)" style="transition: stroke-dashoffset 1s ease;"/>
-            </svg>
-            <div class="roi-center">
-              <p class="roi-percent" id="roiPercent">12.5%</p>
-              <p class="roi-label-small">Annual ROI</p>
+        {% if request.user.is_authenticated %}
+        <!-- INPUT FORM -->
+        <div class="card" style="border-radius: var(--radius-xl); overflow: hidden;">
+            <div style="display: flex; align-items: center; gap: 12px; padding: var(--space-lg); border-bottom: 1px solid var(--color-border); background: var(--color-bg-soft);">
+                <div style="width: 44px; height: 44px; border-radius: var(--radius-md); background: linear-gradient(135deg, rgba(212,175,55,0.15), rgba(212,175,55,0.05)); display: flex; align-items: center; justify-content: center; color: var(--color-gold); border: 1px solid rgba(212,175,55,0.2); flex-shrink: 0;">
+                    <span class="material-icons-round" style="font-size: 22px;">trending_up</span>
+                </div>
+                <div>
+                    <h2 style="font-size: 1.1rem; font-weight: 700; color: var(--color-navy); margin: 0;">Investment Details</h2>
+                    <p style="font-size: 0.8rem; color: var(--color-text-muted); margin: 2px 0 0 0;">Adjust values to see your returns</p>
+                </div>
             </div>
-          </div>
+
+            <div style="padding: var(--space-lg);">
+                <!-- Purchase Price -->
+                <div style="margin-bottom: var(--space-lg);">
+                    <label style="display: block; font-size: 0.75rem; font-weight: 600; color: var(--color-text-muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em;">Property Purchase Price (₹)</label>
+                    <div style="display: flex; align-items: center; background: var(--color-bg-soft); border: 1.5px solid var(--color-border); border-radius: var(--radius-lg); padding: 12px 16px; transition: all 0.25s ease; gap: 8px;" onfocusin="this.style.borderColor='var(--color-gold)';this.style.boxShadow='0 0 0 4px rgba(212,175,55,0.12)'" onfocusout="this.style.borderColor='var(--color-border)';this.style.boxShadow='none'">
+                        <span style="color: var(--color-text-muted); font-weight: 600; font-size: 0.9rem; flex-shrink: 0;">₹</span>
+                        <input type="number" id="purchasePrice" value="5000000" style="background: transparent; border: none; outline: none; color: var(--color-navy); font-size: 1rem; font-weight: 700; width: 100%; font-family: inherit;" inputmode="numeric" oninput="calculateROI()">
+                    </div>
+                    <input type="range" id="purchasePriceRange" min="1000000" max="100000000" step="100000" value="5000000" style="width: 100%; margin-top: 10px; -webkit-appearance: none; height: 6px; border-radius: 3px; background: var(--color-border); outline: none;" oninput="syncRange('purchasePrice', this.value); calculateROI()">
+                </div>
+
+                <!-- Additional Costs -->
+                <div style="margin-bottom: var(--space-lg);">
+                    <label style="display: block; font-size: 0.75rem; font-weight: 600; color: var(--color-text-muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em;">Additional Costs (Registration, Stamp Duty, etc.)</label>
+                    <div style="display: flex; align-items: center; background: var(--color-bg-soft); border: 1.5px solid var(--color-border); border-radius: var(--radius-lg); padding: 12px 16px; transition: all 0.25s ease; gap: 8px;" onfocusin="this.style.borderColor='var(--color-gold)';this.style.boxShadow='0 0 0 4px rgba(212,175,55,0.12)'" onfocusout="this.style.borderColor='var(--color-border)';this.style.boxShadow='none'">
+                        <span style="color: var(--color-text-muted); font-weight: 600; font-size: 0.9rem; flex-shrink: 0;">₹</span>
+                        <input type="number" id="additionalCosts" value="300000" style="background: transparent; border: none; outline: none; color: var(--color-navy); font-size: 1rem; font-weight: 700; width: 100%; font-family: inherit;" inputmode="numeric" oninput="calculateROI()">
+                    </div>
+                    <div style="display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap;">
+                        <span class="cost-tag" onclick="setAdditionalCost(5)" style="background: var(--color-bg-soft); border: 1.5px solid var(--color-border); color: var(--color-text-muted); padding: 8px 16px; min-height: 36px; display: inline-flex; align-items: center; border-radius: var(--radius-full); font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; user-select: none;">5%</span>
+                        <span class="cost-tag active" onclick="setAdditionalCost(6)" style="background: linear-gradient(135deg, rgba(212,175,55,0.15), rgba(212,175,55,0.05)); border: 1.5px solid var(--color-gold); color: var(--color-gold-dark); padding: 8px 16px; min-height: 36px; display: inline-flex; align-items: center; border-radius: var(--radius-full); font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; user-select: none;">6%</span>
+                        <span class="cost-tag" onclick="setAdditionalCost(7)" style="background: var(--color-bg-soft); border: 1.5px solid var(--color-border); color: var(--color-text-muted); padding: 8px 16px; min-height: 36px; display: inline-flex; align-items: center; border-radius: var(--radius-full); font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; user-select: none;">7%</span>
+                        <span class="cost-tag" onclick="setAdditionalCost(10)" style="background: var(--color-bg-soft); border: 1.5px solid var(--color-border); color: var(--color-text-muted); padding: 8px 16px; min-height: 36px; display: inline-flex; align-items: center; border-radius: var(--radius-full); font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; user-select: none;">10%</span>
+                    </div>
+                </div>
+
+                <!-- Monthly Rental -->
+                <div style="margin-bottom: var(--space-lg);">
+                    <label style="display: block; font-size: 0.75rem; font-weight: 600; color: var(--color-text-muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em;">Monthly Rental Income (₹)</label>
+                    <div style="display: flex; align-items: center; background: var(--color-bg-soft); border: 1.5px solid var(--color-border); border-radius: var(--radius-lg); padding: 12px 16px; transition: all 0.25s ease; gap: 8px;" onfocusin="this.style.borderColor='var(--color-gold)';this.style.boxShadow='0 0 0 4px rgba(212,175,55,0.12)'" onfocusout="this.style.borderColor='var(--color-border)';this.style.boxShadow='none'">
+                        <span style="color: var(--color-text-muted); font-weight: 600; font-size: 0.9rem; flex-shrink: 0;">₹</span>
+                        <input type="number" id="monthlyRental" value="25000" style="background: transparent; border: none; outline: none; color: var(--color-navy); font-size: 1rem; font-weight: 700; width: 100%; font-family: inherit;" inputmode="numeric" oninput="calculateROI()">
+                    </div>
+                    <input type="range" id="monthlyRentalRange" min="5000" max="500000" step="1000" value="25000" style="width: 100%; margin-top: 10px; -webkit-appearance: none; height: 6px; border-radius: 3px; background: var(--color-border); outline: none;" oninput="syncRange('monthlyRental', this.value); calculateROI()">
+                </div>
+
+                <!-- Annual Appreciation -->
+                <div style="margin-bottom: var(--space-lg);">
+                    <label style="display: block; font-size: 0.75rem; font-weight: 600; color: var(--color-text-muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em;">Annual Property Appreciation (%)</label>
+                    <div style="display: flex; align-items: center; background: var(--color-bg-soft); border: 1.5px solid var(--color-border); border-radius: var(--radius-lg); padding: 12px 16px; transition: all 0.25s ease; gap: 8px;" onfocusin="this.style.borderColor='var(--color-gold)';this.style.boxShadow='0 0 0 4px rgba(212,175,55,0.12)'" onfocusout="this.style.borderColor='var(--color-border)';this.style.boxShadow='none'">
+                        <input type="number" id="appreciationRate" value="8" step="0.5" style="background: transparent; border: none; outline: none; color: var(--color-navy); font-size: 1rem; font-weight: 700; width: 100%; font-family: inherit;" inputmode="decimal" oninput="calculateROI()">
+                        <span style="color: var(--color-text-muted); font-weight: 600; font-size: 0.9rem; flex-shrink: 0;">%</span>
+                    </div>
+                    <div style="display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap;">
+                        <span class="app-tag" onclick="setAppreciation(5)" style="background: var(--color-bg-soft); border: 1.5px solid var(--color-border); color: var(--color-text-muted); padding: 8px 16px; min-height: 36px; display: inline-flex; align-items: center; border-radius: var(--radius-full); font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; user-select: none;">5%</span>
+                        <span class="app-tag" onclick="setAppreciation(6)" style="background: var(--color-bg-soft); border: 1.5px solid var(--color-border); color: var(--color-text-muted); padding: 8px 16px; min-height: 36px; display: inline-flex; align-items: center; border-radius: var(--radius-full); font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; user-select: none;">6%</span>
+                        <span class="app-tag active" onclick="setAppreciation(8)" style="background: linear-gradient(135deg, rgba(212,175,55,0.15), rgba(212,175,55,0.05)); border: 1.5px solid var(--color-gold); color: var(--color-gold-dark); padding: 8px 16px; min-height: 36px; display: inline-flex; align-items: center; border-radius: var(--radius-full); font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; user-select: none;">8%</span>
+                        <span class="app-tag" onclick="setAppreciation(10)" style="background: var(--color-bg-soft); border: 1.5px solid var(--color-border); color: var(--color-text-muted); padding: 8px 16px; min-height: 36px; display: inline-flex; align-items: center; border-radius: var(--radius-full); font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; user-select: none;">10%</span>
+                        <span class="app-tag" onclick="setAppreciation(12)" style="background: var(--color-bg-soft); border: 1.5px solid var(--color-border); color: var(--color-text-muted); padding: 8px 16px; min-height: 36px; display: inline-flex; align-items: center; border-radius: var(--radius-full); font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; user-select: none;">12%</span>
+                    </div>
+                </div>
+
+                <!-- Holding Period -->
+                <div style="margin-bottom: var(--space-lg);">
+                    <label style="display: block; font-size: 0.75rem; font-weight: 600; color: var(--color-text-muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em;">Holding Period</label>
+                    <div style="display: flex; align-items: center; background: var(--color-bg-soft); border: 1.5px solid var(--color-border); border-radius: var(--radius-lg); padding: 12px 16px; transition: all 0.25s ease; gap: 8px;" onfocusin="this.style.borderColor='var(--color-gold)';this.style.boxShadow='0 0 0 4px rgba(212,175,55,0.12)'" onfocusout="this.style.borderColor='var(--color-border)';this.style.boxShadow='none'">
+                        <input type="number" id="holdingPeriod" value="10" style="background: transparent; border: none; outline: none; color: var(--color-navy); font-size: 1rem; font-weight: 700; width: 100%; font-family: inherit;" inputmode="numeric" oninput="calculateROI()">
+                        <span style="color: var(--color-text-muted); font-weight: 600; font-size: 0.9rem; flex-shrink: 0;">Years</span>
+                    </div>
+                    <div style="display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap;">
+                        <span class="hold-tag" onclick="setHolding(5)" style="background: var(--color-bg-soft); border: 1.5px solid var(--color-border); color: var(--color-text-muted); padding: 8px 16px; min-height: 36px; display: inline-flex; align-items: center; border-radius: var(--radius-full); font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; user-select: none;">5Y</span>
+                        <span class="hold-tag" onclick="setHolding(7)" style="background: var(--color-bg-soft); border: 1.5px solid var(--color-border); color: var(--color-text-muted); padding: 8px 16px; min-height: 36px; display: inline-flex; align-items: center; border-radius: var(--radius-full); font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; user-select: none;">7Y</span>
+                        <span class="hold-tag active" onclick="setHolding(10)" style="background: linear-gradient(135deg, rgba(212,175,55,0.15), rgba(212,175,55,0.05)); border: 1.5px solid var(--color-gold); color: var(--color-gold-dark); padding: 8px 16px; min-height: 36px; display: inline-flex; align-items: center; border-radius: var(--radius-full); font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; user-select: none;">10Y</span>
+                        <span class="hold-tag" onclick="setHolding(15)" style="background: var(--color-bg-soft); border: 1.5px solid var(--color-border); color: var(--color-text-muted); padding: 8px 16px; min-height: 36px; display: inline-flex; align-items: center; border-radius: var(--radius-full); font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; user-select: none;">15Y</span>
+                        <span class="hold-tag" onclick="setHolding(20)" style="background: var(--color-bg-soft); border: 1.5px solid var(--color-border); color: var(--color-text-muted); padding: 8px 16px; min-height: 36px; display: inline-flex; align-items: center; border-radius: var(--radius-full); font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; user-select: none;">20Y</span>
+                    </div>
+                </div>
+
+                <!-- Monthly Expenses -->
+                <div>
+                    <label style="display: block; font-size: 0.75rem; font-weight: 600; color: var(--color-text-muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em;">Monthly Expenses (Maintenance, Tax, etc.)</label>
+                    <div style="display: flex; align-items: center; background: var(--color-bg-soft); border: 1.5px solid var(--color-border); border-radius: var(--radius-lg); padding: 12px 16px; transition: all 0.25s ease; gap: 8px;" onfocusin="this.style.borderColor='var(--color-gold)';this.style.boxShadow='0 0 0 4px rgba(212,175,55,0.12)'" onfocusout="this.style.borderColor='var(--color-border)';this.style.boxShadow='none'">
+                        <span style="color: var(--color-text-muted); font-weight: 600; font-size: 0.9rem; flex-shrink: 0;">₹</span>
+                        <input type="number" id="monthlyExpenses" value="3000" style="background: transparent; border: none; outline: none; color: var(--color-navy); font-size: 1rem; font-weight: 700; width: 100%; font-family: inherit;" inputmode="numeric" oninput="calculateROI()">
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <!-- Chart -->
-        <div class="chart-wrapper">
-          <canvas id="roiChart" width="400" height="180"></canvas>
-        </div>
+        <!-- RESULTS -->
+        <div class="card" style="border-radius: var(--radius-xl); overflow: hidden;">
+            <div style="display: flex; align-items: center; gap: 12px; padding: var(--space-lg); border-bottom: 1px solid var(--color-border); background: var(--color-bg-soft);">
+                <div style="width: 44px; height: 44px; border-radius: var(--radius-md); background: linear-gradient(135deg, rgba(34,197,94,0.15), rgba(34,197,94,0.05)); display: flex; align-items: center; justify-content: center; color: var(--color-success); border: 1px solid rgba(34,197,94,0.2); flex-shrink: 0;">
+                    <span class="material-icons-round" style="font-size: 22px;">analytics</span>
+                </div>
+                <div>
+                    <h2 style="font-size: 1.1rem; font-weight: 700; color: var(--color-navy); margin: 0;">Investment Analysis</h2>
+                    <p style="font-size: 0.8rem; color: var(--color-text-muted); margin: 2px 0 0 0;">Your projected returns summary</p>
+                </div>
+            </div>
 
-        <!-- Stats Grid -->
-        <div class="stats-grid">
-          <div class="stat-box">
-            <p class="stat-label">Total Investment</p>
-            <p class="stat-value" id="totalInvestment">₹53,00,000</p>
-          </div>
-          <div class="stat-box">
-            <p class="stat-label">Future Value</p>
-            <p class="stat-value highlight" id="futureValue">₹1,07,94,625</p>
-          </div>
-          <div class="stat-box">
-            <p class="stat-label">Total Profit</p>
-            <p class="stat-value profit" id="totalProfit">₹54,94,625</p>
-          </div>
-          <div class="stat-box">
-            <p class="stat-label">Net Rental Yield</p>
-            <p class="stat-value yield" id="netRentalYield">4.98%</p>
-          </div>
-          <div class="stat-box">
-            <p class="stat-label">Break-even</p>
-            <p class="stat-value" id="breakEven">7.2 Years</p>
-          </div>
-          <div class="stat-box">
-            <p class="stat-label">Total Rental Income</p>
-            <p class="stat-value" id="totalRentalIncome">₹25,92,000</p>
-          </div>
-        </div>
+            <div style="padding: var(--space-lg);">
+                <!-- ROI Circle -->
+                <div style="display: flex; justify-content: center; padding: var(--space-md) 0 var(--space-xl); border-bottom: 1px solid var(--color-border); margin-bottom: var(--space-lg);">
+                    <div style="position: relative; width: 160px; height: 160px;">
+                        <svg viewBox="0 0 100 100" style="width: 100%; height: 100%; transform: rotate(-90deg);">
+                            <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(15,23,42,0.08)" stroke-width="8"/>
+                            <circle id="roiCircle" cx="50" cy="50" r="42" fill="none" stroke="var(--color-gold)" stroke-width="8" 
+                                stroke-dasharray="264" stroke-dashoffset="100" stroke-linecap="round" 
+                                transform="rotate(-90 50 50)" style="transition: stroke-dashoffset 1s ease;"/>
+                        </svg>
+                        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
+                            <p id="roiPercent" style="font-size: 1.75rem; font-weight: 800; color: var(--color-gold); margin: 0; line-height: 1.2;">12.5%</p>
+                            <p style="font-size: 0.7rem; font-weight: 600; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin: 4px 0 0;">Annual ROI</p>
+                        </div>
+                    </div>
+                </div>
 
-        <!-- CTA -->
-        <a href="/properties/" class="explore-btn">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-          </svg>
-          Find Properties with Best ROI
+                <!-- Chart -->
+                <div style="margin-bottom: var(--space-lg); padding: var(--space-md); background: var(--color-bg-soft); border-radius: var(--radius-lg); border: 1px solid var(--color-border);">
+                    <canvas id="roiChart" width="400" height="180" style="width: 100%; height: 180px;"></canvas>
+                </div>
+
+                <!-- Stats Grid -->
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: var(--space-lg);">
+                    <div style="background: var(--color-bg-soft); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: var(--space-md); text-align: center;">
+                        <p style="font-size: 0.7rem; font-weight: 600; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">Total Investment</p>
+                        <p id="totalInvestment" style="font-size: 0.95rem; font-weight: 800; color: var(--color-navy); margin: 0;">₹53,00,000</p>
+                    </div>
+                    <div style="background: var(--color-bg-soft); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: var(--space-md); text-align: center;">
+                        <p style="font-size: 0.7rem; font-weight: 600; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">Future Value</p>
+                        <p id="futureValue" style="font-size: 0.95rem; font-weight: 800; color: var(--color-gold); margin: 0;">₹1,07,94,625</p>
+                    </div>
+                    <div style="background: var(--color-bg-soft); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: var(--space-md); text-align: center;">
+                        <p style="font-size: 0.7rem; font-weight: 600; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">Total Profit</p>
+                        <p id="totalProfit" style="font-size: 0.95rem; font-weight: 800; color: var(--color-success); margin: 0;">₹54,94,625</p>
+                    </div>
+                    <div style="background: var(--color-bg-soft); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: var(--space-md); text-align: center;">
+                        <p style="font-size: 0.7rem; font-weight: 600; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">Net Rental Yield</p>
+                        <p id="netRentalYield" style="font-size: 0.95rem; font-weight: 800; color: #3b82f6; margin: 0;">4.98%</p>
+                    </div>
+                    <div style="background: var(--color-bg-soft); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: var(--space-md); text-align: center;">
+                        <p style="font-size: 0.7rem; font-weight: 600; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">Break-even</p>
+                        <p id="breakEven" style="font-size: 0.95rem; font-weight: 800; color: var(--color-navy); margin: 0;">7.2 Years</p>
+                    </div>
+                    <div style="background: var(--color-bg-soft); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: var(--space-md); text-align: center;">
+                        <p style="font-size: 0.7rem; font-weight: 600; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">Total Rental Income</p>
+                        <p id="totalRentalIncome" style="font-size: 0.95rem; font-weight: 800; color: var(--color-navy); margin: 0;">₹25,92,000</p>
+                    </div>
+                </div>
+
+                <!-- CTA -->
+                <a href="{% url 'property_list' %}" class="btn btn-gold" style="width: 100%; min-height: 50px; font-size: 0.95rem;">
+                    <span class="material-icons-round" style="font-size: 20px;">search</span>
+                    Find Properties with Best ROI
+                </a>
+            </div>
+        </div>
+        {% else %}
+        <!-- Login Prompt -->
+        <div style="text-align: center; padding: clamp(3rem, 10vw, 5rem) var(--space-md); max-width: 500px; margin-inline: auto;">
+            <div style="width: 80px; height: 80px; background: linear-gradient(135deg, var(--color-bg-soft) 0%, var(--color-border) 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto var(--space-xl);">
+                <span class="material-icons-round" style="font-size: 36px; color: var(--color-text-light);">lock</span>
+            </div>
+            <h2 style="font-size: 1.35rem; color: var(--color-navy); margin-bottom: var(--space-sm);">Login to Use ROI Calculator</h2>
+            <p style="color: var(--color-text-muted); margin-bottom: var(--space-xl); font-size: 0.95rem;">
+                Create an account or login to access our ROI calculator and analyze property investments.
+            </p>
+            <a href="{% url 'login' %}?next={{ request.path }}" class="btn btn-gold" style="font-size: 1rem; padding: 14px 36px;">
+                <span class="material-icons-round">login</span>
+                Login / Register
+            </a>
+
+            <!-- Trust Stats -->
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-md); margin-top: var(--space-2xl); padding-top: var(--space-xl); border-top: 1px solid var(--color-border);">
+                <div>
+                    <div style="font-size: 1.35rem; font-weight: 800; color: var(--color-gold);">100%</div>
+                    <div style="font-size: 0.75rem; color: var(--color-text-muted);">Free Tool</div>
+                </div>
+                <div>
+                    <div style="font-size: 1.35rem; font-weight: 800; color: var(--color-gold);">Instant</div>
+                    <div style="font-size: 0.75rem; color: var(--color-text-muted);">Results</div>
+                </div>
+                <div>
+                    <div style="font-size: 1.35rem; font-weight: 800; color: var(--color-gold);">Accurate</div>
+                    <div style="font-size: 0.75rem; color: var(--color-text-muted);">Analysis</div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    {% if request.user.is_authenticated %}
+    <!-- Projection Table -->
+    <div class="card" style="border-radius: var(--radius-xl); overflow: hidden; margin-top: var(--space-lg);">
+        <div style="display: flex; align-items: center; gap: 12px; padding: var(--space-lg); border-bottom: 1px solid var(--color-border); background: var(--color-bg-soft);">
+            <div style="width: 44px; height: 44px; border-radius: var(--radius-md); background: linear-gradient(135deg, rgba(168,85,247,0.15), rgba(168,85,247,0.05)); display: flex; align-items: center; justify-content: center; color: #a855f7; border: 1px solid rgba(168,85,247,0.2); flex-shrink: 0;">
+                <span class="material-icons-round" style="font-size: 22px;">table_chart</span>
+            </div>
+            <div>
+                <h2 style="font-size: 1.1rem; font-weight: 700; color: var(--color-navy); margin: 0;">Year-wise Projection</h2>
+                <p style="font-size: 0.8rem; color: var(--color-text-muted); margin: 2px 0 0 0;">Track your investment growth year by year</p>
+            </div>
+        </div>
+        <div style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
+            <table style="width: 100%; border-collapse: collapse; min-width: 600px;">
+                <thead>
+                    <tr>
+                        <th style="text-align: left; padding: 12px 16px; font-size: 0.7rem; font-weight: 700; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid var(--color-border); background: var(--color-bg-soft); white-space: nowrap;">Year</th>
+                        <th style="text-align: left; padding: 12px 16px; font-size: 0.7rem; font-weight: 700; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid var(--color-border); background: var(--color-bg-soft); white-space: nowrap;">Property Value</th>
+                        <th style="text-align: left; padding: 12px 16px; font-size: 0.7rem; font-weight: 700; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid var(--color-border); background: var(--color-bg-soft); white-space: nowrap;">Cumulative Rental</th>
+                        <th style="text-align: left; padding: 12px 16px; font-size: 0.7rem; font-weight: 700; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid var(--color-border); background: var(--color-bg-soft); white-space: nowrap;">Net Profit</th>
+                        <th style="text-align: left; padding: 12px 16px; font-size: 0.7rem; font-weight: 700; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid var(--color-border); background: var(--color-bg-soft); white-space: nowrap;">ROI %</th>
+                        <th style="text-align: left; padding: 12px 16px; font-size: 0.7rem; font-weight: 700; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid var(--color-border); background: var(--color-bg-soft); white-space: nowrap;">Growth</th>
+                    </tr>
+                </thead>
+                <tbody id="projectionBody">
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Trust Section -->
+    <div style="margin-top: var(--space-2xl); text-align: center;">
+        <div class="section-header" style="margin-bottom: var(--space-xl);">
+            <span class="label">
+                <span class="material-icons-round" style="font-size: 16px;">verified</span>
+                Why Trust Our Calculator
+            </span>
+            <h2>Accurate & Transparent</h2>
+            <p>Our ROI calculator uses industry-standard formulas trusted by real estate investors across India.</p>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--space-lg);">
+            <div class="card" style="padding: var(--space-xl); text-align: center;">
+                <div style="width: 56px; height: 56px; border-radius: var(--radius-lg); background: linear-gradient(135deg, rgba(212,175,55,0.12), rgba(212,175,55,0.04)); display: flex; align-items: center; justify-content: center; margin: 0 auto var(--space-md); color: var(--color-gold);">
+                    <span class="material-icons-round" style="font-size: 28px;">calculate</span>
+                </div>
+                <h4 style="font-size: 1rem; color: var(--color-navy); margin-bottom: 6px;">Compound Growth</h4>
+                <p style="font-size: 0.85rem; color: var(--color-text-muted); line-height: 1.6;">Uses compound annual growth rate (CAGR) for accurate property appreciation</p>
+            </div>
+            <div class="card" style="padding: var(--space-xl); text-align: center;">
+                <div style="width: 56px; height: 56px; border-radius: var(--radius-lg); background: linear-gradient(135deg, rgba(59,130,246,0.12), rgba(59,130,246,0.04)); display: flex; align-items: center; justify-content: center; margin: 0 auto var(--space-md); color: #3b82f6;">
+                    <span class="material-icons-round" style="font-size: 28px;">update</span>
+                </div>
+                <h4 style="font-size: 1rem; color: var(--color-navy); margin-bottom: 6px;">Real-time Updates</h4>
+                <p style="font-size: 0.85rem; color: var(--color-text-muted); line-height: 1.6;">Adjust any value and see results instantly. No page reload needed</p>
+            </div>
+            <div class="card" style="padding: var(--space-xl); text-align: center;">
+                <div style="width: 56px; height: 56px; border-radius: var(--radius-lg); background: linear-gradient(135deg, rgba(16,185,129,0.12), rgba(16,185,129,0.04)); display: flex; align-items: center; justify-content: center; margin: 0 auto var(--space-md); color: var(--color-success);">
+                    <span class="material-icons-round" style="font-size: 28px;">security</span>
+                </div>
+                <h4 style="font-size: 1rem; color: var(--color-navy); margin-bottom: 6px;">100% Secure</h4>
+                <p style="font-size: 0.85rem; color: var(--color-text-muted); line-height: 1.6;">No data is stored or shared. All calculations happen in your browser</p>
+            </div>
+            <div class="card" style="padding: var(--space-xl); text-align: center;">
+                <div style="width: 56px; height: 56px; border-radius: var(--radius-lg); background: linear-gradient(135deg, rgba(168,85,247,0.12), rgba(168,85,247,0.04)); display: flex; align-items: center; justify-content: center; margin: 0 auto var(--space-md); color: #a855f7;">
+                    <span class="material-icons-round" style="font-size: 28px;">table_chart</span>
+                </div>
+                <h4 style="font-size: 1rem; color: var(--color-navy); margin-bottom: 6px;">Full Projection</h4>
+                <p style="font-size: 0.85rem; color: var(--color-text-muted); line-height: 1.6;">Year-wise breakdown with property value, rental income, and net profit</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- FAQ Section -->
+    <div style="margin-top: var(--space-2xl);">
+        <div class="section-header" style="margin-bottom: var(--space-xl);">
+            <span class="label">
+                <span class="material-icons-round" style="font-size: 16px;">help_outline</span>
+                Common Questions
+            </span>
+            <h2>ROI Calculator FAQs</h2>
+        </div>
+        <div style="max-width: 800px; margin-inline: auto;">
+            <details style="background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); margin-bottom: var(--space-md); overflow: hidden;">
+                <summary style="padding: var(--space-md) var(--space-lg); font-weight: 600; color: var(--color-navy); font-size: 0.95rem; cursor: pointer; list-style: none; display: flex; align-items: center; justify-content: space-between;">
+                    <span>What is ROI in real estate?</span>
+                    <span class="material-icons-round" style="color: var(--color-gold);">expand_more</span>
+                </summary>
+                <div style="padding: 0 var(--space-lg) var(--space-md); color: var(--color-text-muted); font-size: 0.9rem; line-height: 1.7;">
+                    ROI (Return on Investment) in real estate measures the profitability of your property investment. It considers both capital appreciation (increase in property value) and rental income, minus all expenses like registration, stamp duty, maintenance, and taxes.
+                </div>
+            </details>
+            <details style="background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); margin-bottom: var(--space-md); overflow: hidden;">
+                <summary style="padding: var(--space-md) var(--space-lg); font-weight: 600; color: var(--color-navy); font-size: 0.95rem; cursor: pointer; list-style: none; display: flex; align-items: center; justify-content: space-between;">
+                    <span>What is a good ROI for property in India?</span>
+                    <span class="material-icons-round" style="color: var(--color-gold);">expand_more</span>
+                </summary>
+                <div style="padding: 0 var(--space-lg) var(--space-md); color: var(--color-text-muted); font-size: 0.9rem; line-height: 1.7;">
+                    A good ROI for residential property in India typically ranges from 10-15% annually, combining both rental yield (3-5%) and capital appreciation (7-10%). Commercial properties may offer higher yields of 6-10%. Location, property type, and market conditions significantly impact ROI.
+                </div>
+            </details>
+            <details style="background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); margin-bottom: var(--space-md); overflow: hidden;">
+                <summary style="padding: var(--space-md) var(--space-lg); font-weight: 600; color: var(--color-navy); font-size: 0.95rem; cursor: pointer; list-style: none; display: flex; align-items: center; justify-content: space-between;">
+                    <span>How is property appreciation calculated?</span>
+                    <span class="material-icons-round" style="color: var(--color-gold);">expand_more</span>
+                </summary>
+                <div style="padding: 0 var(--space-lg) var(--space-md); color: var(--color-text-muted); font-size: 0.9rem; line-height: 1.7;">
+                    Property appreciation is calculated using compound annual growth rate (CAGR). If a property worth ₹50 lakhs appreciates at 8% annually, after 10 years its value will be ₹50L × (1.08)^10 = ₹1.08 crores. Our calculator uses this standard formula for projections.
+                </div>
+            </details>
+            <details style="background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); margin-bottom: var(--space-md); overflow: hidden;">
+                <summary style="padding: var(--space-md) var(--space-lg); font-weight: 600; color: var(--color-navy); font-size: 0.95rem; cursor: pointer; list-style: none; display: flex; align-items: center; justify-content: space-between;">
+                    <span>What expenses should I include in ROI calculation?</span>
+                    <span class="material-icons-round" style="color: var(--color-gold);">expand_more</span>
+                </summary>
+                <div style="padding: 0 var(--space-lg) var(--space-md); color: var(--color-text-muted); font-size: 0.9rem; line-height: 1.7;">
+                    Include all upfront costs (registration 1%, stamp duty 5-6%, legal fees, brokerage) and ongoing expenses (maintenance, property tax, insurance, vacancy periods, repairs). Our calculator defaults to 6% for additional costs, but adjust based on your state and property type.
+                </div>
+            </details>
+        </div>
+    </div>
+
+    <!-- CTA Section -->
+    <div style="margin-top: var(--space-2xl); text-align: center; padding: var(--space-2xl) var(--space-lg); background: linear-gradient(135deg, var(--color-navy) 0%, var(--color-navy-light) 100%); border-radius: var(--radius-xl); color: #fff;">
+        <h2 style="color: #fff; font-size: clamp(1.25rem, 3vw, 1.75rem); margin-bottom: var(--space-sm);">Ready to Invest Smartly?</h2>
+        <p style="color: rgba(255,255,255,0.8); font-size: 1rem; max-width: 500px; margin: 0 auto var(--space-xl);">Browse 5000+ verified properties across 50+ cities. All listings are RERA registered with complete ROI potential.</p>
+        <a href="{% url 'property_list' %}" class="btn btn-gold" style="font-size: 1rem; padding: 14px 36px;">
+            <span class="material-icons-round">search</span>
+            Browse Investment Properties
         </a>
-      </div>
     </div>
-  </div>
+</div>
 
-  <!-- Year-wise Projection Table -->
-  <div class="calc-card mt-8">
-    <div class="calc-header">
-      <div class="calc-icon">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"/>
-        </svg>
-      </div>
-      <h2 class="calc-title">Year-wise Projection</h2>
-    </div>
-    <div class="table-wrapper">
-      <table class="projection-table" id="projectionTable">
-        <thead>
-          <tr>
-            <th>Year</th>
-            <th>Property Value</th>
-            <th>Cumulative Rental</th>
-            <th>Net Profit</th>
-            <th>ROI %</th>
-            <th>Growth</th>
-          </tr>
-        </thead>
-        <tbody id="projectionBody">
-        </tbody>
-      </table>
-    </div>
-  </div>
-</section>
+{% endblock %}
 
-<style>
-/* ===== CALC CARD ===== */
-.calc-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 24px;
-  overflow: hidden;
-  box-shadow: var(--shadow-card);
-}
-.calc-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 20px 24px;
-  border-bottom: 1px solid var(--hairline);
-}
-.calc-icon {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
-  background: linear-gradient(135deg, rgba(201,146,42, 0.16), rgba(201,146,42, 0.04));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--gold-1);
-  border: 1px solid rgba(201,146,42, 0.2);
-}
-.calc-icon.result-icon {
-  background: linear-gradient(135deg, rgba(34, 197, 94, 0.15), rgba(34, 197, 94, 0.04));
-  color: #16a34a;
-  border-color: rgba(34, 197, 94, 0.2);
-}
-.calc-title {
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--navy-deep);
-  margin: 0;
-}
-.calc-body {
-  padding: 24px;
-}
-
-/* ===== INPUT GROUP ===== */
-.input-group {
-  margin-bottom: 24px;
-}
-.input-group:last-child {
-  margin-bottom: 0;
-}
-.input-label {
-  display: block;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-muted);
-  margin-bottom: 10px;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-.input-wrapper {
-  display: flex;
-  align-items: center;
-  background: var(--bg-soft);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 12px 16px;
-  transition: all 0.3s ease;
-  gap: 8px;
-}
-.input-wrapper:focus-within {
-  border-color: var(--gold-1);
-  background: var(--surface);
-  box-shadow: 0 0 0 3px rgba(201,146,42, 0.12);
-}
-.input-prefix, .input-suffix {
-  color: var(--text-muted);
-  font-weight: 600;
-  font-size: 14px;
-  flex-shrink: 0;
-}
-.calc-input {
-  background: transparent;
-  border: none;
-  outline: none;
-  color: var(--navy-deep);
-  font-size: 16px;
-  font-weight: 700;
-  width: 100%;
-  font-family: inherit;
-}
-.calc-input::-webkit-outer-spin-button,
-.calc-input::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
-/* ===== RANGE SLIDER ===== */
-.range-slider {
-  width: 100%;
-  margin-top: 10px;
-  -webkit-appearance: none;
-  height: 6px;
-  border-radius: 3px;
-  background: var(--border);
-  outline: none;
-}
-.range-slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--gold-1), var(--gold-2));
-  cursor: pointer;
-  box-shadow: 0 2px 10px rgba(201,146,42, 0.35);
-  border: 2px solid #ffffff;
-}
-.range-slider::-moz-range-thumb {
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--gold-1), var(--gold-2));
-  cursor: pointer;
-  border: 2px solid #ffffff;
-  box-shadow: 0 2px 10px rgba(201,146,42, 0.35);
-}
-
-/* ===== TAGS ===== */
-.cost-tags, .appreciation-tags, .holding-tags {
-  display: flex;
-  gap: 8px;
-  margin-top: 10px;
-  flex-wrap: wrap;
-}
-.cost-tag, .app-tag, .hold-tag {
-  background: var(--bg-soft);
-  border: 1px solid var(--border);
-  color: var(--text-muted);
-  padding: 6px 14px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  user-select: none;
-}
-.cost-tag:active, .app-tag:active, .hold-tag:active {
-  background: rgba(201,146,42, 0.1);
-  border-color: rgba(201,146,42, 0.3);
-  color: var(--gold-1);
-}
-.cost-tag.active, .app-tag.active, .hold-tag.active {
-  background: linear-gradient(135deg, rgba(201,146,42, 0.18), rgba(201,146,42, 0.08));
-  border-color: var(--gold-1);
-  color: #a3701f;
-}
-
-/* ===== ROI HERO ===== */
-.roi-hero {
-  display: flex;
-  justify-content: center;
-  padding: 20px 0 30px;
-  border-bottom: 1px solid var(--hairline);
-  margin-bottom: 24px;
-}
-.roi-circle {
-  position: relative;
-  width: 160px;
-  height: 160px;
-}
-.roi-svg {
-  width: 100%;
-  height: 100%;
-  transform: rotate(-90deg);
-}
-.roi-center {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  text-align: center;
-}
-.roi-percent {
-  font-size: 28px;
-  font-weight: 900;
-  color: var(--gold-1);
-  margin: 0;
-  line-height: 1.2;
-}
-.roi-label-small {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin: 4px 0 0;
-}
-
-/* ===== CHART ===== */
-.chart-wrapper {
-  margin-bottom: 24px;
-  padding: 16px;
-  background: var(--bg-soft);
-  border-radius: 16px;
-  border: 1px solid var(--border);
-}
-#roiChart {
-  width: 100%;
-  height: 180px;
-}
-
-/* ===== STATS GRID ===== */
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
-  margin-bottom: 24px;
-}
-.stat-box {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 16px;
-  text-align: center;
-  transition: all 0.3s ease;
-}
-.stat-label {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-bottom: 6px;
-}
-.stat-value {
-  font-size: 16px;
-  font-weight: 800;
-  color: var(--navy-deep);
-  margin: 0;
-}
-.stat-value.highlight {
-  color: var(--gold-1);
-}
-.stat-value.profit {
-  color: #16a34a;
-}
-.stat-value.yield {
-  color: #3b82f6;
-}
-
-/* ===== EXPLORE BUTTON ===== */
-.explore-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  width: 100%;
-  min-height: 50px;
-  background: linear-gradient(135deg, var(--gold-1) 0%, var(--gold-3) 100%);
-  color: #ffffff;
-  padding: 14px 24px;
-  border-radius: 16px;
-  font-weight: 700;
-  font-size: 15px;
-  text-decoration: none;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(201,146,42, 0.3);
-  border: none;
-  cursor: pointer;
-}
-.explore-btn:active {
-  transform: scale(0.98);
-}
-@media (hover: hover) {
-  .explore-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(201,146,42, 0.4);
-  }
-}
-
-/* ===== TABLE ===== */
-.table-wrapper {
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-}
-.projection-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-.projection-table th {
-  text-align: left;
-  padding: 14px 16px;
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  border-bottom: 1px solid var(--hairline);
-  background: var(--bg-soft);
-  white-space: nowrap;
-}
-.projection-table td {
-  padding: 14px 16px;
-  font-size: 14px;
-  color: var(--text-body);
-  border-bottom: 1px solid var(--hairline);
-  white-space: nowrap;
-}
-.projection-table tr:hover td {
-  background: var(--bg-soft);
-}
-.projection-table td:first-child {
-  font-weight: 700;
-  color: var(--gold-1);
-}
-.projection-table td:last-child {
-  font-weight: 700;
-}
-.positive {
-  color: #16a34a;
-}
-.growth-bar {
-  width: 100%;
-  min-width: 60px;
-  height: 6px;
-  background: var(--border);
-  border-radius: 3px;
-  overflow: hidden;
-}
-.growth-fill {
-  height: 100%;
-  background: linear-gradient(90deg, #22c55e, #16a34a);
-  border-radius: 3px;
-  transition: width 0.5s ease;
-}
-
-/* ===== MOBILE ===== */
-@media (max-width: 768px) {
-  .calc-body {
-    padding: 16px;
-  }
-  .roi-circle {
-    width: 130px;
-    height: 130px;
-  }
-  .roi-percent {
-    font-size: 22px;
-  }
-  .stats-grid {
-    grid-template-columns: 1fr;
-  }
-  .projection-table {
-    font-size: 12px;
-  }
-  .projection-table th,
-  .projection-table td {
-    padding: 10px 12px;
-  }
-}
-@media (max-width: 480px) {
-  .calc-card {
-    border-radius: 16px;
-  }
-  .calc-header {
-    padding: 16px;
-  }
-}
-</style>
-
+{% block extra_js %}
 <script>
-// ===== ROI CALCULATION =====
+// ============================================
+// ROI CALCULATOR SCRIPTS
+// ============================================
+
 function calculateROI() {
-  const purchasePrice = parseFloat(document.getElementById('purchasePrice').value) || 0;
-  const additionalCosts = parseFloat(document.getElementById('additionalCosts').value) || 0;
-  const monthlyRental = parseFloat(document.getElementById('monthlyRental').value) || 0;
-  const appreciationRate = parseFloat(document.getElementById('appreciationRate').value) || 0;
-  const holdingPeriod = parseFloat(document.getElementById('holdingPeriod').value) || 0;
-  const monthlyExpenses = parseFloat(document.getElementById('monthlyExpenses').value) || 0;
+    const purchasePrice = parseFloat(document.getElementById('purchasePrice').value) || 0;
+    const additionalCosts = parseFloat(document.getElementById('additionalCosts').value) || 0;
+    const monthlyRental = parseFloat(document.getElementById('monthlyRental').value) || 0;
+    const appreciationRate = parseFloat(document.getElementById('appreciationRate').value) || 0;
+    const holdingPeriod = parseFloat(document.getElementById('holdingPeriod').value) || 0;
+    const monthlyExpenses = parseFloat(document.getElementById('monthlyExpenses').value) || 0;
 
-  const totalInvestment = purchasePrice + additionalCosts;
-  const netMonthlyRental = monthlyRental - monthlyExpenses;
-  const annualRental = netMonthlyRental * 12;
+    const totalInvestment = purchasePrice + additionalCosts;
+    const netMonthlyRental = monthlyRental - monthlyExpenses;
+    const annualRental = netMonthlyRental * 12;
 
-  // Future property value with appreciation
-  const futureValue = purchasePrice * Math.pow(1 + appreciationRate / 100, holdingPeriod);
+    // Future property value with appreciation
+    const futureValue = purchasePrice * Math.pow(1 + appreciationRate / 100, holdingPeriod);
 
-  // Total rental income
-  const totalRentalIncome = annualRental * holdingPeriod;
+    // Total rental income
+    const totalRentalIncome = annualRental * holdingPeriod;
 
-  // Total profit
-  const totalProfit = (futureValue - purchasePrice) + totalRentalIncome - additionalCosts;
+    // Total profit
+    const totalProfit = (futureValue - purchasePrice) + totalRentalIncome - additionalCosts;
 
-  // Annual ROI
-  const annualROI = (Math.pow((totalInvestment + totalProfit) / totalInvestment, 1 / holdingPeriod) - 1) * 100;
+    // Annual ROI
+    const annualROI = (Math.pow((totalInvestment + totalProfit) / totalInvestment, 1 / holdingPeriod) - 1) * 100;
 
-  // Net rental yield
-  const netRentalYield = (annualRental / totalInvestment) * 100;
+    // Net rental yield
+    const netRentalYield = (annualRental / totalInvestment) * 100;
 
-  // Break-even (simple approximation)
-  const breakEven = totalInvestment / (annualRental + (futureValue - purchasePrice) / holdingPeriod);
+    // Break-even (simple approximation)
+    const breakEven = totalInvestment / (annualRental + (futureValue - purchasePrice) / holdingPeriod);
 
-  // Update displays
-  document.getElementById('totalInvestment').textContent = '₹' + formatNumber(totalInvestment);
-  document.getElementById('futureValue').textContent = '₹' + formatNumber(futureValue);
-  document.getElementById('totalProfit').textContent = '₹' + formatNumber(totalProfit);
-  document.getElementById('netRentalYield').textContent = netRentalYield.toFixed(2) + '%';
-  document.getElementById('breakEven').textContent = breakEven.toFixed(1) + ' Years';
-  document.getElementById('totalRentalIncome').textContent = '₹' + formatNumber(totalRentalIncome);
-  document.getElementById('roiPercent').textContent = annualROI.toFixed(1) + '%';
+    // Update displays
+    document.getElementById('totalInvestment').textContent = '₹' + formatNumber(totalInvestment);
+    document.getElementById('futureValue').textContent = '₹' + formatNumber(futureValue);
+    document.getElementById('totalProfit').textContent = '₹' + formatNumber(totalProfit);
+    document.getElementById('netRentalYield').textContent = netRentalYield.toFixed(2) + '%';
+    document.getElementById('breakEven').textContent = breakEven.toFixed(1) + ' Years';
+    document.getElementById('totalRentalIncome').textContent = '₹' + formatNumber(totalRentalIncome);
+    document.getElementById('roiPercent').textContent = annualROI.toFixed(1) + '%';
 
-  // Update circle
-  const circle = document.getElementById('roiCircle');
-  const circumference = 2 * Math.PI * 42;
-  const offset = circumference - (Math.min(annualROI, 30) / 30) * circumference;
-  circle.style.strokeDashoffset = offset;
+    // Update circle
+    const circle = document.getElementById('roiCircle');
+    const circumference = 2 * Math.PI * 42;
+    const offset = circumference - (Math.min(annualROI, 30) / 30) * circumference;
+    circle.style.strokeDashoffset = offset;
 
-  // Draw chart
-  drawROIChart(purchasePrice, appreciationRate, holdingPeriod, annualRental, totalInvestment);
+    // Draw chart
+    drawROIChart(purchasePrice, appreciationRate, holdingPeriod, annualRental, totalInvestment);
 
-  // Update table
-  updateProjectionTable(purchasePrice, additionalCosts, appreciationRate, holdingPeriod, netMonthlyRental, totalInvestment);
+    // Update table
+    updateProjectionTable(purchasePrice, additionalCosts, appreciationRate, holdingPeriod, netMonthlyRental, totalInvestment);
 }
 
 function formatNumber(num) {
-  return Math.round(num).toLocaleString('en-IN');
+    return Math.round(num).toLocaleString('en-IN');
 }
 
 function syncRange(inputId, value) {
-  document.getElementById(inputId).value = value;
+    document.getElementById(inputId).value = value;
 }
 
 function setAdditionalCost(percent) {
-  const price = parseFloat(document.getElementById('purchasePrice').value) || 0;
-  document.getElementById('additionalCosts').value = Math.round(price * percent / 100);
-  document.querySelectorAll('.cost-tag').forEach(t => t.classList.remove('active'));
-  event.target.classList.add('active');
-  calculateROI();
+    const price = parseFloat(document.getElementById('purchasePrice').value) || 0;
+    document.getElementById('additionalCosts').value = Math.round(price * percent / 100);
+    document.querySelectorAll('.cost-tag').forEach(t => {
+        t.style.background = 'var(--color-bg-soft)';
+        t.style.borderColor = 'var(--color-border)';
+        t.style.color = 'var(--color-text-muted)';
+    });
+    event.target.style.background = 'linear-gradient(135deg, rgba(212,175,55,0.15), rgba(212,175,55,0.05))';
+    event.target.style.borderColor = 'var(--color-gold)';
+    event.target.style.color = 'var(--color-gold-dark)';
+    calculateROI();
 }
 
 function setAppreciation(rate) {
-  document.getElementById('appreciationRate').value = rate;
-  document.querySelectorAll('.app-tag').forEach(t => t.classList.remove('active'));
-  event.target.classList.add('active');
-  calculateROI();
+    document.getElementById('appreciationRate').value = rate;
+    document.querySelectorAll('.app-tag').forEach(t => {
+        t.style.background = 'var(--color-bg-soft)';
+        t.style.borderColor = 'var(--color-border)';
+        t.style.color = 'var(--color-text-muted)';
+    });
+    event.target.style.background = 'linear-gradient(135deg, rgba(212,175,55,0.15), rgba(212,175,55,0.05))';
+    event.target.style.borderColor = 'var(--color-gold)';
+    event.target.style.color = 'var(--color-gold-dark)';
+    calculateROI();
 }
 
 function setHolding(years) {
-  document.getElementById('holdingPeriod').value = years;
-  document.querySelectorAll('.hold-tag').forEach(t => t.classList.remove('active'));
-  event.target.classList.add('active');
-  calculateROI();
+    document.getElementById('holdingPeriod').value = years;
+    document.querySelectorAll('.hold-tag').forEach(t => {
+        t.style.background = 'var(--color-bg-soft)';
+        t.style.borderColor = 'var(--color-border)';
+        t.style.color = 'var(--color-text-muted)';
+    });
+    event.target.style.background = 'linear-gradient(135deg, rgba(212,175,55,0.15), rgba(212,175,55,0.05))';
+    event.target.style.borderColor = 'var(--color-gold)';
+    event.target.style.color = 'var(--color-gold-dark)';
+    calculateROI();
 }
 
 // ===== ROI CHART =====
 function drawROIChart(purchasePrice, appreciationRate, years, annualRental, totalInvestment) {
-  const canvas = document.getElementById('roiChart');
-  const ctx = canvas.getContext('2d');
-  const width = canvas.width;
-  const height = canvas.height;
-  const padding = 30;
-  const chartWidth = width - padding * 2;
-  const chartHeight = height - padding * 2;
+    const canvas = document.getElementById('roiChart');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const width = canvas.width;
+    const height = canvas.height;
+    const padding = 30;
+    const chartWidth = width - padding * 2;
+    const chartHeight = height - padding * 2;
 
-  ctx.clearRect(0, 0, width, height);
+    ctx.clearRect(0, 0, width, height);
 
-  // Calculate data points
-  const dataPoints = [];
-  for (let i = 0; i <= years; i++) {
-    const propertyValue = purchasePrice * Math.pow(1 + appreciationRate / 100, i);
-    const rentalIncome = annualRental * i;
-    const totalValue = propertyValue + rentalIncome;
-    dataPoints.push({ year: i, value: totalValue });
-  }
+    // Calculate data points
+    const dataPoints = [];
+    for (let i = 0; i <= years; i++) {
+        const propertyValue = purchasePrice * Math.pow(1 + appreciationRate / 100, i);
+        const rentalIncome = annualRental * i;
+        const totalValue = propertyValue + rentalIncome;
+        dataPoints.push({ year: i, value: totalValue });
+    }
 
-  const maxValue = Math.max(...dataPoints.map(d => d.value));
-  const minValue = totalInvestment;
+    const maxValue = Math.max(...dataPoints.map(d => d.value));
+    const minValue = totalInvestment;
 
-  // Draw grid lines
-  ctx.strokeStyle = 'rgba(11,20,64,0.06)';
-  ctx.lineWidth = 1;
-  for (let i = 0; i <= 5; i++) {
-    const y = padding + (chartHeight / 5) * i;
+    // Draw grid lines
+    ctx.strokeStyle = 'rgba(15,23,42,0.06)';
+    ctx.lineWidth = 1;
+    for (let i = 0; i <= 5; i++) {
+        const y = padding + (chartHeight / 5) * i;
+        ctx.beginPath();
+        ctx.moveTo(padding, y);
+        ctx.lineTo(width - padding, y);
+        ctx.stroke();
+    }
+
+    // Draw investment line (baseline)
+    const baselineY = padding + chartHeight - ((totalInvestment - minValue) / (maxValue - minValue)) * chartHeight;
+    ctx.strokeStyle = 'rgba(15,23,42,0.25)';
+    ctx.setLineDash([5, 5]);
     ctx.beginPath();
-    ctx.moveTo(padding, y);
-    ctx.lineTo(width - padding, y);
+    ctx.moveTo(padding, baselineY);
+    ctx.lineTo(width - padding, baselineY);
     ctx.stroke();
-  }
+    ctx.setLineDash([]);
 
-  // Draw investment line (baseline)
-  const baselineY = padding + chartHeight - ((totalInvestment - minValue) / (maxValue - minValue)) * chartHeight;
-  ctx.strokeStyle = 'rgba(11,20,64,0.25)';
-  ctx.setLineDash([5, 5]);
-  ctx.beginPath();
-  ctx.moveTo(padding, baselineY);
-  ctx.lineTo(width - padding, baselineY);
-  ctx.stroke();
-  ctx.setLineDash([]);
-
-  // Draw area under curve
-  ctx.beginPath();
-  ctx.moveTo(padding, padding + chartHeight);
-  dataPoints.forEach((point, index) => {
-    const x = padding + (index / (dataPoints.length - 1)) * chartWidth;
-    const y = padding + chartHeight - ((point.value - minValue) / (maxValue - minValue)) * chartHeight;
-    if (index === 0) ctx.lineTo(x, padding + chartHeight);
-    ctx.lineTo(x, y);
-  });
-  ctx.lineTo(width - padding, padding + chartHeight);
-  ctx.closePath();
-
-  const gradient = ctx.createLinearGradient(0, padding, 0, height - padding);
-  gradient.addColorStop(0, 'rgba(201,146,42, 0.28)');
-  gradient.addColorStop(1, 'rgba(201,146,42, 0.0)');
-  ctx.fillStyle = gradient;
-  ctx.fill();
-
-  // Draw line
-  ctx.beginPath();
-  ctx.strokeStyle = '#c9922a';
-  ctx.lineWidth = 3;
-  ctx.lineCap = 'round';
-  ctx.lineJoin = 'round';
-  dataPoints.forEach((point, index) => {
-    const x = padding + (index / (dataPoints.length - 1)) * chartWidth;
-    const y = padding + chartHeight - ((point.value - minValue) / (maxValue - minValue)) * chartHeight;
-    if (index === 0) ctx.moveTo(x, y);
-    else ctx.lineTo(x, y);
-  });
-  ctx.stroke();
-
-  // Draw points
-  dataPoints.forEach((point, index) => {
-    const x = padding + (index / (dataPoints.length - 1)) * chartWidth;
-    const y = padding + chartHeight - ((point.value - minValue) / (maxValue - minValue)) * chartHeight;
+    // Draw area under curve
     ctx.beginPath();
-    ctx.arc(x, y, 4, 0, 2 * Math.PI);
-    ctx.fillStyle = '#c9922a';
+    ctx.moveTo(padding, padding + chartHeight);
+    dataPoints.forEach((point, index) => {
+        const x = padding + (index / (dataPoints.length - 1)) * chartWidth;
+        const y = padding + chartHeight - ((point.value - minValue) / (maxValue - minValue)) * chartHeight;
+        if (index === 0) ctx.lineTo(x, padding + chartHeight);
+        ctx.lineTo(x, y);
+    });
+    ctx.lineTo(width - padding, padding + chartHeight);
+    ctx.closePath();
+
+    const gradient = ctx.createLinearGradient(0, padding, 0, height - padding);
+    gradient.addColorStop(0, 'rgba(212,175,55, 0.25)');
+    gradient.addColorStop(1, 'rgba(212,175,55, 0.0)');
+    ctx.fillStyle = gradient;
     ctx.fill();
-    ctx.strokeStyle = '#ffffff';
-    ctx.lineWidth = 2;
-    ctx.stroke();
-  });
 
-  // Labels
-  ctx.fillStyle = 'rgba(11,20,64,0.45)';
-  ctx.font = '11px sans-serif';
-  ctx.textAlign = 'center';
-  for (let i = 0; i < dataPoints.length; i += Math.ceil(dataPoints.length / 6)) {
-    const x = padding + (i / (dataPoints.length - 1)) * chartWidth;
-    ctx.fillText('Y' + dataPoints[i].year, x, height - 8);
-  }
+    // Draw line
+    ctx.beginPath();
+    ctx.strokeStyle = '#d4af37';
+    ctx.lineWidth = 3;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    dataPoints.forEach((point, index) => {
+        const x = padding + (index / (dataPoints.length - 1)) * chartWidth;
+        const y = padding + chartHeight - ((point.value - minValue) / (maxValue - minValue)) * chartHeight;
+        if (index === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+    });
+    ctx.stroke();
+
+    // Draw points
+    dataPoints.forEach((point, index) => {
+        const x = padding + (index / (dataPoints.length - 1)) * chartWidth;
+        const y = padding + chartHeight - ((point.value - minValue) / (maxValue - minValue)) * chartHeight;
+        ctx.beginPath();
+        ctx.arc(x, y, 4, 0, 2 * Math.PI);
+        ctx.fillStyle = '#d4af37';
+        ctx.fill();
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+    });
+
+    // Labels
+    ctx.fillStyle = 'rgba(15,23,42,0.45)';
+    ctx.font = '11px Inter, sans-serif';
+    ctx.textAlign = 'center';
+    for (let i = 0; i < dataPoints.length; i += Math.ceil(dataPoints.length / 6)) {
+        const x = padding + (i / (dataPoints.length - 1)) * chartWidth;
+        ctx.fillText('Y' + dataPoints[i].year, x, height - 8);
+    }
 }
 
 // ===== PROJECTION TABLE =====
 function updateProjectionTable(purchasePrice, additionalCosts, appreciationRate, years, netMonthlyRental, totalInvestment) {
-  const tbody = document.getElementById('projectionBody');
-  tbody.innerHTML = '';
+    const tbody = document.getElementById('projectionBody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
 
-  let cumulativeRental = 0;
+    let cumulativeRental = 0;
 
-  for (let year = 1; year <= years; year++) {
-    const propertyValue = purchasePrice * Math.pow(1 + appreciationRate / 100, year);
-    const yearlyRental = netMonthlyRental * 12;
-    cumulativeRental += yearlyRental;
-    const netProfit = (propertyValue - purchasePrice) + cumulativeRental - additionalCosts;
-    const roi = ((totalInvestment + netProfit) / totalInvestment - 1) * 100;
-    const growth = ((propertyValue / purchasePrice - 1) * 100).toFixed(1);
+    for (let year = 1; year <= years; year++) {
+        const propertyValue = purchasePrice * Math.pow(1 + appreciationRate / 100, year);
+        const yearlyRental = netMonthlyRental * 12;
+        cumulativeRental += yearlyRental;
+        const netProfit = (propertyValue - purchasePrice) + cumulativeRental - additionalCosts;
+        const roi = ((totalInvestment + netProfit) / totalInvestment - 1) * 100;
+        const growth = ((propertyValue / purchasePrice - 1) * 100).toFixed(1);
 
-    const row = document.createElement('tr');
-    row.innerHTML = `
-      <td>Year ${year}</td>
-      <td>₹${formatNumber(propertyValue)}</td>
-      <td>₹${formatNumber(cumulativeRental)}</td>
-      <td class="positive">₹${formatNumber(netProfit)}</td>
-      <td class="positive">${roi.toFixed(1)}%</td>
-      <td>
-        <div class="growth-bar">
-          <div class="growth-fill" style="width: ${Math.min(growth, 100)}%"></div>
-        </div>
-      </td>
-    `;
-    tbody.appendChild(row);
-  }
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td style="padding: 12px 16px; font-size: 0.85rem; color: var(--color-gold); font-weight: 700; border-bottom: 1px solid var(--color-border);">Year ${year}</td>
+            <td style="padding: 12px 16px; font-size: 0.85rem; color: var(--color-text); border-bottom: 1px solid var(--color-border);">₹${formatNumber(propertyValue)}</td>
+            <td style="padding: 12px 16px; font-size: 0.85rem; color: var(--color-text); border-bottom: 1px solid var(--color-border);">₹${formatNumber(cumulativeRental)}</td>
+            <td style="padding: 12px 16px; font-size: 0.85rem; color: var(--color-success); font-weight: 600; border-bottom: 1px solid var(--color-border);">₹${formatNumber(netProfit)}</td>
+            <td style="padding: 12px 16px; font-size: 0.85rem; color: var(--color-success); font-weight: 700; border-bottom: 1px solid var(--color-border);">${roi.toFixed(1)}%</td>
+            <td style="padding: 12px 16px; border-bottom: 1px solid var(--color-border);">
+                <div style="width: 100%; min-width: 60px; height: 6px; background: var(--color-border); border-radius: 3px; overflow: hidden;">
+                    <div style="height: 100%; background: linear-gradient(90deg, var(--color-success), #16a34a); border-radius: 3px; transition: width 0.5s ease; width: ${Math.min(growth, 100)}%;"></div>
+                </div>
+            </td>
+        `;
+        tbody.appendChild(row);
+    }
 }
 
 // Initialize
 calculateROI();
 </script>
-
 {% endblock %}

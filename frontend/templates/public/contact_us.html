@@ -1,135 +1,340 @@
-{% extends "public/base.html" %}
+
+contact_html = '''{% extends "public/base.html" %}
 {% load static %}
-{% block title %}Contact Us{% endblock %}
+{% block title %}Contact Us - RealShri{% endblock %}
 
 {% block content %}
 
-<div class="bg-gradient-to-br from-[#fdfcf9] via-[#f7f4ec] to-[#fdfcf9] text-[#33395a]">
-
-<!-- HERO -->
-<section class="py-16 sm:py-24 px-5 sm:px-6 text-center">
-    <h1 class="font-display text-4xl sm:text-5xl md:text-6xl font-extrabold mb-3 sm:mb-4 leading-[1.1] text-[#0b1440]">
-        Get in Touch
-    </h1>
-    <p class="text-[#6b7280] text-base sm:text-lg">
-        Premium Real Estate Assistance — We're Here to Help
-    </p>
+<!-- ============================================
+   CONTACT HERO - Simple, Clean
+   ============================================ -->
+<section class="hero-section" style="min-height: 30vh;">
+    <div class="hero-content">
+        <span class="label" style="color: rgba(255,255,255,0.7); border-color: rgba(255,255,255,0.2);">
+            <span class="material-icons-round" style="font-size:16px">contact_mail</span>
+            Get in Touch
+        </span>
+        <h1 class="hero-title" style="font-size: clamp(1.75rem, 5vw, 2.5rem);">
+            We're Here to <span style="color: #d4af37;">Help You</span>
+        </h1>
+        <p class="hero-subtitle" style="font-size: 1rem;">
+            Have questions? We'd love to hear from you. Send us a message and we'll respond as soon as possible.
+        </p>
+    </div>
 </section>
 
-<!-- MAIN -->
-<section class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 sm:gap-12 px-5 sm:px-6 pb-16 sm:pb-20">
-
-    <!-- LEFT: FORM -->
-    <div class="bg-white border border-[#d4af37]/20 p-6 sm:p-10 rounded-2xl sm:rounded-3xl shadow-xl shadow-black/5">
-
-        <h2 class="font-display text-2xl sm:text-3xl font-bold mb-6 sm:mb-8 text-[#0b1440]">
-            Send Inquiry
-        </h2>
-
-        <form method="POST" class="space-y-5 sm:space-y-6">
-            {% csrf_token %}
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6">
-
-                <!-- NAME -->
-                <div>
-                    <label class="text-sm text-[#6b7280]">Full Name</label>
-                    <input name="name" required
-                        class="w-full mt-2 min-h-[50px] px-4 py-3 rounded-lg bg-[#fdfcf9] border border-black/10 text-[#0b1440] text-base focus:outline-none focus:ring-2 focus:ring-[#d4af37] focus:border-[#d4af37]/50">
+<!-- ============================================
+   CONTACT SECTION - Form + Info
+   ============================================ -->
+<section class="section-pad bg-white">
+    <div class="container-app">
+        <div class="grid grid-cols-1 lg:grid-cols-5 gap-8 lg:gap-12">
+            
+            <!-- LEFT: Contact Form (3 cols) -->
+            <div class="lg:col-span-3 reveal">
+                <div class="card p-6 md:p-8">
+                    <h2 class="text-xl md:text-2xl font-bold text-[var(--color-navy)] mb-2">Send us a Message</h2>
+                    <p class="text-sm text-[var(--color-text-muted)] mb-6">Fill out the form below and we'll get back to you within 24 hours.</p>
+                    
+                    <form method="POST" class="space-y-5">
+                        {% csrf_token %}
+                        
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                            <!-- Name -->
+                            <div>
+                                <label class="block text-sm font-medium text-[var(--color-text)] mb-2">
+                                    Full Name <span class="text-red-500">*</span>
+                                </label>
+                                <input type="text" name="name" required
+                                    class="w-full px-4 py-3 rounded-xl bg-[var(--color-bg)] border border-[var(--color-border)] text-[var(--color-text)] text-sm focus:outline-none focus:border-[var(--color-gold)] focus:ring-2 focus:ring-[var(--color-gold)]/20 transition-all"
+                                    placeholder="Enter your full name">
+                            </div>
+                            
+                            <!-- Phone -->
+                            <div>
+                                <label class="block text-sm font-medium text-[var(--color-text)] mb-2">
+                                    Phone Number <span class="text-red-500">*</span>
+                                </label>
+                                <input type="tel" name="phone" required
+                                    class="w-full px-4 py-3 rounded-xl bg-[var(--color-bg)] border border-[var(--color-border)] text-[var(--color-text)] text-sm focus:outline-none focus:border-[var(--color-gold)] focus:ring-2 focus:ring-[var(--color-gold)]/20 transition-all"
+                                    placeholder="+91 XXXXX XXXXX">
+                            </div>
+                        </div>
+                        
+                        <!-- Email -->
+                        <div>
+                            <label class="block text-sm font-medium text-[var(--color-text)] mb-2">
+                                Email Address <span class="text-red-500">*</span>
+                            </label>
+                            <input type="email" name="email" required
+                                class="w-full px-4 py-3 rounded-xl bg-[var(--color-bg)] border border-[var(--color-border)] text-[var(--color-text)] text-sm focus:outline-none focus:border-[var(--color-gold)] focus:ring-2 focus:ring-[var(--color-gold)]/20 transition-all"
+                                placeholder="your@email.com">
+                        </div>
+                        
+                        <!-- Subject -->
+                        <div>
+                            <label class="block text-sm font-medium text-[var(--color-text)] mb-2">
+                                Subject
+                            </label>
+                            <select name="subject"
+                                class="w-full px-4 py-3 rounded-xl bg-[var(--color-bg)] border border-[var(--color-border)] text-[var(--color-text)] text-sm focus:outline-none focus:border-[var(--color-gold)] focus:ring-2 focus:ring-[var(--color-gold)]/20 transition-all appearance-none cursor-pointer">
+                                <option value="">Select a subject</option>
+                                <option value="property_inquiry">Property Inquiry</option>
+                                <option value="site_visit">Schedule Site Visit</option>
+                                <option value="price_quote">Get Price Quote</option>
+                                <option value="general">General Question</option>
+                                <option value="feedback">Feedback</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Message -->
+                        <div>
+                            <label class="block text-sm font-medium text-[var(--color-text)] mb-2">
+                                Message <span class="text-red-500">*</span>
+                            </label>
+                            <textarea name="message" rows="5" required
+                                class="w-full px-4 py-3 rounded-xl bg-[var(--color-bg)] border border-[var(--color-border)] text-[var(--color-text)] text-sm focus:outline-none focus:border-[var(--color-gold)] focus:ring-2 focus:ring-[var(--color-gold)]/20 transition-all resize-none"
+                                placeholder="Tell us about your requirements..."></textarea>
+                        </div>
+                        
+                        <!-- Submit Button -->
+                        <button type="submit" class="btn btn-gold w-full" style="min-height:48px;">
+                            <span class="material-icons-round" style="font-size:18px">send</span>
+                            Send Message
+                        </button>
+                        
+                        <!-- Trust Note -->
+                        <p class="text-xs text-[var(--color-text-muted)] text-center flex items-center justify-center gap-1">
+                            <span class="material-icons-round" style="font-size:14px;color:var(--color-success)">lock</span>
+                            Your information is secure and will never be shared with third parties.
+                        </p>
+                    </form>
                 </div>
-
-                <!-- PHONE -->
-                <div>
-                    <label class="text-sm text-[#6b7280]">Phone</label>
-                    <input name="phone" type="tel" required
-                        class="w-full mt-2 min-h-[50px] px-4 py-3 rounded-lg bg-[#fdfcf9] border border-black/10 text-[#0b1440] text-base focus:outline-none focus:ring-2 focus:ring-[#d4af37] focus:border-[#d4af37]/50">
+            </div>
+            
+            <!-- RIGHT: Contact Info (2 cols) -->
+            <div class="lg:col-span-2 space-y-6">
+                
+                <!-- Contact Cards -->
+                <div class="card p-6 reveal">
+                    <h3 class="text-lg font-bold text-[var(--color-navy)] mb-5">Contact Information</h3>
+                    
+                    <div class="space-y-4">
+                        <div class="flex items-start gap-4">
+                            <div class="w-10 h-10 rounded-xl bg-[rgba(212,175,55,0.1)] flex items-center justify-center shrink-0">
+                                <span class="material-icons-round text-[var(--color-gold)]" style="font-size:20px">business</span>
+                            </div>
+                            <div>
+                                <p class="text-xs text-[var(--color-text-muted)] uppercase tracking-wider font-medium">Company</p>
+                                <p class="text-sm font-semibold text-[var(--color-navy)]">{{ site.company_name|default:"RealShri Properties" }}</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start gap-4">
+                            <div class="w-10 h-10 rounded-xl bg-[rgba(212,175,55,0.1)] flex items-center justify-center shrink-0">
+                                <span class="material-icons-round text-[var(--color-gold)]" style="font-size:20px">phone</span>
+                            </div>
+                            <div>
+                                <p class="text-xs text-[var(--color-text-muted)] uppercase tracking-wider font-medium">Phone</p>
+                                <a href="tel:{{ site.phone|default:'+91-XXXXXXXXXX' }}" class="text-sm font-semibold text-[var(--color-navy)] hover:text-[var(--color-gold)] transition">
+                                    {{ site.phone|default:"+91-XXXXXXXXXX" }}
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start gap-4">
+                            <div class="w-10 h-10 rounded-xl bg-[rgba(212,175,55,0.1)] flex items-center justify-center shrink-0">
+                                <span class="material-icons-round text-[var(--color-gold)]" style="font-size:20px">email</span>
+                            </div>
+                            <div>
+                                <p class="text-xs text-[var(--color-text-muted)] uppercase tracking-wider font-medium">Email</p>
+                                <a href="mailto:{{ site.email|default:'info@realshri.com' }}" class="text-sm font-semibold text-[var(--color-navy)] hover:text-[var(--color-gold)] transition break-all">
+                                    {{ site.email|default:"info@realshri.com" }}
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start gap-4">
+                            <div class="w-10 h-10 rounded-xl bg-[rgba(212,175,55,0.1)] flex items-center justify-center shrink-0">
+                                <span class="material-icons-round text-[var(--color-gold)]" style="font-size:20px">location_on</span>
+                            </div>
+                            <div>
+                                <p class="text-xs text-[var(--color-text-muted)] uppercase tracking-wider font-medium">Address</p>
+                                <p class="text-sm font-semibold text-[var(--color-navy)]">{{ site.location|default:"Ahmedabad, Gujarat, India" }}</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-
+                
+                <!-- Quick Response Promise -->
+                <div class="card p-6 reveal" style="background: linear-gradient(135deg, var(--color-navy) 0%, #1e3a5f 100%); border: none;">
+                    <div class="flex items-center gap-3 mb-3">
+                        <span class="material-icons-round text-[var(--color-gold)]" style="font-size:24px">schedule</span>
+                        <h3 class="text-lg font-bold text-white">Quick Response</h3>
+                    </div>
+                    <p class="text-sm text-white/80 mb-4">We typically respond within 2 hours during business hours (9 AM - 7 PM).</p>
+                    <div class="flex items-center gap-2 text-xs text-white/60">
+                        <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
+                        <span>Currently Online</span>
+                    </div>
+                </div>
+                
+                <!-- WhatsApp CTA -->
+                <a href="https://wa.me/{{ site.whatsapp_number|default:'919876543210' }}?text=Hi%20RealShri,%20I'm%20interested%20in%20buying%20a%20property."
+                   target="_blank"
+                   class="card p-6 flex items-center gap-4 hover:shadow-lg transition-all reveal"
+                   style="background: linear-gradient(135deg, #25d366 0%, #128c7e 100%); border: none; color: white;">
+                    <div class="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center shrink-0">
+                        <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="font-semibold">Chat on WhatsApp</p>
+                        <p class="text-xs text-white/80">Get instant replies</p>
+                    </div>
+                    <span class="material-icons-round ml-auto" style="font-size:20px">arrow_forward</span>
+                </a>
+                
+                <!-- Business Hours -->
+                <div class="card p-6 reveal">
+                    <h3 class="text-lg font-bold text-[var(--color-navy)] mb-4">Business Hours</h3>
+                    <div class="space-y-3 text-sm">
+                        <div class="flex justify-between items-center">
+                            <span class="text-[var(--color-text-muted)]">Monday - Saturday</span>
+                            <span class="font-semibold text-[var(--color-navy)]">9:00 AM - 7:00 PM</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-[var(--color-text-muted)]">Sunday</span>
+                            <span class="font-semibold text-[var(--color-navy)]">10:00 AM - 4:00 PM</span>
+                        </div>
+                        <div class="h-px bg-[var(--color-border)] my-2"></div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-[var(--color-text-muted)]">Emergency Support</span>
+                            <span class="font-semibold text-[var(--color-gold)]">24/7 Available</span>
+                        </div>
+                    </div>
+                </div>
+                
             </div>
-
-            <!-- EMAIL -->
-            <div>
-                <label class="text-sm text-[#6b7280]">Email</label>
-                <input type="email" name="email" required
-                    class="w-full mt-2 min-h-[50px] px-4 py-3 rounded-lg bg-[#fdfcf9] border border-black/10 text-[#0b1440] text-base focus:outline-none focus:ring-2 focus:ring-[#d4af37] focus:border-[#d4af37]/50">
-            </div>
-
-            <!-- MESSAGE -->
-            <div>
-                <label class="text-sm text-[#6b7280]">Message</label>
-                <textarea name="message" rows="5" required
-                    class="w-full mt-2 px-4 py-3 rounded-lg bg-[#fdfcf9] border border-black/10 text-[#0b1440] text-base focus:outline-none focus:ring-2 focus:ring-[#d4af37] focus:border-[#d4af37]/50"></textarea>
-            </div>
-
-            <!-- BUTTON -->
-            <button type="submit"
-                class="w-full min-h-[52px] bg-gradient-to-r from-[#d4af37] to-[#f5e6a8] text-[#0a0f1f] font-bold py-3 rounded-lg active:scale-[0.98] sm:hover:scale-105 transition duration-300">
-                Send Message
-            </button>
-
-        </form>
-
-    </div>
-
-    <!-- RIGHT: CONTACT INFO -->
-    <div class="space-y-6 sm:space-y-8">
-
-        <!-- CARD -->
-        <div class="bg-white border border-[#d4af37]/20 p-6 sm:p-8 rounded-2xl sm:rounded-3xl shadow-xl shadow-black/5">
-
-            <h2 class="font-display text-xl sm:text-2xl font-bold mb-5 sm:mb-6 text-[#0b1440]">
-                Contact Information
-            </h2>
-
-            <div class="space-y-4 text-[#33395a] text-sm sm:text-base">
-
-                <p>
-                    <span class="text-[#c9922a] font-semibold">Company:</span><br>
-                    {{ site.company_name }}
-                </p>
-
-                <p>
-                    <span class="text-[#c9922a] font-semibold">Phone:</span><br>
-                    <a href="tel:{{ site.phone }}" class="hover:text-[#c9922a] transition inline-block py-1">
-                        {{ site.phone }}
-                    </a>
-                </p>
-
-                <p>
-                    <span class="text-[#c9922a] font-semibold">Email:</span><br>
-                    <a href="mailto:{{ site.email }}" class="hover:text-[#c9922a] transition inline-block py-1 break-all">
-                        {{ site.email }}
-                    </a>
-                </p>
-
-                <p>
-                    <span class="text-[#c9922a] font-semibold">Location:</span><br>
-                    {{ site.location }}
-                </p>
-
-            </div>
-
         </div>
-
-        <!-- EXTRA CARD -->
-        <div class="bg-gradient-to-r from-[#d4af37] to-[#f5e6a8] text-[#0a0f1f] p-6 sm:p-8 rounded-2xl sm:rounded-3xl shadow-xl">
-            <h3 class="font-display text-lg sm:text-xl font-bold mb-2">
-                Need Immediate Help?
-            </h3>
-            <p class="text-sm mb-4">
-                Connect with our expert agents for instant consultation.
-            </p>
-
-            <a href="https://wa.me/919876543210"
-               class="inline-flex items-center justify-center w-full sm:w-auto min-h-[48px] bg-[#0b1440] text-white px-6 py-2 rounded-lg font-bold active:scale-[0.97] sm:hover:scale-105 transition">
-               WhatsApp Now
-            </a>
-        </div>
-
     </div>
-
 </section>
 
-</div>
+<!-- ============================================
+   MAP SECTION - Location Map
+   ============================================ -->
+<section class="section-pad bg-[var(--color-bg)]">
+    <div class="container-app">
+        <div class="section-header mb-8">
+            <span class="label">
+                <span class="material-icons-round" style="font-size:16px">map</span>
+                Visit Us
+            </span>
+            <h2>Our Location</h2>
+            <p>Come visit our office for a personal consultation</p>
+            <div class="gold-line"></div>
+        </div>
+        
+        <div class="card overflow-hidden reveal">
+            <div class="w-full h-[300px] md:h-[400px] bg-[var(--color-bg-soft)] flex items-center justify-center">
+                <iframe 
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d235013.70717427065!2d72.439654122987!3d23.020497541367155!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x395e848aba5bd449%3A0x4fcedd11614f6516!2sAhmedabad%2C%20Gujarat!5e0!3m2!1sen!2sin!4v1700000000000!5m2!1sen!2sin"
+                    width="100%" 
+                    height="100%" 
+                    style="border:0;" 
+                    allowfullscreen="" 
+                    loading="lazy" 
+                    referrerpolicy="no-referrer-when-downgrade">
+                </iframe>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================
+   FAQ SECTION - Common Questions
+   ============================================ -->
+<section class="section-pad bg-white">
+    <div class="container-app max-w-3xl">
+        <div class="section-header mb-10">
+            <span class="label">
+                <span class="material-icons-round" style="font-size:16px">help</span>
+                FAQ
+            </span>
+            <h2>Frequently Asked Questions</h2>
+            <p>Quick answers to common questions</p>
+            <div class="gold-line"></div>
+        </div>
+        
+        <div class="space-y-4">
+            <div class="card p-5 reveal">
+                <button onclick="toggleFaq(this)" class="w-full flex items-center justify-between text-left">
+                    <span class="font-semibold text-[var(--color-navy)] text-sm md:text-base">How do I schedule a site visit?</span>
+                    <span class="material-icons-round text-[var(--color-gold)] transition-transform duration-200" style="font-size:20px">expand_more</span>
+                </button>
+                <div class="hidden mt-3 text-sm text-[var(--color-text-muted)] leading-relaxed">
+                    You can schedule a site visit directly from the property detail page by clicking "Schedule Visit" or by contacting us via WhatsApp or phone. Our team will confirm the appointment within 2 hours.
+                </div>
+            </div>
+            
+            <div class="card p-5 reveal">
+                <button onclick="toggleFaq(this)" class="w-full flex items-center justify-between text-left">
+                    <span class="font-semibold text-[var(--color-navy)] text-sm md:text-base">Are all properties RERA registered?</span>
+                    <span class="material-icons-round text-[var(--color-gold)] transition-transform duration-200" style="font-size:20px">expand_more</span>
+                </button>
+                <div class="hidden mt-3 text-sm text-[var(--color-text-muted)] leading-relaxed">
+                    Yes, we only list properties that are RERA registered or have valid legal documentation. Each property page displays the RERA number for verification.
+                </div>
+            </div>
+            
+            <div class="card p-5 reveal">
+                <button onclick="toggleFaq(this)" class="w-full flex items-center justify-between text-left">
+                    <span class="font-semibold text-[var(--color-navy)] text-sm md:text-base">Do you charge any brokerage fees?</span>
+                    <span class="material-icons-round text-[var(--color-gold)] transition-transform duration-200" style="font-size:20px">expand_more</span>
+                </button>
+                <div class="hidden mt-3 text-sm text-[var(--color-text-muted)] leading-relaxed">
+                    No, we do not charge any brokerage fees to buyers. Our services are completely free for property seekers. Builders pay us a small commission only after successful deal closure.
+                </div>
+            </div>
+            
+            <div class="card p-5 reveal">
+                <button onclick="toggleFaq(this)" class="w-full flex items-center justify-between text-left">
+                    <span class="font-semibold text-[var(--color-navy)] text-sm md:text-base">Can I get home loan assistance?</span>
+                    <span class="material-icons-round text-[var(--color-gold)] transition-transform duration-200" style="font-size:20px">expand_more</span>
+                </button>
+                <div class="hidden mt-3 text-sm text-[var(--color-text-muted)] leading-relaxed">
+                    Absolutely! We have partnerships with leading banks and NBFCs. Our team can help you get the best home loan rates and guide you through the entire documentation process.
+                </div>
+            </div>
+            
+            <div class="card p-5 reveal">
+                <button onclick="toggleFaq(this)" class="w-full flex items-center justify-between text-left">
+                    <span class="font-semibold text-[var(--color-navy)] text-sm md:text-base">What is your refund policy?</span>
+                    <span class="material-icons-round text-[var(--color-gold)] transition-transform duration-200" style="font-size:20px">expand_more</span>
+                </button>
+                <div class="hidden mt-3 text-sm text-[var(--color-text-muted)] leading-relaxed">
+                    For builders, we offer a 7-day money-back guarantee on subscription plans if you're not satisfied. For buyers, since our services are free, there are no refunds applicable.
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+// FAQ Toggle
+function toggleFaq(btn) {
+    const content = btn.nextElementSibling;
+    const arrow = btn.querySelector('.material-icons-round');
+    
+    if (content.classList.contains('hidden')) {
+        content.classList.remove('hidden');
+        arrow.style.transform = 'rotate(180deg)';
+    } else {
+        content.classList.add('hidden');
+        arrow.style.transform = '';
+    }
+}
+</script>
 
 {% endblock %}
