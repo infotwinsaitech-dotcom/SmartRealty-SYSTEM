@@ -47,3 +47,13 @@ def get_item(dictionary, key):
         return dictionary.get(key)
     except (AttributeError, TypeError):
         return None
+    
+@register.filter(name='split')
+def split(value, arg):
+    """Split a string by delimiter: {{ "a,b,c"|split:"," }}"""
+    if value is None:
+        return []
+    try:
+        return str(value).split(arg)
+    except Exception:
+        return []
