@@ -1,216 +1,138 @@
-{% extends "public/base.html" %}
 {% load static %}
-
-{% block title %}Privacy Policy{% endblock %}
-
-{% block content %}
-
 <!-- ============================================
-     PRIVACY POLICY - RealShri
-     Mobile-first, clean, content-rich
+     PUBLIC NAVBAR - RealShri
+     Sticky, mobile-first, drawer menu
      ============================================ -->
+<header class="navbar" id="siteNavbar">
+    <div class="container-app navbar-inner">
 
-<!-- Hero Section -->
-<section class="hero-section" style="min-height: 25vh; max-height: 32vh;">
-    <div class="hero-content" style="max-width: 700px;">
-        <div style="display: inline-flex; align-items: center; gap: 8px; background: rgba(212,175,55,0.15); padding: 6px 16px; border-radius: 9999px; margin-bottom: 16px;">
-            <span class="material-icons-round" style="font-size: 18px; color: var(--color-gold);">privacy_tip</span>
-            <span style="font-size: 0.85rem; font-weight: 600; color: var(--color-gold);">Legal</span>
-        </div>
-        <h1 class="hero-title" style="font-size: clamp(1.5rem, 4vw, 2.25rem);">Privacy Policy</h1>
-        <p class="hero-subtitle" style="font-size: clamp(0.9rem, 2vw, 1.05rem);">
-            Your privacy is important to us. This policy explains how we collect, use, and protect your information.
-        </p>
-    </div>
-</section>
-
-<!-- Content -->
-<div class="container-app section-pad" style="padding-top: clamp(1.5rem, 4vw, 2.5rem);">
-
-    <!-- Last Updated -->
-    <div style="text-align: center; margin-bottom: var(--space-xl);">
-        <div style="display: inline-flex; align-items: center; gap: 8px; background: var(--color-bg-soft); padding: 8px 20px; border-radius: var(--radius-full); border: 1px solid var(--color-border);">
-            <span class="material-icons-round" style="font-size: 16px; color: var(--color-text-muted);">update</span>
-            <span style="font-size: 0.8rem; color: var(--color-text-muted); font-weight: 500;">Last Updated: July 2026</span>
-        </div>
-    </div>
-
-    <!-- Sections -->
-    <div style="display: flex; flex-direction: column; gap: var(--space-lg); max-width: 800px; margin-inline: auto;">
-
-        <!-- Section 1 -->
-        <div class="card" style="padding: var(--space-lg); border-radius: var(--radius-xl);">
-            <div style="display: flex; align-items: flex-start; gap: var(--space-md);">
-                <div style="width: 40px; height: 40px; border-radius: var(--radius-md); background: linear-gradient(135deg, rgba(212,175,55,0.12), rgba(212,175,55,0.04)); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--color-gold);">
-                    <span class="material-icons-round" style="font-size: 20px;">inventory_2</span>
-                </div>
-                <div style="flex: 1;">
-                    <h2 style="font-size: 1.1rem; font-weight: 700; color: var(--color-navy); margin-bottom: 8px;">1. Information We Collect</h2>
-                    <p style="font-size: 0.9rem; color: var(--color-text-muted); line-height: 1.7; margin: 0;">
-                        We collect personal information such as your name, email address, phone number, and any details you provide when submitting inquiries or forms on our website. We also collect browsing data to improve your experience.
-                    </p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Section 2 -->
-        <div class="card" style="padding: var(--space-lg); border-radius: var(--radius-xl);">
-            <div style="display: flex; align-items: flex-start; gap: var(--space-md);">
-                <div style="width: 40px; height: 40px; border-radius: var(--radius-md); background: linear-gradient(135deg, rgba(59,130,246,0.12), rgba(59,130,246,0.04)); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: #3b82f6;">
-                    <span class="material-icons-round" style="font-size: 20px;">build</span>
-                </div>
-                <div style="flex: 1;">
-                    <h2 style="font-size: 1.1rem; font-weight: 700; color: var(--color-navy); margin-bottom: 8px;">2. How We Use Your Information</h2>
-                    <ul style="margin: 0; padding-left: 20px; font-size: 0.9rem; color: var(--color-text-muted); line-height: 1.8;">
-                        <li>To respond to inquiries and provide customer support</li>
-                        <li>To improve our services and user experience</li>
-                        <li>To send updates or promotional offers (if applicable)</li>
-                        <li>To process property bookings and transactions</li>
-                        <li>To verify your identity and prevent fraud</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-
-        <!-- Section 3 -->
-        <div class="card" style="padding: var(--space-lg); border-radius: var(--radius-xl);">
-            <div style="display: flex; align-items: flex-start; gap: var(--space-md);">
-                <div style="width: 40px; height: 40px; border-radius: var(--radius-md); background: linear-gradient(135deg, rgba(16,185,129,0.12), rgba(16,185,129,0.04)); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--color-success);">
-                    <span class="material-icons-round" style="font-size: 20px;">security</span>
-                </div>
-                <div style="flex: 1;">
-                    <h2 style="font-size: 1.1rem; font-weight: 700; color: var(--color-navy); margin-bottom: 8px;">3. Data Protection</h2>
-                    <p style="font-size: 0.9rem; color: var(--color-text-muted); line-height: 1.7; margin: 0;">
-                        We implement strict security measures including SSL encryption, firewalls, and regular security audits to protect your personal data. Your information is stored on secure servers with restricted access. However, no method of transmission over the internet is 100% secure.
-                    </p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Section 4 -->
-        <div class="card" style="padding: var(--space-lg); border-radius: var(--radius-xl);">
-            <div style="display: flex; align-items: flex-start; gap: var(--space-md);">
-                <div style="width: 40px; height: 40px; border-radius: var(--radius-md); background: linear-gradient(135deg, rgba(168,85,247,0.12), rgba(168,85,247,0.04)); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: #a855f7;">
-                    <span class="material-icons-round" style="font-size: 20px;">share</span>
-                </div>
-                <div style="flex: 1;">
-                    <h2 style="font-size: 1.1rem; font-weight: 700; color: var(--color-navy); margin-bottom: 8px;">4. Sharing of Information</h2>
-                    <p style="font-size: 0.9rem; color: var(--color-text-muted); line-height: 1.7; margin: 0;">
-                        We do not sell, trade, or rent your personal information to third parties. Your data may only be shared with trusted partners for operational purposes such as payment processing, property verification, and legal compliance.
-                    </p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Section 5 -->
-        <div class="card" style="padding: var(--space-lg); border-radius: var(--radius-xl);">
-            <div style="display: flex; align-items: flex-start; gap: var(--space-md);">
-                <div style="width: 40px; height: 40px; border-radius: var(--radius-md); background: linear-gradient(135deg, rgba(245,158,11,0.12), rgba(245,158,11,0.04)); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: #f59e0b;">
-                    <span class="material-icons-round" style="font-size: 20px;">cookie</span>
-                </div>
-                <div style="flex: 1;">
-                    <h2 style="font-size: 1.1rem; font-weight: 700; color: var(--color-navy); margin-bottom: 8px;">5. Cookies</h2>
-                    <p style="font-size: 0.9rem; color: var(--color-text-muted); line-height: 1.7; margin: 0;">
-                        Our website uses cookies to enhance user experience, remember your preferences, and analyze website traffic. You can control cookies through your browser settings. Essential cookies are required for the website to function properly.
-                    </p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Section 6 -->
-        <div class="card" style="padding: var(--space-lg); border-radius: var(--radius-xl);">
-            <div style="display: flex; align-items: flex-start; gap: var(--space-md);">
-                <div style="width: 40px; height: 40px; border-radius: var(--radius-md); background: linear-gradient(135deg, rgba(239,68,68,0.12), rgba(239,68,68,0.04)); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--color-danger);">
-                    <span class="material-icons-round" style="font-size: 20px;">gavel</span>
-                </div>
-                <div style="flex: 1;">
-                    <h2 style="font-size: 1.1rem; font-weight: 700; color: var(--color-navy); margin-bottom: 8px;">6. Your Rights</h2>
-                    <ul style="margin: 0; padding-left: 20px; font-size: 0.9rem; color: var(--color-text-muted); line-height: 1.8;">
-                        <li>You can request access to your personal data</li>
-                        <li>You can request correction or deletion of your data</li>
-                        <li>You can opt out of marketing communications</li>
-                        <li>You can request a copy of your data in portable format</li>
-                        <li>You can object to certain processing activities</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-
-        <!-- Section 7 -->
-        <div class="card" style="padding: var(--space-lg); border-radius: var(--radius-xl);">
-            <div style="display: flex; align-items: flex-start; gap: var(--space-md);">
-                <div style="width: 40px; height: 40px; border-radius: var(--radius-md); background: linear-gradient(135deg, rgba(6,182,212,0.12), rgba(6,182,212,0.04)); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: #06b6d4;">
-                    <span class="material-icons-round" style="font-size: 20px;">handshake</span>
-                </div>
-                <div style="flex: 1;">
-                    <h2 style="font-size: 1.1rem; font-weight: 700; color: var(--color-navy); margin-bottom: 8px;">7. Third-Party Services</h2>
-                    <p style="font-size: 0.9rem; color: var(--color-text-muted); line-height: 1.7; margin: 0;">
-                        We may use third-party services such as Google Analytics, payment gateways, and cloud storage providers. These services have their own privacy policies. We only share the minimum necessary data required for these services to function.
-                    </p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Section 8 -->
-        <div class="card" style="padding: var(--space-lg); border-radius: var(--radius-xl);">
-            <div style="display: flex; align-items: flex-start; gap: var(--space-md);">
-                <div style="width: 40px; height: 40px; border-radius: var(--radius-md); background: linear-gradient(135deg, rgba(212,175,55,0.12), rgba(212,175,55,0.04)); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--color-gold);">
-                    <span class="material-icons-round" style="font-size: 20px;">update</span>
-                </div>
-                <div style="flex: 1;">
-                    <h2 style="font-size: 1.1rem; font-weight: 700; color: var(--color-navy); margin-bottom: 8px;">8. Changes to This Policy</h2>
-                    <p style="font-size: 0.9rem; color: var(--color-text-muted); line-height: 1.7; margin: 0;">
-                        We may update this privacy policy from time to time to reflect changes in our practices or legal requirements. Any changes will be posted on this page with an updated revision date. We encourage you to review this policy periodically.
-                    </p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Section 9 -->
-        <div class="card" style="padding: var(--space-lg); border-radius: var(--radius-xl);">
-            <div style="display: flex; align-items: flex-start; gap: var(--space-md);">
-                <div style="width: 40px; height: 40px; border-radius: var(--radius-md); background: linear-gradient(135deg, rgba(59,130,246,0.12), rgba(59,130,246,0.04)); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: #3b82f6;">
-                    <span class="material-icons-round" style="font-size: 20px;">contact_mail</span>
-                </div>
-                <div style="flex: 1;">
-                    <h2 style="font-size: 1.1rem; font-weight: 700; color: var(--color-navy); margin-bottom: 8px;">9. Contact Us</h2>
-                    <p style="font-size: 0.9rem; color: var(--color-text-muted); line-height: 1.7; margin: 0 0 var(--space-md) 0;">
-                        If you have any questions about this Privacy Policy or how we handle your data, feel free to contact us:
-                    </p>
-                    <div style="display: flex; flex-direction: column; gap: 8px;">
-                        <a href="mailto:{{ site.email|default:'privacy@realshri.com' }}" style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem; color: var(--color-gold); font-weight: 600; text-decoration: none;">
-                            <span class="material-icons-round" style="font-size: 18px;">email</span>
-                            {{ site.email|default:"privacy@realshri.com" }}
-                        </a>
-                        <a href="tel:{{ site.phone|default:'+919876543210' }}" style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem; color: var(--color-gold); font-weight: 600; text-decoration: none;">
-                            <span class="material-icons-round" style="font-size: 18px;">phone</span>
-                            {{ site.phone|default:"+91 98765 43210" }}
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-    </div>
-
-    <!-- CTA Section -->
-    <div style="margin-top: var(--space-2xl); text-align: center; padding: var(--space-2xl) var(--space-lg); background: linear-gradient(135deg, var(--color-navy) 0%, var(--color-navy-light) 100%); border-radius: var(--radius-xl); color: #fff;">
-        <h2 style="color: #fff; font-size: clamp(1.25rem, 3vw, 1.75rem); margin-bottom: var(--space-sm);">Have Questions About Your Privacy?</h2>
-        <p style="color: rgba(255,255,255,0.8); font-size: 1rem; max-width: 500px; margin: 0 auto var(--space-xl);">Our team is here to help you understand how we protect your data.</p>
-        <a href="{% url 'contact' %}" class="btn btn-gold" style="font-size: 1rem; padding: 14px 36px;">
-            <span class="material-icons-round">chat</span>
-            Contact Us
+        <!-- Logo -->
+        <a href="{% url 'home' %}" class="navbar-logo" aria-label="RealShri Home">
+            <img src="{% if site.logo %}{{ site.logo.url }}{% else %}{% static 'images/logo.png' %}{% endif %}" alt="{{ site.company_name|default:'RealShri' }} logo">
         </a>
+
+        <!-- Desktop Links -->
+        <nav class="navbar-links" aria-label="Primary navigation">
+            <a href="{% url 'home' %}" class="nav-link {% if request.resolver_match.url_name == 'home' or request.resolver_match.url_name == 'user_home' %}active{% endif %}">Home</a>
+            <a href="{% url 'property_list' %}" class="nav-link {% if request.resolver_match.url_name == 'property_list' %}active{% endif %}">Properties</a>
+            <a href="{% url 'about' %}" class="nav-link {% if request.resolver_match.url_name == 'about' %}active{% endif %}">About</a>
+            <a href="{% url 'emi_calculator' %}" class="nav-link {% if request.resolver_match.url_name == 'emi_calculator' %}active{% endif %}">EMI Calculator</a>
+            <a href="{% url 'roi_calculator' %}" class="nav-link {% if request.resolver_match.url_name == 'roi_calculator' %}active{% endif %}">ROI Calculator</a>
+            <a href="{% url 'contact' %}" class="nav-link {% if request.resolver_match.url_name == 'contact' %}active{% endif %}">Contact</a>
+        </nav>
+
+        <!-- Actions -->
+        <div class="navbar-actions">
+
+            <a href="{% url 'wishlist' %}" class="icon-btn" aria-label="Wishlist" title="Wishlist">
+                <span class="material-icons-round" style="font-size:20px;">favorite_border</span>
+            </a>
+
+            {% if user.is_authenticated %}
+            <a href="{% url 'profile' %}" class="avatar-circle" title="{{ user.get_full_name|default:user.username }}">
+                {% if user.profile_image %}
+                    <img src="{{ user.profile_image.url }}" alt="{{ user.username }}">
+                {% else %}
+                    {{ user.username|slice:":1"|upper }}
+                {% endif %}
+            </a>
+            <a href="{% url 'logout' %}" class="nav-link btn-text-desktop" style="padding:10px 12px;" title="Logout">
+                <span class="material-icons-round" style="font-size:20px;">logout</span>
+            </a>
+            {% else %}
+            <a href="{% url 'login' %}" class="btn btn-outline btn-sm btn-text-desktop">Login</a>
+            <a href="{% url 'register' %}" class="btn btn-gold btn-sm">Sign Up</a>
+            {% endif %}
+
+            <button type="button" class="hamburger-btn" id="mobileMenuBtn" aria-label="Open menu" aria-expanded="false">
+                <span class="material-icons-round">menu</span>
+            </button>
+        </div>
     </div>
+</header>
 
-    <!-- Footer Note -->
-    <div style="text-align: center; margin-top: var(--space-xl); padding-top: var(--space-lg); border-top: 1px solid var(--color-border);">
-        <p style="font-size: 0.8rem; color: var(--color-text-light); margin: 0;">
-            © 2026 RealShri. All rights reserved. | 
-            <a href="{% url 'terms' %}" style="color: var(--color-gold); text-decoration: none; font-weight: 600;">Terms of Service</a>
-        </p>
+<!-- Mobile Drawer -->
+<div class="mobile-drawer-overlay" id="drawerOverlay"></div>
+<aside class="mobile-drawer" id="mobileDrawer" aria-label="Mobile menu">
+    <div class="mobile-drawer-header">
+        <img src="{% if site.logo %}{{ site.logo.url }}{% else %}{% static 'images/logo.png' %}{% endif %}" alt="{{ site.company_name|default:'RealShri' }} logo">
+        <button type="button" class="icon-btn" id="closeDrawerBtn" aria-label="Close menu">
+            <span class="material-icons-round" style="font-size:20px;">close</span>
+        </button>
     </div>
+    <div class="mobile-drawer-body">
+        <a href="{% url 'home' %}" class="mobile-drawer-link {% if request.resolver_match.url_name == 'home' or request.resolver_match.url_name == 'user_home' %}active{% endif %}">
+            <span class="material-icons-round">home</span> Home
+        </a>
+        <a href="{% url 'property_list' %}" class="mobile-drawer-link {% if request.resolver_match.url_name == 'property_list' %}active{% endif %}">
+            <span class="material-icons-round">apartment</span> Properties
+        </a>
+        <a href="{% url 'about' %}" class="mobile-drawer-link {% if request.resolver_match.url_name == 'about' %}active{% endif %}">
+            <span class="material-icons-round">info</span> About Us
+        </a>
+        <a href="{% url 'emi_calculator' %}" class="mobile-drawer-link {% if request.resolver_match.url_name == 'emi_calculator' %}active{% endif %}">
+            <span class="material-icons-round">calculate</span> EMI Calculator
+        </a>
+        <a href="{% url 'roi_calculator' %}" class="mobile-drawer-link {% if request.resolver_match.url_name == 'roi_calculator' %}active{% endif %}">
+            <span class="material-icons-round">trending_up</span> ROI Calculator
+        </a>
+        <a href="{% url 'wishlist' %}" class="mobile-drawer-link {% if request.resolver_match.url_name == 'wishlist' %}active{% endif %}">
+            <span class="material-icons-round">favorite</span> Wishlist
+        </a>
+        <a href="{% url 'contact' %}" class="mobile-drawer-link {% if request.resolver_match.url_name == 'contact' %}active{% endif %}">
+            <span class="material-icons-round">contact_mail</span> Contact Us
+        </a>
+        {% if user.is_authenticated %}
+        <a href="{% url 'profile' %}" class="mobile-drawer-link {% if request.resolver_match.url_name == 'profile' %}active{% endif %}">
+            <span class="material-icons-round">person</span> My Profile
+        </a>
+        <a href="{% url 'my_inquiries' %}" class="mobile-drawer-link">
+            <span class="material-icons-round">chat</span> My Inquiries
+        </a>
+        {% endif %}
+    </div>
+    <div class="mobile-drawer-footer">
+        {% if user.is_authenticated %}
+        <a href="{% url 'logout' %}" class="btn btn-outline" style="width:100%;">
+            <span class="material-icons-round" style="font-size:18px;">logout</span> Logout
+        </a>
+        {% else %}
+        <a href="{% url 'login' %}" class="btn btn-outline" style="width:100%;">Login</a>
+        <a href="{% url 'register' %}" class="btn btn-gold" style="width:100%;">Sign Up</a>
+        {% endif %}
+    </div>
+</aside>
 
-</div>
+<script>
+(function() {
+    const menuBtn = document.getElementById('mobileMenuBtn');
+    const closeBtn = document.getElementById('closeDrawerBtn');
+    const overlay = document.getElementById('drawerOverlay');
+    const drawer = document.getElementById('mobileDrawer');
+    const navbar = document.getElementById('siteNavbar');
 
-{% endblock %}
+    function openDrawer() {
+        drawer.classList.add('open');
+        overlay.classList.add('open');
+        document.body.style.overflow = 'hidden';
+        menuBtn.setAttribute('aria-expanded', 'true');
+    }
+
+    function closeDrawer() {
+        drawer.classList.remove('open');
+        overlay.classList.remove('open');
+        document.body.style.overflow = '';
+        menuBtn.setAttribute('aria-expanded', 'false');
+    }
+
+    if (menuBtn) menuBtn.addEventListener('click', openDrawer);
+    if (closeBtn) closeBtn.addEventListener('click', closeDrawer);
+    if (overlay) overlay.addEventListener('click', closeDrawer);
+
+    window.addEventListener('scroll', function() {
+        if (navbar) {
+            navbar.classList.toggle('scrolled', window.scrollY > 8);
+        }
+    }, { passive: true });
+})();
+</script>

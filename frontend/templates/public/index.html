@@ -1,339 +1,296 @@
 {% extends "public/base.html" %}
-{% load static %}
-{% block title %}Contact Us - RealShri{% endblock %}
+{% load static cloudinary custom_filters %}
+{% block title %}Home{% endblock %}
 
 {% block content %}
 
 <!-- ============================================
-   CONTACT HERO - Simple, Clean
+   HOME HERO - Search + Trust
    ============================================ -->
-<section class="hero-section" style="min-height: 30vh;">
-    <div class="hero-content">
-        <span class="label" style="color: rgba(255,255,255,0.7); border-color: rgba(255,255,255,0.2);">
-            <span class="material-icons-round" style="font-size:16px">contact_mail</span>
-            Get in Touch
+<section class="hero-section" style="min-height: 56vh; max-height: 640px;">
+    <div class="hero-content" style="max-width: 780px;">
+        <span class="label" style="color: rgba(255,255,255,0.75); border-color: rgba(255,255,255,0.2); display:inline-flex; align-items:center; gap:8px; font-size:0.8rem; font-weight:700; text-transform:uppercase; letter-spacing:2px; margin-bottom: var(--space-sm);">
+            <span class="material-icons-round" style="font-size:16px">verified</span>
+            RERA Verified &bull; Zero Brokerage
         </span>
-        <h1 class="hero-title" style="font-size: clamp(1.75rem, 5vw, 2.5rem);">
-            We're Here to <span style="color: #d4af37;">Help You</span>
+        <h1 class="hero-title">
+            Where Trust Meets <span style="color: #d4af37;">Your Dream Home</span>
         </h1>
-        <p class="hero-subtitle" style="font-size: 1rem;">
-            Have questions? We'd love to hear from you. Send us a message and we'll respond as soon as possible.
+        <p class="hero-subtitle">
+            Discover verified residential, commercial &amp; land properties across Ahmedabad &mdash; curated for buyers who value transparency.
         </p>
+
+        <!-- Search Bar -->
+        <form method="GET" action="{% url 'property_list' %}" class="search-bar" style="margin-bottom: var(--space-md);">
+            <span class="material-icons-round" style="color: var(--color-text-light); font-size:20px;">search</span>
+            <input type="text" name="location" placeholder="Search by location, project, or builder...">
+            <button type="submit" class="search-btn">Search</button>
+        </form>
+
+        <!-- Quick Category Links -->
+        <div style="display:flex; flex-wrap:wrap; gap:8px; justify-content:center;">
+            <a href="{% url 'property_list' %}?category=residential" class="filter-pill" style="background:rgba(255,255,255,0.1); border-color:rgba(255,255,255,0.2); color:#fff;">
+                <span class="material-icons-round">home</span> Residential
+            </a>
+            <a href="{% url 'property_list' %}?category=commercial" class="filter-pill" style="background:rgba(255,255,255,0.1); border-color:rgba(255,255,255,0.2); color:#fff;">
+                <span class="material-icons-round">business</span> Commercial
+            </a>
+            <a href="{% url 'property_list' %}?category=land" class="filter-pill" style="background:rgba(255,255,255,0.1); border-color:rgba(255,255,255,0.2); color:#fff;">
+                <span class="material-icons-round">terrain</span> Land / Plot
+            </a>
+        </div>
     </div>
 </section>
 
 <!-- ============================================
-   CONTACT SECTION - Form + Info
+   TRUST STRIP
    ============================================ -->
-<section class="section-pad bg-white">
+<section style="background: var(--color-surface); border-bottom: 1px solid var(--color-border);">
+    <div class="container-app" style="padding-top: var(--space-lg); padding-bottom: var(--space-lg);">
+        <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-lg); text-align:center;">
+            <div>
+                <div style="font-size: clamp(1.4rem, 4vw, 2rem); font-weight:800; color: var(--color-navy);">500+</div>
+                <div style="font-size:0.8rem; color: var(--color-text-muted); font-weight:500;">Properties Listed</div>
+            </div>
+            <div>
+                <div style="font-size: clamp(1.4rem, 4vw, 2rem); font-weight:800; color: var(--color-navy);">10K+</div>
+                <div style="font-size:0.8rem; color: var(--color-text-muted); font-weight:500;">Happy Families</div>
+            </div>
+            <div>
+                <div style="font-size: clamp(1.4rem, 4vw, 2rem); font-weight:800; color: var(--color-navy);">100%</div>
+                <div style="font-size:0.8rem; color: var(--color-text-muted); font-weight:500;">RERA Verified</div>
+            </div>
+            <div>
+                <div style="font-size: clamp(1.4rem, 4vw, 2rem); font-weight:800; color: var(--color-navy);">0%</div>
+                <div style="font-size:0.8rem; color: var(--color-text-muted); font-weight:500;">Brokerage Fee</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================
+   FEATURED PROPERTIES
+   ============================================ -->
+<section class="section-pad" style="background: var(--color-bg);">
     <div class="container-app">
-        <div class="grid grid-cols-1 lg:grid-cols-5 gap-8 lg:gap-12">
-            
-            <!-- LEFT: Contact Form (3 cols) -->
-            <div class="lg:col-span-3 reveal">
-                <div class="card p-6 md:p-8">
-                    <h2 class="text-xl md:text-2xl font-bold text-[var(--color-navy)] mb-2">Send us a Message</h2>
-                    <p class="text-sm text-[var(--color-text-muted)] mb-6">Fill out the form below and we'll get back to you within 24 hours.</p>
-                    
-                    <form method="POST" class="space-y-5">
-                        {% csrf_token %}
-                        
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                            <!-- Name -->
-                            <div>
-                                <label class="block text-sm font-medium text-[var(--color-text)] mb-2">
-                                    Full Name <span class="text-red-500">*</span>
-                                </label>
-                                <input type="text" name="name" required
-                                    class="w-full px-4 py-3 rounded-xl bg-[var(--color-bg)] border border-[var(--color-border)] text-[var(--color-text)] text-sm focus:outline-none focus:border-[var(--color-gold)] focus:ring-2 focus:ring-[var(--color-gold)]/20 transition-all"
-                                    placeholder="Enter your full name">
-                            </div>
-                            
-                            <!-- Phone -->
-                            <div>
-                                <label class="block text-sm font-medium text-[var(--color-text)] mb-2">
-                                    Phone Number <span class="text-red-500">*</span>
-                                </label>
-                                <input type="tel" name="phone" required
-                                    class="w-full px-4 py-3 rounded-xl bg-[var(--color-bg)] border border-[var(--color-border)] text-[var(--color-text)] text-sm focus:outline-none focus:border-[var(--color-gold)] focus:ring-2 focus:ring-[var(--color-gold)]/20 transition-all"
-                                    placeholder="+91 XXXXX XXXXX">
-                            </div>
+        <div class="section-header">
+            <span class="label">
+                <span class="material-icons-round" style="font-size:16px">apartment</span>
+                Handpicked For You
+            </span>
+            <h2>Featured Properties</h2>
+            <p>Explore our top verified listings, ready for you to move in or invest.</p>
+            <div class="gold-line"></div>
+        </div>
+
+        {% if properties %}
+        <div class="grid-properties">
+            {% for property in properties %}
+            <div class="property-card reveal">
+                <a href="{% url 'property_detail' property.id %}" class="block" style="color:inherit; text-decoration:none;">
+                    <div class="card-img">
+                        {% if property.thumbnail %}
+                        {% cloudinary_url property.thumbnail width=600 height=400 crop='fill' as img_url %}
+                        <img src="{{ img_url }}" alt="{{ property.title }}" loading="lazy">
+                        {% else %}
+                        <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; background: var(--color-bg-soft);">
+                            <span class="material-icons-round" style="font-size:48px; color: var(--color-text-light);">apartment</span>
                         </div>
-                        
-                        <!-- Email -->
-                        <div>
-                            <label class="block text-sm font-medium text-[var(--color-text)] mb-2">
-                                Email Address <span class="text-red-500">*</span>
-                            </label>
-                            <input type="email" name="email" required
-                                class="w-full px-4 py-3 rounded-xl bg-[var(--color-bg)] border border-[var(--color-border)] text-[var(--color-text)] text-sm focus:outline-none focus:border-[var(--color-gold)] focus:ring-2 focus:ring-[var(--color-gold)]/20 transition-all"
-                                placeholder="your@email.com">
-                        </div>
-                        
-                        <!-- Subject -->
-                        <div>
-                            <label class="block text-sm font-medium text-[var(--color-text)] mb-2">
-                                Subject
-                            </label>
-                            <select name="subject"
-                                class="w-full px-4 py-3 rounded-xl bg-[var(--color-bg)] border border-[var(--color-border)] text-[var(--color-text)] text-sm focus:outline-none focus:border-[var(--color-gold)] focus:ring-2 focus:ring-[var(--color-gold)]/20 transition-all appearance-none cursor-pointer">
-                                <option value="">Select a subject</option>
-                                <option value="property_inquiry">Property Inquiry</option>
-                                <option value="site_visit">Schedule Site Visit</option>
-                                <option value="price_quote">Get Price Quote</option>
-                                <option value="general">General Question</option>
-                                <option value="feedback">Feedback</option>
-                            </select>
-                        </div>
-                        
-                        <!-- Message -->
-                        <div>
-                            <label class="block text-sm font-medium text-[var(--color-text)] mb-2">
-                                Message <span class="text-red-500">*</span>
-                            </label>
-                            <textarea name="message" rows="5" required
-                                class="w-full px-4 py-3 rounded-xl bg-[var(--color-bg)] border border-[var(--color-border)] text-[var(--color-text)] text-sm focus:outline-none focus:border-[var(--color-gold)] focus:ring-2 focus:ring-[var(--color-gold)]/20 transition-all resize-none"
-                                placeholder="Tell us about your requirements..."></textarea>
-                        </div>
-                        
-                        <!-- Submit Button -->
-                        <button type="submit" class="btn btn-gold w-full" style="min-height:48px;">
-                            <span class="material-icons-round" style="font-size:18px">send</span>
-                            Send Message
+                        {% endif %}
+
+                        <span class="badge {% if property.status == 'Sold Out' %}badge-sold{% elif property.status == 'Coming Soon' %}badge-soon{% endif %}">
+                            {{ property.status }}
+                        </span>
+
+                        <button class="wishlist-btn {% if property.id in user_wishlist_ids %}active{% endif %}"
+                                onclick="event.preventDefault(); event.stopPropagation(); toggleWishlist({{ property.id }}, this)"
+                                aria-label="Add to wishlist">
+                            <span class="material-icons-round">
+                                {% if property.id in user_wishlist_ids %}favorite{% else %}favorite_border{% endif %}
+                            </span>
                         </button>
-                        
-                        <!-- Trust Note -->
-                        <p class="text-xs text-[var(--color-text-muted)] text-center flex items-center justify-center gap-1">
-                            <span class="material-icons-round" style="font-size:14px;color:var(--color-success)">lock</span>
-                            Your information is secure and will never be shared with third parties.
-                        </p>
-                    </form>
-                </div>
-            </div>
-            
-            <!-- RIGHT: Contact Info (2 cols) -->
-            <div class="lg:col-span-2 space-y-6">
-                
-                <!-- Contact Cards -->
-                <div class="card p-6 reveal">
-                    <h3 class="text-lg font-bold text-[var(--color-navy)] mb-5">Contact Information</h3>
-                    
-                    <div class="space-y-4">
-                        <div class="flex items-start gap-4">
-                            <div class="w-10 h-10 rounded-xl bg-[rgba(212,175,55,0.1)] flex items-center justify-center shrink-0">
-                                <span class="material-icons-round text-[var(--color-gold)]" style="font-size:20px">business</span>
-                            </div>
-                            <div>
-                                <p class="text-xs text-[var(--color-text-muted)] uppercase tracking-wider font-medium">Company</p>
-                                <p class="text-sm font-semibold text-[var(--color-navy)]">{{ site.company_name|default:"RealShri Properties" }}</p>
-                            </div>
+
+                        {% if property.possession %}
+                        <span style="position:absolute; bottom:12px; left:12px; background:rgba(0,0,0,0.7); backdrop-filter:blur(4px); color:#fff; font-size:0.75rem; font-weight:500; padding:6px 12px; border-radius: var(--radius-md);">
+                            {{ property.possession }}
+                        </span>
+                        {% endif %}
+                    </div>
+
+                    <div class="card-content">
+                        <div class="price">₹{{ property.price }} {{ property.price_unit|default:"L" }}</div>
+                        <h3 class="title">{{ property.project_name|default:property.title }}</h3>
+                        <p style="font-size:0.75rem; color: var(--color-text-light); text-transform:uppercase; letter-spacing:0.5px; font-weight:500; margin-bottom:8px;">{{ property.title }}</p>
+
+                        <div class="location">
+                            <span class="material-icons-round" style="font-size:14px">location_on</span>
+                            {{ property.location }}
                         </div>
-                        
-                        <div class="flex items-start gap-4">
-                            <div class="w-10 h-10 rounded-xl bg-[rgba(212,175,55,0.1)] flex items-center justify-center shrink-0">
-                                <span class="material-icons-round text-[var(--color-gold)]" style="font-size:20px">phone</span>
-                            </div>
-                            <div>
-                                <p class="text-xs text-[var(--color-text-muted)] uppercase tracking-wider font-medium">Phone</p>
-                                <a href="tel:{{ site.phone|default:'+91-XXXXXXXXXX' }}" class="text-sm font-semibold text-[var(--color-navy)] hover:text-[var(--color-gold)] transition">
-                                    {{ site.phone|default:"+91-XXXXXXXXXX" }}
-                                </a>
-                            </div>
-                        </div>
-                        
-                        <div class="flex items-start gap-4">
-                            <div class="w-10 h-10 rounded-xl bg-[rgba(212,175,55,0.1)] flex items-center justify-center shrink-0">
-                                <span class="material-icons-round text-[var(--color-gold)]" style="font-size:20px">email</span>
-                            </div>
-                            <div>
-                                <p class="text-xs text-[var(--color-text-muted)] uppercase tracking-wider font-medium">Email</p>
-                                <a href="mailto:{{ site.email|default:'info@realshri.com' }}" class="text-sm font-semibold text-[var(--color-navy)] hover:text-[var(--color-gold)] transition break-all">
-                                    {{ site.email|default:"info@realshri.com" }}
-                                </a>
-                            </div>
-                        </div>
-                        
-                        <div class="flex items-start gap-4">
-                            <div class="w-10 h-10 rounded-xl bg-[rgba(212,175,55,0.1)] flex items-center justify-center shrink-0">
-                                <span class="material-icons-round text-[var(--color-gold)]" style="font-size:20px">location_on</span>
-                            </div>
-                            <div>
-                                <p class="text-xs text-[var(--color-text-muted)] uppercase tracking-wider font-medium">Address</p>
-                                <p class="text-sm font-semibold text-[var(--color-navy)]">{{ site.location|default:"Ahmedabad, Gujarat, India" }}</p>
-                            </div>
+
+                        <div class="features">
+                            {% if property.beds %}
+                            <div class="feature"><span class="material-icons-round">bed</span>{{ property.beds }} BHK</div>
+                            {% endif %}
+                            {% if property.sqft %}
+                            <div class="feature"><span class="material-icons-round">square_foot</span>{{ property.sqft }} sqft</div>
+                            {% endif %}
+                            {% if property.baths %}
+                            <div class="feature"><span class="material-icons-round">bathtub</span>{{ property.baths }} Bath</div>
+                            {% endif %}
                         </div>
                     </div>
-                </div>
-                
-                <!-- Quick Response Promise -->
-                <div class="card p-6 reveal" style="background: linear-gradient(135deg, var(--color-navy) 0%, #1e3a5f 100%); border: none;">
-                    <div class="flex items-center gap-3 mb-3">
-                        <span class="material-icons-round text-[var(--color-gold)]" style="font-size:24px">schedule</span>
-                        <h3 class="text-lg font-bold text-white">Quick Response</h3>
-                    </div>
-                    <p class="text-sm text-white/80 mb-4">We typically respond within 2 hours during business hours (9 AM - 7 PM).</p>
-                    <div class="flex items-center gap-2 text-xs text-white/60">
-                        <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
-                        <span>Currently Online</span>
-                    </div>
-                </div>
-                
-                <!-- WhatsApp CTA -->
-                <a href="https://wa.me/{{ site.whatsapp_number|default:'919876543210' }}?text=Hi%20RealShri,%20I'm%20interested%20in%20buying%20a%20property."
-                   target="_blank"
-                   class="card p-6 flex items-center gap-4 hover:shadow-lg transition-all reveal"
-                   style="background: linear-gradient(135deg, #25d366 0%, #128c7e 100%); border: none; color: white;">
-                    <div class="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center shrink-0">
-                        <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-                        </svg>
-                    </div>
-                    <div>
-                        <p class="font-semibold">Chat on WhatsApp</p>
-                        <p class="text-xs text-white/80">Get instant replies</p>
-                    </div>
-                    <span class="material-icons-round ml-auto" style="font-size:20px">arrow_forward</span>
                 </a>
-                
-                <!-- Business Hours -->
-                <div class="card p-6 reveal">
-                    <h3 class="text-lg font-bold text-[var(--color-navy)] mb-4">Business Hours</h3>
-                    <div class="space-y-3 text-sm">
-                        <div class="flex justify-between items-center">
-                            <span class="text-[var(--color-text-muted)]">Monday - Saturday</span>
-                            <span class="font-semibold text-[var(--color-navy)]">9:00 AM - 7:00 PM</span>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <span class="text-[var(--color-text-muted)]">Sunday</span>
-                            <span class="font-semibold text-[var(--color-navy)]">10:00 AM - 4:00 PM</span>
-                        </div>
-                        <div class="h-px bg-[var(--color-border)] my-2"></div>
-                        <div class="flex justify-between items-center">
-                            <span class="text-[var(--color-text-muted)]">Emergency Support</span>
-                            <span class="font-semibold text-[var(--color-gold)]">24/7 Available</span>
-                        </div>
-                    </div>
-                </div>
-                
             </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="card" style="padding: var(--space-2xl); text-align:center;">
+            <span class="material-icons-round" style="font-size:48px; color: var(--color-text-light);">apartment</span>
+            <p style="margin-top: var(--space-md);">New properties are being added soon. Check back shortly!</p>
+        </div>
+        {% endif %}
+
+        <div style="text-align:center; margin-top: var(--space-xl);">
+            <a href="{% url 'property_list' %}" class="btn btn-navy">
+                View All Properties
+                <span class="material-icons-round" style="font-size:18px;">arrow_forward</span>
+            </a>
         </div>
     </div>
 </section>
 
 <!-- ============================================
-   MAP SECTION - Location Map
+   WHY CHOOSE US
    ============================================ -->
-<section class="section-pad bg-[var(--color-bg)]">
+<section class="section-pad" style="background: var(--color-surface);">
     <div class="container-app">
-        <div class="section-header mb-8">
+        <div class="section-header">
             <span class="label">
-                <span class="material-icons-round" style="font-size:16px">map</span>
-                Visit Us
+                <span class="material-icons-round" style="font-size:16px">star</span>
+                Why RealShri
             </span>
-            <h2>Our Location</h2>
-            <p>Come visit our office for a personal consultation</p>
+            <h2>Built On Trust &amp; Transparency</h2>
+            <p>Everything you need to make a confident property decision.</p>
             <div class="gold-line"></div>
         </div>
-        
-        <div class="card overflow-hidden reveal">
-            <div class="w-full h-[300px] md:h-[400px] bg-[var(--color-bg-soft)] flex items-center justify-center">
-                <iframe 
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d235013.70717427065!2d72.439654122987!3d23.020497541367155!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x395e848aba5bd449%3A0x4fcedd11614f6516!2sAhmedabad%2C%20Gujarat!5e0!3m2!1sen!2sin!4v1700000000000!5m2!1sen!2sin"
-                    width="100%" 
-                    height="100%" 
-                    style="border:0;" 
-                    allowfullscreen="" 
-                    loading="lazy" 
-                    referrerpolicy="no-referrer-when-downgrade">
-                </iframe>
+
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--space-lg);">
+            <div class="card reveal" style="padding: var(--space-lg); text-align:center;">
+                <div style="width:56px; height:56px; border-radius: var(--radius-lg); background: linear-gradient(135deg, rgba(212,175,55,0.15), rgba(212,175,55,0.05)); display:flex; align-items:center; justify-content:center; margin: 0 auto var(--space-md);">
+                    <span class="material-icons-round" style="font-size:26px; color: var(--color-gold);">verified_user</span>
+                </div>
+                <h3 style="font-size:1rem; margin-bottom:6px;">RERA Verified</h3>
+                <p style="font-size:0.85rem;">Every listing is legally verified so you can buy with complete peace of mind.</p>
+            </div>
+            <div class="card reveal" style="padding: var(--space-lg); text-align:center;">
+                <div style="width:56px; height:56px; border-radius: var(--radius-lg); background: linear-gradient(135deg, rgba(16,185,129,0.15), rgba(16,185,129,0.05)); display:flex; align-items:center; justify-content:center; margin: 0 auto var(--space-md);">
+                    <span class="material-icons-round" style="font-size:26px; color: var(--color-success);">savings</span>
+                </div>
+                <h3 style="font-size:1rem; margin-bottom:6px;">Zero Brokerage</h3>
+                <p style="font-size:0.85rem;">Our services are completely free for buyers &mdash; no hidden fees, ever.</p>
+            </div>
+            <div class="card reveal" style="padding: var(--space-lg); text-align:center;">
+                <div style="width:56px; height:56px; border-radius: var(--radius-lg); background: linear-gradient(135deg, rgba(59,130,246,0.15), rgba(59,130,246,0.05)); display:flex; align-items:center; justify-content:center; margin: 0 auto var(--space-md);">
+                    <span class="material-icons-round" style="font-size:26px; color:#3b82f6;">support_agent</span>
+                </div>
+                <h3 style="font-size:1rem; margin-bottom:6px;">Expert Guidance</h3>
+                <p style="font-size:0.85rem;">Our agents guide you through site visits, paperwork, and home loans.</p>
+            </div>
+            <div class="card reveal" style="padding: var(--space-lg); text-align:center;">
+                <div style="width:56px; height:56px; border-radius: var(--radius-lg); background: linear-gradient(135deg, rgba(212,175,55,0.15), rgba(212,175,55,0.05)); display:flex; align-items:center; justify-content:center; margin: 0 auto var(--space-md);">
+                    <span class="material-icons-round" style="font-size:26px; color: var(--color-gold);">calculate</span>
+                </div>
+                <h3 style="font-size:1rem; margin-bottom:6px;">Smart Tools</h3>
+                <p style="font-size:0.85rem;">Plan your budget with our built-in EMI and ROI calculators.</p>
             </div>
         </div>
     </div>
 </section>
 
 <!-- ============================================
-   FAQ SECTION - Common Questions
+   CALCULATORS CTA
    ============================================ -->
-<section class="section-pad bg-white">
-    <div class="container-app max-w-3xl">
-        <div class="section-header mb-10">
+<section class="section-pad" style="background: var(--color-bg);">
+    <div class="container-app">
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--space-lg);">
+            <a href="{% url 'emi_calculator' %}" class="card reveal" style="padding: var(--space-xl); text-decoration:none; color:inherit; display:flex; align-items:center; gap: var(--space-lg);">
+                <div style="width:64px; height:64px; border-radius: var(--radius-lg); background: linear-gradient(135deg, var(--color-navy), var(--color-navy-light)); display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                    <span class="material-icons-round" style="font-size:30px; color: var(--color-gold);">calculate</span>
+                </div>
+                <div style="flex:1;">
+                    <h3 style="font-size:1.1rem; margin-bottom:4px;">EMI Calculator</h3>
+                    <p style="font-size:0.85rem; margin:0;">Estimate your monthly home loan installments instantly.</p>
+                </div>
+                <span class="material-icons-round" style="color: var(--color-gold);">arrow_forward</span>
+            </a>
+            <a href="{% url 'roi_calculator' %}" class="card reveal" style="padding: var(--space-xl); text-decoration:none; color:inherit; display:flex; align-items:center; gap: var(--space-lg);">
+                <div style="width:64px; height:64px; border-radius: var(--radius-lg); background: linear-gradient(135deg, var(--color-navy), var(--color-navy-light)); display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                    <span class="material-icons-round" style="font-size:30px; color: var(--color-gold);">trending_up</span>
+                </div>
+                <div style="flex:1;">
+                    <h3 style="font-size:1.1rem; margin-bottom:4px;">ROI Calculator</h3>
+                    <p style="font-size:0.85rem; margin:0;">Check the projected return on your property investment.</p>
+                </div>
+                <span class="material-icons-round" style="color: var(--color-gold);">arrow_forward</span>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================
+   TESTIMONIALS
+   ============================================ -->
+<section class="section-pad" style="background: var(--color-surface);">
+    <div class="container-app">
+        <div class="section-header">
             <span class="label">
-                <span class="material-icons-round" style="font-size:16px">help</span>
-                FAQ
+                <span class="material-icons-round" style="font-size:16px">reviews</span>
+                Testimonials
             </span>
-            <h2>Frequently Asked Questions</h2>
-            <p>Quick answers to common questions</p>
+            <h2>What Our Customers Say</h2>
             <div class="gold-line"></div>
         </div>
-        
-        <div class="space-y-4">
-            <div class="card p-5 reveal">
-                <button onclick="toggleFaq(this)" class="w-full flex items-center justify-between text-left">
-                    <span class="font-semibold text-[var(--color-navy)] text-sm md:text-base">How do I schedule a site visit?</span>
-                    <span class="material-icons-round text-[var(--color-gold)] transition-transform duration-200" style="font-size:20px">expand_more</span>
-                </button>
-                <div class="hidden mt-3 text-sm text-[var(--color-text-muted)] leading-relaxed">
-                    You can schedule a site visit directly from the property detail page by clicking "Schedule Visit" or by contacting us via WhatsApp or phone. Our team will confirm the appointment within 2 hours.
-                </div>
+
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: var(--space-lg);">
+            <div class="card reveal" style="padding: var(--space-lg);">
+                <div style="color: var(--color-gold); margin-bottom: var(--space-sm);">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                <p style="font-size:0.9rem; margin-bottom: var(--space-md);">Found our dream 3BHK within two weeks. The whole process felt transparent and stress-free.</p>
+                <p style="font-size:0.85rem; font-weight:700; color: var(--color-navy); margin:0;">Priya Shah</p>
+                <p style="font-size:0.75rem; margin:0;">Ahmedabad</p>
             </div>
-            
-            <div class="card p-5 reveal">
-                <button onclick="toggleFaq(this)" class="w-full flex items-center justify-between text-left">
-                    <span class="font-semibold text-[var(--color-navy)] text-sm md:text-base">Are all properties RERA registered?</span>
-                    <span class="material-icons-round text-[var(--color-gold)] transition-transform duration-200" style="font-size:20px">expand_more</span>
-                </button>
-                <div class="hidden mt-3 text-sm text-[var(--color-text-muted)] leading-relaxed">
-                    Yes, we only list properties that are RERA registered or have valid legal documentation. Each property page displays the RERA number for verification.
-                </div>
+            <div class="card reveal" style="padding: var(--space-lg);">
+                <div style="color: var(--color-gold); margin-bottom: var(--space-sm);">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                <p style="font-size:0.9rem; margin-bottom: var(--space-md);">No brokerage, verified paperwork, and a responsive team. Highly recommend RealShri.</p>
+                <p style="font-size:0.85rem; font-weight:700; color: var(--color-navy); margin:0;">Rohit Patel</p>
+                <p style="font-size:0.75rem; margin:0;">Gandhinagar</p>
             </div>
-            
-            <div class="card p-5 reveal">
-                <button onclick="toggleFaq(this)" class="w-full flex items-center justify-between text-left">
-                    <span class="font-semibold text-[var(--color-navy)] text-sm md:text-base">Do you charge any brokerage fees?</span>
-                    <span class="material-icons-round text-[var(--color-gold)] transition-transform duration-200" style="font-size:20px">expand_more</span>
-                </button>
-                <div class="hidden mt-3 text-sm text-[var(--color-text-muted)] leading-relaxed">
-                    No, we do not charge any brokerage fees to buyers. Our services are completely free for property seekers. Builders pay us a small commission only after successful deal closure.
-                </div>
-            </div>
-            
-            <div class="card p-5 reveal">
-                <button onclick="toggleFaq(this)" class="w-full flex items-center justify-between text-left">
-                    <span class="font-semibold text-[var(--color-navy)] text-sm md:text-base">Can I get home loan assistance?</span>
-                    <span class="material-icons-round text-[var(--color-gold)] transition-transform duration-200" style="font-size:20px">expand_more</span>
-                </button>
-                <div class="hidden mt-3 text-sm text-[var(--color-text-muted)] leading-relaxed">
-                    Absolutely! We have partnerships with leading banks and NBFCs. Our team can help you get the best home loan rates and guide you through the entire documentation process.
-                </div>
-            </div>
-            
-            <div class="card p-5 reveal">
-                <button onclick="toggleFaq(this)" class="w-full flex items-center justify-between text-left">
-                    <span class="font-semibold text-[var(--color-navy)] text-sm md:text-base">What is your refund policy?</span>
-                    <span class="material-icons-round text-[var(--color-gold)] transition-transform duration-200" style="font-size:20px">expand_more</span>
-                </button>
-                <div class="hidden mt-3 text-sm text-[var(--color-text-muted)] leading-relaxed">
-                    For builders, we offer a 7-day money-back guarantee on subscription plans if you're not satisfied. For buyers, since our services are free, there are no refunds applicable.
-                </div>
+            <div class="card reveal" style="padding: var(--space-lg);">
+                <div style="color: var(--color-gold); margin-bottom: var(--space-sm);">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                <p style="font-size:0.9rem; margin-bottom: var(--space-md);">The EMI calculator helped us plan our budget perfectly before we even visited a site.</p>
+                <p style="font-size:0.85rem; font-weight:700; color: var(--color-navy); margin:0;">Ansh Mehta</p>
+                <p style="font-size:0.75rem; margin:0;">Ahmedabad</p>
             </div>
         </div>
     </div>
 </section>
 
-<script>
-// FAQ Toggle
-function toggleFaq(btn) {
-    const content = btn.nextElementSibling;
-    const arrow = btn.querySelector('.material-icons-round');
-    
-    if (content.classList.contains('hidden')) {
-        content.classList.remove('hidden');
-        arrow.style.transform = 'rotate(180deg)';
-    } else {
-        content.classList.add('hidden');
-        arrow.style.transform = '';
-    }
-}
-</script>
+<!-- ============================================
+   CTA BANNER
+   ============================================ -->
+<section class="section-pad" style="background: linear-gradient(135deg, var(--color-navy) 0%, var(--color-navy-light) 100%);">
+    <div class="container-app" style="text-align:center;">
+        <h2 style="color:#fff; margin-bottom: var(--space-sm);">Ready to Find Your Dream Home?</h2>
+        <p style="color: rgba(255,255,255,0.75); max-width:520px; margin: 0 auto var(--space-xl);">Talk to our team today and let us guide you to the perfect property.</p>
+        <div style="display:flex; gap: var(--space-md); justify-content:center; flex-wrap:wrap;">
+            <a href="{% url 'contact' %}" class="btn btn-gold">
+                <span class="material-icons-round" style="font-size:18px;">chat</span>
+                Contact Us
+            </a>
+            <a href="{% url 'property_list' %}" class="btn btn-outline" style="border-color: rgba(255,255,255,0.4); color:#fff;">
+                Browse Properties
+            </a>
+        </div>
+    </div>
+</section>
 
 {% endblock %}
