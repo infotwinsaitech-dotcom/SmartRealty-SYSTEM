@@ -442,17 +442,18 @@
 </style>
 
 <script>
-// Tab Switch
-function switchTab(tab) {
+// Tab Switch - updates UI only, does NOT submit the form.
+// Used both on click and on initial page load (via DOMContentLoaded).
+function switchTabUI(tab) {
     closeAllDropdowns();
-    
+
     document.getElementById('residential-filter').classList.add('hidden');
     document.getElementById('commercial-filter').classList.add('hidden');
     document.getElementById('land-filter').classList.add('hidden');
     document.getElementById(tab + '-filter').classList.remove('hidden');
-    
+
     document.getElementById('categoryInput').value = tab;
-    
+
     ['residential', 'commercial', 'land'].forEach(t => {
         const btn = document.getElementById('tab-' + t);
         if (t === tab) {
@@ -461,7 +462,12 @@ function switchTab(tab) {
             btn.classList.remove('active');
         }
     });
-    
+}
+
+// Tab Switch triggered by an actual user click - updates UI AND submits the form
+// to re-run the search with the new category filter.
+function switchTab(tab) {
+    switchTabUI(tab);
     document.getElementById('filterForm').submit();
 }
 
@@ -517,7 +523,7 @@ document.addEventListener('click', function(e) {
 // Init
 document.addEventListener('DOMContentLoaded', function() {
     const category = document.getElementById('categoryInput').value || 'residential';
-    switchTab(category);
+    switchTabUI(category);   // UI only - no form submit, no reload loop
     updateAreaLabel();
 });
 </script>
