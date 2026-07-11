@@ -22,6 +22,9 @@
         <span class="material-icons-round">chevron_right</span>
     </button>
 
+    <!-- Ad dot indicators -->
+    <div class="hero-ad-dots" id="heroAdDots" onclick="event.stopPropagation()"></div>
+
     <div class="hero-content" style="max-width: 780px;">
         <span class="label" style="color: rgba(255,255,255,0.75); border-color: rgba(255,255,255,0.2); display:inline-flex; align-items:center; gap:8px; font-size:0.8rem; font-weight:700; text-transform:uppercase; letter-spacing:2px; margin-bottom: var(--space-sm);">
             <span class="material-icons-round" style="font-size:16px">verified</span>
@@ -353,51 +356,85 @@
     max-height: 640px;
 }
 
+.hero-ad-dots {
+    position: absolute;
+    bottom: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 4;
+    display: flex;
+    gap: 8px;
+}
+.hero-ad-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.4);
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+.hero-ad-dot.active {
+    background: #d4af37;
+    width: 22px;
+    border-radius: 4px;
+}
+
 @media (max-width: 767px) {
     #heroAdSection {
-        min-height: 62vh;
-        max-height: 520px;
+        min-height: 72vh;
+        max-height: 620px;
     }
+    /* Mobile pe arrows chhupa do, swipe se chalega */
     .hero-ad-arrow {
-        width: 32px;
-        height: 32px;
-        top: 20%;
+        display: none;
     }
-    .hero-ad-arrow .material-icons-round { font-size: 20px; }
-    .hero-ad-prev { left: 8px; }
-    .hero-ad-next { right: 8px; }
+    .hero-ad-dots {
+        bottom: 10px;
+    }
 }
 </style>
 <script>
 let heroAdCurrent = 0;
 let heroAdTimer = null;
 
-function heroAdGo(direction) {
+function heroAdUpdateDots() {
+    const dots = document.querySelectorAll('.hero-ad-dot');
+    dots.forEach((dot, i) => dot.classList.toggle('active', i === heroAdCurrent));
+}
+
+function heroAdShow(index) {
     const slidesContainer = document.getElementById('heroAdSlides');
     const imgs = slidesContainer.querySelectorAll('img');
     if (imgs.length === 0) return;
 
     imgs[heroAdCurrent].classList.remove('active');
-    heroAdCurrent = (heroAdCurrent + direction + imgs.length) % imgs.length;
+    heroAdCurrent = (index + imgs.length) % imgs.length;
     imgs[heroAdCurrent].classList.add('active');
+    heroAdUpdateDots();
 
-    // Manual click ke baad auto-rotate timer reset karo
     if (heroAdTimer) clearInterval(heroAdTimer);
     if (imgs.length > 1) {
-        heroAdTimer = setInterval(() => heroAdGo(1), 3000);
+        heroAdTimer = setInterval(() => heroAdShow(heroAdCurrent + 1), 3000);
     }
+}
+
+function heroAdGo(direction) {
+    heroAdShow(heroAdCurrent + direction);
 }
 
 (function() {
     const ads = [
         {% for ad in advertisements %}
-        { image: "{% cloudinary_url ad.image width=1600 height=700 crop='fill' quality='auto' %}", url: "{% url 'property_detail' ad.property.id %}" }{% if not forloop.last %},{% endif %}
+        { image: "{% cloudinary_url ad.image width=1600 height=900 crop='fill' quality='auto' %}", url: "{% url 'property_detail' ad.property.id %}" }{% if not forloop.last %},{% endif %}
         {% endfor %}
     ];
     if (ads.length === 0) return;
 
     const heroSection = document.getElementById('heroAdSection');
     const slidesContainer = document.getElementById('heroAdSlides');
+    const dotsContainer = document.getElementById('heroAdDots');
     const prevBtn = document.getElementById('heroAdPrev');
     const nextBtn = document.getElementById('heroAdNext');
 
@@ -406,16 +443,34 @@ function heroAdGo(direction) {
         img.src = ad.image;
         if (i === 0) img.classList.add('active');
         slidesContainer.appendChild(img);
+
+        const dot = document.createElement('button');
+        dot.className = 'hero-ad-dot' + (i === 0 ? ' active' : '');
+        dot.setAttribute('aria-label', 'Go to ad ' + (i + 1));
+        dot.addEventListener('click', () => heroAdShow(i));
+        dotsContainer.appendChild(dot);
     });
 
     heroSection.addEventListener('click', () => {
         window.location.href = ads[heroAdCurrent].url;
     });
 
+    // Mobile ke liye swipe support
+    let touchStartX = 0;
+    heroSection.addEventListener('touchstart', (e) => {
+        touchStartX = e.changedTouches[0].screenX;
+    }, { passive: true });
+    heroSection.addEventListener('touchend', (e) => {
+        const touchEndX = e.changedTouches[0].screenX;
+        const diff = touchEndX - touchStartX;
+        if (Math.abs(diff) > 40) {
+            heroAdGo(diff < 0 ? 1 : -1);
+        }
+    }, { passive: true });
+
     if (ads.length > 1) {
-        heroAdTimer = setInterval(() => heroAdGo(1), 3000);
+        heroAdTimer = setInterval(() => heroAdShow(heroAdCurrent + 1), 3000);
     } else {
-        // Sirf ek ad hai to arrows dikhane ki zaroorat nahi
         prevBtn.style.display = 'none';
         nextBtn.style.display = 'none';
     }
