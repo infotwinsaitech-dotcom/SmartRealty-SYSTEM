@@ -4204,32 +4204,7 @@ def wishlist_add(request, property_id):
         property=property_obj
     )
 
-    # Builder ko notification bhejo jab naya wishlist add ho (duplicate par nahi)
-    if created and property_obj.builder:
-        Notification.objects.create(
-            recipient=property_obj.builder,
-            title="Property Wishlisted",
-            message=f"{request.user.username} ne aapki property '{property_obj.title}' wishlist mein add ki hai.",
-            type='system',
-            action_url=reverse('property_wishlist_list'),
-            icon='favorite'
-        )
-
-    count = Wishlist.objects.filter(user=request.user).count()
-    # Builder ko notification bhejo jab naya wishlist add ho (duplicate par nahi)
-    if created and property_obj.builder:
-        Notification.objects.create(
-            recipient=property_obj.builder,
-            title="Property Wishlisted",
-            message=f"{request.user.username} ne aapki property '{property_obj.title}' wishlist mein add ki hai.",
-            type='system',
-            action_url=reverse('property_wishlist_list'),
-            icon='favorite'
-        )
-
-    count = Wishlist.objects.filter(user=request.user).count()
-
-    # Pehli baar wishlist mein add hua to builder ko notify karo
+    # Pehli baar wishlist mein add hua to builder ko notify karo (sirf ek baar)
     if created and property_obj.builder:
         Notification.objects.create(
             recipient=property_obj.builder,
@@ -4245,7 +4220,7 @@ def wishlist_add(request, property_id):
         'success': True,
         'wishlist_count': count,
         'created': created,
-        'wishlist_item':wishlist_item,
+        'wishlist_item_id': wishlist_item.id,
         'message': 'Added to wishlist!' if created else 'Already in wishlist!'
     })
 
