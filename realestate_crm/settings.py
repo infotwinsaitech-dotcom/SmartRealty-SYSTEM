@@ -64,7 +64,12 @@ if not DEBUG:
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
     SESSION_COOKIE_HTTPONLY = True
-    CSRF_COOKIE_HTTPONLY = True
+    # NOTE: CSRF_COOKIE_HTTPONLY must stay False (Django default) so that
+    # JavaScript (fetch/AJAX calls like wishlist add/remove) can read the
+    # csrftoken cookie and send it in the X-CSRFToken header. Setting this to
+    # True breaks every AJAX POST on the site with a 403
+    # "CSRF token from header has incorrect length" error.
+    CSRF_COOKIE_HTTPONLY = False
     SESSION_COOKIE_SAMESITE = "Lax"
     CSRF_COOKIE_SAMESITE = "Lax"
     X_FRAME_OPTIONS = "DENY"

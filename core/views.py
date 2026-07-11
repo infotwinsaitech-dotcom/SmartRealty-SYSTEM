@@ -417,6 +417,86 @@ def property_detail(request, id):
         "brochure_pdf_url": brochure_pdf_url,
     })
 
+def property_search_suggestions(request):
+    """
+    AJAX autocomplete: returns matching locations/areas, project names,
+    property titles and builder names from the ENTIRE database (not just
+    the current page of results). Used by the live search box on the
+    public property listing page.
+    """
+    from django.db.models import Q
+
+    term = sanitize_input(request.GET.get('q', '')).strip()
+    if len(term) < 1:
+        return JsonResponse({"results": []})
+
+    AHMEDABAD_AREAS = [
+        "Satellite", "Vastrapur", "Bodakdev", "Thaltej", "SG Highway", "Prahlad Nagar",
+        "Navrangpura", "Ellisbridge", "Paldi", "Vasna", "Maninagar", "Isanpur",
+        "Ghatlodia", "Naranpura", "Ranip", "Chandkheda", "Motera", "Sabarmati",
+        "Gota", "Chandlodia", "Vejalpur", "Jodhpur", "Ambawadi", "Shahibaug",
+        "Naroda", "Nikol", "Vastral", "Bapunagar", "Odhav", "Kubernagar",
+        "Rakhial", "Amraiwadi", "Gomtipur", "Khokhra", "Kankaria", "Danilimda",
+        "Vatva", "Lambha", "Narol", "Sarkhej", "Juhapura", "Makarba",
+        "Ghuma", "South Bopal", "Bopal", "Shela", "Shilaj", "Science City",
+        "Chharodi", "Nava Vadaj", "Vadaj", "Usmanpura", "Memnagar", "Gulbai Tekra",
+        "Panjrapole", "C.G. Road", "Law Garden", "Navjivan", "Income Tax", "Stadium",
+        "Nehru Nagar", "Judges Bungalow Road", "Iscon", "Anand Nagar", "Manekbaug",
+        "Jivraj Park", "Vishala", "Nirnaynagar", "Chenpur", "Sughad", "Zundal",
+        "Gandhinagar Road", "Adalaj", "Koba", "Randesan", "Kudasan", "New CG Road",
+        "Bhat", "Sarangpur", "Kalupur", "Raikhad", "Dariapur", "Jamalpur",
+        "Khadia", "Shahpur", "Dudheshwar", "Saraspur", "Rajpur", "Meghaninagar",
+    ]
+
+    results = []
+    seen = set()
+    term_lower = term.lower()
+
+    for area in AHMEDABAD_AREAS:
+        if term_lower in area.lower() and area.lower() not in seen:
+            seen.add(area.lower())
+            results.append({"name": area, "tag": "Area"})
+
+    matches = Property.objects.select_related('builder').filter(
+        Q(project_name__icontains=term) |
+        Q(title__icontains=term) |
+        Q(location__icontains=term) |
+        Q(builder__username__icontains=term) |
+        Q(builder__first_name__icontains=term) |
+        Q(builder__last_name__icontains=term)
+    ).order_by('-created_at')[:30]
+
+    for p in matches:
+        if p.project_name and term_lower in p.project_name.lower():
+            key = p.project_name.lower()
+            if key not in seen:
+                seen.add(key)
+                results.append({"name": p.project_name, "tag": "Project"})
+
+        if p.title and term_lower in p.title.lower():
+            key = p.title.lower()
+            if key not in seen:
+                seen.add(key)
+                results.append({"name": p.title, "tag": "Property"})
+
+        if p.location and term_lower in p.location.lower():
+            key = p.location.lower()
+            if key not in seen:
+                seen.add(key)
+                results.append({"name": p.location, "tag": "Locality"})
+
+        if p.builder:
+            builder_name = (p.builder.get_full_name() or p.builder.username or "").strip()
+            if builder_name and term_lower in builder_name.lower():
+                key = builder_name.lower()
+                if key not in seen:
+                    seen.add(key)
+                    results.append({"name": builder_name, "tag": "Builder"})
+
+        if len(results) >= 15:
+            break
+
+    return JsonResponse({"results": results[:15]})
 
 def property_list(request):
     """Advanced property search with filters"""

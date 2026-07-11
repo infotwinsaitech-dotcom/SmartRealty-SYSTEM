@@ -15,6 +15,7 @@ urlpatterns = [
 
     path("", views.home, name="user_home"),
     path("properties/", views.property_list, name="property_list"),
+    path("properties/search-suggestions/", views.property_search_suggestions, name="property_search_suggestions"),
     path("properties/<int:id>/", views.property_detail, name="property_detail"),
 
     path("contact/", views.contact, name="contact"),

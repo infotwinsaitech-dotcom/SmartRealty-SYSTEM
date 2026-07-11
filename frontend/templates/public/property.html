@@ -455,7 +455,7 @@
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-xl);
     padding: 12px;
-    z-index: 100;
+    z-index: 300;
     min-width: 220px;
 }
 .dropdown-item {
@@ -482,36 +482,22 @@
 
 <script>
 // ============================================
-// SEARCH SUGGESTIONS (location / project autocomplete)
+// SEARCH SUGGESTIONS (location / project / builder / title autocomplete)
+// Live search across the ENTIRE database via /properties/search-suggestions/
 // ============================================
-const suggestionData = [
-    {% for area in ahmedabad_areas %}
-    { name: "{{ area|escapejs }}", tag: "Area" },
-    {% endfor %}
-    {% for property in properties %}
-    { name: "{{ property.project_name|default:property.title|escapejs }}", tag: "Project" },
-    {% endfor %}
-];
-
-// De-duplicate by name
-const seenNames = new Set();
-const uniqueSuggestions = suggestionData.filter(item => {
-    if (!item.name || seenNames.has(item.name.toLowerCase())) return false;
-    seenNames.add(item.name.toLowerCase());
-    return true;
-});
-
 const searchInput = document.getElementById('locationSearchInput');
 const suggestionsBox = document.getElementById('searchSuggestions');
 let activeIndex = -1;
+let suggestDebounce = null;
+let suggestAbortController = null;
 
 function renderSuggestions(matches) {
-    if (matches.length === 0) {
+    if (!matches || matches.length === 0) {
         suggestionsBox.classList.add('hidden');
         suggestionsBox.innerHTML = '';
         return;
     }
-    suggestionsBox.innerHTML = matches.slice(0, 8).map(item => `
+    suggestionsBox.innerHTML = matches.map(item => `
         <div class="search-suggestion-item" data-value="${item.name.replace(/"/g, '&quot;')}">
             <span>${item.name}</span>
             <span class="sugg-tag">${item.tag}</span>
@@ -521,23 +507,34 @@ function renderSuggestions(matches) {
     activeIndex = -1;
 }
 
+function fetchSuggestions(term) {
+    if (suggestAbortController) suggestAbortController.abort();
+    suggestAbortController = new AbortController();
+
+    fetch(`{% url 'property_search_suggestions' %}?q=${encodeURIComponent(term)}`, {
+        signal: suggestAbortController.signal
+    })
+    .then(r => r.json())
+    .then(data => renderSuggestions(data.results))
+    .catch(err => {
+        if (err.name !== 'AbortError') console.error('Suggestion fetch failed', err);
+    });
+}
+
 if (searchInput) {
     searchInput.addEventListener('input', function() {
-        const term = this.value.trim().toLowerCase();
+        const term = this.value.trim();
+        clearTimeout(suggestDebounce);
         if (term.length === 0) {
             suggestionsBox.classList.add('hidden');
             return;
         }
-        const matches = uniqueSuggestions.filter(item => item.name.toLowerCase().includes(term));
-        renderSuggestions(matches);
+        suggestDebounce = setTimeout(() => fetchSuggestions(term), 250);
     });
 
     searchInput.addEventListener('focus', function() {
-        const term = this.value.trim().toLowerCase();
-        if (term.length > 0) {
-            const matches = uniqueSuggestions.filter(item => item.name.toLowerCase().includes(term));
-            renderSuggestions(matches);
-        }
+        const term = this.value.trim();
+        if (term.length > 0) fetchSuggestions(term);
     });
 
     searchInput.addEventListener('keydown', function(e) {
@@ -621,8 +618,10 @@ function toggleDropdown(id, event) {
     closeAllDropdowns();
     if (!isOpen) {
         dropdown.classList.remove('hidden');
-        document.getElementById('dropdownBackdrop').classList.add('show');
-        if (window.innerWidth < 768) document.body.style.overflow = 'hidden';
+        if (window.innerWidth < 768) {
+            document.getElementById('dropdownBackdrop').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
     }
 }
 
