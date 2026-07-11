@@ -1640,7 +1640,10 @@ function showToast(message, type = 'info') {
 
 // Wishlist toggle
 function toggleWishlist(propertyId, btn) {
-    fetch(`/wishlist/add/${propertyId}/`, {
+    const isActive = btn.classList.contains('active');
+    const url = isActive ? `/wishlist/remove/${propertyId}/` : `/wishlist/add/${propertyId}/`;
+
+    fetch(url, {
         method: 'POST',
         headers: {
             'X-CSRFToken': getCookie('csrftoken'),
@@ -1653,7 +1656,7 @@ function toggleWishlist(propertyId, btn) {
             btn.classList.toggle('active');
             const icon = btn.querySelector('.material-icons-round');
             icon.textContent = btn.classList.contains('active') ? 'favorite' : 'favorite_border';
-            showToast(data.message, 'success');
+            showToast(isActive ? 'Removed from wishlist!' : (data.message || 'Added to wishlist!'), 'success');
         }
     })
     .catch(() => showToast('Something went wrong', 'error'));
