@@ -15,6 +15,7 @@ class PropertyImageInline(admin.TabularInline):
 
 class PropertyAdmin(admin.ModelAdmin):
     inlines = [PropertyImageInline]
+    search_fields = ['title', 'project_name', 'location']
 
 
 admin.site.register(Property, PropertyAdmin)
@@ -90,7 +91,8 @@ class AdvertisementAdmin(admin.ModelAdmin):
     list_filter = ['is_active']
     list_editable = ['is_active', 'order']
     search_fields = ['title', 'property__title', 'property__project_name']
-    
+    autocomplete_fields = ['property']
+
 # ========== FOLLOWUP & AUTOMATION ==========
 admin.site.register(FollowUp)
 admin.site.register(DripSequence)
