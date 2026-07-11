@@ -29,14 +29,14 @@
         </form>
 
         <!-- Quick Category Links -->
-        <div style="display:flex; flex-wrap:wrap; gap:8px; justify-content:center;">
-            <a href="{% url 'property_list' %}?category=residential" class="filter-pill" style="background:rgba(255,255,255,0.1); border-color:rgba(255,255,255,0.2); color:#fff;">
+        <div style="display:flex; flex-wrap:wrap; gap:12px; justify-content:center;">
+            <a href="{% url 'property_list' %}?category=residential" class="category-card cat-blue">
                 <span class="material-icons-round">home</span> Residential
             </a>
-            <a href="{% url 'property_list' %}?category=commercial" class="filter-pill" style="background:rgba(255,255,255,0.1); border-color:rgba(255,255,255,0.2); color:#fff;">
+            <a href="{% url 'property_list' %}?category=commercial" class="category-card cat-teal">
                 <span class="material-icons-round">business</span> Commercial
             </a>
-            <a href="{% url 'property_list' %}?category=land" class="filter-pill" style="background:rgba(255,255,255,0.1); border-color:rgba(255,255,255,0.2); color:#fff;">
+            <a href="{% url 'property_list' %}?category=land" class="category-card cat-coral">
                 <span class="material-icons-round">terrain</span> Land / Plot
             </a>
         </div>
@@ -178,7 +178,7 @@
 <!-- ============================================
    WHY CHOOSE US
    ============================================ -->
-<section class="section-pad" style="background: var(--color-surface);">
+<section class="section-pad" style="background: var(--color-bg-tint);">
     <div class="container-app">
         <div class="section-header">
             <span class="label">
