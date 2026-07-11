@@ -1716,6 +1716,26 @@ if (navbar && window.innerWidth < 768) {
         lastScroll = currentScroll;
     }, { passive: true });
 }
+(function() {
+    const navbar = document.getElementById('mainNavbar');
+    const hero = document.querySelector('.hero-section');
+    if (!navbar || !hero) return; // sirf home page (jahan hero hai) pe chalega
+
+    function handleNavScroll() {
+        const heroHeight = hero.offsetHeight;
+        if (window.scrollY < heroHeight - 80) {
+            navbar.style.backgroundColor = 'transparent';
+            navbar.style.borderBottomColor = 'transparent';
+            navbar.style.boxShadow = 'none';
+        } else {
+            navbar.style.backgroundColor = '';   // wapas default bg-gray-900
+            navbar.style.borderBottomColor = '';
+            navbar.style.boxShadow = '';
+        }
+    }
+    window.addEventListener('scroll', handleNavScroll, { passive: true });
+    handleNavScroll();
+})();
 </script>
 
 {% block extra_js %}{% endblock %}

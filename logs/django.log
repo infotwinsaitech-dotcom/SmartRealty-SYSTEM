@@ -446,3 +446,9 @@ WARNING 2026-07-09 21:35:09,729 log Not Found: /favicon.ico
 WARNING 2026-07-09 21:35:09,731 basehttp "GET /favicon.ico HTTP/1.1" 404 66441
 WARNING 2026-07-09 21:35:36,571 middleware SLOW REQUEST: GET /properties/ took 1.34s User: Anonymous
 INFO 2026-07-09 21:35:36,573 basehttp "GET /properties/?type=Office HTTP/1.1" 200 106995
+INFO 2026-07-11 18:36:38,631 apps  PostgreSQL optimized
+INFO 2026-07-11 18:36:38,631 apps  Core app initialized
+INFO 2026-07-11 18:36:38,808 views views.py loaded successfully
+INFO 2026-07-11 18:36:45,629 apps  PostgreSQL optimized
+INFO 2026-07-11 18:36:45,629 apps  Core app initialized
+INFO 2026-07-11 18:36:45,713 views views.py loaded successfully

@@ -3,7 +3,7 @@ from .models import (
     Property, PropertyImage, Inquiry, SiteSettings, User, Profile, 
     Lead, Deal, Task, Activity, Document, Notification, AIInsight, 
     LeadScore, Campaign, FollowUp, DripSequence, EscalationRule, 
-    AutomationLog
+    AutomationLog, Advertisement
 )
 
 
@@ -83,7 +83,14 @@ admin.site.register(LeadScore)
 class CampaignAdmin(admin.ModelAdmin):
     list_display = ['name', 'type', 'status', 'sent']
 
-
+# ========== ADVERTISEMENT (HOME PAGE BANNER) ==========
+@admin.register(Advertisement)
+class AdvertisementAdmin(admin.ModelAdmin):
+    list_display = ['title', 'property', 'is_active', 'order', 'created_at']
+    list_filter = ['is_active']
+    list_editable = ['is_active', 'order']
+    search_fields = ['title', 'property__title', 'property__project_name']
+    
 # ========== FOLLOWUP & AUTOMATION ==========
 admin.site.register(FollowUp)
 admin.site.register(DripSequence)

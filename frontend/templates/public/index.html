@@ -7,8 +7,13 @@
 <!-- ============================================
    HOME HERO - Search + Trust
    ============================================ -->
-<section class="hero-section" style="min-height: 56vh; max-height: 640px;">
-    <div class="hero-glow-left"></div>
+<section class="hero-section" id="heroAdSection" style="min-height: 56vh; max-height: 640px; cursor: pointer;">
+
+    <!-- Ad images ye JS yahan inject karega -->
+    <div class="hero-ad-slides" id="heroAdSlides"></div>
+    <!-- Text padhne layak rakhne ke liye dark overlay -->
+    <div class="hero-overlay"></div>
+
     <div class="hero-content" style="max-width: 780px;">
         <span class="label" style="color: rgba(255,255,255,0.75); border-color: rgba(255,255,255,0.2); display:inline-flex; align-items:center; gap:8px; font-size:0.8rem; font-weight:700; text-transform:uppercase; letter-spacing:2px; margin-bottom: var(--space-sm);">
             <span class="material-icons-round" style="font-size:16px">verified</span>
@@ -22,41 +27,28 @@
         </p>
 
         <!-- Search Bar -->
-        <form method="GET" action="{% url 'property_list' %}" class="search-bar" style="margin-bottom: var(--space-md);">
+        <form method="GET" action="{% url 'property_list' %}" class="search-bar" style="margin-bottom: var(--space-md);" onclick="event.stopPropagation()">
             <span class="material-icons-round" style="color: var(--color-text-light); font-size:20px;">search</span>
             <input type="text" name="location" placeholder="Search by location, project, or builder...">
             <button type="submit" class="search-btn">Search</button>
         </form>
 
         <!-- Quick Category Links -->
-        <div style="display:flex; flex-wrap:wrap; gap:12px; justify-content:center;">
-            <a href="{% url 'property_list' %}?category=residential" class="category-card cat-blue">
+        <div style="display:flex; flex-wrap:wrap; gap:8px; justify-content:center;" onclick="event.stopPropagation()">
+            <a href="{% url 'property_list' %}?category=residential" class="filter-pill" style="background:rgba(255,255,255,0.1); border-color:rgba(255,255,255,0.2); color:#fff;">
                 <span class="material-icons-round">home</span> Residential
             </a>
-            <a href="{% url 'property_list' %}?category=commercial" class="category-card cat-teal">
+            <a href="{% url 'property_list' %}?category=commercial" class="filter-pill" style="background:rgba(255,255,255,0.1); border-color:rgba(255,255,255,0.2); color:#fff;">
                 <span class="material-icons-round">business</span> Commercial
             </a>
-            <a href="{% url 'property_list' %}?category=land" class="category-card cat-coral">
+            <a href="{% url 'property_list' %}?category=land" class="filter-pill" style="background:rgba(255,255,255,0.1); border-color:rgba(255,255,255,0.2); color:#fff;">
                 <span class="material-icons-round">terrain</span> Land / Plot
             </a>
         </div>
     </div>
 </section>
+        
 
-<!-- ============================================
-   AD BANNER - Advertisement slot right below hero
-   ============================================ -->
-<div class="ad-banner-wrap">
-    <div class="container-app">
-        <a href="#" class="ad-banner" style="text-decoration:none;">
-            <span class="ad-label">Advertisement</span>
-            <div class="ad-banner-content">
-                <span class="material-icons-round" style="color: var(--color-gold-dark); font-size:28px;">campaign</span>
-                <span>Your ad banner goes here &mdash; 1280&times;120 recommended</span>
-            </div>
-        </a>
-    </div>
-</div>
 
 <!-- ============================================
    TRUST STRIP
@@ -309,4 +301,54 @@
     </div>
 </section>
 
+{% endblock %}
+{% block extra_js %}
+<style>
+.hero-ad-slides { position: absolute; inset: 0; z-index: 0; }
+.hero-ad-slides img {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    object-fit: cover; opacity: 0; transition: opacity 1s ease;
+}
+.hero-ad-slides img.active { opacity: 1; }
+.hero-overlay {
+    position: absolute; inset: 0; z-index: 1;
+    background: linear-gradient(135deg, rgba(11,31,58,0.75) 0%, rgba(11,31,58,0.55) 50%, rgba(30,58,95,0.75) 100%);
+}
+.hero-section::before { z-index: 1; }
+.hero-content { z-index: 3 !important; }
+</style>
+<script>
+(function() {
+    const ads = [
+        {% for ad in advertisements %}
+        { image: "{% cloudinary_url ad.image width=1600 height=700 crop='fill' quality='auto' %}", url: "{% url 'property_detail' ad.property.id %}" }{% if not forloop.last %},{% endif %}
+        {% endfor %}
+    ];
+    if (ads.length === 0) return;
+
+    const heroSection = document.getElementById('heroAdSection');
+    const slidesContainer = document.getElementById('heroAdSlides');
+
+    ads.forEach((ad, i) => {
+        const img = document.createElement('img');
+        img.src = ad.image;
+        if (i === 0) img.classList.add('active');
+        slidesContainer.appendChild(img);
+    });
+
+    let current = 0;
+    heroSection.addEventListener('click', () => {
+        window.location.href = ads[current].url;
+    });
+
+    if (ads.length > 1) {
+        setInterval(() => {
+            const imgs = slidesContainer.querySelectorAll('img');
+            imgs[current].classList.remove('active');
+            current = (current + 1) % ads.length;
+            imgs[current].classList.add('active');
+        }, 3000);
+    }
+})();
+</script>
 {% endblock %}

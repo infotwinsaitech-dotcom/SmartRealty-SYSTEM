@@ -1846,3 +1846,28 @@ class AuditLog(models.Model):
 
     def __str__(self):
         return f"{self.action} {self.model_name} by {self.user}"
+    
+# =============================================================================
+# HOME PAGE ADVERTISEMENT BANNER
+# =============================================================================
+class Advertisement(models.Model):
+    """Home page banner ads that link to a property"""
+    title = models.CharField(max_length=200, blank=True, help_text="Internal name, not shown on site")
+    image = CloudinaryField('image')
+    property = models.ForeignKey(
+        Property,
+        on_delete=models.CASCADE,
+        related_name='advertisements',
+        help_text="Clicking the banner will open this property's detail page"
+    )
+    is_active = models.BooleanField(default=True)
+    order = models.PositiveIntegerField(default=0, help_text="Lower number shows first")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['order', '-created_at']
+        verbose_name = "Advertisement"
+        verbose_name_plural = "Advertisements"
+
+    def __str__(self):
+        return self.title or f"Ad for {self.property}"

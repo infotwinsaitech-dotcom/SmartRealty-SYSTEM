@@ -57,7 +57,7 @@ from .models import (
     Property, PropertyImage, User, Profile, Lead, Deal, Task, 
     Activity, Agent, Document, Conversation, Message, 
     Notification, Campaign, SiteVisit, FollowUp, Wishlist,
-    Inquiry, LeadNote, LeadActivity, SavedProperty
+    Inquiry, LeadNote, LeadActivity, SavedProperty , Advertisement,
 )
 
 logger = logging.getLogger('core')
@@ -263,7 +263,12 @@ def home(request):
         properties = list(Property.objects.select_related('builder').all()[:6])
         cache.set(cache_key, properties, CACHE_TTL)
     
-    return render(request, "public/index.html", {"properties": properties})
+    advertisements = Advertisement.objects.filter(is_active=True).select_related('property')
+
+    return render(request, "public/index.html", {
+        "properties": properties,
+        "advertisements": advertisements
+    })
 
 
 def convert_price(price):
