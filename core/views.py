@@ -4153,7 +4153,7 @@ def wishlist(request):
 
 
 @login_required
-def wishlist_remove(request, id):
+def wishlist_remove(request, property_id):
     """Remove from wishlist"""
     Wishlist.objects.filter(user=request.user, property_id=id).delete()
     return JsonResponse({'success': True})
