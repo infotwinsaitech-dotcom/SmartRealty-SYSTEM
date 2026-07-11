@@ -7,7 +7,7 @@
 <!-- ============================================
    HOME HERO - Search + Trust
    ============================================ -->
-<section class="hero-section" id="heroAdSection" style="min-height: 56vh; max-height: 640px; cursor: pointer;">
+<section class="hero-section" id="heroAdSection" style="cursor: pointer;">
 
     <!-- Ad images ye JS yahan inject karega -->
     <div class="hero-ad-slides" id="heroAdSlides"></div>
@@ -346,9 +346,26 @@
 .hero-ad-arrow:hover { background: rgba(255,255,255,0.3); }
 .hero-ad-prev { left: 16px; }
 .hero-ad-next { right: 16px; }
-@media (max-width: 640px) {
-    .hero-ad-arrow { width: 32px; height: 32px; }
+
+/* Hero height ab yahan control hoga, mobile-friendly */
+#heroAdSection {
+    min-height: 56vh;
+    max-height: 640px;
+}
+
+@media (max-width: 767px) {
+    #heroAdSection {
+        min-height: 62vh;
+        max-height: 520px;
+    }
+    .hero-ad-arrow {
+        width: 32px;
+        height: 32px;
+        top: 20%;
+    }
     .hero-ad-arrow .material-icons-round { font-size: 20px; }
+    .hero-ad-prev { left: 8px; }
+    .hero-ad-next { right: 8px; }
 }
 </style>
 <script>
