@@ -25,7 +25,7 @@
 <!-- ============================================
    FILTER SECTION - Mobile Optimized
    ============================================ -->
-<section class="bg-white border-b border-[var(--color-border)] sticky top-14 z-30 md:static">
+<section class="bg-white border-b border-[var(--color-border)] md:sticky md:top-14 md:z-30">
     <div class="container-app py-3">
         
         <!-- Category Tabs -->
@@ -171,6 +171,8 @@
         </form>
     </div>
 </section>
+
+<div class="dropdown-backdrop" id="dropdownBackdrop" onclick="closeAllDropdowns()"></div>
 
 <!-- ============================================
    PROPERTY GRID - Main Content
@@ -488,11 +490,17 @@ function toggleDropdown(id, event) {
     const dropdown = document.getElementById(id);
     const isOpen = !dropdown.classList.contains('hidden');
     closeAllDropdowns();
-    if (!isOpen) dropdown.classList.remove('hidden');
+    if (!isOpen) {
+        dropdown.classList.remove('hidden');
+        document.getElementById('dropdownBackdrop').classList.add('show');
+        if (window.innerWidth < 768) document.body.style.overflow = 'hidden';
+    }
 }
 
 function closeAllDropdowns() {
     document.querySelectorAll('.dropdown-menu').forEach(d => d.classList.add('hidden'));
+    document.getElementById('dropdownBackdrop').classList.remove('show');
+    document.body.style.overflow = '';
 }
 
 // Area Label Update
