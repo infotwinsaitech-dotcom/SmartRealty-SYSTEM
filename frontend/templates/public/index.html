@@ -629,7 +629,7 @@ function heroAdGo(direction) {
 (function() {
     const ads = [
         {% for ad in advertisements %}
-        { image: "{% cloudinary_url ad.image width=1600 height=900 crop='fill' quality='auto' %}", url: "{% url 'property_detail' ad.property.id %}" }{% if not forloop.last %},{% endif %}
+        { image: "{% cloudinary_url ad.image width=1600 height=900 crop='fill' gravity='auto' quality='auto' %}", url: "{% url 'property_detail' ad.property.id %}" }{% if not forloop.last %},{% endif %}
         {% endfor %}
     ];
     if (ads.length === 0) return;
