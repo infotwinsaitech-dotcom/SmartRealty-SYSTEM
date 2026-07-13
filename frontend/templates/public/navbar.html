@@ -11,7 +11,7 @@
         <a href="{% url 'home' %}" id="siteLogoLink" class="flex items-center flex-shrink-0" aria-label="{{ site.company_name|default:'RealShri' }} home">
             <img src="{% if site.logo %}{{ site.logo.url }}{% else %}{% static 'images/logo.png' %}{% endif %}"
                  alt="{{ site.company_name|default:'RealShri' }}"
-                 class="h-16 md:h-20 w-auto object-contain"
+                 class="h-17 md:h-21 w-auto object-contain"
                  onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
             <span style="display:none; font-weight:800; font-size:1.1rem; color: var(--color-navy);">{{ site.company_name|default:'RealShri' }}</span>
         </a>
