@@ -118,9 +118,7 @@
                         <div class="showcase-builder">
                             <span class="material-icons-round">apartment</span>
                         </div>
-                        <div class="showcase-builder-name">
-                            {% if property.builder.profile.full_name %}{{ property.builder.profile.full_name }}{% else %}Verified Builder{% endif %}
-                        </div>
+                        
                         <span class="showcase-view-link">View Projects</span>
  
                         <h3 class="showcase-title">{{ property.project_name|default:property.title }}</h3>
@@ -349,7 +347,10 @@
 }
 .hero-section::before { z-index: 1; }
 #heroAdSection {
-    cursor: pointer;
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
 }
 #heroAdSection .hero-content,
 #heroAdSection input,
