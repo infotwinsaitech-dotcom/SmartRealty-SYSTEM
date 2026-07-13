@@ -7,14 +7,14 @@
 <nav class="sticky top-0 z-50 h-14 md:h-16 flex items-center border-b" style="background: var(--color-surface); border-color: var(--color-border); box-shadow: var(--shadow-sm);">
     <div class="w-full flex items-center justify-between gap-4" style="max-width: 1280px; margin-inline: auto; padding-inline: clamp(1rem, 4vw, 2rem);">
 
-        <!-- LOGO -->
-        <a href="{% url 'home' %}" id="siteLogoLink" class="flex items-center flex-shrink-0" aria-label="{{ site.company_name|default:'RealShri' }} home">
+        <!-- LOGO (ab clickable nahi hai, sirf branding ke liye) -->
+        <div class="flex items-center flex-shrink-0" aria-label="{{ site.company_name|default:'RealShri' }}">
             <img src="{% if site.logo %}{{ site.logo.url }}{% else %}{% static 'images/logo.png' %}{% endif %}"
                  alt="{{ site.company_name|default:'RealShri' }}"
                  class="h-16 md:h-20 w-auto object-contain"
                  onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
             <span style="display:none; font-weight:800; font-size:1.1rem; color: var(--color-navy);">{{ site.company_name|default:'RealShri' }}</span>
-        </a>
+        </div>
 
         <!-- DESKTOP MENU -->
         <div class="hidden lg:flex items-center gap-1 font-medium" style="color: var(--color-text);">
@@ -271,20 +271,6 @@
 </div>
 
 <script>
-// LOGO: agar user pehle se home page par hai to dobara full-page reload na ho,
-// bas smooth scroll top par kar do (yahi "click karte hi wapas yahi page khulna" wala issue fix karta hai)
-(function() {
-    const logoLink = document.getElementById('siteLogoLink');
-    if (!logoLink) return;
-    logoLink.addEventListener('click', function(e) {
-        const target = new URL(this.href, window.location.origin).pathname;
-        if (window.location.pathname === target) {
-            e.preventDefault();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-    });
-})();
-
 // Profile dropdown toggle (public user)
 function toggleProfileMenu() {
     const menu = document.getElementById('profileMenu');
