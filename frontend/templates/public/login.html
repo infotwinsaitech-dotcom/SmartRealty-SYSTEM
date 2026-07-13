@@ -5,66 +5,46 @@
 
 {% block content %}
 
-<section class="min-h-screen flex items-center justify-center luxury-bg px-6 py-16">
+<!-- ============================================
+     LOGIN PAGE - RealShri
+     Mobile-first, matches register.html design system
+     ============================================ -->
 
-    <div class="grid lg:grid-cols-2 gap-10 max-w-6xl w-full items-center">
+<section style="min-height: 100dvh; display: flex; align-items: center; justify-content: center; padding: var(--space-xl) var(--space-md); background: linear-gradient(135deg, var(--color-navy) 0%, var(--color-navy-light) 100%);">
 
-        <!-- LEFT CONTENT -->
-        <div class="hidden lg:block space-y-6 reveal">
+    <div class="card" style="width: 100%; max-width: 440px; border-radius: var(--radius-xl); overflow: hidden; animation: fadeInUp 0.5s ease;">
 
-            <div class="hex-divider mb-2"></div>
-
-            <h1 class="text-6xl font-extrabold leading-tight gold" style="font-family: 'Playfair Display', serif;">
-                Welcome Back
-            </h1>
-
-            <p class="text-[var(--text-muted)] text-lg max-w-md">
-                Step into a premium real estate ecosystem powered by AI, automation,
-                and ultra-modern design.
-            </p>
-
-            <div class="flex gap-10 pt-6">
-                <div>
-                    <h3 class="text-3xl font-bold" style="color:var(--navy-deep);">500+</h3>
-                    <p class="text-[var(--text-muted)] text-sm">Luxury Properties</p>
-                </div>
-                <div>
-                    <h3 class="text-3xl font-bold" style="color:var(--navy-deep);">10K+</h3>
-                    <p class="text-[var(--text-muted)] text-sm">Leads Managed</p>
-                </div>
+        <!-- Header -->
+        <div style="text-align: center; padding: var(--space-xl) var(--space-lg) var(--space-md);">
+            <div style="display: inline-flex; align-items: center; gap: 8px; background: rgba(212,175,55,0.15); padding: 6px 16px; border-radius: 9999px; margin-bottom: var(--space-md);">
+                <span class="material-icons-round" style="font-size: 18px; color: var(--color-gold);">verified_user</span>
+                <span style="font-size: 0.8rem; font-weight: 600; color: var(--color-gold);">Welcome Back</span>
             </div>
-
+            <h2 style="font-size: clamp(1.5rem, 4vw, 1.75rem); font-weight: 800; color: var(--color-navy); margin-bottom: 6px;">Login to Dashboard</h2>
+            <p style="font-size: 0.9rem; color: var(--color-text-muted); margin: 0;">Access your intelligent real estate workspace</p>
         </div>
 
-        <!-- FORM -->
-        <div class="card-luxury reveal">
-
-            <h2 class="text-3xl font-bold mb-2 gold" style="font-family: 'Playfair Display', serif;">
-                Login to Dashboard
-            </h2>
-
-            <p class="text-[var(--text-muted)] mb-6">
-                Access your intelligent real estate workspace
-            </p>
-
-            {% if messages %}
-                {% for message in messages %}
-                    <div class="mb-4 p-3 rounded-xl bg-green-50 text-green-700 border border-green-200">
-                        {{ message }}
-                    </div>
-                {% endfor %}
-            {% endif %}
-
-            {% if error %}
-                <div class="mb-4 p-3 rounded-xl bg-red-50 text-red-600 border border-red-200">
-                    {{ error }}
+        <!-- Messages -->
+        {% if messages %}
+            {% for message in messages %}
+                <div style="margin: 0 var(--space-lg) var(--space-md); padding: var(--space-md); border-radius: var(--radius-lg); background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.2); color: var(--color-success); font-size: 0.85rem; font-weight: 500; display: flex; align-items: center; gap: 8px;">
+                    <span class="material-icons-round" style="font-size: 18px;">check_circle</span>
+                    {{ message }}
                 </div>
-            {% endif %}
+            {% endfor %}
+        {% endif %}
 
-            <!-- GOOGLE LOGIN BUTTON -->
-            <a href="{% provider_login_url 'google' process='login' %}"
-               class="w-full flex items-center justify-center gap-3 py-3 bg-white text-gray-800 font-semibold rounded-xl hover:bg-gray-50 transition mb-4 border border-gray-300 shadow-sm">
-                <svg class="w-5 h-5" viewBox="0 0 24 24">
+        {% if error %}
+            <div style="margin: 0 var(--space-lg) var(--space-md); padding: var(--space-md); border-radius: var(--radius-lg); background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2); color: var(--color-danger); font-size: 0.85rem; font-weight: 500; display: flex; align-items: center; gap: 8px;">
+                <span class="material-icons-round" style="font-size: 18px;">error</span>
+                {{ error }}
+            </div>
+        {% endif %}
+
+        <!-- Google Login -->
+        <div style="padding: 0 var(--space-lg) var(--space-md);">
+            <a href="{% provider_login_url 'google' process='login' %}" class="btn" style="width: 100%; min-height: 50px; background: #ffffff; color: var(--color-navy); border: 1.5px solid var(--color-border); font-size: 0.9rem; font-weight: 600; gap: 10px; box-shadow: var(--shadow-sm);">
+                <svg width="20" height="20" viewBox="0 0 24 24" style="flex-shrink: 0;">
                     <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
                     <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
                     <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
@@ -72,47 +52,62 @@
                 </svg>
                 Login with Google
             </a>
+        </div>
 
-            <!-- Divider -->
-            <div class="flex items-center gap-4 mb-4">
-                <div class="flex-1 h-px" style="background:var(--hairline);"></div>
-                <span class="text-[var(--text-muted)] text-sm">or continue with</span>
-                <div class="flex-1 h-px" style="background:var(--hairline);"></div>
+        <!-- Divider -->
+        <div style="display: flex; align-items: center; gap: var(--space-md); padding: 0 var(--space-lg) var(--space-md);">
+            <div style="flex: 1; height: 1px; background: var(--color-border);"></div>
+            <span style="font-size: 0.8rem; color: var(--color-text-muted); font-weight: 500; white-space: nowrap;">or continue with</span>
+            <div style="flex: 1; height: 1px; background: var(--color-border);"></div>
+        </div>
+
+        <!-- Form -->
+        <form method="POST" style="padding: 0 var(--space-lg) var(--space-lg);">
+            {% csrf_token %}
+
+            <!-- Username -->
+            <div style="margin-bottom: var(--space-md);">
+                <label style="display: block; font-size: 0.75rem; font-weight: 600; color: var(--color-text-muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em;">Username</label>
+                <div style="display: flex; align-items: center; background: var(--color-bg-soft); border: 1.5px solid var(--color-border); border-radius: var(--radius-lg); padding: 12px 14px; transition: all 0.25s ease; gap: 10px;" onfocusin="this.style.borderColor='var(--color-gold)';this.style.boxShadow='0 0 0 4px rgba(212,175,55,0.12)'" onfocusout="this.style.borderColor='var(--color-border)';this.style.boxShadow='none'">
+                    <span class="material-icons-round" style="font-size: 20px; color: var(--color-text-light); flex-shrink: 0;">account_circle</span>
+                    <input name="username" type="text" placeholder="Enter your username" required style="background: transparent; border: none; outline: none; color: var(--color-navy); font-size: 0.95rem; font-weight: 500; width: 100%; font-family: inherit;" autocomplete="username">
+                </div>
             </div>
 
-            <form method="POST" class="space-y-5">
-                {% csrf_token %}
-
-                <input type="text" name="username" placeholder="Username" required
-                    class="w-full p-3 rounded-xl bg-[var(--bg-soft)] border border-[var(--border)] text-[var(--navy-deep)] placeholder-gray-400 focus:ring-2 focus:ring-[var(--gold-1)] outline-none">
-
-                <div class="relative">
-                    <input id="password" type="password" name="password" placeholder="Password" required
-                        class="w-full p-3 rounded-xl bg-[var(--bg-soft)] border border-[var(--border)] text-[var(--navy-deep)] placeholder-gray-400 focus:ring-2 focus:ring-[var(--gold-1)] outline-none">
-
-                    <button type="button" onclick="togglePassword()"
-                        class="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]">
-                        👁
+            <!-- Password -->
+            <div style="margin-bottom: var(--space-lg);">
+                <label style="display: block; font-size: 0.75rem; font-weight: 600; color: var(--color-text-muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em;">Password</label>
+                <div style="display: flex; align-items: center; background: var(--color-bg-soft); border: 1.5px solid var(--color-border); border-radius: var(--radius-lg); padding: 12px 14px; transition: all 0.25s ease; gap: 10px;" onfocusin="this.style.borderColor='var(--color-gold)';this.style.boxShadow='0 0 0 4px rgba(212,175,55,0.12)'" onfocusout="this.style.borderColor='var(--color-border)';this.style.boxShadow='none'">
+                    <span class="material-icons-round" style="font-size: 20px; color: var(--color-text-light); flex-shrink: 0;">lock</span>
+                    <input id="password" name="password" type="password" placeholder="Enter your password" required style="background: transparent; border: none; outline: none; color: var(--color-navy); font-size: 0.95rem; font-weight: 500; width: 100%; font-family: inherit;" autocomplete="current-password">
+                    <button type="button" onclick="togglePassword()" style="background: none; border: none; padding: 0; cursor: pointer; color: var(--color-text-light); display: flex; align-items: center; flex-shrink: 0;">
+                        <span id="togglePasswordIcon" class="material-icons-round" style="font-size: 20px;">visibility</span>
                     </button>
                 </div>
+            </div>
 
-                <button type="submit" class="btn-gold w-full">
-                    Login
-                </button>
+            <!-- Submit -->
+            <button type="submit" class="btn btn-gold" style="width: 100%; min-height: 52px; font-size: 1rem; margin-bottom: var(--space-sm);">
+                <span class="material-icons-round" style="font-size: 20px;">login</span>
+                Login
+            </button>
 
-                <a href="{% url 'otp_verification' %}" class="btn-outline-gold w-full">
-                   Forgot Password?
-                </a>
+            <!-- Forgot Password -->
+            <a href="{% url 'otp_verification' %}" class="btn btn-outline" style="width: 100%; min-height: 48px; font-size: 0.9rem;">
+                Forgot Password?
+            </a>
 
-            </form>
+        </form>
 
-            <p class="text-center text-sm mt-6 text-[var(--text-muted)]">
+        <!-- Register -->
+        <div style="padding: 0 var(--space-lg) var(--space-xl); border-top: 1px solid var(--color-border); padding-top: var(--space-md);">
+            <p style="font-size: 0.85rem; color: var(--color-text-muted); text-align: center; margin: 0 0 var(--space-sm);">
                 Don't have an account?
-                <a href="{% url 'register' %}" class="text-[var(--gold-1)] font-semibold hover:underline">
-                    Register
-                </a>
             </p>
-
+            <a href="{% url 'register' %}" class="btn btn-outline" style="width: 100%; min-height: 50px; font-size: 0.95rem; border-color: var(--color-gold); color: var(--color-gold-dark);">
+                <span class="material-icons-round" style="font-size: 18px;">person_add</span>
+                Register
+            </a>
         </div>
 
     </div>
@@ -122,7 +117,10 @@
 <script>
 function togglePassword() {
     const input = document.getElementById("password");
-    input.type = input.type === "password" ? "text" : "password";
+    const icon = document.getElementById("togglePasswordIcon");
+    const isHidden = input.type === "password";
+    input.type = isHidden ? "text" : "password";
+    icon.textContent = isHidden ? "visibility_off" : "visibility";
 }
 </script>
 
