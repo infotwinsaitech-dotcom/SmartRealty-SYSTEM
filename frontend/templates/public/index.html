@@ -327,7 +327,13 @@
 .hero-ad-slides { position: absolute; inset: 0; z-index: 0; cursor: pointer; }
 .hero-ad-slides img {
     position: absolute; inset: 0; width: 100%; height: 100%;
-    object-fit: cover; opacity: 0; transition: opacity 1s ease;
+    /* Pehle 'cover' tha jo desktop par banner ke wide box (full width,
+       limited height) me ad image ko force-fill karta tha — isse image
+       ke upar/neeche ka hissa cut ho jaata tha. Ab 'contain' use kiya
+       hai taaki poora banner/ad hamesha bina cut hue, sahi aspect ratio
+       ke sath poora dikhe. Mobile par box ka ratio pehle se hi ad image
+       jaisa (16:9) hai, isliye wahan is change se koi fark nahi padega. */
+    object-fit: contain; opacity: 0; transition: opacity 1s ease;
 }
 .hero-ad-slides img.active { opacity: 1; }
 .hero-overlay {
