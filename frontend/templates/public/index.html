@@ -90,6 +90,9 @@
 <!-- ============================================
    FEATURED PROPERTIES
    ============================================ -->
+<!-- ============================================
+   FEATURED PROPERTIES
+   ============================================ -->
 <section class="section-pad" style="background: var(--color-bg);">
     <div class="container-app">
         <div class="section-header">
@@ -101,13 +104,13 @@
             <p>Explore our top verified listings, ready for you to move in or invest.</p>
             <div class="gold-line"></div>
         </div>
-
+ 
         {% if properties %}
         <div class="showcase-wrap">
             <button class="showcase-arrow showcase-prev" onclick="showcaseScroll(-1)" aria-label="Previous property">
                 <span class="material-icons-round">chevron_left</span>
             </button>
-
+ 
             <div class="showcase-track" id="showcaseTrack">
                 {% for property in properties %}
                 <a href="{% url 'property_detail' property.id %}" class="showcase-card reveal">
@@ -119,18 +122,18 @@
                             {% if property.builder.profile.full_name %}{{ property.builder.profile.full_name }}{% else %}Verified Builder{% endif %}
                         </div>
                         <span class="showcase-view-link">View Projects</span>
-
+ 
                         <h3 class="showcase-title">{{ property.project_name|default:property.title }}</h3>
                         <div class="showcase-location">
                             <span class="material-icons-round" style="font-size:14px">location_on</span>
                             {{ property.location }}
                         </div>
-
+ 
                         <div class="showcase-price">₹{{ property.price }} {{ property.price_unit|default:"L" }}</div>
                         {% if property.beds %}
                         <div class="showcase-bhk">{{ property.beds }} BHK Apartments</div>
                         {% endif %}
-
+ 
                         <button class="wishlist-btn showcase-wishlist {% if property.id in user_wishlist_ids %}active{% endif %}"
                                 onclick="event.preventDefault(); event.stopPropagation(); toggleWishlist({{ property.id }}, this)"
                                 aria-label="Add to wishlist">
@@ -138,13 +141,13 @@
                                 {% if property.id in user_wishlist_ids %}favorite{% else %}favorite_border{% endif %}
                             </span>
                         </button>
-
+ 
                         <span class="showcase-cta">
                             Contact
                             <span class="material-icons-round" style="font-size:16px">arrow_forward</span>
                         </span>
                     </div>
-
+ 
                     <div class="showcase-media">
                         {% if property.thumbnail %}
                         {% cloudinary_url property.thumbnail width=1000 height=750 crop='fill' as img_url %}
@@ -154,11 +157,11 @@
                             <span class="material-icons-round">apartment</span>
                         </div>
                         {% endif %}
-
+ 
                         <span class="badge {% if property.status == 'Sold Out' %}badge-sold{% elif property.status == 'Coming Soon' %}badge-soon{% endif %}">
                             {{ property.status }}
                         </span>
-
+ 
                         {% if property.possession %}
                         <span class="showcase-possession">{{ property.possession }}</span>
                         {% endif %}
@@ -166,7 +169,7 @@
                 </a>
                 {% endfor %}
             </div>
-
+ 
             <button class="showcase-arrow showcase-next" onclick="showcaseScroll(1)" aria-label="Next property">
                 <span class="material-icons-round">chevron_right</span>
             </button>
@@ -177,7 +180,7 @@
             <p style="margin-top: var(--space-md);">New properties are being added soon. Check back shortly!</p>
         </div>
         {% endif %}
-
+ 
         <div style="text-align:center; margin-top: var(--space-xl);">
             <a href="{% url 'property_list' %}" class="btn btn-navy">
                 View All Properties
@@ -186,6 +189,7 @@
         </div>
     </div>
 </section>
+
 
 <!-- ============================================
    WHY CHOOSE US
