@@ -315,17 +315,10 @@
 {% endblock %}
 {% block extra_js %}
 <style>
-.hero-ad-slides {
-    position: absolute; inset: 0; z-index: 0; cursor: pointer;
-    /* Letterbox background — image ab crop nahi hogi, agar aspect-ratio
-       match nahi hui to yeh khaali jagah ko theme ke color se bhar dega */
-    background: var(--color-navy);
-}
+.hero-ad-slides { position: absolute; inset: 0; z-index: 0; cursor: pointer; }
 .hero-ad-slides img {
     position: absolute; inset: 0; width: 100%; height: 100%;
-    /* cover pehle image ko crop kar deta tha (ad ka kuch hissa katt jata
-       tha). contain se poori ad image bina crop hue dikhegi. */
-    object-fit: contain; opacity: 0; transition: opacity 1s ease;
+    object-fit: cover; opacity: 0; transition: opacity 1s ease;
 }
 .hero-ad-slides img.active { opacity: 1; }
 .hero-overlay {
@@ -485,7 +478,7 @@ function heroAdGo(direction) {
 (function() {
     const ads = [
         {% for ad in advertisements %}
-        { image: "{% cloudinary_url ad.image width=1600 height=900 crop='fit' quality='auto' %}", url: "{% url 'property_detail' ad.property.id %}" }{% if not forloop.last %},{% endif %}
+        { image: "{% cloudinary_url ad.image width=1600 height=900 crop='fill' quality='auto' %}", url: "{% url 'property_detail' ad.property.id %}" }{% if not forloop.last %},{% endif %}
         {% endfor %}
     ];
     if (ads.length === 0) return;
