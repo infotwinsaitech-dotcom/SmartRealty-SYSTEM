@@ -327,40 +327,30 @@
 .hero-ad-slides { position: absolute; inset: 0; z-index: 0; cursor: pointer; }
 .hero-ad-slides img {
     position: absolute; inset: 0; width: 100%; height: 100%;
-    /* Pehle 'cover' tha jo desktop par banner ke wide box (full width,
-       limited height) me ad image ko force-fill karta tha — isse image
-       ke upar/neeche ka hissa cut ho jaata tha. Ab 'contain' use kiya
-       hai taaki poora banner/ad hamesha bina cut hue, sahi aspect ratio
-       ke sath poora dikhe. Mobile par box ka ratio pehle se hi ad image
-       jaisa (16:9) hai, isliye wahan is change se koi fark nahi padega. */
-    object-fit: contain; opacity: 0; transition: opacity 1s ease;
+    /* Cloudinary se ad image already 1600x900 (16:9) generate hoti hai.
+       Neeche #heroAdSection ka box bhi ab isi 16:9 ratio me lock kiya
+       hai, isliye 'cover' yahan bina kisi crop/gap ke poora banner
+       edge-to-edge dikhayega — bilkul 99acres jaisa clean banner. */
+    object-fit: cover; opacity: 0; transition: opacity 1s ease;
 }
 .hero-ad-slides img.active { opacity: 1; }
 .hero-overlay {
     position: absolute; inset: 0; z-index: 1;
-    /* Pehle overlay halka tha, isliye ad image ka apna text/CTA hamare
-       "Where Trust Meets Your Dream Home" heading ke sath overlap/clash
-       kar raha tha. Ab ek hi uniform dark layer, taaki sirf hamara
-       real hero text hi saaf padhne layak rahe. */
-    background: rgba(11,31,58,0.82);
-    /* Overlay hi banner ke upar sabse upar (z-index:1) baitha hota hai,
-       isliye hover pe cursor yahi decide karta tha aur pointer nahi dikh
-       raha tha. Ab explicitly hand/pointer cursor set kiya taaki poore
-       banner par hover karte hi hath vala cursor dikhe. */
+    /* Pehle flat 0.82 opacity ka pura dark layer tha jo ad ko lagbhag
+       chhupa deta tha. Ab sirf neeche (jahan hamara text/search hai)
+       gradient dark hai — upar ad poora saaf dikhega, neeche text bhi
+       padhne layak rahega. */
+    background: linear-gradient(180deg, rgba(11,31,58,0.15) 0%, rgba(11,31,58,0.35) 45%, rgba(11,31,58,0.88) 100%);
     cursor: pointer;
 }
 .hero-section::before { z-index: 1; }
 #heroAdSection {
-    /* Poora banner clickable hai (property par le jaata hai),
-       isliye pura section hi pointer cursor dikhaega. */
     cursor: pointer;
 }
 #heroAdSection .hero-content,
 #heroAdSection input,
 #heroAdSection .search-btn,
 #heroAdSection .filter-pill {
-    /* Text/search area ke andar apna normal cursor hi rahe (text/pointer
-       jo us element ke liye sahi ho), banner ka pointer yahan override na ho. */
     cursor: auto;
 }
 #heroAdSection input { cursor: text; }
@@ -368,8 +358,6 @@
 #heroAdSection .filter-pill { cursor: pointer; }
 .hero-content {
     z-index: 3 !important;
-    /* Neeche dots indicator (.hero-ad-dots) se takraane se bachne ke liye
-       extra jagah reserve kari hai */
     padding-bottom: 56px;
 }
 
@@ -395,10 +383,17 @@
 .hero-ad-prev { left: 16px; }
 .hero-ad-next { right: 16px; }
 
-/* Hero height ab yahan control hoga, mobile-friendly */
+/* Desktop/tablet: box ko ad ke asli 16:9 ratio me lock kiya (jaisa
+   mobile me pehle se hai) taaki 'cover' se koi letterbox/gap na aaye,
+   width ke saath naturally scale ho, aur bahut zyada tall na ho jaaye
+   uske liye max-height cap bhi rakha hai. */
 #heroAdSection {
-    min-height: 56vh;
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    min-height: 320px;
     max-height: 640px;
+    overflow: hidden;
 }
 
 .hero-ad-dots {
@@ -426,10 +421,6 @@
     border-radius: 4px;
 }
 
-/* ============================================
-   FEATURED PROPERTIES SHOWCASE (housing.com style
-   attractive carousel banner)
-   ============================================ */
 .showcase-wrap {
     position: relative;
     display: flex;
@@ -545,21 +536,17 @@
 }
 
 @media (max-width: 767px) {
-    /* Ab hero ek fullscreen cropped background nahi, balki ek proper
-       stacked layout hai: pehle ad ka apna card, uske baad text/search
-       normal flow me — bilkul competitor apps (99acres) jaisa. */
     #heroAdSection {
         display: flex;
         flex-direction: column;
         align-items: stretch;
         justify-content: flex-start;
+        aspect-ratio: auto;
         min-height: 0;
         max-height: none;
         padding: var(--space-md) var(--space-md) var(--space-xl);
     }
 
-    /* Ad creative apne khud ke rounded card me poori tarah visible,
-       ab pura hero-height me stretch/crop nahi hoga */
     .hero-ad-slides {
         position: relative;
         inset: auto;
@@ -571,12 +558,10 @@
         box-shadow: 0 10px 28px rgba(0,0,0,0.3);
     }
 
-    /* Text overlay ab zaroori nahi, ad apni jagah alag card me hai */
     .hero-overlay {
         display: none;
     }
 
-    /* Dots ab image ke neeche normal jagah par, floating nahi */
     .hero-ad-dots {
         position: static;
         transform: none;
@@ -585,7 +570,6 @@
         margin: 12px 0 var(--space-lg);
     }
 
-    /* Headline/search ab image ke neeche normal padding ke saath, overlay nahi */
     .hero-content {
         order: 3;
         position: relative;
@@ -594,14 +578,12 @@
         max-width: 100%;
     }
 
-    /* Mobile pe arrows chhupa do, swipe se chalega */
     .hero-ad-arrow {
         display: none;
     }
 }
 </style>
 <script>
-// Featured Properties showcase carousel (housing.com style) - prev/next arrows
 function showcaseScroll(direction) {
     const track = document.getElementById('showcaseTrack');
     if (!track) return;
@@ -670,7 +652,6 @@ function heroAdGo(direction) {
         window.location.href = ads[heroAdCurrent].url;
     });
 
-    // Mobile ke liye swipe support (sirf ad card par, neeche headline/search par nahi)
     let touchStartX = 0;
     slidesContainer.addEventListener('touchstart', (e) => {
         touchStartX = e.changedTouches[0].screenX;
