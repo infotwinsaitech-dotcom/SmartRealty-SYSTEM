@@ -4,14 +4,16 @@
      Navy + Gold + White, matches base.html design system
      Mobile-first (90% traffic), scales up to tablet/laptop/iOS
      ============================================ -->
-<nav class="sticky top-0 z-50 h-16 md:h-20 flex items-center border-b" style="background: var(--color-surface); border-color: var(--color-border); box-shadow: var(--shadow-sm);">
+<nav class="sticky top-0 z-50 h-14 md:h-16 flex items-center border-b" style="background: var(--color-surface); border-color: var(--color-border); box-shadow: var(--shadow-sm);">
     <div class="w-full flex items-center justify-between gap-4" style="max-width: 1280px; margin-inline: auto; padding-inline: clamp(1rem, 4vw, 2rem);">
 
         <!-- LOGO -->
         <a href="{% url 'home' %}" class="flex items-center flex-shrink-0" aria-label="{{ site.company_name|default:'RealShri' }} home">
             <img src="{% if site.logo %}{{ site.logo.url }}{% else %}{% static 'images/logo.png' %}{% endif %}"
                  alt="{{ site.company_name|default:'RealShri' }}"
-                 class="h-9 md:h-11 w-auto object-contain">
+                 class="h-7 md:h-9 w-auto object-contain"
+                 onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
+            <span style="display:none; font-weight:800; font-size:1.1rem; color: var(--color-navy);">{{ site.company_name|default:'RealShri' }}</span>
         </a>
 
         <!-- DESKTOP MENU -->
