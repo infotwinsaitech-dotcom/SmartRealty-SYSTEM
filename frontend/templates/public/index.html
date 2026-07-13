@@ -14,9 +14,6 @@
     <!-- Text padhne layak rakhne ke liye dark overlay -->
     <div class="hero-overlay"></div>
 
-    <!-- Desktop par 99acres jaisa ad info panel (image ke sath text) -->
-    <div class="hero-ad-info" id="heroAdInfo"></div>
-
     <!-- Ad navigation arrows -->
     <button id="heroAdPrev" class="hero-ad-arrow hero-ad-prev" onclick="event.stopPropagation(); heroAdGo(-1)" aria-label="Previous ad">
         <span class="material-icons-round">chevron_left</span>
@@ -602,154 +599,6 @@
         display: none;
     }
 }
-
-/* Naya info panel by default hidden — sirf desktop banner ke liye
-   neeche wale min-width query me visible hoga. Isse mobile (jo upar
-   wale max-width:767px block se already control hota hai) par koi
-   asar nahi padega, wahan ka layout bilkul waisa hi rahega. */
-.hero-ad-info { display: none; }
-
-/* ============================================
-   DESKTOP HERO BANNER — 99acres jaisa clean ad-banner
-   (photo + info side-by-side, light background, floating
-   search card neeche). Sirf 768px aur usse bade screens par
-   lagu hota hai — mobile ka layout upar wale max-width:767px
-   block se hi control hota hai aur yahan chhua tak nahi gaya. */
-@media (min-width: 768px) {
-    #heroAdSection {
-        min-height: 0;
-        max-height: none;
-        height: auto;
-        padding: 0 0 56px;
-        overflow: visible;
-        background: #eef2f7;
-        cursor: default;
-    }
-    .hero-section::before,
-    .hero-section::after {
-        display: none;
-    }
-
-    .hero-ad-slides {
-        top: 0; left: 0; right: 0; bottom: auto;
-        height: 380px;
-        background: #eef2f7;
-    }
-    .hero-ad-slides img {
-        object-position: left center;
-    }
-
-    /* 99acres style me dark overlay nahi hota, image aur text dono
-       clearly side by side dikhte hain */
-    .hero-overlay { display: none; }
-
-    .hero-ad-info {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        gap: 6px;
-        position: absolute;
-        top: 0; right: 0;
-        height: 380px;
-        width: 46%;
-        max-width: 620px;
-        z-index: 2;
-        padding: 28px 48px 28px 24px;
-        background: linear-gradient(90deg, rgba(238,242,247,0) 0%, #eef2f7 16%);
-        cursor: pointer;
-    }
-    .hero-ad-info-badge {
-        display: inline-flex; align-items: center; gap: 6px;
-        width: fit-content;
-        font-size: 0.72rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
-        color: var(--color-navy); background: rgba(11,31,58,0.06);
-        padding: 5px 10px; border-radius: var(--radius-full, 20px);
-        margin-bottom: 6px;
-    }
-    .hero-ad-info-title {
-        font-size: 1.2rem; font-weight: 800; color: var(--color-navy);
-        line-height: 1.35; margin: 2px 0;
-    }
-    .hero-ad-info-meta {
-        font-size: 0.85rem; color: var(--color-text-light); display: flex; align-items: center; gap: 4px;
-    }
-    .hero-ad-info-price {
-        font-size: 1.05rem; font-weight: 800; color: var(--color-navy); margin-top: 4px;
-    }
-    .hero-ad-info-cta {
-        margin-top: 14px;
-        display: inline-flex; align-items: center; gap: 8px;
-        width: fit-content;
-        background: #fff; color: var(--color-navy);
-        font-weight: 700; font-size: 0.85rem;
-        padding: 10px 22px;
-        border: 1.5px solid var(--color-navy);
-        border-radius: var(--radius-md, 8px);
-        text-decoration: none;
-    }
-    .hero-ad-info-cta:hover { background: var(--color-navy); color: #fff; }
-
-    .hero-ad-arrow {
-        top: 190px;
-        background: #fff;
-        border-color: rgba(11,31,58,0.15);
-        color: var(--color-navy);
-        box-shadow: 0 4px 14px rgba(11,31,58,0.16);
-        backdrop-filter: none;
-    }
-    .hero-ad-arrow:hover { background: #eef2f7; }
-    .hero-ad-prev { left: 12px; }
-    .hero-ad-next { right: 12px; }
-
-    .hero-ad-dots {
-        top: 344px; bottom: auto;
-    }
-    .hero-ad-dot { background: rgba(11,31,58,0.2); }
-
-    /* Search + category card — banner ke bottom edge par thoda overlap
-       karta hua floating white card, bilkul 99acres ke tabs+search
-       row jaisa */
-    .hero-content {
-        position: relative;
-        z-index: 3;
-        text-align: left;
-        max-width: 900px !important;
-        width: 92%;
-        margin: -46px auto 0;
-        background: #fff;
-        border-radius: var(--radius-lg, 16px);
-        box-shadow: 0 12px 32px rgba(11,31,58,0.16);
-        padding: 22px 30px 26px;
-    }
-    #heroAdSection .hero-content,
-    #heroAdSection input,
-    #heroAdSection .search-btn,
-    #heroAdSection .filter-pill {
-        cursor: auto;
-    }
-    #heroAdSection .hero-content .label {
-        color: var(--color-navy) !important;
-        border-color: rgba(11,31,58,0.15) !important;
-    }
-    .hero-content .hero-title {
-        color: var(--color-navy);
-        text-shadow: none;
-        font-size: 1.5rem;
-    }
-    .hero-content .hero-subtitle {
-        color: var(--color-text-light);
-        margin-inline: 0;
-    }
-    .hero-content .search-bar { margin-inline: 0; }
-    .hero-content > div[style*="justify-content:center"] {
-        justify-content: flex-start !important;
-    }
-    #heroAdSection .hero-content .filter-pill {
-        background: var(--color-bg-soft) !important;
-        border-color: rgba(11,31,58,0.08) !important;
-        color: var(--color-navy) !important;
-    }
-}
 </style>
 <script>
 // Featured Properties showcase carousel (housing.com style) - prev/next arrows
@@ -770,26 +619,6 @@ function heroAdUpdateDots() {
     dots.forEach((dot, i) => dot.classList.toggle('active', i === heroAdCurrent));
 }
 
-function heroAdRenderInfo(ad) {
-    const info = document.getElementById('heroAdInfo');
-    if (!info || !ad) return;
-    const metaParts = [ad.beds, ad.sqft].filter(Boolean).join(' &bull; ');
-    info.innerHTML = `
-        <span class="hero-ad-info-badge">
-            <span class="material-icons-round" style="font-size:14px">verified</span>
-            RERA Verified
-        </span>
-        <h3 class="hero-ad-info-title">${ad.title || ''}</h3>
-        ${ad.location ? `<div class="hero-ad-info-meta"><span class="material-icons-round" style="font-size:14px">location_on</span>${ad.location}</div>` : ''}
-        ${metaParts ? `<div class="hero-ad-info-meta">${metaParts}</div>` : ''}
-        ${ad.price ? `<div class="hero-ad-info-price">${ad.price}</div>` : ''}
-        <a href="${ad.url}" class="hero-ad-info-cta" onclick="event.stopPropagation();">
-            Explore Now
-            <span class="material-icons-round" style="font-size:16px">arrow_forward</span>
-        </a>
-    `;
-}
-
 function heroAdShow(index) {
     const slidesContainer = document.getElementById('heroAdSlides');
     const imgs = slidesContainer.querySelectorAll('img');
@@ -799,7 +628,6 @@ function heroAdShow(index) {
     heroAdCurrent = (index + imgs.length) % imgs.length;
     imgs[heroAdCurrent].classList.add('active');
     heroAdUpdateDots();
-    if (window.heroAdsData) heroAdRenderInfo(window.heroAdsData[heroAdCurrent]);
 
     if (heroAdTimer) clearInterval(heroAdTimer);
     if (imgs.length > 1) {
@@ -814,19 +642,10 @@ function heroAdGo(direction) {
 (function() {
     const ads = [
         {% for ad in advertisements %}
-        {
-            image: "{% cloudinary_url ad.image width=1600 height=900 crop='fill' quality='auto' %}",
-            url: "{% url 'property_detail' ad.property.id %}",
-            title: "{{ ad.property.project_name|default:ad.property.title|escapejs }}",
-            location: "{{ ad.property.location|escapejs }}",
-            beds: "{% if ad.property.beds %}{{ ad.property.beds }} BHK{% endif %}",
-            sqft: "{% if ad.property.sqft %}{{ ad.property.sqft }} sqft{% endif %}",
-            price: "{% if ad.property.price %}₹{{ ad.property.price }} {{ ad.property.price_unit|default:'L' }}{% endif %}"
-        }{% if not forloop.last %},{% endif %}
+        { image: "{% cloudinary_url ad.image width=1600 height=900 crop='fill' quality='auto' %}", url: "{% url 'property_detail' ad.property.id %}" }{% if not forloop.last %},{% endif %}
         {% endfor %}
     ];
     if (ads.length === 0) return;
-    window.heroAdsData = ads;
 
     const heroSection = document.getElementById('heroAdSection');
     const slidesContainer = document.getElementById('heroAdSlides');
@@ -846,8 +665,6 @@ function heroAdGo(direction) {
         dot.addEventListener('click', () => heroAdShow(i));
         dotsContainer.appendChild(dot);
     });
-
-    heroAdRenderInfo(ads[0]);
 
     heroSection.addEventListener('click', () => {
         window.location.href = ads[heroAdCurrent].url;
