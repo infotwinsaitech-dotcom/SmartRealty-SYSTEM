@@ -323,10 +323,19 @@
 .hero-ad-slides img.active { opacity: 1; }
 .hero-overlay {
     position: absolute; inset: 0; z-index: 1;
-    background: linear-gradient(135deg, rgba(11,31,58,0.75) 0%, rgba(11,31,58,0.55) 50%, rgba(30,58,95,0.75) 100%);
+    /* Pehle overlay halka tha, isliye ad image ka apna text/CTA hamare
+       "Where Trust Meets Your Dream Home" heading ke sath overlap/clash
+       kar raha tha. Ab ek hi uniform dark layer, taaki sirf hamara
+       real hero text hi saaf padhne layak rahe. */
+    background: rgba(11,31,58,0.82);
 }
 .hero-section::before { z-index: 1; }
-.hero-content { z-index: 3 !important; }
+.hero-content {
+    z-index: 3 !important;
+    /* Neeche dots indicator (.hero-ad-dots) se takraane se bachne ke liye
+       extra jagah reserve kari hai */
+    padding-bottom: 56px;
+}
 
 .hero-ad-arrow {
     position: absolute;
