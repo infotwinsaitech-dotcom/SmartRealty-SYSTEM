@@ -1,530 +1,328 @@
-{% extends "public/base.html" %}
-{% load static cloudinary custom_filters %}
-{% block title %}Home{% endblock %}
-
-{% block content %}
-
+{% load static %}
 <!-- ============================================
-   HOME HERO - Search + Trust
-   ============================================ -->
-<section class="hero-section" id="heroAdSection">
+     TOP NAVBAR - RealShri
+     Navy + Gold + White, matches base.html design system
+     Mobile-first (90% traffic), scales up to tablet/laptop/iOS
+     ============================================ -->
+<nav class="sticky top-0 z-50 h-14 md:h-16 flex items-center border-b" style="background: var(--color-surface); border-color: var(--color-border); box-shadow: var(--shadow-sm);">
+    <div class="w-full flex items-center justify-between gap-4" style="max-width: 1280px; margin-inline: auto; padding-inline: clamp(1rem, 4vw, 2rem);">
 
-    <!-- Ad images ye JS yahan inject karega -->
-    <div class="hero-ad-slides" id="heroAdSlides"></div>
-    <!-- Text padhne layak rakhne ke liye dark overlay -->
-    <div class="hero-overlay"></div>
-
-    <!-- Ad navigation arrows -->
-    <button id="heroAdPrev" class="hero-ad-arrow hero-ad-prev" onclick="event.stopPropagation(); heroAdGo(-1)" aria-label="Previous ad">
-        <span class="material-icons-round">chevron_left</span>
-    </button>
-    <button id="heroAdNext" class="hero-ad-arrow hero-ad-next" onclick="event.stopPropagation(); heroAdGo(1)" aria-label="Next ad">
-        <span class="material-icons-round">chevron_right</span>
-    </button>
-
-    <!-- Ad dot indicators -->
-    <div class="hero-ad-dots" id="heroAdDots" onclick="event.stopPropagation()"></div>
-
-    <div class="hero-content" style="max-width: 780px;">
-        <span class="label" style="color: rgba(255,255,255,0.75); border-color: rgba(255,255,255,0.2); display:inline-flex; align-items:center; gap:8px; font-size:0.8rem; font-weight:700; text-transform:uppercase; letter-spacing:2px; margin-bottom: var(--space-sm);">
-            <span class="material-icons-round" style="font-size:16px">verified</span>
-            RERA Verified &bull; Zero Brokerage
-        </span>
-        <h1 class="hero-title">
-            Where Trust Meets <span style="color: #d4af37;">Your Dream Home</span>
-        </h1>
-        <p class="hero-subtitle">
-            Discover verified residential, commercial &amp; land properties across Ahmedabad &mdash; curated for buyers who value transparency.
-        </p>
-
-        <!-- Search Bar -->
-        <form method="GET" action="{% url 'property_list' %}" class="search-bar" style="margin-bottom: var(--space-md);" onclick="event.stopPropagation()">
-            <span class="material-icons-round" style="color: var(--color-text-light); font-size:20px;">search</span>
-            <input type="text" name="location" placeholder="Search by location, project, or builder...">
-            <button type="submit" class="search-btn">Search</button>
-        </form>
-
-        <!-- Quick Category Links -->
-        <div style="display:flex; flex-wrap:wrap; gap:8px; justify-content:center;" onclick="event.stopPropagation()">
-            <a href="{% url 'property_list' %}?category=residential" class="filter-pill" style="background:rgba(255,255,255,0.1); border-color:rgba(255,255,255,0.2); color:#fff;">
-                <span class="material-icons-round">home</span> Residential
-            </a>
-            <a href="{% url 'property_list' %}?category=commercial" class="filter-pill" style="background:rgba(255,255,255,0.1); border-color:rgba(255,255,255,0.2); color:#fff;">
-                <span class="material-icons-round">business</span> Commercial
-            </a>
-            <a href="{% url 'property_list' %}?category=land" class="filter-pill" style="background:rgba(255,255,255,0.1); border-color:rgba(255,255,255,0.2); color:#fff;">
-                <span class="material-icons-round">terrain</span> Land / Plot
-            </a>
-        </div>
-    </div>
-</section>
-        
-
-
-<!-- ============================================
-   TRUST STRIP
-   ============================================ -->
-<section style="background: linear-gradient(120deg, var(--color-navy) 0%, var(--color-navy-light) 100%);">
-    <div class="container-app" style="padding-top: var(--space-lg); padding-bottom: var(--space-lg);">
-        <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-lg); text-align:center;">
-            <div>
-                <div style="font-size: clamp(1.4rem, 4vw, 2rem); font-weight:800; color: var(--color-gold-light);">500+</div>
-                <div style="font-size:0.8rem; color: rgba(255,255,255,0.65); font-weight:500;">Properties Listed</div>
-            </div>
-            <div>
-                <div style="font-size: clamp(1.4rem, 4vw, 2rem); font-weight:800; color: var(--color-gold-light);">10K+</div>
-                <div style="font-size:0.8rem; color: rgba(255,255,255,0.65); font-weight:500;">Happy Families</div>
-            </div>
-            <div>
-                <div style="font-size: clamp(1.4rem, 4vw, 2rem); font-weight:800; color: var(--color-gold-light);">100%</div>
-                <div style="font-size:0.8rem; color: rgba(255,255,255,0.65); font-weight:500;">RERA Verified</div>
-            </div>
-            <div>
-                <div style="font-size: clamp(1.4rem, 4vw, 2rem); font-weight:800; color: var(--color-gold-light);">0%</div>
-                <div style="font-size:0.8rem; color: rgba(255,255,255,0.65); font-weight:500;">Brokerage Fee</div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- ============================================
-   FEATURED PROPERTIES
-   ============================================ -->
-<section class="section-pad" style="background: var(--color-bg);">
-    <div class="container-app">
-        <div class="section-header">
-            <span class="label">
-                <span class="material-icons-round" style="font-size:16px">apartment</span>
-                Handpicked For You
-            </span>
-            <h2>Featured Properties</h2>
-            <p>Explore our top verified listings, ready for you to move in or invest.</p>
-            <div class="gold-line"></div>
+        <!-- LOGO (ab clickable nahi hai, sirf branding ke liye) -->
+        <div class="flex items-center flex-shrink-0" aria-label="{{ site.company_name|default:'RealShri' }}">
+            <img src="{% if site.logo %}{{ site.logo.url }}{% else %}{% static 'images/logo.png' %}{% endif %}"
+                 alt="{{ site.company_name|default:'RealShri' }}"
+                 class="h-14 md:h-16 w-auto object-contain"
+                 onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
+            <span style="display:none; font-weight:800; font-size:1.1rem; color: var(--color-navy);">{{ site.company_name|default:'RealShri' }}</span>
         </div>
 
-        {% if properties %}
-        <div class="grid-properties">
-            {% for property in properties %}
-            <div class="property-card reveal">
-                <a href="{% url 'property_detail' property.id %}" class="block" style="color:inherit; text-decoration:none;">
-                    <div class="card-img">
-                        {% if property.thumbnail %}
-                        {% cloudinary_url property.thumbnail width=600 height=400 crop='fill' as img_url %}
-                        <img src="{{ img_url }}" alt="{{ property.title }}" loading="lazy">
-                        {% else %}
-                        <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; background: var(--color-bg-soft);">
-                            <span class="material-icons-round" style="font-size:48px; color: var(--color-text-light);">apartment</span>
+        <!-- DESKTOP MENU -->
+        <div class="hidden lg:flex items-center gap-1 font-medium" style="color: var(--color-text);">
+
+            <a href="{% url 'home' %}" class="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm transition hover:bg-[var(--color-bg-soft)]" style="color: var(--color-text);" onmouseover="this.style.color='var(--color-gold-dark)'" onmouseout="this.style.color='var(--color-text)'">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                Home
+            </a>
+
+            <a href="{% url 'property_list' %}" class="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm transition hover:bg-[var(--color-bg-soft)]" style="color: var(--color-text);" onmouseover="this.style.color='var(--color-gold-dark)'" onmouseout="this.style.color='var(--color-text)'">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                Properties
+            </a>
+
+            <!-- PROPERTY MAP -->
+            <a href="{% url 'property_map_public' %}" class="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm transition hover:bg-[var(--color-bg-soft)]" style="color: var(--color-text);" onmouseover="this.style.color='var(--color-gold-dark)'" onmouseout="this.style.color='var(--color-text)'">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
+                Property Map
+            </a>
+
+            <!-- CALCULATORS DROPDOWN -->
+            <div class="relative group">
+                <button class="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm transition hover:bg-[var(--color-bg-soft)]" style="color: var(--color-text);" onmouseover="this.style.color='var(--color-gold-dark)'" onmouseout="this.style.color='var(--color-text)'">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+                    Calculators
+                    <svg class="w-3 h-3 transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+                </button>
+                <div class="absolute top-full left-0 mt-1 rounded-xl py-2 min-w-[200px] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50" style="background: var(--color-surface); border: 1px solid var(--color-border); box-shadow: var(--shadow-lg);">
+                    <a href="{% url 'emi_calculator' %}" class="flex items-center gap-2.5 px-4 py-2.5 text-sm transition hover:bg-[var(--color-bg-soft)]" style="color: var(--color-text);">
+                        <svg class="w-4 h-4" style="color: var(--color-text-light);" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+                        EMI Calculator
+                    </a>
+                    <a href="{% url 'roi_calculator' %}" class="flex items-center gap-2.5 px-4 py-2.5 text-sm transition hover:bg-[var(--color-bg-soft)]" style="color: var(--color-text);">
+                        <svg class="w-4 h-4" style="color: var(--color-text-light);" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+                        ROI Calculator
+                    </a>
+                </div>
+            </div>
+
+            <a href="{% url 'about' %}" class="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm transition hover:bg-[var(--color-bg-soft)]" style="color: var(--color-text);" onmouseover="this.style.color='var(--color-gold-dark)'" onmouseout="this.style.color='var(--color-text)'">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                About
+            </a>
+
+            <a href="{% url 'contact' %}" class="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm transition hover:bg-[var(--color-bg-soft)]" style="color: var(--color-text);" onmouseover="this.style.color='var(--color-gold-dark)'" onmouseout="this.style.color='var(--color-text)'">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                Contact
+            </a>
+
+        </div>
+
+        <!-- RIGHT SIDE -->
+        <div class="flex gap-2 items-center flex-shrink-0">
+
+            <!-- WISHLIST -->
+            <a href="{% url 'wishlist' %}" class="relative p-2 rounded-full transition hidden sm:flex" style="color: var(--color-text-muted); min-width: var(--tap-min-sm); min-height: var(--tap-min-sm); align-items:center; justify-content:center;" onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='var(--color-text-muted)'">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+                <span id="navWishlistCount" class="absolute top-0 right-0 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center hidden" style="background: #ef4444;">0</span>
+            </a>
+
+            {% if user.is_authenticated %}
+                {% if user.role == 'user' %}
+                <!-- LOGGED IN PUBLIC USER: Profile Avatar Dropdown -->
+                <div class="relative">
+                    <button id="profileMenuBtn" onclick="toggleProfileMenu()"
+                        class="w-10 h-10 rounded-full font-bold flex items-center justify-center transition"
+                        style="background: var(--color-gold); color: var(--color-navy);">
+                        {{ request.user.username|slice:":1"|upper }}
+                    </button>
+
+                    <div id="profileMenu"
+                        class="hidden absolute right-0 mt-3 w-64 rounded-xl py-2 z-50"
+                        style="background: var(--color-surface); border: 1px solid var(--color-border); box-shadow: var(--shadow-lg);">
+
+                        <!-- Email header -->
+                        <div class="px-4 py-3 border-b" style="border-color: var(--color-border);">
+                            <p class="text-sm font-medium truncate" style="color: var(--color-navy);">
+                                {{ request.user.email|default:request.user.username }}
+                            </p>
                         </div>
-                        {% endif %}
 
-                        <span class="badge {% if property.status == 'Sold Out' %}badge-sold{% elif property.status == 'Coming Soon' %}badge-soon{% endif %}">
-                            {{ property.status }}
-                        </span>
+                        <a href="{% url 'profile' %}" class="flex items-center gap-3 px-4 py-2.5 text-sm transition hover:bg-[var(--color-bg-soft)]" style="color: var(--color-text);">
+                            <svg class="w-4 h-4" style="color: var(--color-text-light);" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                            My Profile
+                        </a>
 
-                        <button class="wishlist-btn {% if property.id in user_wishlist_ids %}active{% endif %}"
-                                onclick="event.preventDefault(); event.stopPropagation(); toggleWishlist({{ property.id }}, this)"
-                                aria-label="Add to wishlist">
-                            <span class="material-icons-round">
-                                {% if property.id in user_wishlist_ids %}favorite{% else %}favorite_border{% endif %}
-                            </span>
-                        </button>
+                        <a href="{% url 'edit_profile' %}" class="flex items-center gap-3 px-4 py-2.5 text-sm transition hover:bg-[var(--color-bg-soft)]" style="color: var(--color-text);">
+                            <svg class="w-4 h-4" style="color: var(--color-text-light);" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                            Edit Profile
+                        </a>
 
-                        {% if property.possession %}
-                        <span style="position:absolute; bottom:12px; left:12px; background:rgba(0,0,0,0.7); backdrop-filter:blur(4px); color:#fff; font-size:0.75rem; font-weight:500; padding:6px 12px; border-radius: var(--radius-md);">
-                            {{ property.possession }}
-                        </span>
-                        {% endif %}
+                        <a href="{% url 'wishlist' %}" class="flex items-center gap-3 px-4 py-2.5 text-sm transition hover:bg-[var(--color-bg-soft)]" style="color: var(--color-text);">
+                            <svg class="w-4 h-4" style="color: var(--color-text-light);" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+                            My Wishlist
+                        </a>
+
+                        <a href="{% url 'my_inquiries' %}" class="flex items-center gap-3 px-4 py-2.5 text-sm transition hover:bg-[var(--color-bg-soft)]" style="color: var(--color-text);">
+                            <svg class="w-4 h-4" style="color: var(--color-text-light);" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-6l-4 4v-4z"/></svg>
+                            My Inquiries
+                        </a>
+
+                        <div class="border-t my-2" style="border-color: var(--color-border);"></div>
+
+                        <a href="{% url 'logout' %}" class="flex items-center gap-3 px-4 py-2.5 text-sm transition hover:bg-red-50" style="color: #ef4444;">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                            Log out
+                        </a>
                     </div>
+                </div>
+                {% else %}
+                <!-- BUILDER/AGENT: Show Logout only -->
+                <a href="{% url 'logout' %}" class="hidden sm:flex items-center gap-1.5 font-medium transition px-3 py-2 rounded-lg text-sm hover:bg-red-50" style="color: #ef4444;">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                    Logout
+                </a>
+                {% endif %}
+            {% else %}
+            <!-- NOT LOGGED IN: Show Login + Register -->
+            <a href="{% url 'login' %}" class="btn btn-outline hidden sm:flex" style="min-height: 40px; padding: 8px 20px; font-size: 0.85rem;">
+                Login
+            </a>
 
-                    <div class="card-content">
-                        <div class="price">₹{{ property.price }} {{ property.price_unit|default:"L" }}</div>
-                        <h3 class="title">{{ property.project_name|default:property.title }}</h3>
-                        <p style="font-size:0.75rem; color: var(--color-text-light); text-transform:uppercase; letter-spacing:0.5px; font-weight:500; margin-bottom:8px;">{{ property.title }}</p>
+            <a href="{% url 'register' %}" class="btn btn-gold hidden sm:flex" style="min-height: 40px; padding: 8px 20px; font-size: 0.85rem;">
+                Register
+            </a>
+            {% endif %}
 
-                        <div class="location">
-                            <span class="material-icons-round" style="font-size:14px">location_on</span>
-                            {{ property.location }}
-                        </div>
+            <!-- MOBILE TOGGLE -->
+            <button id="mobileMenuBtn" class="lg:hidden rounded-lg transition flex items-center justify-center" style="color: var(--color-navy); width: var(--tap-min-sm); height: var(--tap-min-sm);" onclick="toggleMobileMenu()" aria-label="Toggle menu">
+                <svg id="menuIcon" class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                <svg id="closeIcon" class="w-6 h-6 hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
 
-                        <div class="features">
-                            {% if property.beds %}
-                            <div class="feature"><span class="material-icons-round">bed</span>{{ property.beds }} BHK</div>
-                            {% endif %}
-                            {% if property.sqft %}
-                            <div class="feature"><span class="material-icons-round">square_foot</span>{{ property.sqft }} sqft</div>
-                            {% endif %}
-                            {% if property.baths %}
-                            <div class="feature"><span class="material-icons-round">bathtub</span>{{ property.baths }} Bath</div>
-                            {% endif %}
-                        </div>
-                    </div>
+        </div>
+
+    </div>
+
+</nav>
+
+<!-- MOBILE MENU -->
+<div id="mobileMenu" class="hidden lg:hidden fixed inset-0 top-16 z-40 overflow-y-auto" style="background: var(--color-surface);">
+    <div class="px-4 py-6 space-y-1" style="padding-bottom: 100px;">
+
+        <a href="{% url 'home' %}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition font-medium hover:bg-[var(--color-bg-soft)]" style="color: var(--color-text);">
+            <svg class="w-5 h-5" style="color: var(--color-text-light);" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+            Home
+        </a>
+
+        <a href="{% url 'property_list' %}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition font-medium hover:bg-[var(--color-bg-soft)]" style="color: var(--color-text);">
+            <svg class="w-5 h-5" style="color: var(--color-text-light);" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+            Properties
+        </a>
+
+        <!-- PROPERTY MAP -->
+        <a href="{% url 'property_map_public' %}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition font-medium hover:bg-[var(--color-bg-soft)]" style="color: var(--color-text);">
+            <svg class="w-5 h-5" style="color: var(--color-text-light);" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
+            Property Map
+        </a>
+
+        <!-- MOBILE CALCULATORS -->
+        <div>
+            <button onclick="toggleMobileCalc()" class="w-full flex items-center justify-between px-4 py-3 rounded-xl transition font-medium hover:bg-[var(--color-bg-soft)]" style="color: var(--color-text);">
+                <span class="flex items-center gap-3">
+                    <svg class="w-5 h-5" style="color: var(--color-text-light);" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+                    Calculators
+                </span>
+                <svg id="calcArrow" class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+            </button>
+            <div id="mobileCalcMenu" class="hidden pl-12 pr-4 pb-2 space-y-1">
+                <a href="{% url 'emi_calculator' %}" class="flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm transition hover:bg-[var(--color-bg-soft)]" style="color: var(--color-text-muted);">
+                    <svg class="w-4 h-4" style="color: var(--color-text-light);" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+                    EMI Calculator
+                </a>
+                <a href="{% url 'roi_calculator' %}" class="flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm transition hover:bg-[var(--color-bg-soft)]" style="color: var(--color-text-muted);">
+                    <svg class="w-4 h-4" style="color: var(--color-text-light);" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+                    ROI Calculator
                 </a>
             </div>
-            {% endfor %}
         </div>
+
+        <a href="{% url 'about' %}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition font-medium hover:bg-[var(--color-bg-soft)]" style="color: var(--color-text);">
+            <svg class="w-5 h-5" style="color: var(--color-text-light);" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            About
+        </a>
+
+        <a href="{% url 'contact' %}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition font-medium hover:bg-[var(--color-bg-soft)]" style="color: var(--color-text);">
+            <svg class="w-5 h-5" style="color: var(--color-text-light);" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+            Contact
+        </a>
+
+        <div class="border-t my-3" style="border-color: var(--color-border);"></div>
+
+        <a href="{% url 'wishlist' %}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition font-medium hover:bg-[var(--color-bg-soft)]" style="color: var(--color-text);">
+            <svg class="w-5 h-5" style="color: var(--color-text-light);" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+            My Wishlist
+        </a>
+
+        <div class="border-t my-3" style="border-color: var(--color-border);"></div>
+
+        {% if user.is_authenticated %}
+            {% if user.role == 'user' %}
+            <!-- LOGGED IN PUBLIC USER -->
+            <div class="px-4 py-3 flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full font-bold flex items-center justify-center" style="background: var(--color-gold); color: var(--color-navy);">
+                    {{ request.user.username|slice:":1"|upper }}
+                </div>
+                <p class="text-sm font-medium truncate" style="color: var(--color-navy);">
+                    {{ request.user.email|default:request.user.username }}
+                </p>
+            </div>
+
+            <a href="{% url 'profile' %}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition font-medium hover:bg-[var(--color-bg-soft)]" style="color: var(--color-text);">
+                <svg class="w-5 h-5" style="color: var(--color-text-light);" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                My Profile
+            </a>
+
+            <a href="{% url 'edit_profile' %}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition font-medium hover:bg-[var(--color-bg-soft)]" style="color: var(--color-text);">
+                <svg class="w-5 h-5" style="color: var(--color-text-light);" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                Edit Profile
+            </a>
+
+            <a href="{% url 'my_inquiries' %}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition font-medium hover:bg-[var(--color-bg-soft)]" style="color: var(--color-text);">
+                <svg class="w-5 h-5" style="color: var(--color-text-light);" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-6l-4 4v-4z"/></svg>
+                My Inquiries
+            </a>
+
+            <div class="border-t my-3" style="border-color: var(--color-border);"></div>
+
+            <a href="{% url 'logout' %}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition font-medium hover:bg-red-50" style="color: #ef4444;">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                Logout
+            </a>
+            {% else %}
+            <!-- BUILDER/AGENT: Show Logout only -->
+            <a href="{% url 'logout' %}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition font-medium hover:bg-red-50" style="color: #ef4444;">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                Logout
+            </a>
+            {% endif %}
         {% else %}
-        <div class="card" style="padding: var(--space-2xl); text-align:center;">
-            <span class="material-icons-round" style="font-size:48px; color: var(--color-text-light);">apartment</span>
-            <p style="margin-top: var(--space-md);">New properties are being added soon. Check back shortly!</p>
+        <!-- NOT LOGGED IN: Show Login + Register -->
+        <div class="px-4 pt-2 space-y-3">
+            <a href="{% url 'login' %}" class="btn btn-outline" style="width: 100%;">
+                Login
+            </a>
+            <a href="{% url 'register' %}" class="btn btn-gold" style="width: 100%;">
+                <span class="material-icons-round" style="font-size: 18px;">person_add</span>
+                Register
+            </a>
         </div>
         {% endif %}
 
-        <div style="text-align:center; margin-top: var(--space-xl);">
-            <a href="{% url 'property_list' %}" class="btn btn-navy">
-                View All Properties
-                <span class="material-icons-round" style="font-size:18px;">arrow_forward</span>
-            </a>
-        </div>
     </div>
-</section>
+</div>
 
-<!-- ============================================
-   WHY CHOOSE US
-   ============================================ -->
-<section class="section-pad" style="background: var(--color-bg-tint);">
-    <div class="container-app">
-        <div class="section-header">
-            <span class="label">
-                <span class="material-icons-round" style="font-size:16px">star</span>
-                Why RealShri
-            </span>
-            <h2>Built On Trust &amp; Transparency</h2>
-            <p>Everything you need to make a confident property decision.</p>
-            <div class="gold-line"></div>
-        </div>
-
-        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--space-lg);">
-            <div class="card reveal" style="padding: var(--space-lg); text-align:center;">
-                <div style="width:56px; height:56px; border-radius: var(--radius-lg); background: linear-gradient(135deg, rgba(212,175,55,0.15), rgba(212,175,55,0.05)); display:flex; align-items:center; justify-content:center; margin: 0 auto var(--space-md);">
-                    <span class="material-icons-round" style="font-size:26px; color: var(--color-gold);">verified_user</span>
-                </div>
-                <h3 style="font-size:1rem; margin-bottom:6px;">RERA Verified</h3>
-                <p style="font-size:0.85rem;">Every listing is legally verified so you can buy with complete peace of mind.</p>
-            </div>
-            <div class="card reveal" style="padding: var(--space-lg); text-align:center;">
-                <div style="width:56px; height:56px; border-radius: var(--radius-lg); background: linear-gradient(135deg, rgba(16,185,129,0.15), rgba(16,185,129,0.05)); display:flex; align-items:center; justify-content:center; margin: 0 auto var(--space-md);">
-                    <span class="material-icons-round" style="font-size:26px; color: var(--color-success);">savings</span>
-                </div>
-                <h3 style="font-size:1rem; margin-bottom:6px;">Zero Brokerage</h3>
-                <p style="font-size:0.85rem;">Our services are completely free for buyers &mdash; no hidden fees, ever.</p>
-            </div>
-            <div class="card reveal" style="padding: var(--space-lg); text-align:center;">
-                <div style="width:56px; height:56px; border-radius: var(--radius-lg); background: linear-gradient(135deg, rgba(59,130,246,0.15), rgba(59,130,246,0.05)); display:flex; align-items:center; justify-content:center; margin: 0 auto var(--space-md);">
-                    <span class="material-icons-round" style="font-size:26px; color:#3b82f6;">support_agent</span>
-                </div>
-                <h3 style="font-size:1rem; margin-bottom:6px;">Expert Guidance</h3>
-                <p style="font-size:0.85rem;">Our agents guide you through site visits, paperwork, and home loans.</p>
-            </div>
-            <div class="card reveal" style="padding: var(--space-lg); text-align:center;">
-                <div style="width:56px; height:56px; border-radius: var(--radius-lg); background: linear-gradient(135deg, rgba(212,175,55,0.15), rgba(212,175,55,0.05)); display:flex; align-items:center; justify-content:center; margin: 0 auto var(--space-md);">
-                    <span class="material-icons-round" style="font-size:26px; color: var(--color-gold);">calculate</span>
-                </div>
-                <h3 style="font-size:1rem; margin-bottom:6px;">Smart Tools</h3>
-                <p style="font-size:0.85rem;">Plan your budget with our built-in EMI and ROI calculators.</p>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- ============================================
-   CALCULATORS CTA
-   ============================================ -->
-<section class="section-pad" style="background: var(--color-bg);">
-    <div class="container-app">
-        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--space-lg);">
-            <a href="{% url 'emi_calculator' %}" class="card reveal" style="padding: var(--space-xl); text-decoration:none; color:inherit; display:flex; align-items:center; gap: var(--space-lg);">
-                <div style="width:64px; height:64px; border-radius: var(--radius-lg); background: linear-gradient(135deg, var(--color-navy), var(--color-navy-light)); display:flex; align-items:center; justify-content:center; flex-shrink:0;">
-                    <span class="material-icons-round" style="font-size:30px; color: var(--color-gold);">calculate</span>
-                </div>
-                <div style="flex:1;">
-                    <h3 style="font-size:1.1rem; margin-bottom:4px;">EMI Calculator</h3>
-                    <p style="font-size:0.85rem; margin:0;">Estimate your monthly home loan installments instantly.</p>
-                </div>
-                <span class="material-icons-round" style="color: var(--color-gold);">arrow_forward</span>
-            </a>
-            <a href="{% url 'roi_calculator' %}" class="card reveal" style="padding: var(--space-xl); text-decoration:none; color:inherit; display:flex; align-items:center; gap: var(--space-lg);">
-                <div style="width:64px; height:64px; border-radius: var(--radius-lg); background: linear-gradient(135deg, var(--color-navy), var(--color-navy-light)); display:flex; align-items:center; justify-content:center; flex-shrink:0;">
-                    <span class="material-icons-round" style="font-size:30px; color: var(--color-gold);">trending_up</span>
-                </div>
-                <div style="flex:1;">
-                    <h3 style="font-size:1.1rem; margin-bottom:4px;">ROI Calculator</h3>
-                    <p style="font-size:0.85rem; margin:0;">Check the projected return on your property investment.</p>
-                </div>
-                <span class="material-icons-round" style="color: var(--color-gold);">arrow_forward</span>
-            </a>
-        </div>
-    </div>
-</section>
-
-<!-- ============================================
-   TESTIMONIALS
-   ============================================ -->
-<section class="section-pad" style="background: var(--color-surface);">
-    <div class="container-app">
-        <div class="section-header">
-            <span class="label">
-                <span class="material-icons-round" style="font-size:16px">reviews</span>
-                Testimonials
-            </span>
-            <h2>What Our Customers Say</h2>
-            <div class="gold-line"></div>
-        </div>
-
-        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: var(--space-lg);">
-            <div class="card reveal" style="padding: var(--space-lg);">
-                <div style="color: var(--color-gold); margin-bottom: var(--space-sm);">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-                <p style="font-size:0.9rem; margin-bottom: var(--space-md);">Found our dream 3BHK within two weeks. The whole process felt transparent and stress-free.</p>
-                <p style="font-size:0.85rem; font-weight:700; color: var(--color-navy); margin:0;">Priya Shah</p>
-                <p style="font-size:0.75rem; margin:0;">Ahmedabad</p>
-            </div>
-            <div class="card reveal" style="padding: var(--space-lg);">
-                <div style="color: var(--color-gold); margin-bottom: var(--space-sm);">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-                <p style="font-size:0.9rem; margin-bottom: var(--space-md);">No brokerage, verified paperwork, and a responsive team. Highly recommend RealShri.</p>
-                <p style="font-size:0.85rem; font-weight:700; color: var(--color-navy); margin:0;">Rohit Patel</p>
-                <p style="font-size:0.75rem; margin:0;">Gandhinagar</p>
-            </div>
-            <div class="card reveal" style="padding: var(--space-lg);">
-                <div style="color: var(--color-gold); margin-bottom: var(--space-sm);">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-                <p style="font-size:0.9rem; margin-bottom: var(--space-md);">The EMI calculator helped us plan our budget perfectly before we even visited a site.</p>
-                <p style="font-size:0.85rem; font-weight:700; color: var(--color-navy); margin:0;">Ansh Mehta</p>
-                <p style="font-size:0.75rem; margin:0;">Ahmedabad</p>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- ============================================
-   CTA BANNER
-   ============================================ -->
-<section class="section-pad" style="background: linear-gradient(135deg, var(--color-navy) 0%, var(--color-navy-light) 100%);">
-    <div class="container-app" style="text-align:center;">
-        <h2 style="color:#fff; margin-bottom: var(--space-sm);">Ready to Find Your Dream Home?</h2>
-        <p style="color: rgba(255,255,255,0.75); max-width:520px; margin: 0 auto var(--space-xl);">Talk to our team today and let us guide you to the perfect property.</p>
-        <div style="display:flex; gap: var(--space-md); justify-content:center; flex-wrap:wrap;">
-            <a href="{% url 'contact' %}" class="btn btn-gold">
-                <span class="material-icons-round" style="font-size:18px;">chat</span>
-                Contact Us
-            </a>
-            <a href="{% url 'property_list' %}" class="btn btn-outline" style="border-color: rgba(255,255,255,0.4); color:#fff;">
-                Browse Properties
-            </a>
-        </div>
-    </div>
-</section>
-
-{% endblock %}
-{% block extra_js %}
-<style>
-.hero-ad-slides { position: absolute; inset: 0; z-index: 0; cursor: pointer; }
-.hero-ad-slides img {
-    position: absolute; inset: 0; width: 100%; height: 100%;
-    object-fit: cover; opacity: 0; transition: opacity 1s ease;
-}
-.hero-ad-slides img.active { opacity: 1; }
-.hero-overlay {
-    position: absolute; inset: 0; z-index: 1;
-    /* Pehle overlay halka tha, isliye ad image ka apna text/CTA hamare
-       "Where Trust Meets Your Dream Home" heading ke sath overlap/clash
-       kar raha tha. Ab ek hi uniform dark layer, taaki sirf hamara
-       real hero text hi saaf padhne layak rahe. */
-    background: rgba(11,31,58,0.82);
-}
-.hero-section::before { z-index: 1; }
-.hero-content {
-    z-index: 3 !important;
-    /* Neeche dots indicator (.hero-ad-dots) se takraane se bachne ke liye
-       extra jagah reserve kari hai */
-    padding-bottom: 56px;
-}
-
-.hero-ad-arrow {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 4;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.15);
-    backdrop-filter: blur(6px);
-    border: 1px solid rgba(255,255,255,0.3);
-    color: #fff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: background 0.2s ease;
-}
-.hero-ad-arrow:hover { background: rgba(255,255,255,0.3); }
-.hero-ad-prev { left: 16px; }
-.hero-ad-next { right: 16px; }
-
-/* Hero height ab yahan control hoga, mobile-friendly */
-#heroAdSection {
-    min-height: 56vh;
-    max-height: 640px;
-}
-
-.hero-ad-dots {
-    position: absolute;
-    bottom: 14px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 4;
-    display: flex;
-    gap: 8px;
-}
-.hero-ad-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.4);
-    border: none;
-    padding: 0;
-    cursor: pointer;
-    transition: all 0.25s ease;
-}
-.hero-ad-dot.active {
-    background: #d4af37;
-    width: 22px;
-    border-radius: 4px;
-}
-
-@media (max-width: 767px) {
-    /* Ab hero ek fullscreen cropped background nahi, balki ek proper
-       stacked layout hai: pehle ad ka apna card, uske baad text/search
-       normal flow me — bilkul competitor apps (99acres) jaisa. */
-    #heroAdSection {
-        display: flex;
-        flex-direction: column;
-        align-items: stretch;
-        justify-content: flex-start;
-        min-height: 0;
-        max-height: none;
-        padding: var(--space-md) var(--space-md) var(--space-xl);
-    }
-
-    /* Ad creative apne khud ke rounded card me poori tarah visible,
-       ab pura hero-height me stretch/crop nahi hoga */
-    .hero-ad-slides {
-        position: relative;
-        inset: auto;
-        order: 1;
-        width: 100%;
-        aspect-ratio: 16 / 9;
-        border-radius: var(--radius-lg, 16px);
-        overflow: hidden;
-        box-shadow: 0 10px 28px rgba(0,0,0,0.3);
-    }
-
-    /* Text overlay ab zaroori nahi, ad apni jagah alag card me hai */
-    .hero-overlay {
-        display: none;
-    }
-
-    /* Dots ab image ke neeche normal jagah par, floating nahi */
-    .hero-ad-dots {
-        position: static;
-        transform: none;
-        order: 2;
-        justify-content: center;
-        margin: 12px 0 var(--space-lg);
-    }
-
-    /* Headline/search ab image ke neeche normal padding ke saath, overlay nahi */
-    .hero-content {
-        order: 3;
-        position: relative;
-        z-index: auto;
-        padding: 0;
-        max-width: 100%;
-    }
-
-    /* Mobile pe arrows chhupa do, swipe se chalega */
-    .hero-ad-arrow {
-        display: none;
-    }
-}
-</style>
 <script>
-let heroAdCurrent = 0;
-let heroAdTimer = null;
-
-function heroAdUpdateDots() {
-    const dots = document.querySelectorAll('.hero-ad-dot');
-    dots.forEach((dot, i) => dot.classList.toggle('active', i === heroAdCurrent));
+// Profile dropdown toggle (public user)
+function toggleProfileMenu() {
+    const menu = document.getElementById('profileMenu');
+    if (menu) menu.classList.toggle('hidden');
 }
 
-function heroAdShow(index) {
-    const slidesContainer = document.getElementById('heroAdSlides');
-    const imgs = slidesContainer.querySelectorAll('img');
-    if (imgs.length === 0) return;
+// Close profile dropdown when clicking outside
+document.addEventListener('click', function(event) {
+    const btn = document.getElementById('profileMenuBtn');
+    const menu = document.getElementById('profileMenu');
+    if (btn && menu && !btn.contains(event.target) && !menu.contains(event.target)) {
+        menu.classList.add('hidden');
+    }
+});
 
-    imgs[heroAdCurrent].classList.remove('active');
-    heroAdCurrent = (index + imgs.length) % imgs.length;
-    imgs[heroAdCurrent].classList.add('active');
-    heroAdUpdateDots();
+// Mobile menu toggle
+function toggleMobileMenu() {
+    const menu = document.getElementById('mobileMenu');
+    const menuIcon = document.getElementById('menuIcon');
+    const closeIcon = document.getElementById('closeIcon');
 
-    if (heroAdTimer) clearInterval(heroAdTimer);
-    if (imgs.length > 1) {
-        heroAdTimer = setInterval(() => heroAdShow(heroAdCurrent + 1), 3000);
+    menu.classList.toggle('hidden');
+    menuIcon.classList.toggle('hidden');
+    closeIcon.classList.toggle('hidden');
+    document.body.style.overflow = menu.classList.contains('hidden') ? '' : 'hidden';
+}
+
+// Mobile calculators toggle
+function toggleMobileCalc() {
+    const calcMenu = document.getElementById('mobileCalcMenu');
+    const arrow = document.getElementById('calcArrow');
+
+    calcMenu.classList.toggle('hidden');
+    arrow.style.transform = calcMenu.classList.contains('hidden') ? '' : 'rotate(180deg)';
+}
+
+// Wishlist count update
+function updateNavWishlistCount(count) {
+    const badge = document.getElementById('navWishlistCount');
+    if (badge) {
+        badge.textContent = count;
+        badge.classList.toggle('hidden', count === 0);
     }
 }
 
-function heroAdGo(direction) {
-    heroAdShow(heroAdCurrent + direction);
-}
-
-(function() {
-    const ads = [
-        {% for ad in advertisements %}
-        { image: "{% cloudinary_url ad.image width=1600 height=900 crop='fill' quality='auto' %}", url: "{% url 'property_detail' ad.property.id %}" }{% if not forloop.last %},{% endif %}
-        {% endfor %}
-    ];
-    if (ads.length === 0) return;
-
-    const heroSection = document.getElementById('heroAdSection');
-    const slidesContainer = document.getElementById('heroAdSlides');
-    const dotsContainer = document.getElementById('heroAdDots');
-    const prevBtn = document.getElementById('heroAdPrev');
-    const nextBtn = document.getElementById('heroAdNext');
-
-    ads.forEach((ad, i) => {
-        const img = document.createElement('img');
-        img.src = ad.image;
-        if (i === 0) img.classList.add('active');
-        slidesContainer.appendChild(img);
-
-        const dot = document.createElement('button');
-        dot.className = 'hero-ad-dot' + (i === 0 ? ' active' : '');
-        dot.setAttribute('aria-label', 'Go to ad ' + (i + 1));
-        dot.addEventListener('click', () => heroAdShow(i));
-        dotsContainer.appendChild(dot);
-    });
-
-    heroSection.addEventListener('click', () => {
-        window.location.href = ads[heroAdCurrent].url;
-    });
-
-    // Mobile ke liye swipe support (sirf ad card par, neeche headline/search par nahi)
-    let touchStartX = 0;
-    slidesContainer.addEventListener('touchstart', (e) => {
-        touchStartX = e.changedTouches[0].screenX;
-    }, { passive: true });
-    slidesContainer.addEventListener('touchend', (e) => {
-        const touchEndX = e.changedTouches[0].screenX;
-        const diff = touchEndX - touchStartX;
-        if (Math.abs(diff) > 40) {
-            heroAdGo(diff < 0 ? 1 : -1);
-        }
-    }, { passive: true });
-
-    if (ads.length > 1) {
-        heroAdTimer = setInterval(() => heroAdShow(heroAdCurrent + 1), 3000);
-    } else {
-        prevBtn.style.display = 'none';
-        nextBtn.style.display = 'none';
-    }
-})();
+// Fetch wishlist count on load
+{% if user.is_authenticated %}
+document.addEventListener('DOMContentLoaded', function() {
+    fetch('/wishlist/count/')
+        .then(r => r.json())
+        .then(data => { if (data.count) updateNavWishlistCount(data.count); })
+        .catch(() => {});
+});
+{% endif %}
 </script>
-{% endblock %}
