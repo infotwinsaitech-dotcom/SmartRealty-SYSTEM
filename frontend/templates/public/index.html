@@ -116,7 +116,7 @@
                             <span class="material-icons-round">apartment</span>
                         </div>
                         <div class="showcase-builder-name">
-                            {% if property.builder %}{{ property.builder.get_full_name }}{% else %}Verified Builder{% endif %}
+                            {% if property.builder.profile.full_name %}{{ property.builder.profile.full_name }}{% else %}Verified Builder{% endif %}
                         </div>
                         <span class="showcase-view-link">View Projects</span>
 
@@ -383,16 +383,16 @@
 .hero-ad-prev { left: 16px; }
 .hero-ad-next { right: 16px; }
 
-/* Desktop/tablet: box ko ad ke asli 16:9 ratio me lock kiya (jaisa
-   mobile me pehle se hai) taaki 'cover' se koi letterbox/gap na aaye,
-   width ke saath naturally scale ho, aur bahut zyada tall na ho jaaye
-   uske liye max-height cap bhi rakha hai. */
+/* Banner ki height ab screen ki height se thodi kam (~46%) rakhi hai,
+   taaki poora banner turant nav ke baad clean dikhe, bina zyada jagah
+   liye. 'cover' (upar set hai) ki wajah se koi gap nahi aayega, bas
+   thoda sa side crop hoga jo normal hai kisi bhi banner ke liye. */
 #heroAdSection {
     position: relative;
     width: 100%;
-    aspect-ratio: 16 / 9;
-    min-height: 320px;
-    max-height: 640px;
+    height: 46vh;
+    min-height: 340px;
+    max-height: 480px;
     overflow: hidden;
 }
 
