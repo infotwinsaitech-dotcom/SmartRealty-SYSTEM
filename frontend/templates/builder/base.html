@@ -100,6 +100,28 @@
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+    <!-- Django Messages (success/error/info/warning) - yahin dikhao taaki login page tak leak na ho -->
+    {% if messages %}
+    <div id="django-messages" class="fixed top-4 right-4 z-[9999] flex flex-col gap-2 w-[calc(100%-2rem)] max-w-sm">
+        {% for message in messages %}
+        <div class="flex items-start gap-2 rounded-lg shadow-lg px-4 py-3 text-sm font-medium border-l-4
+            {% if message.tags == 'success' %} bg-white text-green-800 border-green-500
+            {% elif message.tags == 'error' %} bg-white text-red-800 border-red-500
+            {% elif message.tags == 'warning' %} bg-white text-yellow-800 border-yellow-500
+            {% else %} bg-white text-blue-800 border-blue-500
+            {% endif %}">
+            <span>{{ message }}</span>
+        </div>
+        {% endfor %}
+    </div>
+    <script>
+        setTimeout(function() {
+            const box = document.getElementById('django-messages');
+            if (box) { box.style.transition = 'opacity 0.4s ease'; box.style.opacity = '0'; setTimeout(() => box.remove(), 400); }
+        }, 4000);
+    </script>
+    {% endif %}
+
     <!-- Backdrop (मोबाइल पर साइडबार खुलने पर पीछे धुंधला/ब्लैक करने के लिए) -->
     <div id="sidebar-backdrop" class="fixed inset-0 bg-black/50 z-40 hidden md:hidden" onclick="toggleSidebar()"></div>
 
