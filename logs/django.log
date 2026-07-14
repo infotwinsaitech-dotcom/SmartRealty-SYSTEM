@@ -452,3 +452,7 @@ INFO 2026-07-11 18:36:38,808 views views.py loaded successfully
 INFO 2026-07-11 18:36:45,629 apps  PostgreSQL optimized
 INFO 2026-07-11 18:36:45,629 apps  Core app initialized
 INFO 2026-07-11 18:36:45,713 views views.py loaded successfully
+INFO 2026-07-14 11:22:13,408 apps  PostgreSQL optimized
+WARNING 2026-07-14 11:22:13,721 apps [AUTO-SETUP] Google credentials not set!
+INFO 2026-07-14 11:22:13,737 apps  Core app initialized
+INFO 2026-07-14 11:22:14,270 views views.py loaded successfully

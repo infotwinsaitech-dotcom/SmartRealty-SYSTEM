@@ -4,56 +4,142 @@
 {% block title %}Plans & Pricing{% endblock %}
 
 {% block extra_css %}
-
 <style>
-  .plan-card { transition: all 0.3s ease; }
-  .plan-card:hover { transform: translateY(-4px); }
+  body { background:#05060a; }
+
+  .pricing-hero {
+    background:
+      radial-gradient(1200px 500px at 15% -10%, rgba(251,191,36,0.16), transparent 60%),
+      radial-gradient(900px 500px at 85% -10%, rgba(59,130,246,0.18), transparent 60%),
+      #05060a;
+  }
+
+  .role-chip {
+    display:inline-flex; align-items:center; gap:8px;
+    background:rgba(251,191,36,0.1);
+    border:1px solid rgba(251,191,36,0.35);
+    color:#fbbf24; font-weight:600; font-size:12.5px;
+    padding:6px 16px; border-radius:999px;
+  }
+
+  .plan-card {
+    position:relative;
+    background:linear-gradient(180deg, rgba(255,255,255,0.035), rgba(255,255,255,0.01));
+    border:1px solid rgba(255,255,255,0.08);
+    backdrop-filter:blur(6px);
+    transition:all .35s cubic-bezier(.2,.8,.2,1);
+  }
+  .plan-card:hover {
+    transform:translateY(-6px);
+    border-color:rgba(251,191,36,0.35);
+    box-shadow:0 20px 45px -15px rgba(0,0,0,0.6);
+  }
+  .plan-card.popular {
+    border-color:rgba(251,191,36,0.55);
+    box-shadow:0 0 0 1px rgba(251,191,36,0.15), 0 25px 50px -15px rgba(251,191,36,0.15);
+  }
+  .plan-card.popular:hover { transform:translateY(-10px) scale(1.015); }
+
   .popular-badge {
-    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+    background:linear-gradient(135deg,#fbbf24 0%,#f59e0b 100%);
+    box-shadow:0 4px 14px rgba(251,191,36,0.35);
   }
-  .coupon-box {
-    background: rgba(251, 191, 36, 0.1);
-    border: 1px dashed rgba(251, 191, 36, 0.4);
-  }
-  .price-strike { text-decoration: line-through; opacity: 0.6; }
+
+  .price-strike { text-decoration:line-through; opacity:.55; }
+
   .razorpay-btn {
-    background: linear-gradient(135deg, #3395ff 0%, #0066cc 100%);
+    background:linear-gradient(135deg,#fbbf24 0%,#f59e0b 100%);
+    color:#111827;
   }
+  .razorpay-btn:hover { filter:brightness(1.06); }
+  .razorpay-btn:active { transform:scale(0.98); }
+
+  .coupon-box {
+    background:rgba(251,191,36,0.06);
+    border:1px dashed rgba(251,191,36,0.35);
+  }
+
   .billing-toggle {
-    background: rgba(255,255,255,0.05);
-    border-radius: 999px;
-    padding: 4px;
+    background:rgba(255,255,255,0.05);
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:999px;
+    padding:4px;
   }
   .billing-toggle button {
-    border-radius: 999px;
-    padding: 8px 20px;
-    transition: all 0.3s;
-    background: transparent;
-    color: #9ca3af;
-    border: none;
-    cursor: pointer;
+    border-radius:999px;
+    padding:8px 22px;
+    transition:all .3s;
+    background:transparent;
+    color:#9ca3af;
+    border:none;
+    cursor:pointer;
+    font-weight:500;
+    font-size:14px;
   }
   .billing-toggle button.active {
-    background: #fbbf24;
-    color: #000;
-    font-weight: 600;
+    background:#fbbf24;
+    color:#111827;
+    font-weight:700;
   }
+
+  .feature-check {
+    width:18px; height:18px; border-radius:6px;
+    background:rgba(34,197,94,0.15);
+    color:#22c55e;
+    display:inline-flex; align-items:center; justify-content:center;
+    flex-shrink:0; font-size:12px;
+  }
+
+  .trust-strip { border-top:1px solid rgba(255,255,255,0.06); }
+
+  @keyframes floatIn {
+    from { opacity:0; transform:translateY(16px); }
+    to { opacity:1; transform:translateY(0); }
+  }
+  .plan-card { animation:floatIn .5s ease both; }
+  .plan-card:nth-child(1){animation-delay:.03s}
+  .plan-card:nth-child(2){animation-delay:.09s}
+  .plan-card:nth-child(3){animation-delay:.15s}
+  .plan-card:nth-child(4){animation-delay:.21s}
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="min-h-screen bg-black text-white px-4 md:px-10 py-16">
+<div class="pricing-hero min-h-screen text-white px-4 md:px-10 py-16">
 
   <div class="text-center max-w-2xl mx-auto mb-10">
-    <h1 class="text-3xl md:text-4xl font-extrabold mb-3">
-      Choose your <span class="text-yellow-400">plan</span>
-    </h1>
-    <p class="text-gray-400 mb-8">
-      Panel use karne ke liye pehle ek subscription plan choose karo.
-    </p>
-    
+
+    {% if user_role == 'builder' %}
+      <span class="role-chip mb-4">🏗️ Builder Account</span>
+      <h1 class="text-3xl md:text-4xl font-extrabold mb-3 mt-4">
+        Claim your <span class="text-yellow-400">Builder plan</span>
+      </h1>
+      <p class="text-gray-400 mb-2">
+        Aapke builder panel ka access iss plan se unlock hoga — properties, agents aur leads sab isi ke andar manage honge.
+      </p>
+      <p class="text-gray-500 text-sm">Neeche diya plan choose karke turant apna panel activate karo.</p>
+
+    {% elif user_role == 'agent' %}
+      <span class="role-chip mb-4">👤 Agent Account</span>
+      <h1 class="text-3xl md:text-4xl font-extrabold mb-3 mt-4">
+        Claim your <span class="text-yellow-400">Agent plan</span>
+      </h1>
+      <p class="text-gray-400 mb-2">
+        Aapke agent panel ka access iss plan se unlock hoga — properties dekhna, leads follow-up karna sab isi se milega.
+      </p>
+      <p class="text-gray-500 text-sm">Neeche diya plan choose karke turant apna panel activate karo.</p>
+
+    {% else %}
+      <h1 class="text-3xl md:text-4xl font-extrabold mb-3">
+        Choose your <span class="text-yellow-400">plan</span>
+      </h1>
+      <p class="text-gray-400 mb-2">
+        Panel use karne ke liye pehle ek subscription plan choose karo.
+      </p>
+    {% endif %}
+
     <!-- Billing Cycle Toggle -->
-    <div class="billing-toggle inline-flex mb-8">
+    <div class="billing-toggle inline-flex mt-6 mb-2">
       <button type="button" id="btn-monthly" class="active" onclick="setBilling('monthly')">
         Monthly
       </button>
@@ -66,7 +152,7 @@
   {% if messages %}
   <div class="max-w-2xl mx-auto mb-8 space-y-2">
     {% for message in messages %}
-    <div class="bg-yellow-400/10 border border-yellow-400/30 text-yellow-300 text-sm rounded-lg px-4 py-3">
+    <div class="bg-yellow-400/10 border border-yellow-400/30 text-yellow-300 text-sm rounded-lg px-4 py-3 text-center">
       {{ message }}
     </div>
     {% endfor %}
@@ -74,11 +160,11 @@
   {% endif %}
 
   <!-- Coupon Code Section -->
-  <div class="max-w-md mx-auto mb-12">
+  <div class="max-w-md mx-auto mb-14">
     <div class="coupon-box rounded-xl p-4">
       <div class="flex gap-2">
-        <input type="text" id="coupon-input" placeholder="Enter coupon code (e.g., BUILDER50)" 
-               class="flex-1 bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-yellow-400 uppercase"
+        <input type="text" id="coupon-input" placeholder="Enter coupon code (e.g., BUILDER50)"
+               class="flex-1 bg-gray-800/70 border border-gray-700 rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-yellow-400 uppercase"
                value="{{ applied_coupon.code|default:'' }}">
         <button onclick="applyCoupon()" class="bg-yellow-400 hover:bg-yellow-300 text-black font-semibold px-5 py-2 rounded-lg transition">
           Apply
@@ -92,7 +178,7 @@
       <div id="coupon-message" class="mt-2 text-sm"></div>
       {% if applied_coupon %}
       <div class="mt-2 text-green-400 text-sm">
-        ✅ <strong>{{ applied_coupon.code }}</strong> applied — 
+        ✅ <strong>{{ applied_coupon.code }}</strong> applied —
         {% if applied_coupon.discount_type == 'percentage' %}
           {{ applied_coupon.discount_value|floatformat:0 }}% off
         {% else %}
@@ -105,17 +191,19 @@
 
   <!-- BUILDER PLANS -->
   {% if builder_plans %}
+  {% if not user_role %}
   <h2 class="text-xl font-bold text-gray-200 mb-5 max-w-6xl mx-auto">🏗️ Builder Plans</h2>
+  {% endif %}
   <div class="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
     {% for plan in builder_plans %}
-    <div class="plan-card bg-gray-900 border {% if plan.is_popular %}border-yellow-400/60{% else %}border-gray-800{% endif %} rounded-2xl p-6 flex flex-col relative overflow-hidden">
-      
+    <div class="plan-card {% if plan.is_popular %}popular{% endif %} rounded-2xl p-6 flex flex-col relative overflow-hidden">
+
       {% if plan.is_popular %}
       <div class="popular-badge text-black text-xs font-bold px-3 py-1 rounded-full absolute top-4 right-4">
-        POPULAR
+        ⭐ MOST POPULAR
       </div>
       {% endif %}
-      
+
       <h3 class="text-lg font-bold text-white mb-1">{{ plan.name }}</h3>
       <p class="text-gray-400 text-sm mb-4 min-h-[40px]">{{ plan.description }}</p>
 
@@ -136,19 +224,19 @@
         </div>
       </div>
 
-      <ul class="text-sm text-gray-300 space-y-2 mb-6 flex-1">
-        <li>🏠 {{ plan.max_properties }} Properties</li>
-        <li>👤 {{ plan.max_agents }} Agents</li>
-        <li>📋 {{ plan.max_leads }} Leads</li>
+      <ul class="text-sm text-gray-300 space-y-2.5 mb-6 flex-1">
+        <li class="flex items-center gap-2"><span class="feature-check">✓</span> {{ plan.max_properties }} Properties</li>
+        <li class="flex items-center gap-2"><span class="feature-check">✓</span> {{ plan.max_agents }} Agents</li>
+        <li class="flex items-center gap-2"><span class="feature-check">✓</span> {{ plan.max_leads }} Leads</li>
         {% for feature in plan.features %}
-        <li class="text-gray-400">✅ {{ feature|feature_label }}</li>
+        <li class="flex items-center gap-2 text-gray-400"><span class="feature-check">✓</span> {{ feature|feature_label }}</li>
         {% endfor %}
       </ul>
 
       {% if user.is_authenticated %}
         {% if user.role == 'builder' %}
-        <button onclick="payNow({{ plan.id }})" class="w-full razorpay-btn hover:opacity-90 text-white font-semibold py-2.5 rounded-lg transition">
-          Choose Plan
+        <button onclick="payNow({{ plan.id }})" class="w-full razorpay-btn hover:opacity-95 font-semibold py-2.5 rounded-lg transition">
+          Claim This Plan
         </button>
         {% else %}
         <button disabled class="w-full bg-gray-700 text-gray-500 font-semibold py-2.5 rounded-lg cursor-not-allowed">
@@ -156,7 +244,7 @@
         </button>
         {% endif %}
       {% else %}
-      <a href="{% url 'login' %}?next={% url 'subscriptions:pricing' %}" 
+      <a href="{% url 'login' %}?next={% url 'subscriptions:pricing' %}"
          class="w-full block text-center bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2.5 rounded-lg transition">
         Login to Subscribe
       </a>
@@ -168,17 +256,19 @@
 
   <!-- AGENT PLANS -->
   {% if agent_plans %}
+  {% if not user_role %}
   <h2 class="text-xl font-bold text-gray-200 mb-5 max-w-6xl mx-auto">👤 Agent Plans</h2>
-  <div class="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-6">
+  {% endif %}
+  <div class="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
     {% for plan in agent_plans %}
-    <div class="plan-card bg-gray-900 border {% if plan.is_popular %}border-yellow-400/60{% else %}border-gray-800{% endif %} rounded-2xl p-6 flex flex-col relative overflow-hidden">
-      
+    <div class="plan-card {% if plan.is_popular %}popular{% endif %} rounded-2xl p-6 flex flex-col relative overflow-hidden">
+
       {% if plan.is_popular %}
       <div class="popular-badge text-black text-xs font-bold px-3 py-1 rounded-full absolute top-4 right-4">
-        POPULAR
+        ⭐ MOST POPULAR
       </div>
       {% endif %}
-      
+
       <h3 class="text-lg font-bold text-white mb-1">{{ plan.name }}</h3>
       <p class="text-gray-400 text-sm mb-4 min-h-[40px]">{{ plan.description }}</p>
 
@@ -198,18 +288,18 @@
         </div>
       </div>
 
-      <ul class="text-sm text-gray-300 space-y-2 mb-6 flex-1">
-        <li>🏠 {{ plan.max_properties }} Properties</li>
-        <li>📋 {{ plan.max_leads }} Leads</li>
+      <ul class="text-sm text-gray-300 space-y-2.5 mb-6 flex-1">
+        <li class="flex items-center gap-2"><span class="feature-check">✓</span> {{ plan.max_properties }} Properties</li>
+        <li class="flex items-center gap-2"><span class="feature-check">✓</span> {{ plan.max_leads }} Leads</li>
         {% for feature in plan.features %}
-        <li class="text-gray-400">✅ {{ feature|feature_label }}</li>
+        <li class="flex items-center gap-2 text-gray-400"><span class="feature-check">✓</span> {{ feature|feature_label }}</li>
         {% endfor %}
       </ul>
 
       {% if user.is_authenticated %}
         {% if user.role == 'agent' %}
-        <button onclick="payNow({{ plan.id }})" class="w-full razorpay-btn hover:opacity-90 text-white font-semibold py-2.5 rounded-lg transition">
-          Choose Plan
+        <button onclick="payNow({{ plan.id }})" class="w-full razorpay-btn hover:opacity-95 font-semibold py-2.5 rounded-lg transition">
+          Claim This Plan
         </button>
         {% else %}
         <button disabled class="w-full bg-gray-700 text-gray-500 font-semibold py-2.5 rounded-lg cursor-not-allowed">
@@ -217,13 +307,21 @@
         </button>
         {% endif %}
       {% else %}
-      <a href="{% url 'login' %}?next={% url 'subscriptions:pricing' %}" 
+      <a href="{% url 'login' %}?next={% url 'subscriptions:pricing' %}"
          class="w-full block text-center bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2.5 rounded-lg transition">
         Login to Subscribe
       </a>
       {% endif %}
     </div>
     {% endfor %}
+  </div>
+  {% endif %}
+
+  {% if user_role %}
+  <div class="max-w-2xl mx-auto trust-strip pt-8 mt-4 text-center text-gray-500 text-xs flex flex-wrap justify-center gap-x-6 gap-y-2">
+    <span>🔒 Secure payments via Razorpay</span>
+    <span>⚡ Instant activation</span>
+    <span>🔄 Cancel / upgrade anytime</span>
   </div>
   {% endif %}
 
@@ -238,7 +336,7 @@ function setBilling(cycle) {
   currentBilling = cycle;
   document.getElementById('btn-monthly').classList.toggle('active', cycle === 'monthly');
   document.getElementById('btn-yearly').classList.toggle('active', cycle === 'yearly');
-  
+
   document.querySelectorAll('.monthly-price').forEach(el => {
     el.style.display = cycle === 'monthly' ? 'block' : 'none';
   });
@@ -250,12 +348,12 @@ function setBilling(cycle) {
 function applyCoupon() {
   const code = document.getElementById('coupon-input').value.trim();
   const msgEl = document.getElementById('coupon-message');
-  
+
   if (!code) {
     msgEl.innerHTML = '<span style="color:#ef4444;">Please enter a coupon code</span>';
     return;
   }
-  
+
   fetch("{% url 'subscriptions:apply_coupon' %}", {
     method: 'POST',
     headers: {
@@ -282,7 +380,7 @@ function payNow(planId) {
   const btn = event.target;
   btn.innerHTML = '⟳ Processing...';
   btn.disabled = true;
-  
+
   fetch("{% url 'subscriptions:create_order' %}", {
     method: 'POST',
     headers: {
@@ -298,7 +396,7 @@ function payNow(planId) {
   .then(data => {
     if (!data.success) {
       alert(data.message || 'Failed to create order');
-      btn.innerHTML = 'Choose Plan';
+      btn.innerHTML = 'Claim This Plan';
       btn.disabled = false;
       return;
     }
@@ -309,7 +407,7 @@ function payNow(planId) {
       window.location.href = data.redirect_url || '{% url "subscriptions:pricing" %}';
       return;
     }
-    
+
     const options = {
       key: data.key_id,
       amount: data.amount,
@@ -321,14 +419,14 @@ function payNow(planId) {
         const form = document.createElement('form');
         form.method = 'POST';
         form.action = '{% url "subscriptions:razorpay_callback" %}';
-        
+
         const fields = {
           'razorpay_payment_id': response.razorpay_payment_id,
           'razorpay_order_id': response.razorpay_order_id,
           'razorpay_signature': response.razorpay_signature,
           'csrfmiddlewaretoken': '{{ csrf_token }}'
         };
-        
+
         for (const [key, value] of Object.entries(fields)) {
           const input = document.createElement('input');
           input.type = 'hidden';
@@ -336,7 +434,7 @@ function payNow(planId) {
           input.value = value;
           form.appendChild(input);
         }
-        
+
         document.body.appendChild(form);
         form.submit();
       },
@@ -344,19 +442,19 @@ function payNow(planId) {
       theme: { color: '#fbbf24' },
       modal: {
         ondismiss: function() {
-          btn.innerHTML = 'Choose Plan';
+          btn.innerHTML = 'Claim This Plan';
           btn.disabled = false;
         }
       }
     };
-    
+
     const rzp = new Razorpay(options);
     rzp.open();
   })
   .catch(err => {
     console.error(err);
     alert('Something went wrong. Please try again.');
-    btn.innerHTML = 'Choose Plan';
+    btn.innerHTML = 'Claim This Plan';
     btn.disabled = false;
   });
 }
