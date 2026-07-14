@@ -20,6 +20,10 @@ urlpatterns = [
 
     path("contact/", views.contact, name="contact"),
     path("about/", views.about, name="about"),
+    path("robots.txt", views.robots_txt, name="robots_txt"),
+    path("sitemap.xml", views.sitemap_xml, name="sitemap_xml"),
+    path("blog/", views.blog_list, name="blog_list"),
+    path("blog/<slug:slug>/", views.blog_detail, name="blog_detail"),
 
     path("login/", views.login_view, name="login"),
     path("register/", views.register_view, name="register"),

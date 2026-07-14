@@ -57,7 +57,7 @@ from .models import (
     Property, PropertyImage, User, Profile, Lead, Deal, Task, 
     Activity, Agent, Document, Conversation, Message, 
     Notification, Campaign, SiteVisit, FollowUp, Wishlist,
-    Inquiry, LeadNote, LeadActivity, SavedProperty , Advertisement,
+    Inquiry, LeadNote, LeadActivity, SavedProperty , Advertisement,BlogPost,
 )
 
 logger = logging.getLogger('core')
@@ -735,6 +735,42 @@ def about(request):
     """About page"""
     return render(request, "public/about.html")
 
+def blog_list(request):
+    """
+    /blog/ — published posts ki list, newest first. Ek featured post
+    top pe bada dikhta hai (agar 'is_featured' mark kiya ho), baaki grid me.
+    """
+    posts_qs = BlogPost.objects.filter(status="published").select_related("author")
+
+    featured_post = posts_qs.filter(is_featured=True).first()
+
+    other_posts = posts_qs
+    if featured_post:
+        other_posts = other_posts.exclude(pk=featured_post.pk)
+
+    paginator = Paginator(other_posts, 9)
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
+
+    return render(request, "public/blog_list.html", {
+        "featured_post": featured_post,
+        "page_obj": page_obj,
+    })
+
+
+def blog_detail(request, slug):
+    """
+    /blog/<slug>/ — single blog post, JSON-LD BlogPosting schema ke saath
+    (AEO ke liye) aur 3 related posts.
+    """
+    post = get_object_or_404(BlogPost, slug=slug, status="published")
+
+    related_posts = BlogPost.objects.filter(status="published").exclude(pk=post.pk)[:3]
+
+    return render(request, "public/blog_detail.html", {
+        "post": post,
+        "related_posts": related_posts,
+    })
 
 # =============================================================================
 # AUTHENTICATION VIEWS
@@ -4727,3 +4763,84 @@ def property_map_public(request):
         'properties': properties,
         'google_maps_api_key': google_maps_api_key,
     })
+
+
+# =============================================================================
+# SEO: robots.txt + sitemap.xml
+# Pehle dono files bilkul nahi thi, isliye Google/crawlers ko site ka
+# structure hi nahi pata chal raha tha. Ab dono dynamically generate
+# hote hain — property list DB se live aati hai, hardcode nahi hai.
+# =============================================================================
+
+SITE_DOMAIN = "https://realshri.com"
+
+
+def robots_txt(request):
+    """
+    /robots.txt — crawlers ko batata hai kya crawl karna hai, kya nahi,
+    aur sitemap kaha milega. Login/dashboard/checkout jaisे private
+    pages ko disallow kiya hai taaki wo Google index me na aayein.
+    """
+    lines = [
+        "User-agent: *",
+        "Allow: /",
+        "Disallow: /admin/",
+        "Disallow: /login/",
+        "Disallow: /register/",
+        "Disallow: /otp_verification/",
+        "Disallow: /builder/",
+        "Disallow: /agent/",
+        "Disallow: /profile/",
+        "Disallow: /edit-profile/",
+        "Disallow: /my-inquiries/",
+        "Disallow: /wishlist/",
+        "Disallow: /plans/",
+        "Disallow: /accounts/",
+        "",
+        f"Sitemap: {SITE_DOMAIN}/sitemap.xml",
+    ]
+    return HttpResponse("\n".join(lines), content_type="text/plain")
+
+
+def sitemap_xml(request):
+    """
+    /sitemap.xml — static pages + har available property ki detail
+    page ko list karta hai, taaki Google sab listings dhoondh sake.
+    Django admin/sites framework use nahi kiya (extra setup se bachne
+    ke liye) — seedha XML banate hain, safe aur dependency-free.
+    """
+    static_pages = [
+        {"loc": reverse("home"), "priority": "1.0", "changefreq": "daily"},
+        {"loc": reverse("property_list"), "priority": "0.9", "changefreq": "daily"},
+        {"loc": reverse("property_map_public"), "priority": "0.6", "changefreq": "weekly"},
+        {"loc": reverse("about"), "priority": "0.5", "changefreq": "monthly"},
+        {"loc": reverse("contact"), "priority": "0.5", "changefreq": "monthly"},
+        {"loc": reverse("emi_calculator"), "priority": "0.5", "changefreq": "monthly"},
+        {"loc": reverse("roi_calculator"), "priority": "0.5", "changefreq": "monthly"},
+        {"loc": reverse("blog_list"), "priority": "0.7", "changefreq": "daily"},
+    ]
+
+    properties = Property.objects.filter(status='Available').only("id", "updated_at")
+    blog_posts = BlogPost.objects.filter(status='published').only("slug", "updated_at")
+
+    xml_parts = ['<?xml version="1.0" encoding="UTF-8"?>']
+    xml_parts.append('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">')
+
+    for page in static_pages:
+        xml_parts.append(
+            f"<url><loc>{SITE_DOMAIN}{page['loc']}</loc>"
+            f"<changefreq>{page['changefreq']}</changefreq>"
+            f"<priority>{page['priority']}</priority></url>"
+        )
+
+    for prop in properties:
+        loc = reverse("property_detail", args=[prop.id])
+        lastmod = prop.updated_at.strftime("%Y-%m-%d")
+        xml_parts.append(
+            f"<url><loc>{SITE_DOMAIN}{loc}</loc>"
+            f"<lastmod>{lastmod}</lastmod>"
+            f"<changefreq>weekly</changefreq><priority>0.8</priority></url>"
+        )
+
+    xml_parts.append('</urlset>')
+    return HttpResponse("\n".join(xml_parts), content_type="application/xml")

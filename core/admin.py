@@ -1,11 +1,11 @@
 from django.contrib import admin
+from django.utils.html import format_html
 from .models import (
     Property, PropertyImage, Inquiry, SiteSettings, User, Profile, 
     Lead, Deal, Task, Activity, Document, Notification, AIInsight, 
     LeadScore, Campaign, FollowUp, DripSequence, EscalationRule, 
-    AutomationLog, Advertisement
+    AutomationLog, Advertisement, BlogPost
 )
-
 
 # ========== PROPERTY ==========
 class PropertyImageInline(admin.TabularInline):

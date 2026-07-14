@@ -25,7 +25,8 @@ from django.core.validators import (
 from django.utils import timezone
 
 from cloudinary.models import CloudinaryField
-
+from django.utils import timezone
+from django.utils.text import slugify
 
 # =============================================================================
 # VALIDATORS
@@ -1871,3 +1872,95 @@ class Advertisement(models.Model):
 
     def __str__(self):
         return self.title or f"Ad for {self.property}"
+    
+class BlogPost(models.Model):
+    """
+    Blog posts jo /blog/ pe list hote hain aur /blog/<slug>/ pe khulte hain.
+    Har post ka apna title, meta description, canonical URL aur JSON-LD
+    'BlogPosting' schema hota hai — Google aur AI answer engines (ChatGPT,
+    Perplexity, Google AI Overview) dono ke liye achha content signal.
+    """
+    STATUS_CHOICES = [
+        ("draft", "Draft"),
+        ("published", "Published"),
+    ]
+
+    title = models.CharField(max_length=200)
+    slug = models.SlugField(
+        max_length=220,
+        unique=True,
+        blank=True,
+        help_text="Khaali chhodo — title se auto-generate ho jayega. URL me yehi dikhega: /blog/is-slug-me/"
+    )
+    featured_image = CloudinaryField(
+        'image',
+        blank=True,
+        null=True,
+        help_text="Blog list aur detail page ke top pe dikhta hai. Bina image ke bhi save ho sakta hai."
+    )
+    excerpt = models.CharField(
+        max_length=300,
+        help_text="1-2 line ka summary — blog list card pe dikhta hai, aur meta description na diya ho to wahi use hota hai."
+    )
+    content = models.TextField(
+        help_text="Poora blog content. Basic HTML allowed hai jaise <p>, <h2>, <h3>, <b>, <ul><li>, <a href=''>."
+    )
+    meta_description = models.CharField(
+        max_length=160,
+        blank=True,
+        help_text="Google search result me ye line dikhti hai (max 160 characters). Khaali chhodo to excerpt use ho jayega."
+    )
+    author = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="blog_posts"
+    )
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="draft")
+    is_featured = models.BooleanField(
+        default=False,
+        help_text="Blog list page ke top/highlighted spot me dikhega"
+    )
+    published_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text="Status 'Published' karne par khud-ba-khud set ho jata hai, agar khaali ho"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-published_at', '-created_at']
+        indexes = [
+            Index(fields=['status', 'published_at']),
+            Index(fields=['slug']),
+        ]
+        verbose_name = "Blog Post"
+        verbose_name_plural = "Blog Posts"
+
+    def __str__(self):
+        return self.title
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            base_slug = slugify(self.title)[:200] or "post"
+            slug = base_slug
+            counter = 1
+            while BlogPost.objects.filter(slug=slug).exclude(pk=self.pk).exists():
+                counter += 1
+                slug = f"{base_slug}-{counter}"
+            self.slug = slug
+
+        if self.status == "published" and not self.published_at:
+            self.published_at = timezone.now()
+
+        super().save(*args, **kwargs)
+
+    def get_absolute_url(self):
+        from django.urls import reverse
+        return reverse("blog_detail", args=[self.slug])
+
+    @property
+    def seo_description(self):
+        return self.meta_description or self.excerpt
