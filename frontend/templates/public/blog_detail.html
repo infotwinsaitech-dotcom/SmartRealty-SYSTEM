@@ -1,0 +1,119 @@
+{% extends "public/base.html" %}
+{% load static cloudinary custom_filters %}
+{% block title %}{{ post.title }}{% endblock %}
+{% block meta_description %}{{ post.seo_description }}{% endblock %}
+{% block og_title %}{{ post.title }} – RealShri Blog{% endblock %}
+{% block og_description %}{{ post.seo_description }}{% endblock %}
+{% if post.featured_image %}{% cloudinary_url post.featured_image width=1200 height=630 crop='fill' as og_img_url %}{% block og_image %}{{ og_img_url }}{% endblock %}{% endif %}
+{% block canonical_url %}https://realshri.com{% url 'blog_detail' post.slug %}{% endblock %}
+
+{% block content %}
+
+<!-- Structured data: this article (helps rich results + AI answer engines like ChatGPT/Perplexity) -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "{{ post.title|escapejs }}",
+  "description": "{{ post.seo_description|escapejs }}",
+  "url": "https://realshri.com{% url 'blog_detail' post.slug %}",
+  {% if post.featured_image %}"image": "{{ og_img_url }}",{% endif %}
+  "datePublished": "{{ post.published_at|date:'c' }}",
+  "dateModified": "{{ post.updated_at|date:'c' }}",
+  "author": {
+    "@type": "{% if post.author %}Person{% else %}Organization{% endif %}",
+    "name": "{% if post.author %}{{ post.author.get_full_name|default:post.author.username|escapejs }}{% else %}RealShri{% endif %}"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "RealShri",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://realshri.com{% static 'images/logo.png' %}"
+    }
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://realshri.com{% url 'blog_detail' post.slug %}"
+  }
+}
+</script>
+
+<!-- Structured data: breadcrumb trail -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://realshri.com{% url 'home' %}"},
+    {"@type": "ListItem", "position": 2, "name": "Blog", "item": "https://realshri.com{% url 'blog_list' %}"},
+    {"@type": "ListItem", "position": 3, "name": "{{ post.title|escapejs }}", "item": "https://realshri.com{% url 'blog_detail' post.slug %}"}
+  ]
+}
+</script>
+
+<!-- ============================================
+   ARTICLE HERO
+   ============================================ -->
+<section class="relative w-full" style="height: 40vh; min-height: 260px; max-height: 440px;">
+    {% if post.featured_image %}
+    {% cloudinary_url post.featured_image width=1600 height=700 crop='fill' as hero_img %}
+    <img src="{{ hero_img }}" alt="{{ post.title }}" class="w-full h-full object-cover">
+    {% else %}
+    <div class="w-full h-full bg-[var(--color-navy)] flex items-center justify-center">
+        <span class="material-icons-round text-white/30" style="font-size:72px">article</span>
+    </div>
+    {% endif %}
+    <div class="absolute inset-0" style="background: linear-gradient(180deg, rgba(15,23,42,0.1), rgba(15,23,42,0.75));"></div>
+    <div class="absolute bottom-0 left-0 right-0 container-app pb-6">
+        <nav style="font-size:0.8rem; color:rgba(255,255,255,0.7); margin-bottom:8px;">
+            <a href="{% url 'home' %}" style="color:rgba(255,255,255,0.7);">Home</a> /
+            <a href="{% url 'blog_list' %}" style="color:rgba(255,255,255,0.7);">Blog</a>
+        </nav>
+        <h1 style="font-size: clamp(1.5rem, 4.5vw, 2.25rem); font-weight:700; color:#fff; max-width:800px;">{{ post.title }}</h1>
+        <p style="color:rgba(255,255,255,0.75); font-size:0.85rem; margin-top:10px;">
+            {% if post.author %}By {{ post.author.get_full_name|default:post.author.username }} &middot; {% endif %}
+            {{ post.published_at|date:"d M Y" }}
+        </p>
+    </div>
+</section>
+
+<!-- ============================================
+   ARTICLE CONTENT
+   ============================================ -->
+<div class="container-app" style="max-width:760px; padding-top: 32px; padding-bottom: 48px;">
+
+    <article style="color: var(--color-text); font-size:1.02rem; line-height:1.75;">
+        {{ post.content|safe }}
+    </article>
+
+    <div class="border-t my-8" style="border-color: var(--color-border);"></div>
+
+    <div class="rounded-2xl p-5" style="background: var(--color-surface); border:1px solid var(--color-border);">
+        <p style="font-weight:600; color:var(--color-text); margin-bottom:4px;">Looking for verified properties in Ahmedabad?</p>
+        <p style="color:var(--color-text-muted); font-size:0.9rem; margin-bottom:14px;">Browse RERA-verified flats, villas &amp; commercial spaces with zero brokerage on RealShri.</p>
+        <a href="{% url 'property_list' %}" class="btn btn-gold" style="display:inline-block; padding:10px 22px; font-size:0.9rem;">Browse Properties</a>
+    </div>
+
+    {% if related_posts %}
+    <h2 style="font-size:1.15rem; font-weight:700; color:var(--color-text); margin-top:40px; margin-bottom:16px;">More from the blog</h2>
+    <div class="grid sm:grid-cols-3 gap-5">
+        {% for rp in related_posts %}
+        <a href="{{ rp.get_absolute_url }}" class="rounded-xl overflow-hidden" style="border:1px solid var(--color-border); background: var(--color-surface); text-decoration:none;">
+            <div style="height:110px; background:var(--color-navy);">
+                {% if rp.featured_image %}
+                {% cloudinary_url rp.featured_image width=350 height=220 crop='fill' as rp_img %}
+                <img src="{{ rp_img }}" alt="{{ rp.title }}" class="w-full h-full object-cover" loading="lazy">
+                {% endif %}
+            </div>
+            <div class="p-3">
+                <p style="font-size:0.9rem; font-weight:600; color:var(--color-text);">{{ rp.title }}</p>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+</div>
+
+{% endblock %}

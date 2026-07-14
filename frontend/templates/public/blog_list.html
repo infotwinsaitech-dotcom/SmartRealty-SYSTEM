@@ -1,0 +1,130 @@
+{% extends "public/base.html" %}
+{% load static cloudinary %}
+{% block title %}Blog - RealShri{% endblock %}
+{% block meta_description %}Real estate insights, buying guides &amp; market updates from RealShri — Ahmedabad's trusted RERA-verified property platform.{% endblock %}
+{% block og_title %}Blog – RealShri Ahmedabad{% endblock %}
+{% block og_description %}Real estate insights, buying guides &amp; market updates from RealShri.{% endblock %}
+
+{% block content %}
+
+<!-- ============================================
+   BLOG HERO
+   ============================================ -->
+<section class="hero-section" style="min-height: 25vh;">
+    <div class="hero-content">
+        <span class="label" style="color: rgba(255,255,255,0.7); border-color: rgba(255,255,255,0.2);">
+            <span class="material-icons-round" style="font-size:16px">article</span>
+            RealShri Blog
+        </span>
+        <h1 class="hero-title" style="font-size: clamp(1.75rem, 5vw, 2.5rem);">
+            Insights &amp; <span style="color: #d4af37;">Guides</span>
+        </h1>
+        <p class="hero-subtitle" style="font-size: 1rem;">
+            Real estate tips, market trends &amp; buying guides for Ahmedabad
+        </p>
+    </div>
+</section>
+
+<section class="section-pad bg-[var(--color-surface)]">
+    <div class="container-app">
+
+        {% if featured_post %}
+        <!-- ============================================
+           FEATURED POST
+           ============================================ -->
+        <a href="{% url 'blog_detail' featured_post.slug %}" class="reveal block mb-10 rounded-2xl overflow-hidden shadow-lg group" style="text-decoration:none;">
+            <div class="grid grid-cols-1 md:grid-cols-2">
+                <div class="relative" style="min-height:260px;">
+                    {% if featured_post.featured_image %}
+                    <img src="{% cloudinary_url featured_post.featured_image width=900 height=600 crop='fill' %}"
+                         alt="{{ featured_post.title }}"
+                         class="w-full h-full object-cover"
+                         style="min-height:260px;">
+                    {% else %}
+                    <div class="w-full h-full flex items-center justify-center bg-[var(--color-bg-soft)]" style="min-height:260px;">
+                        <span class="material-icons-round text-[var(--color-text-light)]" style="font-size:48px">image</span>
+                    </div>
+                    {% endif %}
+                    <span class="absolute top-4 left-4 px-3 py-1 rounded-full text-xs font-semibold" style="background:#d4af37; color:#0f172a;">Featured</span>
+                </div>
+                <div class="p-6 md:p-8 flex flex-col justify-center bg-[var(--color-bg-soft)]">
+                    <p class="text-xs text-[var(--color-text-light)] mb-2">
+                        {% if featured_post.published_at %}{{ featured_post.published_at|date:"M d, Y" }}{% endif %}
+                        {% if featured_post.author %} &middot; {{ featured_post.author.get_full_name|default:featured_post.author.username }}{% endif %}
+                    </p>
+                    <h2 class="text-xl md:text-2xl font-bold text-[var(--color-navy)] mb-3 group-hover:text-[var(--color-gold)] transition-colors">
+                        {{ featured_post.title }}
+                    </h2>
+                    <p class="text-sm text-[var(--color-text-light)] mb-4">{{ featured_post.excerpt }}</p>
+                    <span class="inline-flex items-center gap-1 text-sm font-semibold text-[var(--color-gold)]">
+                        Read more
+                        <span class="material-icons-round" style="font-size:16px">arrow_forward</span>
+                    </span>
+                </div>
+            </div>
+        </a>
+        {% endif %}
+
+        <!-- ============================================
+           POSTS GRID
+           ============================================ -->
+        {% if page_obj.object_list %}
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for post in page_obj %}
+            <a href="{% url 'blog_detail' post.slug %}" class="reveal rounded-xl overflow-hidden shadow-md bg-white group flex flex-col" style="text-decoration:none; border:1px solid var(--color-border);">
+                <div class="relative overflow-hidden" style="aspect-ratio:16/10;">
+                    {% if post.featured_image %}
+                    <img src="{% cloudinary_url post.featured_image width=500 height=310 crop='fill' %}"
+                         alt="{{ post.title }}"
+                         loading="lazy"
+                         class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105">
+                    {% else %}
+                    <div class="w-full h-full flex items-center justify-center bg-[var(--color-bg-soft)]">
+                        <span class="material-icons-round text-[var(--color-text-light)]" style="font-size:36px">image</span>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="p-5 flex flex-col flex-1">
+                    <p class="text-xs text-[var(--color-text-light)] mb-2">
+                        {% if post.published_at %}{{ post.published_at|date:"M d, Y" }}{% endif %}
+                    </p>
+                    <h3 class="text-base font-bold text-[var(--color-navy)] mb-2 group-hover:text-[var(--color-gold)] transition-colors">
+                        {{ post.title }}
+                    </h3>
+                    <p class="text-sm text-[var(--color-text-light)] mb-4 flex-1">{{ post.excerpt }}</p>
+                    <span class="inline-flex items-center gap-1 text-sm font-semibold text-[var(--color-gold)]">
+                        Read more
+                        <span class="material-icons-round" style="font-size:16px">arrow_forward</span>
+                    </span>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+        {% elif not featured_post %}
+        <div class="text-center py-16">
+            <span class="material-icons-round text-[var(--color-text-light)]" style="font-size:56px">article</span>
+            <p class="text-[var(--color-text-light)] mt-4">No blog posts yet. Check back soon!</p>
+        </div>
+        {% endif %}
+
+        <!-- ============================================
+           PAGINATION
+           ============================================ -->
+        {% if page_obj.paginator.num_pages > 1 %}
+        <div class="flex items-center justify-center gap-2 mt-10">
+            {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}" class="px-4 py-2 rounded-lg text-sm font-medium border border-[var(--color-border)] hover:bg-[var(--color-bg-soft)]">Previous</a>
+            {% endif %}
+            <span class="px-4 py-2 text-sm text-[var(--color-text-light)]">
+                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+            </span>
+            {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}" class="px-4 py-2 rounded-lg text-sm font-medium border border-[var(--color-border)] hover:bg-[var(--color-bg-soft)]">Next</a>
+            {% endif %}
+        </div>
+        {% endif %}
+
+    </div>
+</section>
+
+{% endblock %}
