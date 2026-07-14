@@ -41,18 +41,41 @@ except ImportError:
 
 def pricing(request):
     """
-    Public pricing page with coupon support.
+    Pricing page with coupon support.
     Admin can customize plans, prices, and coupons from Django Admin.
-    """
-    builder_plans = SubscriptionPlan.objects.filter(
-        plan_type='builder', 
-        is_active=True
-    ).order_by('display_order', 'price_monthly')
 
-    agent_plans = SubscriptionPlan.objects.filter(
-        plan_type='agent', 
-        is_active=True
-    ).order_by('display_order', 'price_monthly')
+    Behaviour:
+    - Logged-in BUILDER  -> sees ONLY builder plans (their own plan to claim).
+    - Logged-in AGENT    -> sees ONLY agent plans (their own plan to claim).
+    - Anonymous visitor  -> sees both, so the public marketing page still works.
+    """
+    user_role = None
+    if request.user.is_authenticated:
+        user_role = getattr(request.user, 'role', None)
+
+    builder_plans = SubscriptionPlan.objects.none()
+    agent_plans = SubscriptionPlan.objects.none()
+
+    if user_role == 'builder':
+        builder_plans = SubscriptionPlan.objects.filter(
+            plan_type='builder',
+            is_active=True
+        ).order_by('display_order', 'price_monthly')
+    elif user_role == 'agent':
+        agent_plans = SubscriptionPlan.objects.filter(
+            plan_type='agent',
+            is_active=True
+        ).order_by('display_order', 'price_monthly')
+    else:
+        # Not logged in (or some other role) -> show the full public catalogue
+        builder_plans = SubscriptionPlan.objects.filter(
+            plan_type='builder',
+            is_active=True
+        ).order_by('display_order', 'price_monthly')
+        agent_plans = SubscriptionPlan.objects.filter(
+            plan_type='agent',
+            is_active=True
+        ).order_by('display_order', 'price_monthly')
 
     # Check for applied coupon in session
     applied_coupon = None
@@ -83,6 +106,7 @@ def pricing(request):
         "applied_coupon": applied_coupon,
         "coupon_discounts": coupon_discounts,
         "razorpay_key_id": getattr(settings, 'RAZORPAY_KEY_ID', ''),
+        "user_role": user_role,
     }
     return render(request, "subscriptions/pricing.html", context)
 

@@ -5,63 +5,61 @@
 
 {% block extra_css %}
 <style>
-  body { background:#05060a; }
-
   .pricing-hero {
     background:
-      radial-gradient(1200px 500px at 15% -10%, rgba(251,191,36,0.16), transparent 60%),
-      radial-gradient(900px 500px at 85% -10%, rgba(59,130,246,0.18), transparent 60%),
-      #05060a;
+      radial-gradient(900px 420px at 12% -10%, rgba(212,160,23,0.14), transparent 60%),
+      radial-gradient(800px 420px at 90% 0%, rgba(30,58,138,0.08), transparent 60%),
+      #FBF7EF;
   }
 
   .role-chip {
     display:inline-flex; align-items:center; gap:8px;
-    background:rgba(251,191,36,0.1);
-    border:1px solid rgba(251,191,36,0.35);
-    color:#fbbf24; font-weight:600; font-size:12.5px;
-    padding:6px 16px; border-radius:999px;
+    background:#FFF3D6;
+    border:1px solid #E8C567;
+    color:#8A6300; font-weight:700; font-size:12.5px;
+    padding:6px 18px; border-radius:999px;
   }
 
   .plan-card {
     position:relative;
-    background:linear-gradient(180deg, rgba(255,255,255,0.035), rgba(255,255,255,0.01));
-    border:1px solid rgba(255,255,255,0.08);
-    backdrop-filter:blur(6px);
-    transition:all .35s cubic-bezier(.2,.8,.2,1);
+    background:#ffffff;
+    border:1px solid #ECE3D3;
+    box-shadow:0 2px 10px rgba(30,20,0,0.05);
+    transition:all .3s cubic-bezier(.2,.8,.2,1);
   }
   .plan-card:hover {
-    transform:translateY(-6px);
-    border-color:rgba(251,191,36,0.35);
-    box-shadow:0 20px 45px -15px rgba(0,0,0,0.6);
+    transform:translateY(-8px);
+    border-color:#E8C567;
+    box-shadow:0 24px 45px -18px rgba(180,130,20,0.35);
   }
   .plan-card.popular {
-    border-color:rgba(251,191,36,0.55);
-    box-shadow:0 0 0 1px rgba(251,191,36,0.15), 0 25px 50px -15px rgba(251,191,36,0.15);
+    border:2px solid #D4A017;
+    box-shadow:0 0 0 4px rgba(212,160,23,0.10), 0 20px 45px -15px rgba(212,160,23,0.35);
   }
-  .plan-card.popular:hover { transform:translateY(-10px) scale(1.015); }
+  .plan-card.popular:hover { transform:translateY(-12px) scale(1.015); }
 
   .popular-badge {
-    background:linear-gradient(135deg,#fbbf24 0%,#f59e0b 100%);
-    box-shadow:0 4px 14px rgba(251,191,36,0.35);
+    background:linear-gradient(135deg,#F5C542 0%,#D4A017 100%);
+    box-shadow:0 4px 14px rgba(212,160,23,0.45);
   }
 
-  .price-strike { text-decoration:line-through; opacity:.55; }
+  .price-strike { text-decoration:line-through; opacity:.5; }
 
-  .razorpay-btn {
-    background:linear-gradient(135deg,#fbbf24 0%,#f59e0b 100%);
-    color:#111827;
+  .claim-btn {
+    background:linear-gradient(135deg,#F5C542 0%,#D4A017 100%);
+    color:#1E1400;
   }
-  .razorpay-btn:hover { filter:brightness(1.06); }
-  .razorpay-btn:active { transform:scale(0.98); }
+  .claim-btn:hover { filter:brightness(1.07); box-shadow:0 8px 20px rgba(212,160,23,0.35); }
+  .claim-btn:active { transform:scale(0.98); }
 
   .coupon-box {
-    background:rgba(251,191,36,0.06);
-    border:1px dashed rgba(251,191,36,0.35);
+    background:#FFF8E7;
+    border:1px dashed #E8C567;
   }
 
   .billing-toggle {
-    background:rgba(255,255,255,0.05);
-    border:1px solid rgba(255,255,255,0.08);
+    background:#F1E9D8;
+    border:1px solid #E8DCC0;
     border-radius:999px;
     padding:4px;
   }
@@ -70,30 +68,36 @@
     padding:8px 22px;
     transition:all .3s;
     background:transparent;
-    color:#9ca3af;
+    color:#8a7a5c;
     border:none;
     cursor:pointer;
-    font-weight:500;
+    font-weight:600;
     font-size:14px;
   }
   .billing-toggle button.active {
-    background:#fbbf24;
-    color:#111827;
-    font-weight:700;
+    background:#D4A017;
+    color:#fff;
   }
 
   .feature-check {
-    width:18px; height:18px; border-radius:6px;
-    background:rgba(34,197,94,0.15);
-    color:#22c55e;
+    width:19px; height:19px; border-radius:6px;
+    background:#E8F7EC;
+    color:#1D9A4A;
     display:inline-flex; align-items:center; justify-content:center;
-    flex-shrink:0; font-size:12px;
+    flex-shrink:0; font-size:12px; font-weight:700;
   }
 
-  .trust-strip { border-top:1px solid rgba(255,255,255,0.06); }
+  .plan-icon-strip {
+    height:5px;
+    background:linear-gradient(90deg,#D4A017,#F5C542,#D4A017);
+    border-radius:6px 6px 0 0;
+    margin:-24px -24px 20px -24px;
+  }
+
+  .trust-strip { border-top:1px solid #E8DCC0; }
 
   @keyframes floatIn {
-    from { opacity:0; transform:translateY(16px); }
+    from { opacity:0; transform:translateY(18px); }
     to { opacity:1; transform:translateY(0); }
   }
   .plan-card { animation:floatIn .5s ease both; }
@@ -105,35 +109,35 @@
 {% endblock %}
 
 {% block content %}
-<div class="pricing-hero min-h-screen text-white px-4 md:px-10 py-16">
+<div class="pricing-hero min-h-screen px-4 md:px-10 py-16" style="color:#2B2313;">
 
   <div class="text-center max-w-2xl mx-auto mb-10">
 
     {% if user_role == 'builder' %}
       <span class="role-chip mb-4">🏗️ Builder Account</span>
-      <h1 class="text-3xl md:text-4xl font-extrabold mb-3 mt-4">
-        Claim your <span class="text-yellow-400">Builder plan</span>
+      <h1 class="text-3xl md:text-4xl font-extrabold mb-3 mt-4" style="color:#1E293B;">
+        Claim your <span style="color:#D4A017;">Builder plan</span>
       </h1>
-      <p class="text-gray-400 mb-2">
+      <p class="text-gray-600 mb-1">
         Aapke builder panel ka access iss plan se unlock hoga — properties, agents aur leads sab isi ke andar manage honge.
       </p>
       <p class="text-gray-500 text-sm">Neeche diya plan choose karke turant apna panel activate karo.</p>
 
     {% elif user_role == 'agent' %}
       <span class="role-chip mb-4">👤 Agent Account</span>
-      <h1 class="text-3xl md:text-4xl font-extrabold mb-3 mt-4">
-        Claim your <span class="text-yellow-400">Agent plan</span>
+      <h1 class="text-3xl md:text-4xl font-extrabold mb-3 mt-4" style="color:#1E293B;">
+        Claim your <span style="color:#D4A017;">Agent plan</span>
       </h1>
-      <p class="text-gray-400 mb-2">
+      <p class="text-gray-600 mb-1">
         Aapke agent panel ka access iss plan se unlock hoga — properties dekhna, leads follow-up karna sab isi se milega.
       </p>
       <p class="text-gray-500 text-sm">Neeche diya plan choose karke turant apna panel activate karo.</p>
 
     {% else %}
-      <h1 class="text-3xl md:text-4xl font-extrabold mb-3">
-        Choose your <span class="text-yellow-400">plan</span>
+      <h1 class="text-3xl md:text-4xl font-extrabold mb-3" style="color:#1E293B;">
+        Choose your <span style="color:#D4A017;">plan</span>
       </h1>
-      <p class="text-gray-400 mb-2">
+      <p class="text-gray-600 mb-1">
         Panel use karne ke liye pehle ek subscription plan choose karo.
       </p>
     {% endif %}
@@ -144,7 +148,7 @@
         Monthly
       </button>
       <button type="button" id="btn-yearly" onclick="setBilling('yearly')">
-        Yearly <span style="background:#22c55e;color:#fff;font-size:10px;padding:2px 6px;border-radius:4px;margin-left:4px;">Save</span>
+        Yearly <span style="background:#1D9A4A;color:#fff;font-size:10px;padding:2px 6px;border-radius:4px;margin-left:4px;">Save</span>
       </button>
     </div>
   </div>
@@ -152,7 +156,7 @@
   {% if messages %}
   <div class="max-w-2xl mx-auto mb-8 space-y-2">
     {% for message in messages %}
-    <div class="bg-yellow-400/10 border border-yellow-400/30 text-yellow-300 text-sm rounded-lg px-4 py-3 text-center">
+    <div class="bg-yellow-50 border border-yellow-300 text-yellow-800 text-sm rounded-lg px-4 py-3 text-center">
       {{ message }}
     </div>
     {% endfor %}
@@ -164,21 +168,21 @@
     <div class="coupon-box rounded-xl p-4">
       <div class="flex gap-2">
         <input type="text" id="coupon-input" placeholder="Enter coupon code (e.g., BUILDER50)"
-               class="flex-1 bg-gray-800/70 border border-gray-700 rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-yellow-400 uppercase"
+               class="flex-1 bg-white border border-gray-300 rounded-lg px-4 py-2 text-gray-800 placeholder-gray-400 focus:outline-none focus:border-yellow-500 uppercase"
                value="{{ applied_coupon.code|default:'' }}">
-        <button onclick="applyCoupon()" class="bg-yellow-400 hover:bg-yellow-300 text-black font-semibold px-5 py-2 rounded-lg transition">
+        <button onclick="applyCoupon()" class="claim-btn font-semibold px-5 py-2 rounded-lg transition">
           Apply
         </button>
         {% if applied_coupon %}
-        <a href="{% url 'subscriptions:remove_coupon' %}" class="bg-red-500/20 hover:bg-red-500/30 text-red-400 px-3 py-2 rounded-lg transition text-sm flex items-center">
+        <a href="{% url 'subscriptions:remove_coupon' %}" class="bg-red-100 hover:bg-red-200 text-red-500 px-3 py-2 rounded-lg transition text-sm flex items-center">
           ✕
         </a>
         {% endif %}
       </div>
       <div id="coupon-message" class="mt-2 text-sm"></div>
       {% if applied_coupon %}
-      <div class="mt-2 text-green-400 text-sm">
-        ✅ <strong>{{ applied_coupon.code }}</strong> applied —
+      <div class="mt-2 text-green-600 text-sm font-medium">
+        ✅ {{ applied_coupon.code }} applied —
         {% if applied_coupon.discount_type == 'percentage' %}
           {{ applied_coupon.discount_value|floatformat:0 }}% off
         {% else %}
@@ -192,60 +196,61 @@
   <!-- BUILDER PLANS -->
   {% if builder_plans %}
   {% if not user_role %}
-  <h2 class="text-xl font-bold text-gray-200 mb-5 max-w-6xl mx-auto">🏗️ Builder Plans</h2>
+  <h2 class="text-xl font-bold mb-5 max-w-6xl mx-auto" style="color:#1E293B;">🏗️ Builder Plans</h2>
   {% endif %}
   <div class="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
     {% for plan in builder_plans %}
     <div class="plan-card {% if plan.is_popular %}popular{% endif %} rounded-2xl p-6 flex flex-col relative overflow-hidden">
+      <div class="plan-icon-strip"></div>
 
       {% if plan.is_popular %}
-      <div class="popular-badge text-black text-xs font-bold px-3 py-1 rounded-full absolute top-4 right-4">
+      <div class="popular-badge text-white text-xs font-bold px-3 py-1 rounded-full absolute top-4 right-4">
         ⭐ MOST POPULAR
       </div>
       {% endif %}
 
-      <h3 class="text-lg font-bold text-white mb-1">{{ plan.name }}</h3>
-      <p class="text-gray-400 text-sm mb-4 min-h-[40px]">{{ plan.description }}</p>
+      <h3 class="text-lg font-bold mb-1" style="color:#1E293B;">{{ plan.name }}</h3>
+      <p class="text-gray-500 text-sm mb-4 min-h-[40px]">{{ plan.description }}</p>
 
       <div class="mb-4">
         <div class="monthly-price">
           {% if coupon_discounts and plan.id in coupon_discounts %}
-            <span class="text-xl price-strike text-gray-500">₹{{ plan.price_monthly|floatformat:0 }}</span>
-            <span class="text-3xl font-extrabold text-yellow-400 ml-2">₹{{ coupon_discounts|get_item:plan.id|get_item:'discounted'|floatformat:0 }}</span>
-            <div class="text-xs text-green-400 mt-1">You save ₹{{ coupon_discounts|get_item:plan.id|get_item:'savings'|floatformat:0 }}</div>
+            <span class="text-xl price-strike text-gray-400">₹{{ plan.price_monthly|floatformat:0 }}</span>
+            <span class="text-3xl font-extrabold ml-2" style="color:#D4A017;">₹{{ coupon_discounts|get_item:plan.id|get_item:'discounted'|floatformat:0 }}</span>
+            <div class="text-xs text-green-600 mt-1 font-medium">You save ₹{{ coupon_discounts|get_item:plan.id|get_item:'savings'|floatformat:0 }}</div>
           {% else %}
-            <span class="text-3xl font-extrabold text-yellow-400">₹{{ plan.price_monthly|floatformat:0 }}</span>
+            <span class="text-3xl font-extrabold" style="color:#D4A017;">₹{{ plan.price_monthly|floatformat:0 }}</span>
           {% endif %}
-          <span class="text-gray-500 text-sm">/mo</span>
+          <span class="text-gray-400 text-sm">/mo</span>
         </div>
         <div class="yearly-price" style="display:none;">
-          <span class="text-3xl font-extrabold text-yellow-400">₹{{ plan.price_yearly|floatformat:0 }}</span>
-          <span class="text-gray-500 text-sm">/yr</span>
+          <span class="text-3xl font-extrabold" style="color:#D4A017;">₹{{ plan.price_yearly|floatformat:0 }}</span>
+          <span class="text-gray-400 text-sm">/yr</span>
         </div>
       </div>
 
-      <ul class="text-sm text-gray-300 space-y-2.5 mb-6 flex-1">
+      <ul class="text-sm text-gray-600 space-y-2.5 mb-6 flex-1">
         <li class="flex items-center gap-2"><span class="feature-check">✓</span> {{ plan.max_properties }} Properties</li>
         <li class="flex items-center gap-2"><span class="feature-check">✓</span> {{ plan.max_agents }} Agents</li>
         <li class="flex items-center gap-2"><span class="feature-check">✓</span> {{ plan.max_leads }} Leads</li>
         {% for feature in plan.features %}
-        <li class="flex items-center gap-2 text-gray-400"><span class="feature-check">✓</span> {{ feature|feature_label }}</li>
+        <li class="flex items-center gap-2"><span class="feature-check">✓</span> {{ feature|feature_label }}</li>
         {% endfor %}
       </ul>
 
       {% if user.is_authenticated %}
         {% if user.role == 'builder' %}
-        <button onclick="payNow({{ plan.id }})" class="w-full razorpay-btn hover:opacity-95 font-semibold py-2.5 rounded-lg transition">
+        <button onclick="payNow({{ plan.id }})" class="w-full claim-btn font-semibold py-2.5 rounded-lg transition">
           Claim This Plan
         </button>
         {% else %}
-        <button disabled class="w-full bg-gray-700 text-gray-500 font-semibold py-2.5 rounded-lg cursor-not-allowed">
+        <button disabled class="w-full bg-gray-200 text-gray-400 font-semibold py-2.5 rounded-lg cursor-not-allowed">
           Builder Only
         </button>
         {% endif %}
       {% else %}
       <a href="{% url 'login' %}?next={% url 'subscriptions:pricing' %}"
-         class="w-full block text-center bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2.5 rounded-lg transition">
+         class="w-full block text-center bg-gray-700 hover:bg-gray-800 text-white font-semibold py-2.5 rounded-lg transition">
         Login to Subscribe
       </a>
       {% endif %}
@@ -257,58 +262,59 @@
   <!-- AGENT PLANS -->
   {% if agent_plans %}
   {% if not user_role %}
-  <h2 class="text-xl font-bold text-gray-200 mb-5 max-w-6xl mx-auto">👤 Agent Plans</h2>
+  <h2 class="text-xl font-bold mb-5 max-w-6xl mx-auto" style="color:#1E293B;">👤 Agent Plans</h2>
   {% endif %}
   <div class="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
     {% for plan in agent_plans %}
     <div class="plan-card {% if plan.is_popular %}popular{% endif %} rounded-2xl p-6 flex flex-col relative overflow-hidden">
+      <div class="plan-icon-strip"></div>
 
       {% if plan.is_popular %}
-      <div class="popular-badge text-black text-xs font-bold px-3 py-1 rounded-full absolute top-4 right-4">
+      <div class="popular-badge text-white text-xs font-bold px-3 py-1 rounded-full absolute top-4 right-4">
         ⭐ MOST POPULAR
       </div>
       {% endif %}
 
-      <h3 class="text-lg font-bold text-white mb-1">{{ plan.name }}</h3>
-      <p class="text-gray-400 text-sm mb-4 min-h-[40px]">{{ plan.description }}</p>
+      <h3 class="text-lg font-bold mb-1" style="color:#1E293B;">{{ plan.name }}</h3>
+      <p class="text-gray-500 text-sm mb-4 min-h-[40px]">{{ plan.description }}</p>
 
       <div class="mb-4">
         <div class="monthly-price">
           {% if coupon_discounts and plan.id in coupon_discounts %}
-            <span class="text-xl price-strike text-gray-500">₹{{ plan.price_monthly|floatformat:0 }}</span>
-            <span class="text-3xl font-extrabold text-yellow-400 ml-2">₹{{ coupon_discounts|get_item:plan.id|get_item:'discounted'|floatformat:0 }}</span>
+            <span class="text-xl price-strike text-gray-400">₹{{ plan.price_monthly|floatformat:0 }}</span>
+            <span class="text-3xl font-extrabold ml-2" style="color:#D4A017;">₹{{ coupon_discounts|get_item:plan.id|get_item:'discounted'|floatformat:0 }}</span>
           {% else %}
-            <span class="text-3xl font-extrabold text-yellow-400">₹{{ plan.price_monthly|floatformat:0 }}</span>
+            <span class="text-3xl font-extrabold" style="color:#D4A017;">₹{{ plan.price_monthly|floatformat:0 }}</span>
           {% endif %}
-          <span class="text-gray-500 text-sm">/mo</span>
+          <span class="text-gray-400 text-sm">/mo</span>
         </div>
         <div class="yearly-price" style="display:none;">
-          <span class="text-3xl font-extrabold text-yellow-400">₹{{ plan.price_yearly|floatformat:0 }}</span>
-          <span class="text-gray-500 text-sm">/yr</span>
+          <span class="text-3xl font-extrabold" style="color:#D4A017;">₹{{ plan.price_yearly|floatformat:0 }}</span>
+          <span class="text-gray-400 text-sm">/yr</span>
         </div>
       </div>
 
-      <ul class="text-sm text-gray-300 space-y-2.5 mb-6 flex-1">
+      <ul class="text-sm text-gray-600 space-y-2.5 mb-6 flex-1">
         <li class="flex items-center gap-2"><span class="feature-check">✓</span> {{ plan.max_properties }} Properties</li>
         <li class="flex items-center gap-2"><span class="feature-check">✓</span> {{ plan.max_leads }} Leads</li>
         {% for feature in plan.features %}
-        <li class="flex items-center gap-2 text-gray-400"><span class="feature-check">✓</span> {{ feature|feature_label }}</li>
+        <li class="flex items-center gap-2"><span class="feature-check">✓</span> {{ feature|feature_label }}</li>
         {% endfor %}
       </ul>
 
       {% if user.is_authenticated %}
         {% if user.role == 'agent' %}
-        <button onclick="payNow({{ plan.id }})" class="w-full razorpay-btn hover:opacity-95 font-semibold py-2.5 rounded-lg transition">
+        <button onclick="payNow({{ plan.id }})" class="w-full claim-btn font-semibold py-2.5 rounded-lg transition">
           Claim This Plan
         </button>
         {% else %}
-        <button disabled class="w-full bg-gray-700 text-gray-500 font-semibold py-2.5 rounded-lg cursor-not-allowed">
+        <button disabled class="w-full bg-gray-200 text-gray-400 font-semibold py-2.5 rounded-lg cursor-not-allowed">
           Agent Only
         </button>
         {% endif %}
       {% else %}
       <a href="{% url 'login' %}?next={% url 'subscriptions:pricing' %}"
-         class="w-full block text-center bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2.5 rounded-lg transition">
+         class="w-full block text-center bg-gray-700 hover:bg-gray-800 text-white font-semibold py-2.5 rounded-lg transition">
         Login to Subscribe
       </a>
       {% endif %}
@@ -350,7 +356,7 @@ function applyCoupon() {
   const msgEl = document.getElementById('coupon-message');
 
   if (!code) {
-    msgEl.innerHTML = '<span style="color:#ef4444;">Please enter a coupon code</span>';
+    msgEl.innerHTML = '<span style="color:#dc2626;">Please enter a coupon code</span>';
     return;
   }
 
@@ -365,14 +371,14 @@ function applyCoupon() {
   .then(r => r.json())
   .then(data => {
     if (data.success) {
-      msgEl.innerHTML = '<span style="color:#22c55e;">✅ ' + data.message + '</span>';
+      msgEl.innerHTML = '<span style="color:#16a34a;">✅ ' + data.message + '</span>';
       setTimeout(() => window.location.reload(), 800);
     } else {
-      msgEl.innerHTML = '<span style="color:#ef4444;">❌ ' + data.message + '</span>';
+      msgEl.innerHTML = '<span style="color:#dc2626;">❌ ' + data.message + '</span>';
     }
   })
   .catch(() => {
-    msgEl.innerHTML = '<span style="color:#ef4444;">❌ Network error</span>';
+    msgEl.innerHTML = '<span style="color:#dc2626;">❌ Network error</span>';
   });
 }
 
@@ -439,7 +445,7 @@ function payNow(planId) {
         form.submit();
       },
       prefill: data.prefill,
-      theme: { color: '#fbbf24' },
+      theme: { color: '#D4A017' },
       modal: {
         ondismiss: function() {
           btn.innerHTML = 'Claim This Plan';
