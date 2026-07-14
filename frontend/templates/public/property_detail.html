@@ -10,7 +10,7 @@
 <section class="relative w-full" style="height: 45vh; min-height: 300px; max-height: 500px;">
     {% if property.thumbnail %}
     {% cloudinary_url property.thumbnail width=1920 height=800 crop='fill' as hero_img %}
-    <img src="{{ hero_img }}" alt="{{ property.title }}" class="w-full h-full object-cover">
+    <img src="{{ hero_img }}" alt="{{ property.property_type }} for sale in {{ property.location }}, Ahmedabad - {{ property.project_name|default:property.title }}" class="w-full h-full object-cover">
     {% else %}
     <div class="w-full h-full bg-[var(--color-navy)] flex items-center justify-center">
         <span class="material-icons-round text-white/30" style="font-size:80px">apartment</span>
@@ -66,7 +66,7 @@
 <!-- ============================================
    QUICK INFO BAR
    ============================================ -->
-<section class="bg-white border-b border-[var(--color-border)]">
+<section class="bg-[var(--color-surface)] border-b border-[var(--color-border)]">
     <div class="container-app py-4">
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div class="flex items-center gap-3 p-3 rounded-xl bg-[var(--color-bg-soft)]">

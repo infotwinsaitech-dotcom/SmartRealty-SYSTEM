@@ -1,6 +1,9 @@
 {% extends "public/base.html" %}
 {% load static cloudinary custom_filters %}
-{% block title %}Home{% endblock %}
+{% block title %}RealShri Ahmedabad – RERA-Verified Flats, Plots &amp; Commercial Property{% endblock %}
+{% block meta_description %}Looking for property in Ahmedabad? RealShri offers RERA-verified flats, villas, commercial spaces &amp; plots with zero brokerage. Search by locality, book a free site visit today.{% endblock %}
+{% block og_title %}RealShri – Ahmedabad's Most Trusted Real Estate Platform{% endblock %}
+{% block og_description %}RERA-verified residential, commercial &amp; land properties across Ahmedabad. Zero brokerage, verified owners, expert local guidance.{% endblock %}
 
 {% block content %}
 
@@ -149,7 +152,7 @@
                     <div class="showcase-media">
                         {% if property.thumbnail %}
                         {% cloudinary_url property.thumbnail width=1000 height=750 crop='fill' as img_url %}
-                        <img src="{{ img_url }}" alt="{{ property.title }}" loading="lazy">
+                        <img src="{{ img_url }}" alt="{{ property.property_type }} for sale in {{ property.location }}, Ahmedabad - {{ property.project_name|default:property.title }}" loading="lazy">
                         {% else %}
                         <div class="showcase-media-fallback">
                             <span class="material-icons-round">apartment</span>
@@ -263,6 +266,42 @@
                 </div>
                 <span class="material-icons-round" style="color: var(--color-gold);">arrow_forward</span>
             </a>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================
+   LOCAL AUTHORITY / AEO CONTENT — Ahmedabad focus
+   ============================================ -->
+<section class="section-pad" style="background: var(--color-bg-tint);">
+    <div class="container-app">
+        <div class="section-header">
+            <span class="label">
+                <span class="material-icons-round" style="font-size:16px">location_on</span>
+                Local Experts
+            </span>
+            <h2>Why Buy Property in Ahmedabad With RealShri?</h2>
+        </div>
+        <p style="max-width: 760px; margin: 0 auto var(--space-lg); text-align:center;">
+            Ahmedabad is one of India's fastest-growing real estate markets — from SG Highway and
+            Bopal to Vaishnodevi and South Bopal, new residential and commercial projects are
+            launching every month. RealShri helps you cut through the noise with RERA-verified
+            listings, transparent pricing and zero brokerage, so you deal directly with genuine
+            owners and builders instead of chasing unreliable ads.
+        </p>
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: var(--space-lg);">
+            <div class="card reveal" style="padding: var(--space-lg);">
+                <h3 style="font-size:1.05rem; margin-bottom:6px;">Which is the best area to invest in Ahmedabad right now?</h3>
+                <p style="margin:0; font-size:0.9rem;">Localities like SG Highway, Shela, South Bopal and Vaishnodevi Circle are seeing strong appreciation thanks to new metro connectivity and upcoming social infrastructure — good options for both end-use and investment.</p>
+            </div>
+            <div class="card reveal" style="padding: var(--space-lg);">
+                <h3 style="font-size:1.05rem; margin-bottom:6px;">Is it safe to buy a flat without a broker?</h3>
+                <p style="margin:0; font-size:0.9rem;">Yes — every listing on RealShri is RERA-verified and cross-checked before it goes live, so you can deal directly with the owner or builder with zero brokerage and full documentation support.</p>
+            </div>
+            <div class="card reveal" style="padding: var(--space-lg);">
+                <h3 style="font-size:1.05rem; margin-bottom:6px;">Do you cover commercial and plot listings too?</h3>
+                <p style="margin:0; font-size:0.9rem;">RealShri currently lists residential, commercial and land/plot properties across Ahmedabad, with more Gujarat cities being added soon.</p>
+            </div>
         </div>
     </div>
 </section>
@@ -676,5 +715,55 @@ function heroAdGo(direction) {
         nextBtn.style.display = 'none';
     }
 })();
+</script>
+
+<!-- FAQ Schema for Google Featured Snippets / AI Overviews -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Which is the best area to invest in Ahmedabad right now?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Localities like SG Highway, Shela, South Bopal and Vaishnodevi Circle are seeing strong appreciation thanks to new metro connectivity and upcoming social infrastructure, making them good options for both end-use and investment."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is it safe to buy a flat without a broker on RealShri?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. Every listing on RealShri is RERA-verified and cross-checked before it goes live, so buyers can deal directly with the owner or builder with zero brokerage and full documentation support."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Does RealShri list commercial properties and plots in Ahmedabad?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes, RealShri lists residential, commercial and land/plot properties across Ahmedabad, with more Gujarat cities being added soon."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How is RealShri different from Housing, 99acres or Magicbricks?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "RealShri focuses only on Ahmedabad, so every listing is locally verified and updated by a team that knows the area, rather than relying on generic pan-India listings."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Does RealShri charge brokerage on property deals?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No, RealShri operates on a zero-brokerage model, connecting buyers directly with verified owners and builders."
+      }
+    }
+  ]
+}
 </script>
 {% endblock %}

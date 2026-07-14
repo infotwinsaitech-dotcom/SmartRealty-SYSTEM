@@ -74,12 +74,12 @@ tailwind.config = {
    ============================================ */
 
 :root {
-    /* 60% - Primary/Neutral (Backgrounds) */
-    --color-bg: #faf6ec;
-    --color-bg-soft: #f3ecd9;
-    --color-bg-tint: #eef1f8;
-    --color-surface: #ffffff;
-    --color-surface-hover: #faf8f3;
+    /* 60% - Primary/Neutral (Backgrounds) - softened so it doesn't glare */
+    --color-bg: #f1ece0;
+    --color-bg-soft: #e9e0c9;
+    --color-bg-tint: #e6e9f1;
+    --color-surface: #fbf9f3;
+    --color-surface-hover: #f4efe2;
 
     /* 30% - Secondary (Navy - Text, Headers, Dark elements) */
     --color-navy: #0f172a;
@@ -1572,8 +1572,45 @@ p {
 }
 </style>
 
-<title>{% block title %}{% endblock %} | RealShri</title>
+<title>{% block title %}{% endblock %} | RealShri Ahmedabad</title>
+<meta name="description" content="{% block meta_description %}RealShri – Ahmedabad's trusted RERA-verified real estate platform. Buy, sell &amp; rent residential, commercial &amp; land properties with zero brokerage.{% endblock %}">
+<link rel="canonical" href="{% block canonical_url %}https://realshri.com{{ request.path }}{% endblock %}">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="RealShri">
+<meta property="og:title" content="{% block og_title %}{% endblock %} | RealShri Ahmedabad">
+<meta property="og:description" content="{% block og_description %}RealShri – Ahmedabad's trusted RERA-verified real estate platform. Zero brokerage on residential, commercial &amp; land listings.{% endblock %}">
+<meta property="og:image" content="{% block og_image %}{% static 'images/logo.png' %}{% endblock %}">
+<meta property="og:url" content="https://realshri.com{{ request.path }}">
+<meta name="twitter:card" content="summary_large_image">
+
 <link rel="icon" type="image/png" href="{% if site.favicon %}{{ site.favicon.url }}{% else %}{% static 'images/logo.png' %}{% endif %}">
+
+<!-- Sitewide LocalBusiness / RealEstateAgent Schema (AEO - helps AI Overviews & assistants cite us) -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "RealEstateAgent",
+  "name": "RealShri",
+  "description": "RERA-verified real estate platform for buying, selling &amp; renting residential, commercial and land properties in Ahmedabad, Gujarat.",
+  "url": "https://realshri.com",
+  "logo": "https://realshri.com{% static 'images/logo.png' %}",
+  "areaServed": {
+    "@type": "City",
+    "name": "Ahmedabad"
+  },
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "Ahmedabad",
+    "addressRegion": "Gujarat",
+    "addressCountry": "IN"
+  },
+  "priceRange": "₹₹"
+}
+</script>
+
+{% block extra_head %}{% endblock %}
 </head>
 
 <body>
