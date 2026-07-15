@@ -1,11 +1,11 @@
 {% extends "public/base.html" %}
 {% load static cloudinary custom_filters %}
-{% block title %}{{ property.project_name|default:property.title }} | RealShri{% endblock %}
-{% block meta_description %}{{ property.beds|default:"" }}{% if property.beds %} BHK{% endif %} {{ property.property_type }} for sale in {{ property.location }}, Ahmedabad{% if property.price %} at ₹{{ property.price }} {{ property.get_price_unit_display }}{% endif %}. RERA-verified, zero brokerage on RealShri.{% endblock %}
+{% block title %}{{ property.project_name|default:property.title }} | RealShree{% endblock %}
+{% block meta_description %}{{ property.beds|default:"" }}{% if property.beds %} BHK{% endif %} {{ property.property_type }} for sale in {{ property.location }}, Ahmedabad{% if property.price %} at ₹{{ property.price }} {{ property.get_price_unit_display }}{% endif %}. RERA-verified, zero brokerage on RealShree.{% endblock %}
 {% block og_title %}{{ property.project_name|default:property.title }} – {{ property.location }}, Ahmedabad{% endblock %}
 {% block og_description %}{{ property.beds|default:"" }}{% if property.beds %} BHK{% endif %} {{ property.property_type }} in {{ property.location }}{% if property.price %}, ₹{{ property.price }} {{ property.get_price_unit_display }}{% endif %}. RERA-verified listing, zero brokerage.{% endblock %}
 {% if property.thumbnail %}{% cloudinary_url property.thumbnail width=1200 height=630 crop='fill' as og_img_url %}{% block og_image %}{{ og_img_url }}{% endblock %}{% endif %}
-{% block canonical_url %}https://realshri.com{% url 'property_detail' property.id %}{% endblock %}
+{% block canonical_url %}https://RealShree.com{% url 'property_detail' property.id %}{% endblock %}
 
 {% block content %}
 
@@ -16,7 +16,7 @@
   "@type": "RealEstateListing",
   "name": "{{ property.project_name|default:property.title|escapejs }}",
   "description": "{{ property.description|striptags|truncatewords:40|escapejs }}",
-  "url": "https://realshri.com{% url 'property_detail' property.id %}",
+  "url": "https://RealShree.com{% url 'property_detail' property.id %}",
   {% if property.thumbnail %}"image": "{{ og_img_url }}",{% endif %}
   "datePosted": "{{ property.created_at|date:'Y-m-d' }}",
   "address": {
@@ -40,9 +40,9 @@
   "@context": "https://schema.org",
   "@type": "BreadcrumbList",
   "itemListElement": [
-    {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://realshri.com{% url 'home' %}"},
-    {"@type": "ListItem", "position": 2, "name": "Properties", "item": "https://realshri.com{% url 'property_list' %}"},
-    {"@type": "ListItem", "position": 3, "name": "{{ property.project_name|default:property.title|escapejs }}", "item": "https://realshri.com{% url 'property_detail' property.id %}"}
+    {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://RealShree.com{% url 'home' %}"},
+    {"@type": "ListItem", "position": 2, "name": "Properties", "item": "https://RealShree.com{% url 'property_list' %}"},
+    {"@type": "ListItem", "position": 3, "name": "{{ property.project_name|default:property.title|escapejs }}", "item": "https://RealShree.com{% url 'property_detail' property.id %}"}
   ]
 }
 </script>

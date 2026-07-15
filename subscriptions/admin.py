@@ -1,5 +1,5 @@
 """
-SmartRealty CRM - Subscription Admin Panel
+RealShree - Subscription Admin Panel
 Admin can fully customize plans, coupons, and view all payments
 NOTE: UserSubscription is in core/models.py - we reference it, don't redefine it.
 """

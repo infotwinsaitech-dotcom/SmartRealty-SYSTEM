@@ -9,9 +9,9 @@
             <!-- Brand -->
             <div>
                 <div class="footer-logo">
-                    <img src="{% if site.logo %}{{ site.logo.url }}{% else %}{% static 'images/logo.png' %}{% endif %}" alt="{{ site.company_name|default:'RealShri' }} logo"
+                    <img src="{% if site.logo %}{{ site.logo.url }}{% else %}{% static 'images/logo.png' %}{% endif %}" alt="{{ site.company_name|default:'RealShree' }} logo"
                          onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
-                    <span style="display:none; font-weight:800; font-size:1.4rem; color:#fff;">{{ site.company_name|default:'RealShri' }}</span>
+                    <span style="display:none; font-weight:800; font-size:1.4rem; color:#fff;">{{ site.company_name|default:'RealShree' }}</span>
                 </div>
                 <p style="font-size:0.875rem; line-height:1.7; max-width:320px; color:rgba(255,255,255,0.6);">
                     {{ site.about_text|default:"Where trust meets your dream home. We help you find verified, RERA-registered properties with complete transparency and zero brokerage." }}
@@ -89,7 +89,7 @@
 
     <div class="container-app">
         <div class="footer-bottom">
-            <p style="margin:0;">&copy; {% now "Y" %} {{ site.company_name|default:"RealShri" }}. All rights reserved.</p>
+            <p style="margin:0;">&copy; {% now "Y" %} {{ site.company_name|default:"RealShree" }}. All rights reserved.</p>
             <div class="footer-bottom-links">
                 <a href="{% url 'privacy' %}">Privacy Policy</a>
                 <a href="{% url 'contact' %}">Contact</a>

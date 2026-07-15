@@ -19,7 +19,7 @@ from core.tasks import (
 
 
 class Command(BaseCommand):
-    help = 'Run background tasks for SmartRealty CRM'
+    help = 'Run background tasks for RealShree'
 
     def add_arguments(self, parser):
         parser.add_argument(

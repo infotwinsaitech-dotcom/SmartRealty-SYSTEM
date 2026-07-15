@@ -161,7 +161,7 @@ class SmartAutomationEngine:
     def _send_email(self, email, message):
         if email:
             send_mail(
-                'Smart Realty - Follow-up',
+                'RealShree - Follow-up',
                 message,
                 settings.DEFAULT_FROM_EMAIL,
                 [email],

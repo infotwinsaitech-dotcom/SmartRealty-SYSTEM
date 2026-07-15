@@ -1,5 +1,5 @@
 """
-SmartRealty CRM - Production Ready Background Tasks
+RealShree - Production Ready Background Tasks
 No Celery version - Use with Django management commands, cron, or APScheduler
 """
 
@@ -244,7 +244,7 @@ def _fallback_send_message(lead, channel, message):
     try:
         if channel == 'EMAIL':
             send_mail(
-                subject='Smart Realty - Follow-up',
+                subject='RealShree - Follow-up',
                 message=message,
                 from_email=getattr(settings, 'DEFAULT_FROM_EMAIL', 'noreply@smartrealty.com'),
                 recipient_list=[lead.email],
@@ -421,7 +421,7 @@ Details:
 Please take immediate action.
 
 Best regards,
-Smart Realty System
+RealShree
             """,
             from_email=getattr(settings, 'DEFAULT_FROM_EMAIL', 'noreply@smartrealty.com'),
             recipient_list=[builder.email],
@@ -570,7 +570,7 @@ def _get_welcome_message(lead):
     """Generate welcome message for new lead"""
     return f"""Hello {lead.name}! 👋
 
-Thank you for your interest in Smart Realty. 
+Thank you for your interest in RealShree. 
 
 I'm your dedicated property advisor. I'll help you find your dream property.
 
@@ -768,7 +768,7 @@ Here's your daily summary for {yesterday}:
 Login to your dashboard for details.
 
 Best regards,
-Smart Realty Team
+RealShree Team
                 """,
                 from_email=getattr(settings, 'DEFAULT_FROM_EMAIL', 'noreply@smartrealty.com'),
                 recipient_list=[builder.email],

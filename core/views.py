@@ -1,5 +1,5 @@
 """
-SmartRealty CRM - Production Ready Views
+RealShree - Production Ready Views
 All features preserved with security & performance fixes
 """
 
@@ -3972,7 +3972,7 @@ def whatsapp_bot(request):
         resp = MessagingResponse()
         
         if "hi" in msg or "hello" in msg:
-            reply = "Welcome to Smart Realty 🏠\n\n1️⃣ Residential Properties\n2️⃣ Commercial Properties\n3️⃣ Talk to Agent\n\nReply with number:"
+            reply = "Welcome to RealShree 🏠\n\n1️⃣ Residential Properties\n2️⃣ Commercial Properties\n3️⃣ Talk to Agent\n\nReply with number:"
         elif msg in ["1", "residential"]:
             reply = "Great! Please tell us your preferred location:"
         elif msg in ["2", "commercial"]:
@@ -3980,7 +3980,7 @@ def whatsapp_bot(request):
         elif msg in ["3", "agent"]:
             reply = "Connecting you to our agent... Please share your name and phone number."
         else:
-            reply = "Welcome to Smart Realty 🏠\nType 'Hi' to get started!"
+            reply = "Welcome to RealShree 🏠\nType 'Hi' to get started!"
         
         resp.message(reply)
         return HttpResponse(str(resp), content_type="application/xml")
@@ -4561,7 +4561,7 @@ def property_leads_page(request, property_id):
 def google_login_redirect(request):
     """Redirect after Google OAuth login with success message."""
 
-    messages.success(request, "🎉 Registration completed successfully! Welcome to SmartRealty.")
+    messages.success(request, "🎉 Registration completed successfully! Welcome to RealShree.")
 
     # Use direct paths instead of URL names to avoid NoReverseMatch
     if request.user.role == 'builder':
@@ -4772,7 +4772,7 @@ def property_map_public(request):
 # hote hain — property list DB se live aati hai, hardcode nahi hai.
 # =============================================================================
 
-SITE_DOMAIN = "https://realshri.com"
+SITE_DOMAIN = "https://RealShree.com"
 
 
 def robots_txt(request):

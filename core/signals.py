@@ -283,7 +283,7 @@ def geocode_property(sender, instance, **kwargs):
             try:
                 import requests
                 url = f"https://nominatim.openstreetmap.org/search?q={instance.location},India&format=json&limit=1"
-                headers = {'User-Agent': 'SmartRealty/1.0'}
+                headers = {'User-Agent': 'RealShree/1.0'}
                 resp = requests.get(url, headers=headers, timeout=5)
                 data = resp.json()
                 if data:

@@ -1,5 +1,5 @@
 """
-SmartRealty CRM - Subscription Models with Razorpay & Coupons
+RealShree - Subscription Models with Razorpay & Coupons
 NOTE: UserSubscription is in core/models.py, NOT here. We reference it via imports.
 """
 

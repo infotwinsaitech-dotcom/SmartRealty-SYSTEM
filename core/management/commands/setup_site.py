@@ -14,7 +14,7 @@ class Command(BaseCommand):
             id=1,
             defaults={
                 'domain': 'smartrealty-system.onrender.com',
-                'name': 'SmartRealty'
+                'name': 'RealShree'
             }
         )
         action = 'Created' if created else 'Updated'

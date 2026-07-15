@@ -1,5 +1,5 @@
 """
-SmartRealty CRM - Production Ready Models
+RealShree - Production Ready Models
 FIXED VERSION:
   1. Activity.lead ForeignKey indentation fixed
   2. LeadNote.lead related_name fixed
@@ -334,7 +334,7 @@ class SiteSettings(models.Model):
         settings_obj, created = cls.objects.get_or_create(
             id=1,
             defaults={
-                'company_name': 'Smart Realty',
+                'company_name': 'RealShree',
                 'phone': '+91-9876543210',
                 'email': 'info@smartrealty.com',
                 'location': 'India'

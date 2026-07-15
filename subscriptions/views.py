@@ -1,5 +1,5 @@
 """
-SmartRealty CRM - Razorpay Payment + Coupon Integration
+RealShree - Razorpay Payment + Coupon Integration
 All admin-customizable via Django Admin
 """
 

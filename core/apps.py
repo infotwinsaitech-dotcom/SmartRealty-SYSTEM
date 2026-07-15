@@ -75,7 +75,7 @@ class CoreConfig(AppConfig):
                 id=1,
                 defaults={
                     'domain': 'smartrealty-system.onrender.com',
-                    'name': 'SmartRealty'
+                    'name': 'RealShree'
                 }
             )
 
