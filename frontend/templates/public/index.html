@@ -586,15 +586,14 @@
         align-items: stretch;
         justify-content: flex-start;
         aspect-ratio: auto;
-        /* Desktop wali height:46vh aur overflow:hidden yahan tak carry ho
-           rahi thi, jisse ad image + dots + text + category pills poora
-           content ek chhoti fixed box me clip ho raha tha (isiliye ad
-           blank aur Residential/Commercial/Land pills gayab dikh rahe
-           the). Ab height auto hai — content jitni jagah le utni milegi. */
+        /* height:auto hi asli fix tha (content ko apni poori jagah milti
+           hai, kuch clip nahi hota). overflow ko hidden hi rakha hai —
+           'visible' set karne se ek chhota horizontal overflow (right
+           side gap) create ho gaya tha jo yahan avoid karna hai. */
         height: auto;
         min-height: 0;
         max-height: none;
-        overflow: visible;
+        overflow: hidden;
         padding: var(--space-md) var(--space-md) var(--space-xl);
     }
 
