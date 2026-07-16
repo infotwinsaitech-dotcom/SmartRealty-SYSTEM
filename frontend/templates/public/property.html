@@ -75,7 +75,7 @@
                         <span id="areaLabel">Select Area</span>
                         <span class="material-icons-round" style="font-size:16px">expand_more</span>
                     </button>
-                    <div id="areaDropdown" class="dropdown-menu hidden" style="width: 280px;">
+                    <div id="areaDropdown" class="dropdown-menu dropdown-menu-area hidden">
                         <input type="text" id="areaSearch" placeholder="Search area..." class="w-full px-3 py-2 mb-2 text-sm border border-[var(--color-border)] rounded-lg">
                         <div class="max-h-48 overflow-y-auto space-y-1">
                             {% for area in ahmedabad_areas %}
@@ -450,16 +450,27 @@
 
 /* Dropdown Menu */
 .dropdown-menu {
-    position: absolute;
-    top: calc(100% + 8px);
-    left: 0;
     background: white;
     border: 1px solid var(--color-border);
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-xl);
     padding: 12px;
     z-index: 300;
-    min-width: 220px;
+}
+/* Desktop-only positioning — mobile (<768px) uses the bottom-sheet
+   style already defined in base.html; this rule used to apply on
+   ALL screen sizes with no media query and was overriding/breaking
+   that mobile bottom-sheet dropdown. */
+@media (min-width: 768px) {
+    .dropdown-menu {
+        position: absolute;
+        top: calc(100% + 8px);
+        left: 0;
+        min-width: 220px;
+    }
+    .dropdown-menu-area {
+        width: 280px;
+    }
 }
 .dropdown-item {
     display: flex;
