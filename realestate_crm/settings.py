@@ -577,7 +577,7 @@ def _auto_setup_site_and_socialapp():
         site, created = Site.objects.get_or_create(
             id=1,
             defaults={
-                'domain': 'smartrealty-system.onrender.com',
+                'domain': 'realshree.com',
                 'name': 'SmartRealty'
             }
         )

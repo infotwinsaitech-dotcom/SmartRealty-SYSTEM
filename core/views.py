@@ -4772,7 +4772,7 @@ def property_map_public(request):
 # hote hain — property list DB se live aati hai, hardcode nahi hai.
 # =============================================================================
 
-SITE_DOMAIN = "https://RealShree.com"
+SITE_DOMAIN = "https://realshree.com"
 
 
 def robots_txt(request):

@@ -74,7 +74,7 @@ class CoreConfig(AppConfig):
             site, _ = Site.objects.get_or_create(
                 id=1,
                 defaults={
-                    'domain': 'smartrealty-system.onrender.com',
+                    'domain': 'realshree.com',
                     'name': 'RealShree'
                 }
             )

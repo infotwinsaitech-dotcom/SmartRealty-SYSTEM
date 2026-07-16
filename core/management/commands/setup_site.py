@@ -13,7 +13,7 @@ class Command(BaseCommand):
         site, created = Site.objects.update_or_create(
             id=1,
             defaults={
-                'domain': 'smartrealty-system.onrender.com',
+                'domain': 'realshree.com',
                 'name': 'RealShree'
             }
         )
