@@ -36,7 +36,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2">
                 <div class="relative" style="min-height:260px;">
                     {% if featured_post.featured_image %}
-                    <img src="{% cloudinary_url featured_post.featured_image width=900 height=600 crop='fill' %}"
+                    <img src="{{ featured_post.featured_image.url }}"
                          alt="{{ featured_post.title }}"
                          class="w-full h-full object-cover"
                          style="min-height:260px;">
@@ -74,7 +74,7 @@
             <a href="{% url 'blog_detail' post.slug %}" class="reveal rounded-xl overflow-hidden shadow-md bg-white group flex flex-col" style="text-decoration:none; border:1px solid var(--color-border);">
                 <div class="relative overflow-hidden" style="aspect-ratio:16/10;">
                     {% if post.featured_image %}
-                    <img src="{% cloudinary_url post.featured_image width=500 height=310 crop='fill' %}"
+                    <img src="{{ post.featured_image.url }}"
                          alt="{{ post.title }}"
                          loading="lazy"
                          class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105">

@@ -4,7 +4,7 @@
 {% block meta_description %}{{ post.seo_description }}{% endblock %}
 {% block og_title %}{{ post.title }} – RealShree Blog{% endblock %}
 {% block og_description %}{{ post.seo_description }}{% endblock %}
-{% if post.featured_image %}{% cloudinary_url post.featured_image width=1200 height=630 crop='fill' as og_img_url %}{% block og_image %}{{ og_img_url }}{% endblock %}{% endif %}
+{% if post.featured_image %}{% block og_image %}{{ post.featured_image.url }}{% endblock %}{% endif %}
 {% block canonical_url %}https://RealShree.com{% url 'blog_detail' post.slug %}{% endblock %}
 
 {% block content %}
@@ -17,7 +17,7 @@
   "headline": "{{ post.title|escapejs }}",
   "description": "{{ post.seo_description|escapejs }}",
   "url": "https://RealShree.com{% url 'blog_detail' post.slug %}",
-  {% if post.featured_image %}"image": "{{ og_img_url }}",{% endif %}
+  {% if post.featured_image %}"image": "{{ post.featured_image.url }}",{% endif %}
   "datePublished": "{{ post.published_at|date:'c' }}",
   "dateModified": "{{ post.updated_at|date:'c' }}",
   "author": {
@@ -57,8 +57,7 @@
    ============================================ -->
 <section class="relative w-full" style="height: 40vh; min-height: 260px; max-height: 440px;">
     {% if post.featured_image %}
-    {% cloudinary_url post.featured_image width=1600 height=700 crop='fill' as hero_img %}
-    <img src="{{ hero_img }}" alt="{{ post.title }}" class="w-full h-full object-cover">
+    <img src="{{ post.featured_image.url }}" alt="{{ post.title }}" class="w-full h-full object-cover">
     {% else %}
     <div class="w-full h-full bg-[var(--color-navy)] flex items-center justify-center">
         <span class="material-icons-round text-white/30" style="font-size:72px">article</span>
@@ -102,8 +101,7 @@
         <a href="{{ rp.get_absolute_url }}" class="rounded-xl overflow-hidden" style="border:1px solid var(--color-border); background: var(--color-surface); text-decoration:none;">
             <div style="height:110px; background:var(--color-navy);">
                 {% if rp.featured_image %}
-                {% cloudinary_url rp.featured_image width=350 height=220 crop='fill' as rp_img %}
-                <img src="{{ rp_img }}" alt="{{ rp.title }}" class="w-full h-full object-cover" loading="lazy">
+                <img src="{{ rp.featured_image.url }}" alt="{{ rp.title }}" class="w-full h-full object-cover" loading="lazy">
                 {% endif %}
             </div>
             <div class="p-3">
