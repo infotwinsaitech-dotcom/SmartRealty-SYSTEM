@@ -8,6 +8,8 @@ from django.db.models import Index
 from django.conf import settings
 from django.core.validators import MinValueValidator, MaxValueValidator
 from decimal import Decimal
+from django.utils.text import slugify
+from django.utils import timezone
 
 
 class SubscriptionPlan(models.Model):
@@ -228,7 +230,77 @@ class RazorpayOrder(models.Model):
     def __str__(self):
         return f"Order {self.razorpay_order_id} - {self.status}"
 
+class BlogPost(models.Model):
+    STATUS_CHOICES = (
+        ("draft", "Draft"),
+        ("published", "Published"),
+    )
 
+    title = models.CharField(max_length=255)
+    slug = models.SlugField(max_length=255, unique=True, blank=True)
+
+    featured_image = models.ImageField(
+        upload_to="blog/",
+        blank=True,
+        null=True
+    )
+
+    excerpt = models.TextField(blank=True)
+    content = models.TextField()
+
+    meta_description = models.CharField(
+        max_length=160,
+        blank=True
+    )
+
+    author = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="blog_posts"
+    )
+
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default="draft"
+    )
+
+    is_featured = models.BooleanField(default=False)
+
+    published_at = models.DateTimeField(
+        blank=True,
+        null=True
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-published_at", "-created_at"]
+
+    def __str__(self):
+        return self.title
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            base_slug = slugify(self.title)
+            slug = base_slug
+            counter = 1
+
+            while BlogPost.objects.filter(slug=slug).exclude(pk=self.pk).exists():
+                slug = f"{base_slug}-{counter}"
+                counter += 1
+
+            self.slug = slug
+
+        if self.status == "published" and self.published_at is None:
+            self.published_at = timezone.now()
+
+        if not self.meta_description:
+            self.meta_description = self.excerpt[:160]
+
+        super().save(*args, **kwargs)
 # NOTE: UserSubscription is defined in core/models.py to avoid duplication.
 # The subscriptions app only adds RazorpayOrder, CouponCode, and SubscriptionPlan.
 # The core.UserSubscription model already has: user (OneToOne), plan (FK), start_date, end_date, etc.

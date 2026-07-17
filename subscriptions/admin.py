@@ -11,7 +11,8 @@ from django.urls import path
 from django.shortcuts import redirect
 from django.contrib import messages
 
-from .models import SubscriptionPlan, RazorpayOrder, CouponCode, CouponUsage
+from .models import SubscriptionPlan, RazorpayOrder, CouponCode, CouponUsage, BlogPost
+
 from core.models import UserSubscription
 
 
@@ -254,3 +255,60 @@ class UserSubscriptionAdmin(admin.ModelAdmin):
             return format_html('<span style="color:#fbbf24;">{} days</span>', days)
         return format_html('<span style="color:#22c55e;">{} days</span>', days)
     days_left.short_description = "Days Left"
+    
+@admin.register(BlogPost)
+class BlogPostAdmin(admin.ModelAdmin):
+    """
+    Builder/marketing team is yahi se blog post likhte hain — image upload,
+    content, aur SEO fields (meta description) sab ek hi form me. Save karte
+    hi slug, published_at, aur JSON-LD sab apne aap ban jaata hai (model ke
+    save() me already handle hai) — yaha sirf easy-to-use form banaya hai.
+    """
+    list_display = ['thumb', 'title', 'status', 'is_featured', 'author', 'published_at', 'updated_at']
+    list_display_links = ['thumb', 'title']
+    list_filter = ['status', 'is_featured']
+    search_fields = ['title', 'excerpt', 'content']
+    readonly_fields = ['image_preview', 'published_at', 'created_at', 'updated_at']
+    autocomplete_fields = []
+
+    fieldsets = (
+        ('Content', {
+            'fields': ('title', 'slug', 'featured_image', 'image_preview', 'excerpt', 'content'),
+            'description': 'Title likhte hi neeche URL slug apne aap ban jaayega — khaali chhod sakte ho.',
+        }),
+        ('SEO — Google Search Result me Ye Dikhega', {
+            'fields': ('meta_description',),
+            'description': (
+                'Google search results me title ke neeche ye line dikhti hai. '
+                'Ismein wahi keyword daalo jo log search karte hain — jaise '
+                '"flats in Bopal Ahmedabad" ya "property in SG Highway". '
+                'Max 160 characters. Khaali chhoda to excerpt use ho jayega.'
+            ),
+        }),
+        ('Publishing', {
+            'fields': ('author', 'status', 'is_featured', 'published_at', 'created_at', 'updated_at'),
+        }),
+    )
+
+    def thumb(self, obj):
+        if obj.featured_image:
+            return format_html(
+                '<img src="{}" style="width:60px;height:40px;object-fit:cover;border-radius:4px;" />',
+                obj.featured_image.url
+            )
+        return "—"
+    thumb.short_description = "Image"
+
+    def image_preview(self, obj):
+        if obj.featured_image:
+            return format_html(
+                '<img src="{}" style="max-width:320px;border-radius:8px;" />',
+                obj.featured_image.url
+            )
+        return "Koi image upload nahi hui abhi — upload karne ke baad yahan preview dikhega."
+    image_preview.short_description = "Preview"
+
+    def save_model(self, request, obj, form, change):
+        if not obj.author_id:
+            obj.author = request.user
+        super().save_model(request, obj, form, change)
