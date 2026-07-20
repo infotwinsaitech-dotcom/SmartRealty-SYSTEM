@@ -137,7 +137,8 @@ def generate_secure_otp():
 
 def check_rate_limit(request, prefix, max_attempts=5, window=300):
     """Redis-based rate limiting"""
-    client_ip = request.META.get('REMOTE_ADDR', 'unknown')
+    forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR', '')
+    client_ip = forwarded_for.split(',')[0].strip() if forwarded_for else request.META.get('REMOTE_ADDR', 'unknown')
     key = f"ratelimit:{prefix}:{client_ip}"
     
     try:
@@ -162,7 +163,8 @@ def check_rate_limit(request, prefix, max_attempts=5, window=300):
 
 def clear_rate_limit(request, prefix):
     """Clear rate limit on successful auth"""
-    client_ip = request.META.get('REMOTE_ADDR', 'unknown')
+    forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR', '')
+    client_ip = forwarded_for.split(',')[0].strip() if forwarded_for else request.META.get('REMOTE_ADDR', 'unknown')
     key = f"ratelimit:{prefix}:{client_ip}"
     cache.delete(key)
 
