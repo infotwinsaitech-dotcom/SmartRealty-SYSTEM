@@ -947,27 +947,12 @@ def forgot_password(request):
                 "created_at": now().timestamp()
             }, OTP_EXPIRY_SECONDS)
 
-            # Send email via Celery (async)
+            # Send email (synchronous - this project has no Celery workers running)
             try:
                 from .tasks import send_password_reset_email
-                send_password_reset_email.delay(email, otp)
+                send_password_reset_email(email, otp)
             except Exception as e:
-                logger.error(f"Failed to queue password reset email: {str(e)}")
-                # Fallback to synchronous
-                message = Mail(
-                    from_email=os.getenv("DEFAULT_FROM_EMAIL"),
-                    to_emails=user.email,
-                    subject="Password Reset OTP",
-                    html_content=f"""
-                    <h2>Password Reset OTP</h2>
-                    <p>Your OTP is:</p>
-                    <h1>{otp}</h1>
-                    <p>This OTP will expire in 5 minutes.</p>
-                    <p>If you didn't request this, please ignore.</p>
-                    """
-                )
-                sg = SendGridAPIClient(os.getenv("SENDGRID_API_KEY"))
-                sg.send(message)
+                logger.error(f"Failed to send password reset email: {str(e)}")
 
             request.session["reset_email"] = email
             return redirect("otp_verification")

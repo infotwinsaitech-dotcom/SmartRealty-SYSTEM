@@ -693,6 +693,64 @@ def process_scheduled_campaigns(dry_run=False):
 
 
 # =============================================================================
+# PASSWORD RESET EMAIL
+# =============================================================================
+
+@log_task_execution("send_password_reset_email")
+def send_password_reset_email(email, otp):
+    """
+    Send the password reset OTP email.
+    Called synchronously from the view (no Celery in this project).
+    """
+    html_content = f"""
+    <h2>Password Reset OTP</h2>
+    <p>Your OTP is:</p>
+    <h1>{otp}</h1>
+    <p>This OTP will expire in 5 minutes.</p>
+    <p>If you didn't request this, please ignore.</p>
+    """
+    send_mail(
+        subject="Password Reset OTP",
+        message=f"Your OTP is: {otp}. This OTP will expire in 5 minutes. "
+                f"If you didn't request this, please ignore.",
+        from_email=getattr(settings, "DEFAULT_FROM_EMAIL", "noreply@smartrealty.com"),
+        recipient_list=[email],
+        html_message=html_content,
+        fail_silently=False,
+    )
+    return True
+
+
+# =============================================================================
+# PASSWORD RESET EMAIL
+# =============================================================================
+
+@log_task_execution("send_password_reset_email")
+def send_password_reset_email(email, otp):
+    """
+    Send the password reset OTP email.
+    Called synchronously from the view (no Celery in this project).
+    """
+    html_content = f"""
+    <h2>Password Reset OTP</h2>
+    <p>Your OTP is:</p>
+    <h1>{otp}</h1>
+    <p>This OTP will expire in 5 minutes.</p>
+    <p>If you didn't request this, please ignore.</p>
+    """
+    send_mail(
+        subject="Password Reset OTP",
+        message=f"Your OTP is: {otp}. This OTP will expire in 5 minutes. "
+                f"If you didn't request this, please ignore.",
+        from_email=getattr(settings, "DEFAULT_FROM_EMAIL", "noreply@smartrealty.com"),
+        recipient_list=[email],
+        html_message=html_content,
+        fail_silently=False,
+    )
+    return True
+
+
+# =============================================================================
 # DAILY SUMMARY TASK
 # =============================================================================
 
