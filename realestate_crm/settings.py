@@ -437,21 +437,13 @@ if HAS_CHANNELS:
 # =============================================================================
 # EMAIL
 # =============================================================================
+BREVO_API_KEY = os.environ.get("BREVO_API_KEY")
+DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "noreply@realshree.com")
 
-SENDGRID_API_KEY = os.environ.get("SENDGRID_API_KEY")
-DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "noreply@smartrealty.com")
-
-if SENDGRID_API_KEY and IS_PRODUCTION:
-    EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-    EMAIL_HOST = "smtp.sendgrid.net"
-    EMAIL_PORT = 587
-    EMAIL_USE_TLS = True
-    EMAIL_TIMEOUT = 10
-    EMAIL_HOST_USER = "apikey"
-    EMAIL_HOST_PASSWORD = SENDGRID_API_KEY
-else:
-    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-
+# Sent via Brevo's HTTP API (not SMTP) in core/tasks.py, so no EMAIL_BACKEND
+# SMTP settings are needed. EMAIL_BACKEND is kept only as a safe fallback
+# for any code path that still calls Django's send_mail() directly.
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 # =============================================================================
 # REST FRAMEWORK
 # =============================================================================

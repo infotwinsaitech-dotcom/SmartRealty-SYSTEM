@@ -699,12 +699,16 @@ def process_scheduled_campaigns(dry_run=False):
 @log_task_execution("send_password_reset_email")
 def send_password_reset_email(email, otp):
     """
-    Send the password reset OTP email via SendGrid's HTTPS API.
-    (SMTP port 587 is blocked/hangs on Render, so we avoid send_mail's SMTP backend here.)
+    Send the password reset OTP email via Brevo's HTTPS transactional API.
+    (HTTP, not SMTP -- SMTP ports hang/get blocked on Render, see earlier incident.)
     """
-    from sendgrid import SendGridAPIClient
-    from sendgrid.helpers.mail import Mail
+    import requests
 
+    api_key = getattr(settings, "BREVO_API_KEY", None)
+    if not api_key:
+        raise RuntimeError("BREVO_API_KEY is not set")
+
+    from_email = getattr(settings, "DEFAULT_FROM_EMAIL", "noreply@realshree.com")
     html_content = f"""
     <h2>Password Reset OTP</h2>
     <p>Your OTP is:</p>
@@ -712,14 +716,23 @@ def send_password_reset_email(email, otp):
     <p>This OTP will expire in 5 minutes.</p>
     <p>If you didn't request this, please ignore.</p>
     """
-    message = Mail(
-        from_email=getattr(settings, "DEFAULT_FROM_EMAIL", "noreply@smartrealty.com"),
-        to_emails=email,
-        subject="Password Reset OTP",
-        html_content=html_content,
+
+    response = requests.post(
+        "https://api.brevo.com/v3/smtp/email",
+        headers={
+            "api-key": api_key,
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+        },
+        json={
+            "sender": {"name": "RealShree", "email": from_email},
+            "to": [{"email": email}],
+            "subject": "Password Reset OTP",
+            "htmlContent": html_content,
+        },
+        timeout=10,
     )
-    sg = SendGridAPIClient(getattr(settings, "SENDGRID_API_KEY", None))
-    sg.send(message)
+    response.raise_for_status()
     return True
 
 
