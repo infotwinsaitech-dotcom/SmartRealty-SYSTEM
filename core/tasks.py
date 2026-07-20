@@ -699,9 +699,12 @@ def process_scheduled_campaigns(dry_run=False):
 @log_task_execution("send_password_reset_email")
 def send_password_reset_email(email, otp):
     """
-    Send the password reset OTP email.
-    Called synchronously from the view (no Celery in this project).
+    Send the password reset OTP email via SendGrid's HTTPS API.
+    (SMTP port 587 is blocked/hangs on Render, so we avoid send_mail's SMTP backend here.)
     """
+    from sendgrid import SendGridAPIClient
+    from sendgrid.helpers.mail import Mail
+
     html_content = f"""
     <h2>Password Reset OTP</h2>
     <p>Your OTP is:</p>
@@ -709,45 +712,20 @@ def send_password_reset_email(email, otp):
     <p>This OTP will expire in 5 minutes.</p>
     <p>If you didn't request this, please ignore.</p>
     """
-    send_mail(
-        subject="Password Reset OTP",
-        message=f"Your OTP is: {otp}. This OTP will expire in 5 minutes. "
-                f"If you didn't request this, please ignore.",
+    message = Mail(
         from_email=getattr(settings, "DEFAULT_FROM_EMAIL", "noreply@smartrealty.com"),
-        recipient_list=[email],
-        html_message=html_content,
-        fail_silently=False,
+        to_emails=email,
+        subject="Password Reset OTP",
+        html_content=html_content,
     )
+    sg = SendGridAPIClient(getattr(settings, "SENDGRID_API_KEY", None))
+    sg.send(message)
     return True
 
 
 # =============================================================================
 # PASSWORD RESET EMAIL
 # =============================================================================
-
-@log_task_execution("send_password_reset_email")
-def send_password_reset_email(email, otp):
-    """
-    Send the password reset OTP email.
-    Called synchronously from the view (no Celery in this project).
-    """
-    html_content = f"""
-    <h2>Password Reset OTP</h2>
-    <p>Your OTP is:</p>
-    <h1>{otp}</h1>
-    <p>This OTP will expire in 5 minutes.</p>
-    <p>If you didn't request this, please ignore.</p>
-    """
-    send_mail(
-        subject="Password Reset OTP",
-        message=f"Your OTP is: {otp}. This OTP will expire in 5 minutes. "
-                f"If you didn't request this, please ignore.",
-        from_email=getattr(settings, "DEFAULT_FROM_EMAIL", "noreply@smartrealty.com"),
-        recipient_list=[email],
-        html_message=html_content,
-        fail_silently=False,
-    )
-    return True
 
 
 # =============================================================================
