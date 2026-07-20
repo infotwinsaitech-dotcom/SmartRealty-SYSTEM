@@ -985,9 +985,10 @@ def otp_verification(request):
     cached_data = cache.get(cache_key)
 
     if not cached_data:
-        return render(request, "public/otp_verification.html", {
-            "error": "OTP expired. Please request a new OTP."
-        })
+        request.session.pop("reset_email", None)
+        request.session.pop("otp_verified", None)
+        messages.error(request, "OTP expired or session ended. Please enter your email again.")
+        return redirect("forgot_password")
 
     if request.method == "POST":
         user_otp = sanitize_input(request.POST.get("otp", "")).strip()
