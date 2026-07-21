@@ -96,6 +96,55 @@ def sanitize_input(text):
     text = re.sub(r'<embed.*?>', '', text, flags=re.IGNORECASE)
     return text.strip()
 
+# Gujarat RERA registration numbers look like:
+#   PR/GJ/AHMEDABAD/AHMEDABAD CITY/AUDA/RAA02798/110219
+#   PR/GJ/SURAT/SURATCITY/SUDA/RAA05825/030819
+#   PR/GJ/RAJKOT/RAJKOT/Others/RAA06807/270220
+# i.e. PR/GJ/<city>/<city area>/<authority>/<letters+digits code>/<optional extra>/<6-digit date>
+GUJARAT_RERA_REGEX = re.compile(
+    r'^PR/GJ/[A-Z .]+/[A-Z .]+/[A-Z]+/[A-Z]{2,4}\d{3,6}(?:/[A-Z0-9]+)?/\d{5,6}$',
+    re.IGNORECASE
+)
+
+# MahaRERA (Maharashtra) numbers look like: P51700012345 (P + 11 digits)
+MAHARASHTRA_RERA_REGEX = re.compile(r'^P\d{11}$', re.IGNORECASE)
+
+# Generic fallback for other states, whose formats vary a lot:
+# require a realistic minimum length and only "reasonable" RERA-style characters.
+GENERIC_RERA_REGEX = re.compile(r'^[A-Z0-9](?:[A-Z0-9 /\-]{8,58})[A-Z0-9]$', re.IGNORECASE)
+
+
+def validate_rera_format(rera_number):
+    """
+    Format-only validation of a RERA registration number (NOT a live check
+    against any government database — there's no official public API for
+    that). Returns (is_valid, message).
+    """
+    if not rera_number or not rera_number.strip():
+        return False, "RERA number khaali hai"
+
+    value = rera_number.strip().upper()
+
+    if GUJARAT_RERA_REGEX.match(value):
+        return True, "Valid Gujarat RERA number format"
+
+    if MAHARASHTRA_RERA_REGEX.match(value):
+        return True, "Valid Maharashtra (MahaRERA) number format"
+
+    if GENERIC_RERA_REGEX.match(value):
+        return True, "RERA number format looks valid"
+
+    return False, "RERA number format sahi nahi hai. Sahi format: PR/GJ/CITY/AREA/AUTHORITY/CODE/DATE"
+
+
+def verify_rera(request):
+    """AJAX endpoint: format-check a RERA number and return JSON."""
+    if request.method != "POST":
+        return JsonResponse({"valid": False, "message": "Invalid request"}, status=405)
+
+    rera_number = sanitize_input(request.POST.get("rera_number", ""))
+    is_valid, message = validate_rera_format(rera_number)
+    return JsonResponse({"valid": is_valid, "message": message})
 
 def validate_file_upload(file, allowed_extensions=None, max_size_mb=10):
     """Validate uploaded file for security with MIME type check"""
@@ -1215,6 +1264,12 @@ def add_property(request):
         
         if not data['property_type']:
             errors.append("Property type is required")
+
+        # RERA number, agar diya gaya hai, to uska format valid hona chahiye
+        if data['rera_number'].strip():
+            rera_valid, rera_msg = validate_rera_format(data['rera_number'])
+            if not rera_valid:
+                errors.append(f"RERA Number: {rera_msg}")
 
         if errors:
             for error in errors:

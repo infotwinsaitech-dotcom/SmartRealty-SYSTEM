@@ -434,8 +434,19 @@ class="w-full mb-3 border p-2 rounded text-sm">
     <p class="text-[11px] text-gray-400 mt-1">Apna video pehle YouTube pe upload karo (unlisted rakh sakte ho), phir uska link yaha paste karo.</p>
 </div>
 
-<input name="rera_number" placeholder="RERA Number"
-class="w-full mb-3 border p-2 rounded text-sm">
+<div class="mb-3">
+    <label class="text-xs font-semibold text-gray-600 mb-1.5 block">RERA Number</label>
+    <div class="flex gap-2 items-center">
+        <input name="rera_number" id="reraInput" placeholder="e.g. PR/GJ/AHMEDABAD/AHMEDABAD CITY/AUDA/RAA02798/110219"
+        class="flex-1 border p-2 rounded text-sm">
+        <button type="button" id="verifyReraBtn"
+            class="shrink-0 bg-blue-600 text-white text-xs font-semibold px-3 py-2 rounded hover:bg-blue-700">
+            Verify RERA
+        </button>
+    </div>
+    <p id="reraStatusMsg" class="text-xs mt-1"></p>
+    <input type="hidden" name="rera_verified" id="reraVerifiedInput" value="">
+</div>
 
 <select name="possession" class="w-full mb-3 border p-2 rounded text-sm">
 <option value="">Select Possession</option>
@@ -1138,11 +1149,82 @@ document.addEventListener('DOMContentLoaded', function() {
   // Brochure PDF
   setupDropzone('brochureDropzone', 'brochureInput', 'brochurePreview', 'brochurePlaceholder', null, 'brochureFileName', false, true);
 });
+// ===================== RERA NUMBER VERIFICATION =====================
+(function() {
+  const reraInput = document.getElementById('reraInput');
+  const verifyBtn = document.getElementById('verifyReraBtn');
+  const statusMsg = document.getElementById('reraStatusMsg');
+  const verifiedInput = document.getElementById('reraVerifiedInput');
+
+  function resetVerification() {
+    verifiedInput.value = '';
+    statusMsg.textContent = '';
+    statusMsg.className = 'text-xs mt-1';
+  }
+
+  // Agar RERA number badla, to purani verification invalid ho jaati hai
+  reraInput.addEventListener('input', resetVerification);
+
+  verifyBtn.addEventListener('click', function() {
+    const reraValue = reraInput.value.trim();
+    if (!reraValue) {
+      statusMsg.textContent = 'Pehle RERA number daalein';
+      statusMsg.className = 'text-xs mt-1 text-red-600';
+      return;
+    }
+
+    verifyBtn.disabled = true;
+    verifyBtn.textContent = 'Checking...';
+    statusMsg.textContent = '';
+
+    const formData = new FormData();
+    formData.append('rera_number', reraValue);
+
+    fetch("{% url 'verify_rera' %}", {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+      }
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.valid) {
+        verifiedInput.value = '1';
+        statusMsg.textContent = '✅ ' + data.message;
+        statusMsg.className = 'text-xs mt-1 text-green-600 font-semibold';
+      } else {
+        verifiedInput.value = '';
+        statusMsg.textContent = '❌ ' + data.message;
+        statusMsg.className = 'text-xs mt-1 text-red-600 font-semibold';
+      }
+    })
+    .catch(() => {
+      verifiedInput.value = '';
+      statusMsg.textContent = '❌ Verification fail hui, dobara try karein';
+      statusMsg.className = 'text-xs mt-1 text-red-600 font-semibold';
+    })
+    .finally(() => {
+      verifyBtn.disabled = false;
+      verifyBtn.textContent = 'Verify RERA';
+    });
+  });
+})();
+
 // ===================== FORM SUBMIT WITH GALLERY FILES =====================
 document.getElementById('propertyForm').addEventListener('submit', function(e) {
   e.preventDefault();
-  
+
   const form = e.target;
+
+  // Agar RERA number bhara hua hai to verify hona zaroori hai
+  const reraInput = document.getElementById('reraInput');
+  const reraVerifiedInput = document.getElementById('reraVerifiedInput');
+  if (reraInput.value.trim() && !reraVerifiedInput.value) {
+    alert('Property add karne se pehle RERA Number verify karein (Verify RERA button dabayein).');
+    return;
+  }
+
   const formData = new FormData(form);
   
   // Remove empty 'images' from formData (since input.files is read-only)
