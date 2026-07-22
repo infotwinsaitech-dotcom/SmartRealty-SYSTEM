@@ -47,6 +47,36 @@
 }
 </script>
 
+<!-- Structured data: FAQ shown on this page -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is the price of {{ property.project_name|default:property.title|escapejs }}?",
+      "acceptedAnswer": {"@type": "Answer", "text": "{{ property.project_name|default:property.title|escapejs }} is priced at ₹{{ property.price|escapejs }} {{ property.price_unit|default:'L'|escapejs }} in {{ property.location|escapejs }}, Ahmedabad."}
+    },
+    {
+      "@type": "Question",
+      "name": "Is {{ property.project_name|default:property.title|escapejs }} RERA registered?",
+      "acceptedAnswer": {"@type": "Answer", "text": "{% if property.rera_number %}Yes, this project is RERA-registered with number {{ property.rera_number|escapejs }}.{% else %}RERA status is confirmed at the time of listing verification.{% endif %}"}
+    },
+    {
+      "@type": "Question",
+      "name": "Do I have to pay brokerage to buy this property?",
+      "acceptedAnswer": {"@type": "Answer", "text": "No, RealShree lists this property with zero brokerage — buyers deal directly with the owner or builder."}
+    },
+    {
+      "@type": "Question",
+      "name": "When is possession available for this property?",
+      "acceptedAnswer": {"@type": "Answer", "text": "{% if property.possession_date %}Possession is expected {{ property.possession_date|escapejs }}.{% else %}Contact RealShree for the latest possession timeline on this property.{% endif %}"}
+    }
+  ]
+}
+</script>
+
 <!-- ============================================
    PROPERTY HERO - Full Width Image
    ============================================ -->
@@ -171,8 +201,16 @@
                         <span class="material-icons-round text-[var(--color-gold)]" style="font-size:20px">info</span>
                         <h2 class="text-xl font-bold text-[var(--color-navy)]">About Project</h2>
                     </div>
+                    <p class="text-sm text-[var(--color-text-muted)] leading-relaxed mb-3">
+                        {{ property.project_name|default:property.title }} is a {{ property.property_type|default:"residential" }} property
+                        {% if property.configuration %}offering a {{ property.configuration }} configuration{% endif %}
+                        located in {{ property.location }}, Ahmedabad{% if property.sqft %}, spread across {{ property.sqft }} sq.ft{% endif %}.
+                        {% if property.status == "Available" %}This property is currently available for sale{% elif property.status == "Coming Soon" %}This is an upcoming project{% elif property.status %}This property's current status is {{ property.status }}{% endif %}
+                        {% if property.rera_number %}and is RERA-registered (No. {{ property.rera_number }}), so all approvals and paperwork are verified.{% else %}and is listed with zero brokerage — you deal directly with the {% if property.builder_name %}builder{% else %}owner{% endif %}.{% endif %}
+                        {% if property.possession_date %}Possession is expected {{ property.possession_date }}.{% endif %}
+                    </p>
                     <p class="text-sm text-[var(--color-text-muted)] leading-relaxed">
-                        {{ property.description|default:"No description available for this property." }}
+                        {{ property.description|default:"" }}
                     </p>
                     
                     <!-- Project Details Grid -->
@@ -351,6 +389,32 @@
                     </p>
                 </div>
                 
+                <!-- FAQs -->
+                <div class="card p-6 reveal">
+                    <div class="flex items-center gap-2 mb-4">
+                        <span class="material-icons-round text-[var(--color-gold)]" style="font-size:20px">help_outline</span>
+                        <h2 class="text-xl font-bold text-[var(--color-navy)]">Frequently Asked Questions</h2>
+                    </div>
+                    <div class="space-y-3">
+                        <details class="p-3 bg-[var(--color-bg-soft)] rounded-xl">
+                            <summary class="text-sm font-semibold text-[var(--color-navy)] cursor-pointer">What is the price of {{ property.project_name|default:property.title }}?</summary>
+                            <p class="text-sm text-[var(--color-text-muted)] mt-2">{{ property.project_name|default:property.title }} is priced at ₹{{ property.price }} {{ property.price_unit|default:"L" }}{% if property.configuration %} for a {{ property.configuration }} unit{% endif %} in {{ property.location }}, Ahmedabad.</p>
+                        </details>
+                        <details class="p-3 bg-[var(--color-bg-soft)] rounded-xl">
+                            <summary class="text-sm font-semibold text-[var(--color-navy)] cursor-pointer">Is {{ property.project_name|default:property.title }} RERA registered?</summary>
+                            <p class="text-sm text-[var(--color-text-muted)] mt-2">{% if property.rera_number %}Yes, this project is RERA-registered with number {{ property.rera_number }}, so the approvals and paperwork are verified.{% else %}RERA status is confirmed at the time of listing verification — contact us for the latest documentation on this property.{% endif %}</p>
+                        </details>
+                        <details class="p-3 bg-[var(--color-bg-soft)] rounded-xl">
+                            <summary class="text-sm font-semibold text-[var(--color-navy)] cursor-pointer">Do I have to pay brokerage to buy this property?</summary>
+                            <p class="text-sm text-[var(--color-text-muted)] mt-2">No — RealShree lists this property with zero brokerage, so you deal directly with the {% if property.builder_name %}builder ({{ property.builder_name }}){% else %}owner{% endif %}.</p>
+                        </details>
+                        <details class="p-3 bg-[var(--color-bg-soft)] rounded-xl">
+                            <summary class="text-sm font-semibold text-[var(--color-navy)] cursor-pointer">When is possession available?</summary>
+                            <p class="text-sm text-[var(--color-text-muted)] mt-2">{% if property.possession_date %}Possession for this property is expected {{ property.possession_date }}.{% else %}This property's status is currently marked as {{ property.status|default:"available" }} — contact our team for the latest possession timeline.{% endif %}</p>
+                        </details>
+                    </div>
+                </div>
+
                 <!-- Similar Properties -->
                 {% if similar_properties %}
                 <div class="reveal">
