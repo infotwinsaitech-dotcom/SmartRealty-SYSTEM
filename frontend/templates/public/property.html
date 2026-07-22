@@ -546,6 +546,23 @@
         width: 280px;
     }
 }
+/* Mobile: dropdown ko footer ke upar force karo (fixed bottom-sheet) */
+@media (max-width: 767px) {
+    .dropdown-menu-area {
+        position: fixed !important;
+        left: 12px !important;
+        right: 12px !important;
+        bottom: 12px !important;
+        top: auto !important;
+        max-height: 70vh;
+        overflow-y: auto;
+        z-index: 99999 !important;
+        margin: 0 auto;
+    }
+    #dropdownBackdrop.show {
+        z-index: 99998 !important;
+    }
+}
 .dropdown-item {
     display: flex;
     align-items: center;
