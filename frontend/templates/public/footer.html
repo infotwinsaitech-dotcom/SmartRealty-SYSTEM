@@ -14,7 +14,9 @@
                     <span style="display:none; font-weight:800; font-size:1.4rem; color:#fff;">{{ site.company_name|default:'RealShree' }}</span>
                 </div>
                 <p style="font-size:0.875rem; line-height:1.7; max-width:320px; color:rgba(255,255,255,0.6);">
-                    {{ site.about_text|default:"Where trust meets your dream home. We help you find verified, RERA-registered properties with complete transparency and zero brokerage." }}
+                    {{ site.about_text|default:"<p style="font-size:0.75rem; line-height:1.6; max-width:320px; color:rgba(255,255,255,0.45); margin-top:12px;">
+    {{ site.company_name|default:"RealShree" }} is an online property listing platform. Property details are provided by third parties and must be independently verified by users. We are not a promoter, builder, broker, or legal adviser.
+</p>" }}
                 </p>
                 <div class="footer-social">
                     {% if site.facebook_url %}
@@ -63,7 +65,7 @@
                     <li><a href="{% url 'roi_calculator' %}">ROI Calculator</a></li>
                     <li><a href="{% url 'login' %}">Login</a></li>
                     <li><a href="{% url 'register' %}">Create Account</a></li>
-                    <li><a href="{% url 'privacy' %}">Privacy Policy</a></li>
+                    <li><a href="{% url 'terms' %}">Terms &amp; Conditions</a></li>
                 </ul>
             </div>
 
@@ -91,7 +93,7 @@
         <div class="footer-bottom">
             <p style="margin:0;">&copy; {% now "Y" %} {{ site.company_name|default:"RealShree" }}. All rights reserved.</p>
             <div class="footer-bottom-links">
-                <a href="{% url 'privacy' %}">Privacy Policy</a>
+                <a href="{% url 'terms' %}">Terms &amp; Conditions</a>
                 <a href="{% url 'contact' %}">Contact</a>
                 <a href="{% url 'about' %}">About</a>
             </div>

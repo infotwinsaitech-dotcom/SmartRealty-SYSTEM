@@ -165,7 +165,8 @@ path('accounts/', include('allauth.urls')),
     path('contact/', views.contact, name='contact'),
     path('wishlist/', views.wishlist, name='wishlist'),
     path('profile/', views.profile, name='profile'),
-    
+    path("privacy/", views.privacy, name="privacy"),
+    path("terms/", views.terms, name="terms"),
 ]
 
 if settings.DEBUG:

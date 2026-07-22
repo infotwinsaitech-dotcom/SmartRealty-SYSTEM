@@ -3923,7 +3923,10 @@ def privacy(request):
     property = Property.objects.select_related('builder').first()
     return render(request, "public/privacy.html", {"property": property})
 
-
+def terms(request):
+    """Terms & Conditions page"""
+    property = Property.objects.select_related('builder').first()
+    return render(request, "public/terms.html", {"property": property})
 # =============================================================================
 # UTILITY FUNCTIONS
 # =============================================================================
