@@ -1,4 +1,8 @@
-{% load static %}
+{% extends "public/base.html" %}
+  {% load static %}
+  {% block title %}Sign In{% endblock %}
+
+  {% block content %}
 <section class="min-h-[calc(100dvh-60px)] flex items-center justify-center px-4 py-8" style="background: linear-gradient(135deg, var(--color-bg-soft) 0%, var(--color-bg) 100%);">
     
     <div class="w-full max-w-[420px] bg-white rounded-2xl shadow-lg border border-[rgba(15,23,42,0.08)] p-6 sm:p-8">
