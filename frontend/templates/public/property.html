@@ -195,7 +195,7 @@
         <div class="grid-properties">
             {% for property in properties %}
             <div class="property-card reveal">
-                <a href="{% url 'property_detail' property.id %}" class="block">
+                <a href="{{ property.get_absolute_url }}" class="block">
                     <div class="card-img">
                         {% if property.thumbnail %}
                         {% cloudinary_url property.thumbnail width=600 height=400 crop='fill' as img_url %}

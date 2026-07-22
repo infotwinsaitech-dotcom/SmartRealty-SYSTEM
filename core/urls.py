@@ -1,4 +1,4 @@
-from django.urls import path, include
+from django.urls import path,re_path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from django.shortcuts import render
@@ -16,7 +16,7 @@ urlpatterns = [
     path("", views.home, name="user_home"),
     path("properties/", views.property_list, name="property_list"),
     path("properties/search-suggestions/", views.property_search_suggestions, name="property_search_suggestions"),
-    path("properties/<int:id>/", views.property_detail, name="property_detail"),
+    re_path(r'^properties/(?:(?P<slug>[\w-]+)-)?(?P<id>\d+)/$', views.property_detail, name="property_detail"),
 
     path("contact/", views.contact, name="contact"),
     path("about/", views.about, name="about"),
@@ -159,7 +159,7 @@ path('accounts/', include('allauth.urls')),
     path("property-map/", views.property_map_public, name="property_map_public"),
     path('', views.home, name='home'),
     path('properties/', views.property_list, name='property_list'),
-    path('property/<int:id>/', views.property_detail, name='property_detail'),
+    re_path(r'^property/(?:(?P<slug>[\w-]+)-)?(?P<id>\d+)/$', views.property_detail, name='property_detail'),
     path('login/', views.login_view, name='login'),
     path('register/', views.register_view, name='register'),
     path('contact/', views.contact, name='contact'),

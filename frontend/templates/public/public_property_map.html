@@ -84,7 +84,7 @@
         <div class="grid-properties" id="propertyGrid">
             {% for property in properties %}
             <div class="property-card reveal" data-status="{{ property.status }}" data-lat="{{ property.latitude|default:'' }}" data-lng="{{ property.longitude|default:'' }}">
-                <a href="{% url 'property_detail' property.id %}" class="block">
+                <a href="{{ property.get_absolute_url }}" class="block">
                     <div class="card-img" style="aspect-ratio: 16/10;">
                         {% if property.thumbnail %}
                         {% cloudinary_url property.thumbnail width=400 height=250 crop='fill' as img_url %}
@@ -196,7 +196,7 @@ const properties = [
         lat: {{ property.latitude }},
         lng: {{ property.longitude }},
         thumbnail: "{% if property.thumbnail %}{% cloudinary_url property.thumbnail width=300 height=200 crop='fill' %}{% else %}https://via.placeholder.com/300x200?text=No+Image{% endif %}",
-        url: "{% url 'property_detail' property.id %}",
+        url: "{{ property.get_absolute_url }}",
         beds: {{ property.beds|default:'null' }},
         sqft: {{ property.sqft|default:'null' }},
         builder: "{{ property.builder.get_full_name|default:property.builder.username|escapejs }}"

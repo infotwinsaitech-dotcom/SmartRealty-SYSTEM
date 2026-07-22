@@ -1,0 +1,30 @@
+{% extends "public/base.html" %}
+{% load static %}
+{% block title %}Page Not Found – RealShree{% endblock %}
+{% block meta_description %}Yeh page nahi mila. RealShree par verified properties browse karein Ahmedabad mein.{% endblock %}
+
+{% block content %}
+<section class="hero-section" style="min-height: 60vh; display:flex; align-items:center;">
+    <div class="hero-content" style="text-align:center;">
+        <span class="label" style="color: rgba(255,255,255,0.7); border-color: rgba(255,255,255,0.2);">
+            <span class="material-icons-round" style="font-size:16px">error_outline</span>
+            404 Error
+        </span>
+        <h1 class="hero-title" style="font-size: clamp(2rem, 6vw, 3.5rem); margin: 1rem 0;">
+            Page <span style="color: #d4af37;">Not Found</span>
+        </h1>
+        <p class="hero-subtitle" style="font-size: 1.05rem; max-width: 500px; margin: 0 auto 2rem;">
+            Yeh page maujood nahi hai ya move ho gaya hai. Lekin chinta mat kariye —
+            aapko sahi jagah pahunchane ke liye kuch links neeche diye hain.
+        </p>
+        <div style="display:flex; gap: 1rem; justify-content:center; flex-wrap:wrap;">
+            <a href="{% url 'user_home' %}" class="btn" style="background:#d4af37; color:#111; padding: 0.85rem 1.75rem; border-radius: 999px; text-decoration:none; font-weight:600;">
+                Go to Home
+            </a>
+            <a href="{% url 'property_list' %}" class="btn" style="border: 1.5px solid #d4af37; color:#d4af37; padding: 0.85rem 1.75rem; border-radius: 999px; text-decoration:none; font-weight:600;">
+                Browse Properties
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}

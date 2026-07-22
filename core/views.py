@@ -34,6 +34,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.conf import settings
 from django.utils import timezone
+from django.utils.text import slugify
 from django.utils.timezone import now
 from django.core.cache import cache
 from subscriptions.utils import check_property_limit, check_agent_limit, LimitExceeded
@@ -364,13 +365,16 @@ def properties_view(request):
     })
 
 
-def property_detail(request, id):
+def property_detail(request, id, slug=None):
     """Property detail with inquiry form"""
     property = get_object_or_404(
         Property.objects.select_related('builder').prefetch_related('images'), 
         id=id
     )
-    
+
+    if property.slug and slug != property.slug:
+        return redirect(property.get_absolute_url(), permanent=True)
+
     highlights_list = []
     if property.highlights:
         highlights_list = [h.strip() for h in property.highlights.split(",") if h.strip()]
@@ -4863,7 +4867,7 @@ def sitemap_xml(request):
         {"loc": reverse("blog_list"), "priority": "0.7", "changefreq": "daily"},
     ]
 
-    properties = Property.objects.filter(status='Available').only("id", "updated_at")
+    properties = Property.objects.filter(status='Available').only("id", "slug", "updated_at")
     blog_posts = BlogPost.objects.filter(status='published').only("slug", "updated_at")
 
     xml_parts = ['<?xml version="1.0" encoding="UTF-8"?>']
@@ -4877,13 +4881,22 @@ def sitemap_xml(request):
         )
 
     for prop in properties:
-        loc = reverse("property_detail", args=[prop.id])
+        loc = prop.get_absolute_url()
         lastmod = prop.updated_at.strftime("%Y-%m-%d")
         xml_parts.append(
             f"<url><loc>{SITE_DOMAIN}{loc}</loc>"
             f"<lastmod>{lastmod}</lastmod>"
             f"<changefreq>weekly</changefreq><priority>0.8</priority></url>"
         )
-
+        for post in blog_posts:
+            loc = reverse("blog_detail", args=[post.slug])
+            lastmod = post.updated_at.strftime("%Y-%m-%d")
+            xml_parts.append(
+                f"<url><loc>{SITE_DOMAIN}{loc}</loc>"
+                f"<lastmod>{lastmod}</lastmod>"
+                f"<changefreq>weekly</changefreq><priority>0.6</priority></url>"
+            )
     xml_parts.append('</urlset>')
     return HttpResponse("\n".join(xml_parts), content_type="application/xml")
+def custom_404(request, exception=None):
+    return render(request, "public/404.html", status=404)

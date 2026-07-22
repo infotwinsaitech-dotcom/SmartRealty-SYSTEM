@@ -5,7 +5,7 @@
 {% block og_title %}{{ property.project_name|default:property.title }} – {{ property.location }}, Ahmedabad{% endblock %}
 {% block og_description %}{{ property.beds|default:"" }}{% if property.beds %} BHK{% endif %} {{ property.property_type }} in {{ property.location }}{% if property.price %}, ₹{{ property.price }} {{ property.get_price_unit_display }}{% endif %}. RERA-verified listing, zero brokerage.{% endblock %}
 {% if property.thumbnail %}{% cloudinary_url property.thumbnail width=1200 height=630 crop='fill' as og_img_url %}{% block og_image %}{{ og_img_url }}{% endblock %}{% endif %}
-{% block canonical_url %}https://RealShree.com{% url 'property_detail' property.id %}{% endblock %}
+{% block canonical_url %}https://RealShree.com{{ property.get_absolute_url }}{% endblock %}
 
 {% block content %}
 
@@ -16,7 +16,7 @@
   "@type": "RealEstateListing",
   "name": "{{ property.project_name|default:property.title|escapejs }}",
   "description": "{{ property.description|striptags|truncatewords:40|escapejs }}",
-  "url": "https://RealShree.com{% url 'property_detail' property.id %}",
+  "url": "https://RealShree.com{{ property.get_absolute_url }}",
   {% if property.thumbnail %}"image": "{{ og_img_url }}",{% endif %}
   "datePosted": "{{ property.created_at|date:'Y-m-d' }}",
   "address": {
@@ -42,7 +42,7 @@
   "itemListElement": [
     {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://RealShree.com{% url 'home' %}"},
     {"@type": "ListItem", "position": 2, "name": "Properties", "item": "https://RealShree.com{% url 'property_list' %}"},
-    {"@type": "ListItem", "position": 3, "name": "{{ property.project_name|default:property.title|escapejs }}", "item": "https://RealShree.com{% url 'property_detail' property.id %}"}
+    {"@type": "ListItem", "position": 3, "name": "{{ property.project_name|default:property.title|escapejs }}", "item": "https://RealShree.com{{ property.get_absolute_url }}"}
   ]
 }
 </script>
@@ -360,7 +360,7 @@
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         {% for p in similar_properties %}
-                        <a href="{% url 'property_detail' p.id %}" class="property-card">
+                        <a href="{{ p.get_absolute_url }}" class="property-card">
                             <div class="card-img" style="aspect-ratio: 16/10;">
                                 {% if p.thumbnail %}
                                 <img src="{% cloudinary_url p.thumbnail width=400 height=250 crop='fill' %}" alt="{{ p.title }}" loading="lazy">

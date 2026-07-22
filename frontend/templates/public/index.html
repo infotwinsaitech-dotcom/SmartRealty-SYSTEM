@@ -116,7 +116,7 @@
  
             <div class="showcase-track" id="showcaseTrack">
                 {% for property in properties %}
-                <a href="{% url 'property_detail' property.id %}" class="showcase-card reveal">
+                <a href="{{ property.get_absolute_url }}" class="showcase-card reveal">
                     <div class="showcase-info">
                         <div class="showcase-builder">
                             <span class="material-icons-round">apartment</span>
@@ -674,7 +674,7 @@ function heroAdGo(direction) {
 (function() {
     const ads = [
         {% for ad in advertisements %}
-        { image: "{% cloudinary_url ad.image width=1600 height=900 crop='fill' gravity='auto' quality='auto' %}", url: "{% url 'property_detail' ad.property.id %}" }{% if not forloop.last %},{% endif %}
+        { image: "{% cloudinary_url ad.image width=1600 height=900 crop='fill' gravity='auto' quality='auto' %}", url: "{{ ad.property.get_absolute_url }}" }{% if not forloop.last %},{% endif %}
         {% endfor %}
     ];
     if (ads.length === 0) return;

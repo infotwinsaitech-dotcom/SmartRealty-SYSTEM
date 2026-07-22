@@ -25,6 +25,7 @@ urlpatterns = [
      path('admin/', admin.site.urls),
     path('', include('core.urls')),
     path('plans/', include('subscriptions.urls')), 
+    
 ]
 
 if settings.DEBUG:
@@ -32,3 +33,4 @@ if settings.DEBUG:
         settings.MEDIA_URL,
         document_root=settings.MEDIA_ROOT
     )
+    handler404 = "core.views.custom_404"

@@ -73,6 +73,7 @@ class Property(models.Model):
     ]
 
     title = models.CharField(max_length=255, db_index=True)
+    slug = models.SlugField(max_length=255, blank=True, db_index=True)
     location = models.CharField(max_length=255, db_index=True)
     price = models.CharField(max_length=50, blank=True, null=True)
     PRICE_UNIT_CHOICES = [
@@ -211,6 +212,18 @@ class Property(models.Model):
             return num * Decimal("10000000")
         else:  # default: Lakh
             return num * Decimal("100000")
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            base_text = self.project_name or self.title
+            self.slug = slugify(f"{base_text}-{self.location}")[:255]
+        super().save(*args, **kwargs)
+
+    def get_absolute_url(self):
+        from django.urls import reverse
+        if self.slug:
+            return reverse('property_detail', kwargs={'slug': self.slug, 'id': self.id})
+        return reverse('property_detail', kwargs={'id': self.id})
 
     def __str__(self):
         return self.title

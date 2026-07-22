@@ -163,7 +163,7 @@
                 </div>
 
                 <!-- View Details -->
-                <a href="{% url 'property_detail' property.id %}" style="display: block; text-align: center; margin-top: 10px; padding: 10px; color: var(--color-gold); font-weight: 600; font-size: 0.85rem; text-decoration: none; border: 1.5px solid var(--color-gold); border-radius: var(--radius-full); transition: all 0.25s ease;">
+                <a href="{{ property.get_absolute_url }}" style="display: block; text-align: center; margin-top: 10px; padding: 10px; color: var(--color-gold); font-weight: 600; font-size: 0.85rem; text-decoration: none; border: 1.5px solid var(--color-gold); border-radius: var(--radius-full); transition: all 0.25s ease;">
                     View Details
                     <span class="material-icons-round" style="font-size: 16px; vertical-align: middle; margin-left: 4px;">arrow_forward</span>
                 </a>
