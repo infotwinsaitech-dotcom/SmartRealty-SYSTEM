@@ -211,14 +211,52 @@
                             {{ property.status }}
                         </span>
                         
-                        <!-- Wishlist -->
-                        <button class="wishlist-btn {% if property.id in user_wishlist_ids %}active{% endif %}" 
-                                onclick="event.preventDefault(); event.stopPropagation(); toggleWishlist({{ property.id }}, this)"
-                                aria-label="Add to wishlist">
-                            <span class="material-icons-round">
-                                {% if property.id in user_wishlist_ids %}favorite{% else %}favorite_border{% endif %}
-                            </span>
-                        </button>
+                        <!-- Share Button -->
+    <button class="absolute top-4 right-20 md:top-6 md:right-24 w-12 h-12 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center shadow-lg hover:bg-white transition"
+            onclick="shareProperty()"
+            aria-label="Share this property">
+        <span class="material-icons-round text-[var(--color-text-muted)]" style="font-size:22px">share</span>
+    </button>
+
+    <!-- Wishlist Button -->
+    <button class="absolute top-4 right-4 md:top-6 md:right-6 w-12 h-12 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center shadow-lg hover:bg-white transition"
+            onclick="toggleWishlist({{ property.id }}, this)"
+            aria-label="Add to wishlist">
+        <span class="material-icons-round {% if property.id in user_wishlist_ids %}text-red-500{% else %}text-[var(--color-text-muted)]{% endif %}" style="font-size:24px">
+            {% if property.id in user_wishlist_ids %}favorite{% else %}favorite_border{% endif %}
+        </span>
+    </button>
+</section>
+
+<script>
+function shareProperty() {
+    const shareTitle = {{ property.project_name|default:property.title|escapejs }};
+    const shareLocation = {{ property.location|default:""|escapejs }};
+    {% if property.price %}
+    const sharePrice = "₹" + {{ property.price|escapejs }} + " {{ property.get_price_unit_display|escapejs }}";
+    {% else %}
+    const sharePrice = "";
+    {% endif %}
+    const shareUrl = window.location.href;
+    const shareText = shareTitle + " - " + shareLocation + (sharePrice ? " at " + sharePrice : "") + ". Check it out on RealShree:";
+
+    if (navigator.share) {
+        navigator.share({
+            title: shareTitle,
+            text: shareText,
+            url: shareUrl
+        }).catch(function(err) {
+            if (err.name !== 'AbortError') console.error('Share failed:', err);
+        });
+    } else if (navigator.clipboard) {
+        navigator.clipboard.writeText(shareText + " " + shareUrl).then(function() {
+            alert('Link copied to clipboard! Paste it anywhere to share.');
+        });
+    } else {
+        window.prompt('Copy this link to share:', shareUrl);
+    }
+}
+</script>
                         
                         <!-- Possession Badge -->
                         {% if property.possession %}
