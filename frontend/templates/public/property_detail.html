@@ -4,7 +4,7 @@
 {% block meta_description %}{{ property.beds|default:"" }}{% if property.beds %} BHK{% endif %} {{ property.property_type }} for sale in {{ property.location }}, Ahmedabad{% if property.price %} at ₹{{ property.price }} {{ property.get_price_unit_display }}{% endif %}. RERA-verified, zero brokerage on RealShree.{% endblock %}
 {% block og_title %}{{ property.project_name|default:property.title }} – {{ property.location }}, Ahmedabad{% endblock %}
 {% block og_description %}{{ property.beds|default:"" }}{% if property.beds %} BHK{% endif %} {{ property.property_type }} in {{ property.location }}{% if property.price %}, ₹{{ property.price }} {{ property.get_price_unit_display }}{% endif %}. RERA-verified listing, zero brokerage.{% endblock %}
-{% if property.thumbnail %}{% cloudinary_url property.thumbnail width=1200 height=630 crop='fill' as og_img_url %}{% block og_image %}{{ og_img_url }}{% endblock %}{% elif property.images.first %}{% cloudinary_url property.images.first.image width=1200 height=630 crop='fill' as og_img_url %}{% block og_image %}{{ og_img_url }}{% endblock %}{% else %}{% block og_image %}https://www.realshree.com{% static 'images/logo.png' %}{% endblock %}{% endif %}
+{% block og_image %}{% if property.thumbnail %}{% cloudinary_url property.thumbnail width=1200 height=630 crop='fill' %}{% elif property.images.first %}{% cloudinary_url property.images.first.image width=1200 height=630 crop='fill' %}{% else %}https://www.realshree.com{% static 'images/logo.png' %}{% endif %}{% endblock %}
 {% block canonical_url %}https://RealShree.com{{ property.get_absolute_url }}{% endblock %}
 
 {% block content %}
