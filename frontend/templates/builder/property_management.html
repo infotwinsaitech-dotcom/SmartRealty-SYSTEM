@@ -311,6 +311,33 @@ class="mb-3 px-3 py-1.5 bg-red-100 text-red-600 rounded text-sm font-medium hove
 Clear Gallery
 </button>
 
+<!-- ==================== FLOOR PLANS (unit-type wise) ==================== -->
+<label class="font-semibold mt-4 block text-sm">Floor Plans <span class="text-gray-400 font-normal">(add one row per unit type, e.g. "3 BHK")</span></label>
+
+<div id="floorPlanRows">
+  <div class="floorplan-row grid grid-cols-2 md:grid-cols-5 gap-2 mb-2 items-center border border-gray-200 rounded-lg p-2">
+    <input type="text" name="floorplan_unit_type[]" placeholder="Unit Type (e.g. 3 BHK)" class="border rounded px-2 py-1.5 text-sm col-span-2 md:col-span-1">
+    <input type="number" step="0.01" name="floorplan_carpet_area[]" placeholder="Carpet Area (sqft)" class="border rounded px-2 py-1.5 text-sm">
+    <input type="number" step="0.01" name="floorplan_super_area[]" placeholder="Super Area (sqft)" class="border rounded px-2 py-1.5 text-sm">
+    <input type="number" step="0.01" name="floorplan_price[]" placeholder="Price (₹)" class="border rounded px-2 py-1.5 text-sm">
+    <input type="file" name="floorplan_image[]" accept="image/*" class="text-xs">
+  </div>
+</div>
+
+<button type="button" onclick="addFloorPlanRow()"
+class="mb-3 px-3 py-1.5 bg-blue-100 text-blue-700 rounded text-sm font-medium hover:bg-blue-200 transition">
++ Add Another Floor Plan
+</button>
+
+<script>
+function addFloorPlanRow() {
+  const container = document.getElementById('floorPlanRows');
+  const row = container.firstElementChild.cloneNode(true);
+  row.querySelectorAll('input').forEach(function(el){ el.value = ''; });
+  container.appendChild(row);
+}
+</script>
+
 <!-- ==================== DYNAMIC AMENITIES (CUSTOM ADD) ==================== -->
 <label class="font-semibold mt-4 block text-sm">Amenities <span class="text-gray-400 font-normal">(Type & press Enter to add custom)</span></label>
 

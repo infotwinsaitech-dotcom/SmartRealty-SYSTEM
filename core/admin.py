@@ -4,7 +4,7 @@ from .models import (
     Property, PropertyImage, Inquiry, SiteSettings, User, Profile, 
     Lead, Deal, Task, Activity, Document, Notification, AIInsight, 
     LeadScore, Campaign, FollowUp, DripSequence, EscalationRule, 
-    AutomationLog, Advertisement
+    AutomationLog, Advertisement, PropertyReview, FloorPlan
 )
 
 # ========== PROPERTY ==========
@@ -13,8 +13,14 @@ class PropertyImageInline(admin.TabularInline):
     extra = 3
 
 
+class FloorPlanInline(admin.TabularInline):
+    model = FloorPlan
+    extra = 1
+    fields = ['unit_type', 'carpet_area', 'super_area', 'price', 'image', 'display_order']
+
+
 class PropertyAdmin(admin.ModelAdmin):
-    inlines = [PropertyImageInline]
+    inlines = [PropertyImageInline, FloorPlanInline]
     search_fields = ['title', 'project_name', 'location']
 
 
@@ -26,6 +32,21 @@ admin.site.register(Property, PropertyAdmin)
 class InquiryAdmin(admin.ModelAdmin):
     list_display = ['name', 'email', 'property', 'created_at']
 
+# ========== PROPERTY REVIEW (Ratings & Reviews moderation) ==========
+@admin.register(PropertyReview)
+class PropertyReviewAdmin(admin.ModelAdmin):
+    list_display = ['reviewer_name', 'property', 'overall_rating', 'is_approved', 'created_at']
+    list_filter = ['is_approved', 'reviewer_type']
+    list_editable = ['is_approved']
+    search_fields = ['reviewer_name', 'property__title', 'property__project_name']
+    autocomplete_fields = ['property']
+    readonly_fields = ['created_at']
+    fieldsets = (
+        ('Reviewer', {'fields': ('property', 'user', 'reviewer_name', 'reviewer_type')}),
+        ('Ratings (1-5)', {'fields': ('connectivity_rating', 'neighbourhood_rating', 'safety_rating', 'livability_rating')}),
+        ('Review Text', {'fields': ('good_things', 'needs_improvement')}),
+        ('Moderation', {'fields': ('is_approved', 'helpful_count', 'created_at')}),
+    )
 
 # ========== SITE SETTINGS (ONLY ONCE!) ==========
 @admin.register(SiteSettings)

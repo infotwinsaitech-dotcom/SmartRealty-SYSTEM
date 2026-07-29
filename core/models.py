@@ -227,6 +227,32 @@ class Property(models.Model):
 
     def __str__(self):
         return self.title
+    def get_rating_summary(self):
+        approved = self.reviews.filter(is_approved=True)
+        count = approved.count()
+        if count == 0:
+            return None
+        from django.db.models import Avg
+        agg = approved.aggregate(
+            connectivity=Avg('connectivity_rating'),
+            neighbourhood=Avg('neighbourhood_rating'),
+            safety=Avg('safety_rating'),
+            livability=Avg('livability_rating'),
+        )
+        overall = sum(v for v in agg.values() if v is not None) / 4
+        return {
+            'overall': round(overall, 1),
+            'connectivity': round(agg['connectivity'] or 0, 1),
+            'neighbourhood': round(agg['neighbourhood'] or 0, 1),
+            'safety': round(agg['safety'] or 0, 1),
+            'livability': round(agg['livability'] or 0, 1),
+            'count': count,
+        }
+
+    def get_rera_verify_url(self):
+        if self.rera_number:
+            return "https://gujrera.gujarat.gov.in/#/project-preview"
+        return None
 
 
 # =============================================================================
@@ -250,7 +276,29 @@ class PropertyImage(models.Model):
     def __str__(self):
         return f"{self.property.title} - Image {self.id}"
 
+# =============================================================================
+# FLOOR PLAN MODEL (unit-type wise floor plans - builder panel se add hote hain)
+# =============================================================================
 
+class FloorPlan(models.Model):
+    property = models.ForeignKey(
+        Property, on_delete=models.CASCADE, related_name="floor_plans", db_index=True
+    )
+    unit_type = models.CharField(max_length=100, help_text="e.g. 3 BHK, 4 BHK Penthouse")
+    carpet_area = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, help_text="Carpet area in sq.ft")
+    super_area = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, help_text="Super built-up area in sq.ft")
+    price = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True, help_text="Price in Rupees for this unit type")
+    image = CloudinaryField('image', blank=True, null=True)
+    display_order = models.PositiveIntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['display_order', 'created_at']
+        verbose_name = "Floor Plan"
+        verbose_name_plural = "Floor Plans"
+
+    def __str__(self):
+        return f"{self.property.title} - {self.unit_type}"
 # =============================================================================
 # AMENITY MODEL
 # =============================================================================
@@ -268,6 +316,55 @@ class Amenity(models.Model):
     def __str__(self):
         return self.name
 
+# =============================================================================
+# PROPERTY REVIEW MODEL (Ratings & Reviews - Housing.com jaisa feature)
+# =============================================================================
+
+class PropertyReview(models.Model):
+    REVIEWER_TYPE_CHOICES = [
+        ('Owner', 'Owner'),
+        ('Tenant', 'Tenant'),
+        ('Visitor', 'Visitor'),
+        ('Others', 'Others'),
+    ]
+
+    property = models.ForeignKey(
+        'Property', on_delete=models.CASCADE, related_name='reviews', db_index=True
+    )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True,
+        related_name='property_reviews'
+    )
+    reviewer_name = models.CharField(max_length=100)
+    reviewer_type = models.CharField(max_length=20, choices=REVIEWER_TYPE_CHOICES, default='Owner')
+
+    connectivity_rating = models.PositiveSmallIntegerField(default=5, validators=[MinValueValidator(1), MaxValueValidator(5)])
+    neighbourhood_rating = models.PositiveSmallIntegerField(default=5, validators=[MinValueValidator(1), MaxValueValidator(5)])
+    safety_rating = models.PositiveSmallIntegerField(default=5, validators=[MinValueValidator(1), MaxValueValidator(5)])
+    livability_rating = models.PositiveSmallIntegerField(default=5, validators=[MinValueValidator(1), MaxValueValidator(5)])
+
+    good_things = models.TextField(blank=True, help_text="Good things here")
+    needs_improvement = models.TextField(blank=True, help_text="Things need improvement")
+
+    is_approved = models.BooleanField(default=False, db_index=True, help_text="Sirf approved reviews public page par dikhengi")
+    helpful_count = models.PositiveIntegerField(default=0)
+
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        indexes = [
+            Index(fields=['property', 'is_approved']),
+        ]
+        verbose_name = 'Property Review'
+        verbose_name_plural = 'Property Reviews'
+
+    def overall_rating(self):
+        total = self.connectivity_rating + self.neighbourhood_rating + self.safety_rating + self.livability_rating
+        return round(total / 4, 1)
+
+    def __str__(self):
+        return f"{self.reviewer_name} - {self.property.title} ({self.overall_rating}/5)"
 
 # =============================================================================
 # INQUIRY MODEL

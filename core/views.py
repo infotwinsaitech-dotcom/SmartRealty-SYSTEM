@@ -58,7 +58,7 @@ from .models import (
     Property, PropertyImage, User, Profile, Lead, Deal, Task, 
     Activity, Agent, Document, Conversation, Message, 
     Notification, Campaign, SiteVisit, FollowUp, Wishlist,
-    Inquiry, LeadNote, LeadActivity, SavedProperty , Advertisement,
+    Inquiry, LeadNote, LeadActivity, SavedProperty , Advertisement,PropertyReview, FloorPlan,
 )
 from subscriptions.models import BlogPost
 logger = logging.getLogger('core')
@@ -382,6 +382,38 @@ def property_detail(request, id, slug=None):
     similar_properties = Property.objects.filter(
         location=property.location
     ).exclude(id=property.id).select_related('builder')[:3]
+    if request.method == "POST" and request.POST.get("form_type") == "review":
+        reviewer_name = sanitize_input(request.POST.get("reviewer_name"))
+        reviewer_type = sanitize_input(request.POST.get("reviewer_type", "Owner"))
+        good_things = sanitize_input(request.POST.get("good_things", ""))
+        needs_improvement = sanitize_input(request.POST.get("needs_improvement", ""))
+
+        def _rating(field):
+            try:
+                val = int(request.POST.get(field, 5))
+                return max(1, min(5, val))
+            except (TypeError, ValueError):
+                return 5
+
+        if not reviewer_name.strip():
+            messages.error(request, "Naam daalna zaroori hai review ke liye")
+            return redirect(property.get_absolute_url())
+
+        PropertyReview.objects.create(
+            property=property,
+            user=request.user if request.user.is_authenticated else None,
+            reviewer_name=reviewer_name,
+            reviewer_type=reviewer_type or "Owner",
+            connectivity_rating=_rating("connectivity_rating"),
+            neighbourhood_rating=_rating("neighbourhood_rating"),
+            safety_rating=_rating("safety_rating"),
+            livability_rating=_rating("livability_rating"),
+            good_things=good_things,
+            needs_improvement=needs_improvement,
+            is_approved=False,
+        )
+        messages.success(request, "Review submit ho gayi! Admin approval ke baad ye public page par dikhegi.")
+        return redirect(property.get_absolute_url())
 
     if request.method == "POST":
         name = sanitize_input(request.POST.get("name"))
@@ -468,6 +500,16 @@ def property_detail(request, id, slug=None):
             brochure_pdf_url = property.brochure.url
         except Exception:
             brochure_pdf_url = None
+    approved_reviews = property.reviews.filter(is_approved=True).order_by('-created_at')
+    rating_summary = property.get_rating_summary()
+    rera_verify_url = property.get_rera_verify_url()
+    floor_plans = property.floor_plans.all()
+    review_rating_fields = [
+        ("connectivity_rating", "Connectivity"),
+        ("neighbourhood_rating", "Neighbourhood"),
+        ("safety_rating", "Safety"),
+        ("livability_rating", "Livability"),
+    ]
 
     return render(request, "public/property_detail.html", {
         "property": property,
@@ -475,6 +517,11 @@ def property_detail(request, id, slug=None):
         "similar_properties": similar_properties,
         "user_wishlist_ids": user_wishlist_ids,
         "brochure_pdf_url": brochure_pdf_url,
+        "approved_reviews": approved_reviews,
+        "rating_summary": rating_summary,
+        "rera_verify_url": rera_verify_url,
+        "review_rating_fields": review_rating_fields,
+        "floor_plans": floor_plans,
     })
 
 def property_search_suggestions(request):
@@ -1411,6 +1458,38 @@ def add_property(request):
                 else:
                     logger.warning(f"Gallery image skipped: {msg}")
             logger.info(f"DEBUG: Gallery upload complete -> {saved_count}/{len(images)} images saved for property '{prop.title}'")
+            # Floor Plans (unit-type wise) - parallel arrays from the form
+            fp_unit_types = request.POST.getlist("floorplan_unit_type[]")
+            fp_carpet_areas = request.POST.getlist("floorplan_carpet_area[]")
+            fp_super_areas = request.POST.getlist("floorplan_super_area[]")
+            fp_prices = request.POST.getlist("floorplan_price[]")
+            fp_images = request.FILES.getlist("floorplan_image[]")
+
+            def _decimal_or_none(val):
+                try:
+                    return Decimal(val) if val not in (None, "",) else None
+                except Exception:
+                    return None
+
+            for idx, unit_type in enumerate(fp_unit_types):
+                unit_type = sanitize_input(unit_type)
+                if not unit_type.strip():
+                    continue
+                fp_image = fp_images[idx] if idx < len(fp_images) else None
+                if fp_image:
+                    valid, msg = validate_file_upload(fp_image, ['.jpg', '.jpeg', '.png', '.webp'], 10)
+                    if not valid:
+                        logger.warning(f"Floor plan image skipped for '{unit_type}': {msg}")
+                        fp_image = None
+                FloorPlan.objects.create(
+                    property=prop,
+                    unit_type=unit_type,
+                    carpet_area=_decimal_or_none(fp_carpet_areas[idx] if idx < len(fp_carpet_areas) else None),
+                    super_area=_decimal_or_none(fp_super_areas[idx] if idx < len(fp_super_areas) else None),
+                    price=_decimal_or_none(fp_prices[idx] if idx < len(fp_prices) else None),
+                    image=fp_image,
+                    display_order=idx,
+                )
 
             messages.success(request, f"Property '{prop.title}' added successfully!")
             logger.info(f"Property created: {prop.title} by {request.user.username}")

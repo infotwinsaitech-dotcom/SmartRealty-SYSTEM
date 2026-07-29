@@ -99,10 +99,10 @@
             <div class="flex items-center gap-2 mb-2">
                 <span class="badge">{{ property.status }}</span>
                 {% if property.rera_number %}
-                <span class="rera-badge">
+                <a href="{{ rera_verify_url }}" target="_blank" rel="noopener" class="rera-badge" title="Verify on Gujarat RERA site">
                     <span class="material-icons-round" style="font-size:10px">verified</span>
                     RERA
-                </span>
+                </a>
                 {% endif %}
             </div>
             
@@ -276,7 +276,145 @@
                     </div>
                 </div>
                 {% endif %}
-                
+
+                <!-- Ratings & Reviews -->
+                <div class="card p-6 reveal">
+                    <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
+                        <div class="flex items-center gap-2">
+                            <span class="material-icons-round text-[var(--color-gold)]" style="font-size:20px">star_rate</span>
+                            <h2 class="text-xl font-bold text-[var(--color-navy)]">Ratings &amp; Reviews</h2>
+                        </div>
+                        <button type="button" onclick="document.getElementById('write-review-box').classList.toggle('hidden')"
+                            class="text-sm font-semibold text-[var(--color-gold)] hover:underline">
+                            + Write a Review
+                        </button>
+                    </div>
+
+                    {% if rating_summary %}
+                    <div class="mb-5">
+                        <div class="flex items-baseline gap-2 mb-3">
+                            <span class="text-3xl font-extrabold text-[var(--color-navy)]">{{ rating_summary.overall }}</span>
+                            <span class="text-sm text-[var(--color-text-muted)]">/5 &middot; based on {{ rating_summary.count }} review{{ rating_summary.count|pluralize }}</span>
+                        </div>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
+                            <div class="bg-[var(--color-bg-soft)] rounded-xl p-3">
+                                <p class="text-lg font-bold text-[var(--color-navy)]">{{ rating_summary.connectivity }}/5</p>
+                                <p class="text-xs text-[var(--color-text-muted)]">Connectivity</p>
+                            </div>
+                            <div class="bg-[var(--color-bg-soft)] rounded-xl p-3">
+                                <p class="text-lg font-bold text-[var(--color-navy)]">{{ rating_summary.neighbourhood }}/5</p>
+                                <p class="text-xs text-[var(--color-text-muted)]">Neighbourhood</p>
+                            </div>
+                            <div class="bg-[var(--color-bg-soft)] rounded-xl p-3">
+                                <p class="text-lg font-bold text-[var(--color-navy)]">{{ rating_summary.safety }}/5</p>
+                                <p class="text-xs text-[var(--color-text-muted)]">Safety</p>
+                            </div>
+                            <div class="bg-[var(--color-bg-soft)] rounded-xl p-3">
+                                <p class="text-lg font-bold text-[var(--color-navy)]">{{ rating_summary.livability }}/5</p>
+                                <p class="text-xs text-[var(--color-text-muted)]">Livability</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <p class="text-sm text-[var(--color-text-muted)] mb-4">Is property ke liye abhi tak koi review nahi hai. Sabse pehle review dene wale bano!</p>
+                    {% endif %}
+
+                    <!-- Write a Review form (hidden by default) -->
+                    <div id="write-review-box" class="hidden border-t border-[var(--color-border)] pt-5 mt-2">
+                        <form method="POST" class="space-y-4">
+                            {% csrf_token %}
+                            <input type="hidden" name="form_type" value="review">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <input type="text" name="reviewer_name" placeholder="Your Name *" required
+                                    class="w-full px-4 py-3 rounded-xl bg-[var(--color-bg)] border border-[var(--color-border)] text-sm focus:outline-none focus:border-[var(--color-gold)] transition">
+                                <select name="reviewer_type"
+                                    class="w-full px-4 py-3 rounded-xl bg-[var(--color-bg)] border border-[var(--color-border)] text-sm focus:outline-none focus:border-[var(--color-gold)] transition">
+                                    <option value="Owner">Owner</option>
+                                    <option value="Tenant">Tenant</option>
+                                    <option value="Visitor">Visitor</option>
+                                    <option value="Others">Others</option>
+                                </select>
+                            </div>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                {% for field, label in review_rating_fields %}
+                                <div>
+                                    <label class="text-xs text-[var(--color-text-muted)]">{{ label }}</label>
+                                    <select name="{{ field }}"
+                                        class="w-full px-3 py-2 rounded-xl bg-[var(--color-bg)] border border-[var(--color-border)] text-sm">
+                                        <option value="5">5 - Excellent</option>
+                                        <option value="4">4 - Good</option>
+                                        <option value="3">3 - Average</option>
+                                        <option value="2">2 - Below Average</option>
+                                        <option value="1">1 - Poor</option>
+                                    </select>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            <textarea name="good_things" placeholder="Good things here..." rows="2"
+                                class="w-full px-4 py-3 rounded-xl bg-[var(--color-bg)] border border-[var(--color-border)] text-sm focus:outline-none focus:border-[var(--color-gold)] transition resize-none"></textarea>
+                            <textarea name="needs_improvement" placeholder="Things need improvement..." rows="2"
+                                class="w-full px-4 py-3 rounded-xl bg-[var(--color-bg)] border border-[var(--color-border)] text-sm focus:outline-none focus:border-[var(--color-gold)] transition resize-none"></textarea>
+                            <button type="submit" class="btn btn-gold" style="min-height:44px;">
+                                <span class="material-icons-round" style="font-size:18px">send</span>
+                                Submit Review
+                            </button>
+                            <p class="text-xs text-[var(--color-text-muted)]">Aapki review admin approval ke baad publicly dikhegi.</p>
+                        </form>
+                    </div>
+
+                    <!-- Approved reviews list -->
+                    {% if approved_reviews %}
+                    <div class="space-y-4 mt-5">
+                        {% for review in approved_reviews %}
+                        <div class="border-t border-[var(--color-border)] pt-4">
+                            <div class="flex items-center justify-between mb-1">
+                                <p class="font-semibold text-sm text-[var(--color-navy)]">{{ review.reviewer_name }} <span class="text-xs font-normal text-[var(--color-text-muted)]">&middot; {{ review.reviewer_type }}</span></p>
+                                <span class="text-sm font-bold text-[var(--color-gold)]">{{ review.overall_rating }}/5</span>
+                            </div>
+                            {% if review.good_things %}
+                            <p class="text-xs font-semibold text-green-700 mt-2">Good things here</p>
+                            <p class="text-sm text-[var(--color-text)]">{{ review.good_things }}</p>
+                            {% endif %}
+                            {% if review.needs_improvement %}
+                            <p class="text-xs font-semibold text-amber-700 mt-2">Things need improvement</p>
+                            <p class="text-sm text-[var(--color-text)]">{{ review.needs_improvement }}</p>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+<!-- Floor Plans -->
+{% if floor_plans %}
+<div class="card p-6 reveal">
+    <div class="flex items-center gap-2 mb-4">
+        <span class="material-icons-round text-[var(--color-gold)]" style="font-size:20px">architecture</span>
+        <h2 class="text-xl font-bold text-[var(--color-navy)]">Floor Plans</h2>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {% for fp in floor_plans %}
+        <div class="border border-[var(--color-border)] rounded-xl overflow-hidden">
+            {% if fp.image %}
+            <img src="{% cloudinary_url fp.image width=500 height=400 crop='fit' %}"
+                 alt="{{ fp.unit_type }} floor plan"
+                 class="w-full object-contain bg-[var(--color-bg-soft)] cursor-pointer"
+                 style="max-height:280px"
+                 onclick="window.open(this.src, '_blank')"
+                 loading="lazy">
+            {% endif %}
+            <div class="p-3">
+                <p class="font-semibold text-sm text-[var(--color-navy)]">{{ fp.unit_type }}</p>
+                <div class="flex flex-wrap gap-x-4 gap-y-1 mt-1 text-xs text-[var(--color-text-muted)]">
+                    {% if fp.carpet_area %}<span>Carpet: {{ fp.carpet_area }} sq.ft</span>{% endif %}
+                    {% if fp.super_area %}<span>Super: {{ fp.super_area }} sq.ft</span>{% endif %}
+                    {% if fp.price %}<span>₹{{ fp.price }}</span>{% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
                 <!-- Gallery -->
                 {% if property.images.all %}
                 <div class="card p-6 reveal">
@@ -473,9 +611,14 @@
                                 <span class="text-white/60">Property Type</span>
                                 <span class="text-white font-medium">{{ property.property_type|default:"N/A" }}</span>
                             </div>
-                            <div class="flex justify-between text-sm">
+                            <div class="flex justify-between text-sm items-center">
                                 <span class="text-white/60">RERA</span>
-                                <span class="text-white font-medium">{{ property.rera_number|default:"N/A" }}</span>
+                                <span class="text-white font-medium">
+                                    {{ property.rera_number|default:"N/A" }}
+                                    {% if rera_verify_url %}
+                                    <a href="{{ rera_verify_url }}" target="_blank" rel="noopener" class="text-[var(--color-gold)] text-xs underline ml-1">Verify</a>
+                                    {% endif %}
+                                </span>
                             </div>
                         </div>
                     </div>
@@ -536,13 +679,23 @@
                     </div>
                     
                     <!-- Trust Badge -->
-                    <div class="card p-4 reveal flex items-center gap-3">
+                    {% if rera_verify_url %}
+                    <a href="{{ rera_verify_url }}" target="_blank" rel="noopener" class="card p-4 reveal flex items-center gap-3 hover:shadow-md transition">
                         <span class="material-icons-round text-[var(--color-success)]" style="font-size:28px">verified</span>
                         <div>
                             <p class="font-semibold text-sm text-[var(--color-navy)]">RERA Verified</p>
-                            <p class="text-xs text-[var(--color-text-muted)]">This property is legally verified</p>
+                            <p class="text-xs text-[var(--color-text-muted)]">Tap to verify on Gujarat RERA site</p>
+                        </div>
+                    </a>
+                    {% else %}
+                    <div class="card p-4 reveal flex items-center gap-3">
+                        <span class="material-icons-round text-[var(--color-text-muted)]" style="font-size:28px">info</span>
+                        <div>
+                            <p class="font-semibold text-sm text-[var(--color-navy)]">RERA Pending</p>
+                            <p class="text-xs text-[var(--color-text-muted)]">RERA number not added yet by builder</p>
                         </div>
                     </div>
+                    {% endif %}
                     
                 </div>
             </div>
