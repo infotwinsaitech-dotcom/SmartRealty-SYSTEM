@@ -2,6 +2,9 @@
 {% load cloudinary %}
 {% block content %}
 
+<script src="https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/umd/ffmpeg.js"></script>
+<script src="https://unpkg.com/@ffmpeg/util@0.12.1/dist/umd/index.js"></script>
+
 <main class="min-h-screen bg-gray-50 p-4 md:p-6">
 
 <div class="max-w-4xl mx-auto">
@@ -312,6 +315,130 @@ Update Property
 </main>
 
 <script>
+    // ===================== IMAGE AUTO-COMPRESS (Cloudinary free-plan 10MB limit) =====================
+    function compressImageFile(file, maxBytes = 9.5 * 1024 * 1024, maxDimension = 2500) {
+      return new Promise((resolve, reject) => {
+        if (file.size <= maxBytes) {
+          resolve(file);
+          return;
+        }
+        const img = new Image();
+        const url = URL.createObjectURL(file);
+        img.onload = function () {
+          URL.revokeObjectURL(url);
+          let { width, height } = img;
+
+          if (width > maxDimension || height > maxDimension) {
+            const scale = maxDimension / Math.max(width, height);
+            width = Math.round(width * scale);
+            height = Math.round(height * scale);
+          }
+
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+
+          let quality = 0.92;
+          function tryCompress() {
+            canvas.toBlob(blob => {
+              if (!blob) { reject(new Error('Compression failed')); return; }
+              if (blob.size <= maxBytes || quality <= 0.4) {
+                resolve(new File([blob], file.name, { type: 'image/jpeg' }));
+              } else {
+                quality -= 0.1;
+                tryCompress();
+              }
+            }, 'image/jpeg', quality);
+          }
+          tryCompress();
+        };
+        img.onerror = () => reject(new Error('Image load failed'));
+        img.src = url;
+      });
+    }
+
+    // ===================== VIDEO AUTO-COMPRESS (ffmpeg.wasm, target <99MB) =====================
+    let ffmpegInstance = null;
+
+    async function loadFFmpeg(onLog) {
+      if (ffmpegInstance) return ffmpegInstance;
+
+      const { FFmpeg } = FFmpegWASM;
+      const { toBlobURL } = FFmpegUtil;
+
+      const baseURL = 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd';
+      const ffmpeg = new FFmpeg();
+      if (onLog) ffmpeg.on('log', ({ message }) => onLog(message));
+
+      await ffmpeg.load({
+        coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
+        wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm'),
+      });
+
+      ffmpegInstance = ffmpeg;
+      return ffmpeg;
+    }
+
+    function getVideoDuration(file) {
+      return new Promise((resolve, reject) => {
+        const video = document.createElement('video');
+        video.preload = 'metadata';
+        video.onloadedmetadata = () => {
+          URL.revokeObjectURL(video.src);
+          resolve(video.duration);
+        };
+        video.onerror = () => reject(new Error('Video duration read nahi ho payi'));
+        video.src = URL.createObjectURL(file);
+      });
+    }
+
+    async function compressVideoFile(file, maxBytes = 99.5 * 1024 * 1024, onProgress) {
+      if (file.size <= maxBytes) return file;
+
+      const { fetchFile } = FFmpegUtil;
+      if (onProgress) onProgress('Compressor load ho raha hai...');
+      const ffmpeg = await loadFFmpeg();
+
+      const duration = await getVideoDuration(file);
+      if (!duration || !isFinite(duration)) {
+        throw new Error('Video duration nahi mil payi, compress nahi ho sakta');
+      }
+
+      const targetTotalBits = maxBytes * 8 * 0.92;
+      const audioBitrate = 128000;
+      const videoBitrate = Math.max(200000, Math.floor(targetTotalBits / duration) - audioBitrate);
+
+      ffmpeg.on('progress', ({ progress }) => {
+        if (onProgress) onProgress(`Compressing... ${Math.round(progress * 100)}%`);
+      });
+
+      const inputName = 'input' + (file.name.match(/\.\w+$/)?.[0] || '.mp4');
+      await ffmpeg.writeFile(inputName, await fetchFile(file));
+
+      await ffmpeg.exec([
+        '-i', inputName,
+        '-c:v', 'libx264',
+        '-preset', 'veryfast',
+        '-b:v', `${videoBitrate}`,
+        '-maxrate', `${Math.floor(videoBitrate * 1.2)}`,
+        '-bufsize', `${Math.floor(videoBitrate * 2)}`,
+        '-c:a', 'aac',
+        '-b:a', `${audioBitrate}`,
+        '-movflags', '+faststart',
+        'output.mp4',
+      ]);
+
+      const data = await ffmpeg.readFile('output.mp4');
+      const compressedFile = new File([data.buffer], file.name.replace(/\.\w+$/, '.mp4'), { type: 'video/mp4' });
+
+      await ffmpeg.deleteFile(inputName);
+      await ffmpeg.deleteFile('output.mp4');
+
+      return compressedFile;
+    }
+
     // ===================== CLOUDINARY DIRECT UPLOAD (Edit Property) =====================
     let editPendingUploads = 0;
 
@@ -340,7 +467,11 @@ Update Property
                     if (xhr.status >= 200 && xhr.status < 300) {
                         resolve(JSON.parse(xhr.responseText).public_id);
                     } else {
-                        reject(new Error('Cloudinary upload failed: ' + xhr.status));
+                        let reason = xhr.status;
+                        try {
+                            reason = JSON.parse(xhr.responseText).error?.message || xhr.status;
+                        } catch (e) {}
+                        reject(new Error(reason));
                     }
                 };
                 xhr.onerror = () => reject(new Error('Cloudinary upload network error'));
@@ -355,13 +486,38 @@ Update Property
     }
 
     // Thumbnail / Logo / Video ke liye — inline onchange se call hota hai
-    function editUpload(inputEl, resourceType, publicIdInputId, statusId) {
-        const file = inputEl.files[0];
+    async function editUpload(inputEl, resourceType, publicIdInputId, statusId) {
+        let file = inputEl.files[0];
         if (!file) return;
 
         editPendingUploads++;
         editSetSubmitDisabled(true);
         const statusEl = document.getElementById(statusId);
+
+        if (resourceType === 'image' && file.size > 9.5 * 1024 * 1024) {
+            if (statusEl) statusEl.textContent = 'Compressing image...';
+            try {
+                file = await compressImageFile(file);
+            } catch (err) {
+                console.error('Compression failed, uploading original:', err);
+            }
+        }
+
+        if (resourceType === 'video' && file.size > 99.5 * 1024 * 1024) {
+            try {
+                file = await compressVideoFile(file, 99.5 * 1024 * 1024, msg => {
+                    if (statusEl) statusEl.textContent = msg;
+                });
+            } catch (err) {
+                console.error(err);
+                if (statusEl) statusEl.textContent = '❌ Video compress nahi ho payi';
+                alert('Video compress nahi ho payi: ' + err.message + '\nYouTube link use karke try karein.');
+                editPendingUploads--;
+                if (editPendingUploads === 0) editSetSubmitDisabled(false);
+                return;
+            }
+        }
+
         if (statusEl) statusEl.textContent = 'Uploading... 0%';
 
         editUploadToCloudinary(file, resourceType, pct => {
@@ -369,11 +525,11 @@ Update Property
         }).then(publicId => {
             document.getElementById(publicIdInputId).value = publicId;
             if (statusEl) statusEl.textContent = '✅ Uploaded';
-            inputEl.value = ''; // asli bhaari file ab form ke saath nahi jaayegi
+            inputEl.value = '';
         }).catch(err => {
             console.error(err);
-            if (statusEl) statusEl.textContent = '❌ Upload failed, try again';
-            alert('Upload failed: ' + file.name);
+            if (statusEl) statusEl.textContent = '❌ ' + err.message;
+            alert('Upload failed: ' + file.name + '\n' + err.message);
         }).finally(() => {
             editPendingUploads--;
             if (editPendingUploads === 0) editSetSubmitDisabled(false);
