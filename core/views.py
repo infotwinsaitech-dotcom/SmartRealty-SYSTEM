@@ -1257,6 +1257,41 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+@builder_required
+@require_GET
+def cloudinary_signature(request):
+    """
+    Browser directly uploads images/videos to Cloudinary (never through this
+    Render server). This endpoint only hands out a short-lived signed
+    signature so the direct upload can't be abused by randoms who don't
+    have a builder account. No file ever touches Django/Render RAM or disk.
+    """
+    import time
+    import cloudinary.utils
+
+    resource_type = request.GET.get('resource_type', 'image')
+    if resource_type not in ('image', 'video', 'raw'):
+        resource_type = 'image'
+
+    if not (settings.CLOUDINARY_CLOUD_NAME and settings.CLOUDINARY_API_KEY and settings.CLOUDINARY_API_SECRET):
+        return JsonResponse({'error': 'Cloudinary not configured on server'}, status=500)
+
+    timestamp = int(time.time())
+    folder = f"smartrealty/{resource_type}s"
+    params_to_sign = {
+        'timestamp': timestamp,
+        'folder': folder,
+    }
+    signature = cloudinary.utils.api_sign_request(params_to_sign, settings.CLOUDINARY_API_SECRET)
+
+    return JsonResponse({
+        'signature': signature,
+        'timestamp': timestamp,
+        'api_key': settings.CLOUDINARY_API_KEY,
+        'cloud_name': settings.CLOUDINARY_CLOUD_NAME,
+        'folder': folder,
+        'resource_type': resource_type,
+    })
 
 @builder_required
 def add_property(request):
@@ -1328,6 +1363,8 @@ def add_property(request):
             return redirect("add_property")
 
         # File validations
+        DIRECT_UPLOAD_FIELDS = {'thumbnail', 'project_logo', 'project_video'}
+
         files = {}
         file_fields = {
             'thumbnail': (['.jpg', '.jpeg', '.png', '.gif', '.webp', '.avif'], 10),
@@ -1337,6 +1374,12 @@ def add_property(request):
         }
 
         for field, (exts, max_size) in file_fields.items():
+            if field in DIRECT_UPLOAD_FIELDS:
+                public_id = sanitize_input(request.POST.get(f"{field}_public_id", "")).strip()
+                if public_id:
+                    files[field] = public_id
+                    continue
+
             uploaded = request.FILES.get(field)
             if uploaded:
                 valid, msg = validate_file_upload(uploaded, exts, max_size)
@@ -1442,6 +1485,17 @@ def add_property(request):
             # Cloudinary upload calls slow network operations hain, DB transaction ko itni der
             # tak khula rakhna DB connection ko block karta hai. Har image apne aap mein
             # ek independent save hai, isliye alag rakhna safe hai.
+            gallery_public_ids = request.POST.getlist("gallery_public_ids")
+            for public_id in gallery_public_ids:
+                public_id = public_id.strip()
+                if not public_id:
+                    continue
+                try:
+                    pi = PropertyImage.objects.create(property=prop, image=public_id)
+                    logger.info(f"DEBUG: Gallery image (direct-upload) saved -> id={pi.id}, public_id={public_id}")
+                except Exception as img_err:
+                    logger.error(f"DEBUG: Gallery image (direct-upload) FAILED to save: {img_err}")
+
             images = request.FILES.getlist("images")
             logger.info(f"DEBUG: Received {len(images)} gallery image(s) in request.FILES for property '{prop.title}'")
             saved_count = 0
@@ -2322,6 +2376,7 @@ def _update_property(request, property):
     property.nearby_places = nearby_data
 
     # File uploads
+    DIRECT_UPLOAD_FIELDS = {'thumbnail', 'project_logo', 'project_video'}
     file_fields = {
         'thumbnail': (['.jpg', '.jpeg', '.png', '.gif', '.avif'], 10),
         'project_logo': (['.jpg', '.jpeg', '.png', '.gif', '.avif'], 10),
@@ -2330,6 +2385,12 @@ def _update_property(request, property):
     }
 
     for field, (exts, max_size) in file_fields.items():
+        if field in DIRECT_UPLOAD_FIELDS:
+            public_id = sanitize_input(request.POST.get(f"{field}_public_id", "")).strip()
+            if public_id:
+                setattr(property, field, public_id)
+                continue
+
         if request.FILES.get(field):
             valid, msg = validate_file_upload(request.FILES.get(field), exts, max_size)
             if valid:
@@ -2339,7 +2400,13 @@ def _update_property(request, property):
 
     property.save()
 
-    # New gallery images
+    # New gallery images uploaded directly to Cloudinary from the browser
+    for public_id in request.POST.getlist("gallery_public_ids"):
+        public_id = public_id.strip()
+        if public_id:
+            PropertyImage.objects.create(property=property, image=public_id)
+
+    # Legacy fallback: images sent as actual files through the server
     images = request.FILES.getlist("images")
     for img in images:
         valid, msg = validate_file_upload(img, ['.jpg', '.jpeg', '.png', '.gif', '.avif'])

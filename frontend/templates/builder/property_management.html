@@ -273,6 +273,8 @@ class="w-full mt-3 mb-3 border p-2 rounded text-sm" rows="3"></textarea>
   onclick="document.getElementById('thumbnailInput').click()"
 >
   <input type="file" name="thumbnail" id="thumbnailInput" class="hidden" accept="image/*">
+  <input type="hidden" name="thumbnail_public_id" id="thumbnailPublicId">
+  <p id="thumbnailUploadStatus" class="text-xs text-blue-600 mt-1"></p>
   <div id="thumbnailPreview" class="hidden">
     <img id="thumbnailImg" class="mx-auto h-32 object-contain rounded mb-2" src="">
     <p id="thumbnailFileName" class="text-sm text-gray-600"></p>
@@ -305,6 +307,8 @@ class="w-full mt-3 mb-3 border p-2 rounded text-sm" rows="3"></textarea>
 </div>
 
 <div id="galleryPreviewContainer" class="grid grid-cols-3 gap-2 mb-3"></div>
+<div id="galleryPublicIdsContainer"></div>
+<p id="galleryUploadStatus" class="text-xs text-blue-600 mb-2"></p>
 
 <button type="button" onclick="clearGallery()"
 class="mb-3 px-3 py-1.5 bg-red-100 text-red-600 rounded text-sm font-medium hover:bg-red-200 transition">
@@ -412,6 +416,8 @@ class="w-full mb-3 border p-2 rounded text-sm">
   onclick="document.getElementById('logoInput').click()"
 >
   <input type="file" name="project_logo" id="logoInput" class="hidden" accept="image/*">
+  <input type="hidden" name="project_logo_public_id" id="logoPublicId">
+  <p id="logoUploadStatus" class="text-xs text-blue-600 mt-1"></p>
   <div id="logoPreview" class="hidden">
     <img id="logoImg" class="mx-auto h-16 object-contain rounded mb-1" src="">
     <p id="logoFileName" class="text-xs text-gray-600"></p>
@@ -433,6 +439,8 @@ class="w-full mb-3 border p-2 rounded text-sm">
   onclick="document.getElementById('videoInput').click()"
 >
   <input type="file" name="project_video" id="videoInput" class="hidden" accept="video/*">
+  <input type="hidden" name="project_video_public_id" id="videoPublicId">
+  <p id="videoUploadStatus" class="text-xs text-blue-600 mt-1"></p>
   <div id="videoPreview" class="hidden">
     <video id="videoEl" class="mx-auto h-24 rounded mb-1" controls></video>
     <p id="videoFileName" class="text-xs text-gray-600"></p>
@@ -1017,8 +1025,65 @@ bhk.style.display = "none";
 }
 }
 
+// ===================== CLOUDINARY DIRECT UPLOAD =====================
+let pendingUploads = 0;
+
+async function getCloudinarySignature(resourceType) {
+  const res = await fetch(`{% url 'cloudinary_signature' %}?resource_type=${resourceType}`);
+  if (!res.ok) throw new Error('Signature fetch failed');
+  return res.json();
+}
+
+function uploadToCloudinary(file, resourceType, onProgress) {
+  return getCloudinarySignature(resourceType).then(sig => {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('api_key', sig.api_key);
+    formData.append('timestamp', sig.timestamp);
+    formData.append('signature', sig.signature);
+    formData.append('folder', sig.folder);
+
+    return new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', `https://api.cloudinary.com/v1_1/${sig.cloud_name}/${resourceType}/upload`);
+      xhr.upload.onprogress = function (e) {
+        if (e.lengthComputable && onProgress) onProgress(Math.round((e.loaded / e.total) * 100));
+      };
+      xhr.onload = function () {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          resolve(JSON.parse(xhr.responseText).public_id);
+        } else {
+          reject(new Error('Cloudinary upload failed: ' + xhr.status));
+        }
+      };
+      xhr.onerror = () => reject(new Error('Cloudinary upload network error'));
+      xhr.send(formData);
+    });
+  });
+}
+
+function startUpload(file, resourceType, publicIdInputId, statusId, clearInput) {
+  pendingUploads++;
+  const statusEl = document.getElementById(statusId);
+  if (statusEl) statusEl.textContent = 'Uploading... 0%';
+
+  uploadToCloudinary(file, resourceType, pct => {
+    if (statusEl) statusEl.textContent = `Uploading... ${pct}%`;
+  }).then(publicId => {
+    document.getElementById(publicIdInputId).value = publicId;
+    if (statusEl) statusEl.textContent = '✅ Uploaded';
+    if (clearInput) clearInput.value = '';
+  }).catch(err => {
+    console.error(err);
+    if (statusEl) statusEl.textContent = '❌ Upload failed, try again';
+    alert('Upload failed for ' + file.name + '. Please try again.');
+  }).finally(() => {
+    pendingUploads--;
+  });
+}
+
 // ===================== DRAG & DROP HANDLER =====================
-function setupDropzone(dropzoneId, inputId, previewId, placeholderId, imgId, fileNameId, isVideo = false, isPdf = false) {
+function setupDropzone(dropzoneId, inputId, previewId, placeholderId, imgId, fileNameId, isVideo = false, isPdf = false, resourceType = null, publicIdInputId = null, statusId = null) {
   const dropzone = document.getElementById(dropzoneId);
   const input = document.getElementById(inputId);
   const preview = document.getElementById(previewId);
@@ -1102,49 +1167,75 @@ function setupDropzone(dropzoneId, inputId, previewId, placeholderId, imgId, fil
       };
       document.getElementById(fileNameId).textContent = file.name;
     }
+
+    // Direct-to-Cloudinary upload — file Render server se kabhi nahi guzarti
+    if (resourceType && publicIdInputId) {
+      startUpload(file, resourceType, publicIdInputId, statusId, input);
+    }
   }
 }
 
-// Gallery specific handler
+// Gallery specific handler — direct-to-Cloudinary
 let galleryFiles = [];
+let galleryUploadCounter = 0;
 
 function handleGalleryFiles(files) {
   const container = document.getElementById('galleryPreviewContainer');
-  const input = document.getElementById('galleryInput');
 
   Array.from(files).forEach(file => {
     if (!file.type.startsWith('image/')) return;
 
-    galleryFiles.push(file);
+    const localId = 'gal_' + (++galleryUploadCounter);
+    galleryFiles.push({ localId, file });
 
     const div = document.createElement('div');
     div.className = 'relative group';
+    div.id = localId;
     div.innerHTML = `
       <img src="${URL.createObjectURL(file)}" class="w-full h-20 object-cover rounded border">
-      <button type="button" onclick="removeGalleryImage(this, '${file.name}')" 
+      <span class="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-[10px] text-center py-0.5" data-role="progress">0%</span>
+      <button type="button" onclick="removeGalleryImage(this, '${localId}')" 
         class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs shadow hover:bg-red-600">
         ✕
       </button>
     `;
     container.appendChild(div);
-  });
 
-  // Update input with all files
-  const dataTransfer = new DataTransfer();
-  galleryFiles.forEach(f => dataTransfer.items.add(f));
-  input.files = dataTransfer.files;
+    pendingUploads++;
+    uploadToCloudinary(file, 'image', pct => {
+      const progressEl = div.querySelector('[data-role="progress"]');
+      if (progressEl) progressEl.textContent = pct + '%';
+    }).then(publicId => {
+      const progressEl = div.querySelector('[data-role="progress"]');
+      if (progressEl) progressEl.textContent = '✅';
+
+      const hidden = document.createElement('input');
+      hidden.type = 'hidden';
+      hidden.name = 'gallery_public_ids';
+      hidden.id = localId + '_input';
+      hidden.value = publicId;
+      document.getElementById('galleryPublicIdsContainer').appendChild(hidden);
+    }).catch(err => {
+      console.error(err);
+      const progressEl = div.querySelector('[data-role="progress"]');
+      if (progressEl) progressEl.textContent = '❌';
+      alert('Gallery image upload failed: ' + file.name);
+    }).finally(() => {
+      pendingUploads--;
+    });
+  });
 
   document.getElementById('galleryPlaceholder').classList.add('hidden');
 }
 
-function removeGalleryImage(btn, fileName) {
-  btn.parentElement.remove();
-  galleryFiles = galleryFiles.filter(f => f.name !== fileName);
+function removeGalleryImage(btn, localId) {
+  const div = document.getElementById(localId);
+  if (div) div.remove();
 
-  const input = document.getElementById('galleryInput');
-  const dataTransfer = new DataTransfer();
-  galleryFiles.forEach(f => dataTransfer.items.add(f));
-  input.files = dataTransfer.files;
+  const hiddenInput = document.getElementById(localId + '_input');
+  if (hiddenInput) hiddenInput.remove();
+
+  galleryFiles = galleryFiles.filter(f => f.localId !== localId);
 
   if (galleryFiles.length === 0) {
     document.getElementById('galleryPlaceholder').classList.remove('hidden');
@@ -1154,6 +1245,7 @@ function removeGalleryImage(btn, fileName) {
 function clearGallery() {
   galleryFiles = [];
   document.getElementById('galleryPreviewContainer').innerHTML = '';
+  document.getElementById('galleryPublicIdsContainer').innerHTML = '';
   document.getElementById('galleryPlaceholder').classList.remove('hidden');
   const input = document.getElementById('galleryInput');
   input.value = '';
@@ -1161,19 +1253,19 @@ function clearGallery() {
 
 // Initialize all dropzones
 document.addEventListener('DOMContentLoaded', function() {
-  // Thumbnail
-  setupDropzone('thumbnailDropzone', 'thumbnailInput', 'thumbnailPreview', 'thumbnailPlaceholder', 'thumbnailImg', 'thumbnailFileName');
+  // Thumbnail — direct-to-Cloudinary
+  setupDropzone('thumbnailDropzone', 'thumbnailInput', 'thumbnailPreview', 'thumbnailPlaceholder', 'thumbnailImg', 'thumbnailFileName', false, false, 'image', 'thumbnailPublicId', 'thumbnailUploadStatus');
 
-  // Gallery
+  // Gallery (handleGalleryFiles ke andar hi handle hota hai)
   setupDropzone('galleryDropzone', 'galleryInput', 'galleryPreviewContainer', 'galleryPlaceholder', null, null);
 
-  // Project Logo
-  setupDropzone('logoDropzone', 'logoInput', 'logoPreview', 'logoPlaceholder', 'logoImg', 'logoFileName');
+  // Project Logo — direct-to-Cloudinary
+  setupDropzone('logoDropzone', 'logoInput', 'logoPreview', 'logoPlaceholder', 'logoImg', 'logoFileName', false, false, 'image', 'logoPublicId', 'logoUploadStatus');
 
-  // Project Video
-  setupDropzone('videoDropzone', 'videoInput', 'videoPreview', 'videoPlaceholder', 'videoEl', 'videoFileName', true);
+  // Project Video — direct-to-Cloudinary
+  setupDropzone('videoDropzone', 'videoInput', 'videoPreview', 'videoPlaceholder', 'videoEl', 'videoFileName', true, false, 'video', 'videoPublicId', 'videoUploadStatus');
 
-  // Brochure PDF
+  // Brochure PDF — chhoti file hai, purane path pe hi rehne do
   setupDropzone('brochureDropzone', 'brochureInput', 'brochurePreview', 'brochurePlaceholder', null, 'brochureFileName', false, true);
 });
 // ===================== RERA NUMBER VERIFICATION =====================
@@ -1244,24 +1336,31 @@ document.getElementById('propertyForm').addEventListener('submit', function(e) {
 
   const form = e.target;
 
+  // Jab tak Cloudinary uploads chal rahe hain, save mat hone do
+  if (pendingUploads > 0) {
+    alert('Media abhi upload ho raha hai, thoda wait karke dobara try karein.');
+    isSubmitting = false;
+    return;
+  }
+
   // Agar RERA number bhara hua hai to verify hona zaroori hai
   const reraInput = document.getElementById('reraInput');
   const reraVerifiedInput = document.getElementById('reraVerifiedInput');
   if (reraInput.value.trim() && !reraVerifiedInput.value) {
     alert('Property add karne se pehle RERA Number verify karein (Verify RERA button dabayein).');
+    isSubmitting = false;
     return;
   }
 
   const formData = new FormData(form);
-  
-  // Remove empty 'images' from formData (since input.files is read-only)
+
+  // Ye sab ab direct Cloudinary pe upload ho chuke hain (public_id hidden fields mein hai),
+  // isliye asli bhaari files ko Django/Render ki taraf bhejne ki zaroorat nahi:
   formData.delete('images');
-  
-  // Add gallery files properly
-  galleryFiles.forEach(file => {
-    formData.append('images', file);
-  });
-  
+  formData.delete('thumbnail');
+  formData.delete('project_logo');
+  formData.delete('project_video');
+
   // Submit via fetch
   fetch(form.action, {
     method: 'POST',
@@ -1308,15 +1407,25 @@ function closeSaveConfirmModal() {
 
 function proceedSaveProperty() {
     if (isSubmitting) return;
+
+    // Jab tak Cloudinary uploads chal rahe hain, save mat karne do
+    if (pendingUploads > 0) {
+        alert('Media abhi upload ho raha hai, thoda wait karein.');
+        return;
+    }
+
     isSubmitting = true;
 
     // Confirmation step ko hide karke processing step dikhao
     document.getElementById('saveConfirmStep').classList.add('hidden');
     document.getElementById('saveProcessingStep').classList.remove('hidden');
 
-    // Form ko actual submit karo (form.submit() onsubmit event trigger nahi karta,
-    // isliye double-guard collision nahi hoga)
-    document.getElementById('propertyForm').submit();
+    // IMPORTANT: form.submit() ki jagah requestSubmit() use karo. form.submit() 'submit'
+    // event ko trigger NAHI karta — isi wajah se upar wala fetch-based AJAX handler
+    // (jo bhaari files ko formData se hata ke sirf public_id bhejta hai) skip ho jaata tha,
+    // aur asli bhaari file seedhi purane multipart path se Django/Render ko chali jaati thi
+    // (yani crash fix effectively bypass ho raha tha). requestSubmit() se wahi listener chalega.
+    document.getElementById('propertyForm').requestSubmit();
 }
 </script>
 

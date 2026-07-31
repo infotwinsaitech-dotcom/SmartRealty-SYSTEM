@@ -40,6 +40,7 @@ urlpatterns = [
     path("my-inquiries/", views.my_inquiries, name="my_inquiries"),
 
     path("add-property/", views.add_property, name="add_property"),
+    path("cloudinary-signature/", views.cloudinary_signature, name="cloudinary_signature"),
     path("verify-rera/", views.verify_rera, name="verify_rera"),
 
     path("privacy/", views.privacy, name="privacy"),

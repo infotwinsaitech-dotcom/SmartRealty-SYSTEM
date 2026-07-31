@@ -108,7 +108,7 @@ class Property(models.Model):
     )
 
     thumbnail = CloudinaryField('image', blank=True, null=True)
-    video = models.FileField(upload_to='videos/', blank=True, null=True)
+    video = CloudinaryField('video', resource_type='video', blank=True, null=True, max_length=255)
     # Property class ke andar add karo:
     latitude = models.DecimalField(max_digits=10, decimal_places=8, null=True, blank=True)
     longitude = models.DecimalField(max_digits=11, decimal_places=8, null=True, blank=True)
@@ -136,7 +136,7 @@ class Property(models.Model):
     max_price = models.CharField(max_length=50, blank=True, null=True)
 
     project_logo = CloudinaryField('image', blank=True, null=True)
-    project_video = models.FileField(upload_to='project_videos/', blank=True, null=True)
+    project_video = CloudinaryField('video', resource_type='video', blank=True, null=True, max_length=255)
     project_video_url = models.URLField(
         max_length=500, blank=True, null=True,
         help_text="YouTube (ya kisi bhi) video ka link - file upload ki jagah use kar sakte ho, especially bade/detailed videos ke liye"
