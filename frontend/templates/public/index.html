@@ -1,9 +1,9 @@
 {% extends "public/base.html" %}
 {% load static cloudinary custom_filters %}
-{% block title %}RealShree Ahmedabad – RERA-Verified Flats, Plots &amp; Commercial Property{% endblock %}
-{% block meta_description %}Looking for property in Ahmedabad? RealShree offers RERA-verified flats, villas, commercial spaces &amp; plots with zero brokerage. Search by locality, book a free site visit today.{% endblock %}
-{% block og_title %}RealShree – Ahmedabad's Most Trusted Real Estate Platform{% endblock %}
-{% block og_description %}RERA-verified residential, commercial &amp; land properties across Ahmedabad. Zero brokerage, verified owners, expert local guidance.{% endblock %}
+{% block title %}Property in Ahmedabad – Verified Flats, Homes &amp; Commercial Spaces | RealShree{% endblock %}
+{% block meta_description %}Looking for property in Ahmedabad? Browse RERA-verified flats, homes, plots and commercial spaces across the city — zero brokerage, listed direct by owners and builders. Book a free site visit today.{% endblock %}
+{% block og_title %}RealShree – Verified Flats &amp; Homes in Ahmedabad, Zero Brokerage{% endblock %}
+{% block og_description %}RERA-verified flats, homes, plots and commercial property across Ahmedabad. Zero brokerage, verified owners, local expertise you can actually call.{% endblock %}
 
 {% block content %}
 
@@ -34,10 +34,10 @@
             RERA Verified &bull; Zero Brokerage
         </span>
         <h1 class="hero-title">
-            Where Trust Meets <span style="color: #d4af37;">Your Dream Home</span>
+            Buy Property in Ahmedabad &mdash; <span style="color: #d4af37;">Zero Brokerage, 100% RERA-Verified</span>
         </h1>
         <p class="hero-subtitle">
-            Discover verified residential, commercial &amp; land properties across Ahmedabad &mdash; curated for buyers who value transparency.
+            Verified flats, homes, commercial spaces and land across Ahmedabad &mdash; listed direct by owners and builders, curated for buyers who value transparency.
         </p>
 
         <!-- Search Bar -->
@@ -331,8 +331,23 @@
                 <span style="color: var(--color-gold); font-weight:700; font-size:0.8rem; display:inline-flex; align-items:center; gap:4px;">View Properties <span class="material-icons-round" style="font-size:15px">arrow_forward</span></span>
             </a>
             <a href="{% url 'property_list' %}?location=Gota" class="card reveal" style="padding: var(--space-lg); text-decoration:none; color:inherit; display:block;">
-                <h3 style="font-size:1.05rem; margin-bottom:6px; color: var(--color-navy);">Gota &amp; Chandkheda</h3>
-                <p style="margin:0 0 10px; font-size:0.88rem;">On the northern edge of the city, these areas are pulling in first-time buyers with friendlier pricing and a fast-growing stock of new-launch apartments to choose from.</p>
+                <h3 style="font-size:1.05rem; margin-bottom:6px; color: var(--color-navy);">Gota</h3>
+                <p style="margin:0 0 10px; font-size:0.88rem;">A newer high-rise belt off the SG Highway extension that has grown fast over the last five or six years &mdash; mostly 2 &amp; 3 BHK towers aimed at young couples and IT-sector families who want more space without old-city prices.</p>
+                <span style="color: var(--color-gold); font-weight:700; font-size:0.8rem; display:inline-flex; align-items:center; gap:4px;">View Properties <span class="material-icons-round" style="font-size:15px">arrow_forward</span></span>
+            </a>
+            <a href="{% url 'property_list' %}?location=Chandkheda" class="card reveal" style="padding: var(--space-lg); text-decoration:none; color:inherit; display:block;">
+                <h3 style="font-size:1.05rem; margin-bottom:6px; color: var(--color-navy);">Chandkheda</h3>
+                <p style="margin:0 0 10px; font-size:0.88rem;">Sitting right along the Ahmedabad Metro's red line, Chandkheda has become a genuine metro-linked suburb &mdash; not something every outer locality here can claim &mdash; which is a big reason demand has stayed steady even as some other fringe areas slowed down.</p>
+                <span style="color: var(--color-gold); font-weight:700; font-size:0.8rem; display:inline-flex; align-items:center; gap:4px;">View Properties <span class="material-icons-round" style="font-size:15px">arrow_forward</span></span>
+            </a>
+            <a href="{% url 'property_list' %}?location=Navrangpura" class="card reveal" style="padding: var(--space-lg); text-decoration:none; color:inherit; display:block;">
+                <h3 style="font-size:1.05rem; margin-bottom:6px; color: var(--color-navy);">Naranpura &amp; Navrangpura</h3>
+                <p style="margin:0 0 10px; font-size:0.88rem;">Old, leafy, and close to everything &mdash; Ellis Bridge, CG Road, the university area. This is where a lot of people who grew up in Ahmedabad want to stay put. Very little new construction happens here, so resale flats tend to move fast.</p>
+                <span style="color: var(--color-gold); font-weight:700; font-size:0.8rem; display:inline-flex; align-items:center; gap:4px;">View Properties <span class="material-icons-round" style="font-size:15px">arrow_forward</span></span>
+            </a>
+            <a href="{% url 'property_list' %}?location=Maninagar" class="card reveal" style="padding: var(--space-lg); text-decoration:none; color:inherit; display:block;">
+                <h3 style="font-size:1.05rem; margin-bottom:6px; color: var(--color-navy);">Maninagar</h3>
+                <p style="margin:0 0 10px; font-size:0.88rem;">One of the city's oldest, most self-sufficient neighbourhoods on the eastern side of the river &mdash; its own market, hospitals, schools and the railway station, all within walking distance. Prices are gentler than the west side, which keeps pulling in budget-conscious families.</p>
                 <span style="color: var(--color-gold); font-weight:700; font-size:0.8rem; display:inline-flex; align-items:center; gap:4px;">View Properties <span class="material-icons-round" style="font-size:15px">arrow_forward</span></span>
             </a>
         </div>
@@ -353,12 +368,13 @@
         </div>
         <div style="max-width: 780px; margin: 0 auto var(--space-xl);">
             <p style="margin-bottom: var(--space-md);">
-                Ahmedabad has quietly become one of the more sensible real estate markets in the
-                country. It doesn't move on hype the way some metros do — most of the buying here
-                is still by people who plan to actually live in the flat, not just flip it. That's
-                partly why prices have grown steadily rather than in sudden spikes, and why belts
-                like SG Highway, Bopal, South Bopal, Shela and Vaishnodevi keep adding new launches
-                every few months without the market feeling oversupplied.
+                Short answer, if you're just starting to look at property in Ahmedabad: it's one of
+                the more sensible real estate markets in the country right now. It doesn't move on
+                hype the way some metros do — most people buying flats in Ahmedabad are still doing
+                it to actually live in the home, not to flip it in a year. That's partly why prices
+                here have grown steadily rather than in sudden spikes, and why belts like SG Highway,
+                Bopal, South Bopal, Shela and Vaishnodevi keep adding new launches every few months
+                without the market ever feeling oversupplied.
             </p>
             <h3 style="font-size:1.05rem; margin: var(--space-lg) 0 8px;">A city that's growing outward, not just upward</h3>
             <p style="margin-bottom: var(--space-md);">
@@ -386,11 +402,30 @@
                 brochure promise that falls apart at the sale deed stage.
             </p>
             <h3 style="font-size:1.05rem; margin: var(--space-lg) 0 8px;">Zero brokerage, in practice</h3>
-            <p style="margin:0;">
+            <p style="margin-bottom: var(--space-md);">
                 On a typical Ahmedabad flat, brokerage alone can run into a few lakh rupees — money
                 that's better spent on your interiors or your loan down payment. RealShree connects
                 you straight to the owner or builder, so that entire cost simply doesn't apply,
                 whether you're buying a resale flat, a new-launch apartment, a shop, or a plot.
+            </p>
+            <h3 style="font-size:1.05rem; margin: var(--space-lg) 0 8px;">The east-west price gap, and why it's narrowing</h3>
+            <p style="margin-bottom: var(--space-md);">
+                Ask any old-timer and they'll tell you Ahmedabad has always had an east side and a
+                west side, with the Sabarmati sitting in between. The west &mdash; Satellite,
+                Vastrapur, SG Highway, Bopal &mdash; has commanded a premium for two decades, mostly
+                because that's where the newer malls, offices and schools showed up first. The east,
+                around the old city and areas like Maninagar, was seen as the "affordable" side. That
+                gap is narrowing now that the riverfront redevelopment and better road connectivity
+                have made the east side a lot more liveable than it used to be, and we're seeing that
+                show up as renewed buyer interest in resale flats there.
+            </p>
+            <h3 style="font-size:1.05rem; margin: var(--space-lg) 0 8px;">What buyers actually ask for</h3>
+            <p style="margin:0;">
+                Two things come up in almost every conversation our team has with a buyer here: Vastu
+                compliance, and an east or north-facing main door. It sounds like a small detail from
+                the outside, but it genuinely narrows down which flats a family will even consider —
+                which is why it's one of the filters built into every RealShree listing, so you're
+                not spending a Sunday on a site visit for something that gets rejected over this alone.
             </p>
         </div>
 
@@ -466,6 +501,18 @@
             <div class="card reveal" style="padding: var(--space-lg);">
                 <h3 style="font-size:1.05rem; margin-bottom:6px;">How does RealShree verify a listing before publishing it?</h3>
                 <p style="margin:0; font-size:0.9rem;">Our team checks RERA registration, ownership documents and, where possible, visits the site in person before a property is allowed on the platform — the same diligence a careful buyer would want done for them.</p>
+            </div>
+            <div class="card reveal" style="padding: var(--space-lg);">
+                <h3 style="font-size:1.05rem; margin-bottom:6px;">Can I filter properties by Vastu compliance on RealShree?</h3>
+                <p style="margin:0; font-size:0.9rem;">Yes — since it matters to a lot of our buyers, Vastu-compliant layout and main door direction are both filters available on the property search page, alongside the usual budget and BHK filters.</p>
+            </div>
+            <div class="card reveal" style="padding: var(--space-lg);">
+                <h3 style="font-size:1.05rem; margin-bottom:6px;">What are the stamp duty and registration charges in Ahmedabad?</h3>
+                <p style="margin:0; font-size:0.9rem;">Gujarat's stamp duty and registration charges apply on the sale deed value and vary depending on the buyer's category, with some concessions available for women buyers. Your RealShree advisor will confirm the exact rate that applies to your deal before you sign anything.</p>
+            </div>
+            <div class="card reveal" style="padding: var(--space-lg);">
+                <h3 style="font-size:1.05rem; margin-bottom:6px;">Does RealShree help arrange home loans and legal paperwork?</h3>
+                <p style="margin:0; font-size:0.9rem;">Our team can point you to lenders who are already comfortable financing a particular project and help you through the sale agreement and registration steps — though the final loan sanction and legal sign-off always rest with the bank and your own lawyer.</p>
             </div>
         </div>
     </div>
@@ -972,6 +1019,30 @@ function heroAdGo(direction) {
       "acceptedAnswer": {
         "@type": "Answer",
         "text": "RealShree's team checks RERA registration, ownership documents and, where possible, visits the site in person before a property is allowed on the platform, matching the diligence a careful buyer would want done for them."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I filter properties by Vastu compliance on RealShree?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes, Vastu-compliant layout and main door direction are both available as filters on the RealShree property search page, alongside budget and BHK filters."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What are the stamp duty and registration charges in Ahmedabad?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Gujarat's stamp duty and registration charges apply on the sale deed value and vary by buyer category, with concessions available for women buyers in some cases. A RealShree advisor confirms the exact applicable rate before the deal is signed."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Does RealShree help arrange home loans and legal paperwork?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "RealShree can connect buyers with lenders already comfortable financing a specific project and guide them through the sale agreement and registration process, though final loan approval and legal review rest with the bank and the buyer's lawyer."
       }
     }
   ]
