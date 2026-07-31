@@ -1053,7 +1053,11 @@ function uploadToCloudinary(file, resourceType, onProgress) {
         if (xhr.status >= 200 && xhr.status < 300) {
           resolve(JSON.parse(xhr.responseText).public_id);
         } else {
-          reject(new Error('Cloudinary upload failed: ' + xhr.status));
+          let reason = xhr.status;
+          try {
+            reason = JSON.parse(xhr.responseText).error?.message || xhr.status;
+          } catch (e) {}
+          reject(new Error(reason));
         }
       };
       xhr.onerror = () => reject(new Error('Cloudinary upload network error'));
@@ -1075,8 +1079,8 @@ function startUpload(file, resourceType, publicIdInputId, statusId, clearInput) 
     if (clearInput) clearInput.value = '';
   }).catch(err => {
     console.error(err);
-    if (statusEl) statusEl.textContent = '❌ Upload failed, try again';
-    alert('Upload failed for ' + file.name + '. Please try again.');
+    if (statusEl) statusEl.textContent = '❌ ' + err.message;
+    alert('Upload failed for ' + file.name + ':\n' + err.message);
   }).finally(() => {
     pendingUploads--;
   });
