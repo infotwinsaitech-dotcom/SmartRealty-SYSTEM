@@ -271,9 +271,78 @@
 </section>
 
 <!-- ============================================
-   LOCAL AUTHORITY / AEO CONTENT — Ahmedabad focus
+   POPULAR LOCALITIES — long-tail locality SEO
    ============================================ -->
 <section class="section-pad" style="background: var(--color-bg-tint);">
+    <div class="container-app">
+        <div class="section-header">
+            <span class="label">
+                <span class="material-icons-round" style="font-size:16px">map</span>
+                Explore By Locality
+            </span>
+            <h2>Popular Areas to Buy Property in Ahmedabad</h2>
+            <p>A locality-by-locality look at where Ahmedabad buyers are actually putting their money right now.</p>
+            <div class="gold-line"></div>
+        </div>
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: var(--space-lg);">
+            <a href="{% url 'property_list' %}?location=SG Highway" class="card reveal" style="padding: var(--space-lg); text-decoration:none; color:inherit; display:block;">
+                <h3 style="font-size:1.05rem; margin-bottom:6px; color: var(--color-navy);">SG Highway</h3>
+                <p style="margin:0 0 10px; font-size:0.88rem;">Ahmedabad's busiest commercial-cum-residential stretch, lined with malls, office parks and high-rise towers. A natural fit for professionals who want work, shopping and dining within a short drive.</p>
+                <span style="color: var(--color-gold); font-weight:700; font-size:0.8rem; display:inline-flex; align-items:center; gap:4px;">View Properties <span class="material-icons-round" style="font-size:15px">arrow_forward</span></span>
+            </a>
+            <a href="{% url 'property_list' %}?location=Bopal" class="card reveal" style="padding: var(--space-lg); text-decoration:none; color:inherit; display:block;">
+                <h3 style="font-size:1.05rem; margin-bottom:6px; color: var(--color-navy);">Bopal</h3>
+                <p style="margin:0 0 10px; font-size:0.88rem;">A well-settled suburb that families like for its schools, temples and mid-range apartment projects. Prices sit comfortably below SG Highway while connectivity keeps getting better.</p>
+                <span style="color: var(--color-gold); font-weight:700; font-size:0.8rem; display:inline-flex; align-items:center; gap:4px;">View Properties <span class="material-icons-round" style="font-size:15px">arrow_forward</span></span>
+            </a>
+            <a href="{% url 'property_list' %}?location=South Bopal" class="card reveal" style="padding: var(--space-lg); text-decoration:none; color:inherit; display:block;">
+                <h3 style="font-size:1.05rem; margin-bottom:6px; color: var(--color-navy);">South Bopal</h3>
+                <p style="margin:0 0 10px; font-size:0.88rem;">The newer, greener extension of Bopal — mostly gated societies and modern 2 &amp; 3 BHK projects. A favourite with young families looking for more open space than the older city offers.</p>
+                <span style="color: var(--color-gold); font-weight:700; font-size:0.8rem; display:inline-flex; align-items:center; gap:4px;">View Properties <span class="material-icons-round" style="font-size:15px">arrow_forward</span></span>
+            </a>
+            <a href="{% url 'property_list' %}?location=Shela" class="card reveal" style="padding: var(--space-lg); text-decoration:none; color:inherit; display:block;">
+                <h3 style="font-size:1.05rem; margin-bottom:6px; color: var(--color-navy);">Shela</h3>
+                <p style="margin:0 0 10px; font-size:0.88rem;">Once a quiet village on the outskirts, now one of the fastest-growing residential belts near South Bopal, with larger plots, row houses and villas at rates still well below the city core.</p>
+                <span style="color: var(--color-gold); font-weight:700; font-size:0.8rem; display:inline-flex; align-items:center; gap:4px;">View Properties <span class="material-icons-round" style="font-size:15px">arrow_forward</span></span>
+            </a>
+            <a href="{% url 'property_list' %}?location=Vaishnodevi" class="card reveal" style="padding: var(--space-lg); text-decoration:none; color:inherit; display:block;">
+                <h3 style="font-size:1.05rem; margin-bottom:6px; color: var(--color-navy);">Vaishnodevi Circle</h3>
+                <p style="margin:0 0 10px; font-size:0.88rem;">Sitting on the SG Highway extension, this belt is drawing first-time buyers and investors for its upcoming infrastructure and land and apartment rates that are still relatively easy on the pocket.</p>
+                <span style="color: var(--color-gold); font-weight:700; font-size:0.8rem; display:inline-flex; align-items:center; gap:4px;">View Properties <span class="material-icons-round" style="font-size:15px">arrow_forward</span></span>
+            </a>
+            <a href="{% url 'property_list' %}?location=Satellite" class="card reveal" style="padding: var(--space-lg); text-decoration:none; color:inherit; display:block;">
+                <h3 style="font-size:1.05rem; margin-bottom:6px; color: var(--color-navy);">Satellite</h3>
+                <p style="margin:0 0 10px; font-size:0.88rem;">One of the city's most established addresses — wide roads, reputed schools and a mature social scene already in place. Ideal if you'd rather not wait for an area to "develop."</p>
+                <span style="color: var(--color-gold); font-weight:700; font-size:0.8rem; display:inline-flex; align-items:center; gap:4px;">View Properties <span class="material-icons-round" style="font-size:15px">arrow_forward</span></span>
+            </a>
+            <a href="{% url 'property_list' %}?location=Vastrapur" class="card reveal" style="padding: var(--space-lg); text-decoration:none; color:inherit; display:block;">
+                <h3 style="font-size:1.05rem; margin-bottom:6px; color: var(--color-navy);">Vastrapur</h3>
+                <p style="margin:0 0 10px; font-size:0.88rem;">Centrally located around the lake, with parks and some of Ahmedabad's most respected schools close by — a dependable pick for families who don't want to compromise on location.</p>
+                <span style="color: var(--color-gold); font-weight:700; font-size:0.8rem; display:inline-flex; align-items:center; gap:4px;">View Properties <span class="material-icons-round" style="font-size:15px">arrow_forward</span></span>
+            </a>
+            <a href="{% url 'property_list' %}?location=Prahladnagar" class="card reveal" style="padding: var(--space-lg); text-decoration:none; color:inherit; display:block;">
+                <h3 style="font-size:1.05rem; margin-bottom:6px; color: var(--color-navy);">Prahladnagar</h3>
+                <p style="margin:0 0 10px; font-size:0.88rem;">A mix of corporate offices, upscale apartments and a genuinely lively food street — popular with working professionals who value a short commute over a large garden.</p>
+                <span style="color: var(--color-gold); font-weight:700; font-size:0.8rem; display:inline-flex; align-items:center; gap:4px;">View Properties <span class="material-icons-round" style="font-size:15px">arrow_forward</span></span>
+            </a>
+            <a href="{% url 'property_list' %}?location=Thaltej" class="card reveal" style="padding: var(--space-lg); text-decoration:none; color:inherit; display:block;">
+                <h3 style="font-size:1.05rem; margin-bottom:6px; color: var(--color-navy);">Thaltej</h3>
+                <p style="margin:0 0 10px; font-size:0.88rem;">Bordering SG Highway, Thaltej blends residential calm with quick access to the city's business districts — a steady, low-drama choice for end-users rather than speculators.</p>
+                <span style="color: var(--color-gold); font-weight:700; font-size:0.8rem; display:inline-flex; align-items:center; gap:4px;">View Properties <span class="material-icons-round" style="font-size:15px">arrow_forward</span></span>
+            </a>
+            <a href="{% url 'property_list' %}?location=Gota" class="card reveal" style="padding: var(--space-lg); text-decoration:none; color:inherit; display:block;">
+                <h3 style="font-size:1.05rem; margin-bottom:6px; color: var(--color-navy);">Gota &amp; Chandkheda</h3>
+                <p style="margin:0 0 10px; font-size:0.88rem;">On the northern edge of the city, these areas are pulling in first-time buyers with friendlier pricing and a fast-growing stock of new-launch apartments to choose from.</p>
+                <span style="color: var(--color-gold); font-weight:700; font-size:0.8rem; display:inline-flex; align-items:center; gap:4px;">View Properties <span class="material-icons-round" style="font-size:15px">arrow_forward</span></span>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================
+   LOCAL AUTHORITY / AEO CONTENT — Ahmedabad focus
+   ============================================ -->
+<section class="section-pad" style="background: var(--color-bg);">
     <div class="container-app">
         <div class="section-header">
             <span class="label">
@@ -282,13 +351,89 @@
             </span>
             <h2>Why Buy Property in Ahmedabad With RealShree?</h2>
         </div>
-        <p style="max-width: 760px; margin: 0 auto var(--space-lg); text-align:center;">
-            Ahmedabad is one of India's fastest-growing real estate markets — from SG Highway and
-            Bopal to Vaishnodevi and South Bopal, new residential and commercial projects are
-            launching every month. RealShree helps you cut through the noise with RERA-verified
-            listings, transparent pricing and zero brokerage, so you deal directly with genuine
-            owners and builders instead of chasing unreliable ads.
-        </p>
+        <div style="max-width: 780px; margin: 0 auto var(--space-xl);">
+            <p style="margin-bottom: var(--space-md);">
+                Ahmedabad has quietly become one of the more sensible real estate markets in the
+                country. It doesn't move on hype the way some metros do — most of the buying here
+                is still by people who plan to actually live in the flat, not just flip it. That's
+                partly why prices have grown steadily rather than in sudden spikes, and why belts
+                like SG Highway, Bopal, South Bopal, Shela and Vaishnodevi keep adding new launches
+                every few months without the market feeling oversupplied.
+            </p>
+            <h3 style="font-size:1.05rem; margin: var(--space-lg) 0 8px;">A city that's growing outward, not just upward</h3>
+            <p style="margin-bottom: var(--space-md);">
+                A lot of the current demand is being pulled by better roads and the metro network
+                reaching further out, plus the steady pull of GIFT City just across the Sabarmati in
+                Gandhinagar, which has brought a fresh wave of working professionals looking for
+                homes within commuting distance. That's pushed development toward the western and
+                northern edges of the city — areas that were considered "far" a decade ago are now
+                where a lot of the new construction is actually happening.
+            </p>
+            <h3 style="font-size:1.05rem; margin: var(--space-lg) 0 8px;">Still more affordable than most metros</h3>
+            <p style="margin-bottom: var(--space-md);">
+                Compared to Mumbai, Bangalore or even Pune, per-square-foot rates in Ahmedabad remain
+                noticeably lower, which is a big reason NRIs and buyers from other states keep an eye
+                on this market. You can pick up a comfortable 3 BHK in a well-located society here
+                for what would barely cover a 1 BHK in some other cities — and that gap is exactly
+                why a lot of long-term investors are looking at Ahmedabad now rather than later.
+            </p>
+            <h3 style="font-size:1.05rem; margin: var(--space-lg) 0 8px;">Why the paperwork matters as much as the flat</h3>
+            <p style="margin-bottom: var(--space-md);">
+                Ahmedabad has its share of projects stuck in limbo over unclear titles or missing
+                RERA registration, and that's the risk we built RealShree around avoiding. Every
+                listing on our platform is checked for RERA registration and ownership documentation
+                before it ever goes live, so what you see is what you can actually buy — not a
+                brochure promise that falls apart at the sale deed stage.
+            </p>
+            <h3 style="font-size:1.05rem; margin: var(--space-lg) 0 8px;">Zero brokerage, in practice</h3>
+            <p style="margin:0;">
+                On a typical Ahmedabad flat, brokerage alone can run into a few lakh rupees — money
+                that's better spent on your interiors or your loan down payment. RealShree connects
+                you straight to the owner or builder, so that entire cost simply doesn't apply,
+                whether you're buying a resale flat, a new-launch apartment, a shop, or a plot.
+            </p>
+        </div>
+
+        <div class="gold-line" style="margin: 0 auto var(--space-xl);"></div>
+
+        <h3 style="text-align:center; font-size:1.2rem; margin-bottom: var(--space-lg);">How Buying a Home in Ahmedabad Actually Works</h3>
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: var(--space-lg); margin-bottom: var(--space-2xl);">
+            <div class="card reveal" style="padding: var(--space-lg);">
+                <h3 style="font-size:1rem; margin-bottom:6px;">1. Fix your budget and loan eligibility first</h3>
+                <p style="margin:0; font-size:0.88rem;">Talk to your bank or a home loan advisor before you fall in love with a flat. Knowing your eligible loan amount and monthly EMI upfront saves you from shortlisting properties you can't actually close on.</p>
+            </div>
+            <div class="card reveal" style="padding: var(--space-lg);">
+                <h3 style="font-size:1rem; margin-bottom:6px;">2. Shortlist localities that fit your life, not just your budget</h3>
+                <p style="margin:0; font-size:0.88rem;">Think about your daily commute, your kids' school, and how far you're willing to travel for groceries at 9 pm. The "best" locality in Ahmedabad is different for every buyer.</p>
+            </div>
+            <div class="card reveal" style="padding: var(--space-lg);">
+                <h3 style="font-size:1rem; margin-bottom:6px;">3. Verify RERA registration and title before you get attached</h3>
+                <p style="margin:0; font-size:0.88rem;">Check the project's RERA number, the seller's ownership documents, and whether there's any loan or dispute against the property. On RealShree, this check is already done for you.</p>
+            </div>
+            <div class="card reveal" style="padding: var(--space-lg);">
+                <h3 style="font-size:1rem; margin-bottom:6px;">4. Visit the site, not just the brochure</h3>
+                <p style="margin:0; font-size:0.88rem;">Photos and renders always look better than reality. Visit at different times of day if you can, check water pressure, parking, and how far construction actually is from what's promised.</p>
+            </div>
+            <div class="card reveal" style="padding: var(--space-lg);">
+                <h3 style="font-size:1rem; margin-bottom:6px;">5. Negotiate, then sign the agreement to sell</h3>
+                <p style="margin:0; font-size:0.88rem;">Once the price is agreed, the agreement to sell lays out the terms, timeline and payment schedule. Read it carefully — this is the document that protects you if something goes wrong later.</p>
+            </div>
+            <div class="card reveal" style="padding: var(--space-lg);">
+                <h3 style="font-size:1rem; margin-bottom:6px;">6. Register the sale deed and take possession</h3>
+                <p style="margin:0; font-size:0.88rem;">Stamp duty and registration charges apply as per current Gujarat government rates — your RealShree advisor can walk you through the exact numbers for your deal. Once registered, the property is legally yours.</p>
+            </div>
+        </div>
+
+        <div style="max-width: 780px; margin: 0 auto var(--space-lg); text-align:center;">
+            <p>
+                None of this needs to be complicated, and it definitely doesn't need a broker's
+                commission attached to it. RealShree exists because Ahmedabad's property buyers
+                deserve the same transparency that platforms like Housing.com, 99acres and
+                Magicbricks promise nationally — except delivered by people who actually know these
+                localities street by street, not just by pin code.
+            </p>
+        </div>
+
         <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: var(--space-lg);">
             <div class="card reveal" style="padding: var(--space-lg);">
                 <h3 style="font-size:1.05rem; margin-bottom:6px;">Which is the best area to invest in Ahmedabad right now?</h3>
@@ -301,6 +446,26 @@
             <div class="card reveal" style="padding: var(--space-lg);">
                 <h3 style="font-size:1.05rem; margin-bottom:6px;">Do you cover commercial and plot listings too?</h3>
                 <p style="margin:0; font-size:0.9rem;">RealShree currently lists residential, commercial and land/plot properties across Ahmedabad, with more Gujarat cities being added soon.</p>
+            </div>
+            <div class="card reveal" style="padding: var(--space-lg);">
+                <h3 style="font-size:1.05rem; margin-bottom:6px;">What documents should I check before booking a flat?</h3>
+                <p style="margin:0; font-size:0.9rem;">Look for the project's RERA certificate, the seller's title deed and property tax receipts, an encumbrance certificate, and (for under-construction projects) the approved building plan. RealShree verifies these before a listing goes live.</p>
+            </div>
+            <div class="card reveal" style="padding: var(--space-lg);">
+                <h3 style="font-size:1.05rem; margin-bottom:6px;">Can I get a home loan for a resale property?</h3>
+                <p style="margin:0; font-size:0.9rem;">Yes, most banks and housing finance companies lend against resale flats in Ahmedabad, provided the title is clear and the building has the right approvals. Our team can point you to lenders who are comfortable with a given project.</p>
+            </div>
+            <div class="card reveal" style="padding: var(--space-lg);">
+                <h3 style="font-size:1.05rem; margin-bottom:6px;">How is buying a plot different from buying a flat?</h3>
+                <p style="margin:0; font-size:0.9rem;">With land, you're checking the title chain, land-use zoning and NA (non-agricultural) permission rather than a builder's RERA registration. It's a different checklist, and it's one our team walks you through separately.</p>
+            </div>
+            <div class="card reveal" style="padding: var(--space-lg);">
+                <h3 style="font-size:1.05rem; margin-bottom:6px;">What is RERA and why does it matter here?</h3>
+                <p style="margin:0; font-size:0.9rem;">RERA (the Real Estate Regulation Act) requires builders to register projects, disclose timelines and honestly represent what's being sold. A RERA number doesn't guarantee a good deal, but its absence is a serious red flag.</p>
+            </div>
+            <div class="card reveal" style="padding: var(--space-lg);">
+                <h3 style="font-size:1.05rem; margin-bottom:6px;">How does RealShree verify a listing before publishing it?</h3>
+                <p style="margin:0; font-size:0.9rem;">Our team checks RERA registration, ownership documents and, where possible, visits the site in person before a property is allowed on the platform — the same diligence a careful buyer would want done for them.</p>
             </div>
         </div>
     </div>
@@ -767,6 +932,46 @@ function heroAdGo(direction) {
       "acceptedAnswer": {
         "@type": "Answer",
         "text": "No, RealShree operates on a zero-brokerage model, connecting buyers directly with verified owners and builders."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What documents should I check before booking a flat in Ahmedabad?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Look for the project's RERA certificate, the seller's title deed and property tax receipts, an encumbrance certificate, and, for under-construction projects, the approved building plan. RealShree verifies these before a listing goes live."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I get a home loan for a resale property in Ahmedabad?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes, most banks and housing finance companies lend against resale flats in Ahmedabad provided the title is clear and the building has the right approvals. RealShree can point buyers to lenders comfortable with a given project."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How is buying a plot different from buying a flat in Ahmedabad?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "With land, buyers need to check the title chain, land-use zoning and non-agricultural (NA) permission rather than a builder's RERA registration. It is a different checklist that RealShree's team walks buyers through separately."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is RERA and why does it matter for Ahmedabad buyers?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "RERA, the Real Estate Regulation Act, requires builders to register projects, disclose timelines and represent what is being sold honestly. A RERA number does not guarantee a good deal, but its absence is a serious red flag."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How does RealShree verify a listing before publishing it?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "RealShree's team checks RERA registration, ownership documents and, where possible, visits the site in person before a property is allowed on the platform, matching the diligence a careful buyer would want done for them."
       }
     }
   ]
