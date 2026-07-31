@@ -171,9 +171,13 @@ class Property(models.Model):
 
     def get_video_embed_url(self):
         """
-        Kisi bhi YouTube link format (watch?v=, youtu.be/, shorts/) ko
-        embed-ready URL mein convert karta hai, taaki property detail page
-        pe iframe se seedha play ho sake.
+        Kisi bhi YouTube link format (watch?v=, youtu.be/, shorts/) ya
+        Google Drive share link ko embed-ready URL mein convert karta hai,
+        taaki property detail page pe iframe se seedha play ho sake.
+
+        NOTE: Google Drive wale video ke liye file ki sharing setting
+        "Anyone with the link" (Viewer) honi chahiye, warna "You need
+        access" wala error aayega chahe URL sahi ho ya nahi.
         """
         url = (self.project_video_url or '').strip()
         if not url:
@@ -195,7 +199,21 @@ class Property(models.Model):
         if video_id:
             return f"https://www.youtube.com/embed/{video_id}"
 
-        # YouTube na ho (koi aur video link ho) to jaisa hai waisa hi use karo
+        # Google Drive link ko preview/embed format mein convert karo
+        if 'drive.google.com' in url:
+            drive_id = None
+            try:
+                if '/file/d/' in url:
+                    drive_id = url.split('/file/d/')[1].split('/')[0]
+                elif 'id=' in url:
+                    drive_id = url.split('id=')[1].split('&')[0]
+            except Exception:
+                drive_id = None
+
+            if drive_id:
+                return f"https://drive.google.com/file/d/{drive_id}/preview"
+
+        # Koi aur video link ho to jaisa hai waisa hi use karo
         return url
 
     def get_price_numeric(self):
