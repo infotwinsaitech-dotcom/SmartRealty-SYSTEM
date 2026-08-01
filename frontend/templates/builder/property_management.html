@@ -326,7 +326,9 @@ Clear Gallery
     <input type="number" step="0.01" name="floorplan_carpet_area[]" placeholder="Carpet Area (sqft)" class="border rounded px-2 py-1.5 text-sm">
     <input type="number" step="0.01" name="floorplan_super_area[]" placeholder="Super Area (sqft)" class="border rounded px-2 py-1.5 text-sm">
     <input type="number" step="0.01" name="floorplan_price[]" placeholder="Price (₹)" class="border rounded px-2 py-1.5 text-sm">
-    <input type="file" name="floorplan_image[]" accept="image/*,.pdf,application/pdf" class="text-xs">
+    <input type="file" name="floorplan_image[]" accept="image/*" class="text-xs floorplan-image-input">
+    <input type="hidden" name="floorplan_image_public_id[]" class="floorplan-image-public-id">
+    <span class="text-[10px] text-blue-600 floorplan-image-status col-span-2 md:col-span-1"></span>
   </div>
 </div>
 
@@ -340,10 +342,54 @@ function addFloorPlanRow() {
   const container = document.getElementById('floorPlanRows');
   const row = container.firstElementChild.cloneNode(true);
   row.querySelectorAll('input').forEach(function(el){ el.value = ''; });
+  row.querySelectorAll('.floorplan-image-status').forEach(function(el){ el.textContent = ''; });
   container.appendChild(row);
 }
-</script>
 
+document.getElementById('floorPlanRows').addEventListener('change', function (e) {
+  if (!e.target.classList.contains('floorplan-image-input')) return;
+
+  const fileInput = e.target;
+  const file = fileInput.files[0];
+  if (!file) return;
+
+  const row = fileInput.closest('.floorplan-row');
+  const publicIdInput = row.querySelector('.floorplan-image-public-id');
+  const statusEl = row.querySelector('.floorplan-image-status');
+
+  publicIdInput.value = '';
+  pendingUploads++;
+  statusEl.textContent = 'Uploading... 0%';
+
+  (async () => {
+    let uploadFile = file;
+    if (uploadFile.size > 9.5 * 1024 * 1024) {
+      statusEl.textContent = 'Compressing...';
+      try {
+        uploadFile = await compressImageFile(uploadFile);
+      } catch (err) {
+        console.error('Compression failed, uploading original:', err);
+      }
+    }
+    return uploadToCloudinary(uploadFile, 'image', pct => {
+      statusEl.textContent = `Uploading... ${pct}%`;
+    });
+  })()
+    .then(publicId => {
+      publicIdInput.value = publicId;
+      statusEl.textContent = '✅ Uploaded';
+      fileInput.value = '';
+    })
+    .catch(err => {
+      console.error(err);
+      statusEl.textContent = '❌ ' + err.message;
+      alert('Floor plan image upload failed: ' + file.name);
+    })
+    .finally(() => {
+      pendingUploads--;
+    });
+});
+</script>
 <!-- ==================== DYNAMIC AMENITIES (CUSTOM ADD) ==================== -->
 <label class="font-semibold mt-4 block text-sm">Amenities <span class="text-gray-400 font-normal">(Type & press Enter to add custom)</span></label>
 
@@ -1523,11 +1569,11 @@ document.getElementById('propertyForm').addEventListener('submit', function(e) {
 
   // Ye sab ab direct Cloudinary pe upload ho chuke hain (public_id hidden fields mein hai),
   // isliye asli bhaari files ko Django/Render ki taraf bhejne ki zaroorat nahi:
-  formData.delete('images');
+formData.delete('images');
   formData.delete('thumbnail');
-  formData.delete('brochure');
   formData.delete('project_logo');
   formData.delete('project_video');
+  formData.delete('floorplan_image[]');
 
   // Submit via fetch
   fetch(form.action, {

@@ -1517,6 +1517,7 @@ def add_property(request):
             fp_carpet_areas = request.POST.getlist("floorplan_carpet_area[]")
             fp_super_areas = request.POST.getlist("floorplan_super_area[]")
             fp_prices = request.POST.getlist("floorplan_price[]")
+            fp_image_public_ids = request.POST.getlist("floorplan_image_public_id[]")
             fp_images = request.FILES.getlist("floorplan_image[]")
 
             def _decimal_or_none(val):
@@ -1529,12 +1530,16 @@ def add_property(request):
                 unit_type = sanitize_input(unit_type)
                 if not unit_type.strip():
                     continue
-                fp_image = fp_images[idx] if idx < len(fp_images) else None
-                if fp_image:
-                    valid, msg = validate_file_upload(fp_image, ['.jpg', '.jpeg', '.png', '.webp', '.avif', '.pdf'], 10)
-                    if not valid:
-                        logger.warning(f"Floor plan image skipped for '{unit_type}': {msg}")
-                        fp_image = None
+                fp_public_id = fp_image_public_ids[idx].strip() if idx < len(fp_image_public_ids) else ""
+                if fp_public_id:
+                    fp_image = fp_public_id
+                else:
+                    fp_image = fp_images[idx] if idx < len(fp_images) else None
+                    if fp_image:
+                        valid, msg = validate_file_upload(fp_image, ['.jpg', '.jpeg', '.png', '.webp'], 10)
+                        if not valid:
+                            logger.warning(f"Floor plan image skipped for '{unit_type}': {msg}")
+                            fp_image = None
                 FloorPlan.objects.create(
                     property=prop,
                     unit_type=unit_type,
