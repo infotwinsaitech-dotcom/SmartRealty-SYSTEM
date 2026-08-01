@@ -1363,7 +1363,7 @@ def add_property(request):
             return redirect("add_property")
 
         # File validations
-        DIRECT_UPLOAD_FIELDS = {'thumbnail', 'project_logo', 'project_video'}
+        DIRECT_UPLOAD_FIELDS = {'thumbnail', 'project_logo', 'project_video', 'brochure'}
 
         files = {}
         file_fields = {
@@ -1531,7 +1531,7 @@ def add_property(request):
                     continue
                 fp_image = fp_images[idx] if idx < len(fp_images) else None
                 if fp_image:
-                    valid, msg = validate_file_upload(fp_image, ['.jpg', '.jpeg', '.png', '.webp'], 10)
+                    valid, msg = validate_file_upload(fp_image, ['.jpg', '.jpeg', '.png', '.webp', '.avif', '.pdf'], 10)
                     if not valid:
                         logger.warning(f"Floor plan image skipped for '{unit_type}': {msg}")
                         fp_image = None
