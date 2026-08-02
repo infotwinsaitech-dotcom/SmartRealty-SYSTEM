@@ -611,15 +611,17 @@
                                 <span class="text-white/60">Property Type</span>
                                 <span class="text-white font-medium">{{ property.property_type|default:"N/A" }}</span>
                             </div>
-                            <div class="flex justify-between text-sm items-center">
-                                <span class="text-white/60">RERA</span>
-                                <span class="text-white font-medium">
-                                    {{ property.rera_number|default:"N/A" }}
+                            {% if property.rera_number %}
+                            <div class="text-sm pt-2 border-t border-white/10 mt-1">
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="text-white/60">RERA No.</span>
                                     {% if rera_verify_url %}
-                                    <a href="{{ rera_verify_url }}" target="_blank" rel="noopener" class="text-[var(--color-gold)] text-xs underline ml-1">Verify</a>
+                                    <a href="{{ rera_verify_url }}" target="_blank" rel="noopener" class="text-[var(--color-gold)] text-xs underline">Verify</a>
                                     {% endif %}
-                                </span>
+                                </div>
+                                <p class="text-white font-medium text-xs break-all leading-relaxed">{{ property.rera_number }}</p>
                             </div>
+                            {% endif %}
                         </div>
                     </div>
                     
