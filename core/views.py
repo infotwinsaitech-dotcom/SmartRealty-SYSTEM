@@ -126,6 +126,19 @@ def validate_rera_format(rera_number):
 
     value = rera_number.strip().upper()
 
+    # BUG FIX: copy-paste (PDF/WhatsApp/Word) often carries invisible/lookalike
+    # characters that break the regex even when the number is visually correct —
+    # non-breaking spaces, zero-width spaces, smart/curly quotes, en/em dashes
+    # standing in for a hyphen, and repeated spaces. Normalize before matching
+    # so a genuinely correct number never fails on this.
+    value = value.replace("\u00a0", " ")   # non-breaking space
+    value = value.replace("\u200b", "")    # zero-width space
+    value = value.replace("\u2018", "'").replace("\u2019", "'")
+    value = value.replace("\u201c", '"').replace("\u201d", '"')
+    value = value.replace("\u2013", "-").replace("\u2014", "-")  # en/em dash
+    value = re.sub(r"\s+", " ", value)     # collapse repeated spaces
+    value = value.strip()
+
     if GUJARAT_RERA_REGEX.match(value):
         return True, "Valid Gujarat RERA number format"
 
