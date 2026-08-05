@@ -558,7 +558,7 @@ def property_search_suggestions(request):
         "Naroda", "Nikol", "Vastral", "Bapunagar", "Odhav", "Kubernagar",
         "Rakhial", "Amraiwadi", "Gomtipur", "Khokhra", "Kankaria", "Danilimda",
         "Vatva", "Lambha", "Narol", "Sarkhej", "Juhapura", "Makarba",
-        "Ghuma", "South Bopal", "Bopal", "Shela", "Shilaj", "Science City", "Science Park"
+        "Ghuma", "South Bopal", "Bopal", "Shela", "Shilaj", "Science City", "Science Park",
         "Chharodi", "Nava Vadaj", "Vadaj", "Usmanpura", "Memnagar", "Gulbai Tekra",
         "Panjrapole", "C.G. Road", "Law Garden", "Navjivan", "Income Tax", "Stadium",
         "Nehru Nagar", "Judges Bungalow Road", "Iscon", "Anand Nagar", "Manekbaug",
