@@ -628,7 +628,7 @@ def property_list(request):
         "Satellite", "Vastrapur", "Bodakdev", "Thaltej", "SG Highway", "Prahlad Nagar",
         "Navrangpura", "Ellisbridge", "Paldi", "Vasna", "Maninagar", "Isanpur",
         "Ghatlodia", "Naranpura", "Ranip", "Chandkheda", "Motera", "Sabarmati",
-        "Gota", "Chandlodia", "Vejalpur", "Jodhpur", "Ambawadi", "Shahibaug",
+        "Gota","Vaishnodevi", "Chandlodia", "Vejalpur", "Jodhpur", "Ambawadi", "Shahibaug",
         "Naroda", "Nikol", "Vastral", "Bapunagar", "Odhav", "Kubernagar",
         "Rakhial", "Amraiwadi", "Gomtipur", "Khokhra", "Kankaria", "Danilimda",
         "Vatva", "Lambha", "Narol", "Sarkhej", "Juhapura", "Makarba",
