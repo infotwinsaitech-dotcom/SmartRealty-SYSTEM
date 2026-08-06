@@ -213,7 +213,7 @@
                         
                         <!-- Share Button -->
                         <button type="button" class="absolute top-4 right-20 md:top-6 md:right-24 w-12 h-12 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center shadow-lg hover:bg-white transition"
-                                onclick="event.preventDefault(); event.stopPropagation(); shareProperty('{{ property.project_name|default:property.title|escapejs }}', '{{ property.location|escapejs }}', '₹{{ property.price }} {{ property.price_unit|default:"L" }}', '{{ property.get_absolute_url }}')"
+                                onclick="event.preventDefault(); event.stopPropagation(); shareProperty('{{ property.project_name|default:property.title|escapejs }}', '{{ property.location|escapejs }}', '{% if property.price == "Price on Request" %}Price on Request{% else %}₹{{ property.price }} {{ property.price_unit|default:"L" }}{% endif %}', '{{ property.get_absolute_url }}')"
                                 aria-label="Share this property">
                             <span class="material-icons-round text-[var(--color-text-muted)]" style="font-size:22px">share</span>
                         </button>
@@ -238,7 +238,7 @@
                     <div class="card-content">
                         <!-- Price -->
                         <div class="price">
-                            ₹{{ property.price }} {{ property.price_unit|default:"L" }}
+                            {% if property.price == "Price on Request" %}Price on Request{% else %}₹{{ property.price }} {{ property.price_unit|default:"L" }}{% endif %}
                         </div>
                         
                         <!-- Title -->

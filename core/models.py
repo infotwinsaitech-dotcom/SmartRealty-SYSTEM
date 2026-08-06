@@ -83,7 +83,7 @@ class Property(models.Model):
     price_unit = models.CharField(max_length=2, choices=PRICE_UNIT_CHOICES, default='L')
     project_name = models.CharField(max_length=200, blank=True, null=True, db_index=True)
 
-    beds = models.IntegerField(null=True, blank=True, validators=[MinValueValidator(0)])
+    beds = models.CharField(max_length=20, null=True, blank=True, help_text="e.g. 3 or 4/5")
     baths = models.FloatField(default=0, validators=[MinValueValidator(0)])
     sqft = models.IntegerField(default=0, validators=[MinValueValidator(0)])
 

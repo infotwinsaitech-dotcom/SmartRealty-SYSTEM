@@ -789,10 +789,22 @@ def property_list(request):
             pass
 
     if beds_target is not None or price_target is not None:
+        def _beds_distance(beds_value, target):
+            """beds ab '4/5', '3/4' jaisi text bhi ho sakti hai (multiple BHK ek property me).
+            Isme jo bhi numbers hain unme se jo target ke sabse kareeb ho wahi use karo —
+            matlab '4/5' wali property '4 BHK' aur '5 BHK' dono search me EXACT match maani jayegi."""
+            if beds_value is None:
+                return 999
+            numbers = [int(n) for n in re.findall(r'\d+', str(beds_value))]
+            if not numbers:
+                return 999
+            return min(abs(n - target) for n in numbers)
+
         def sort_key(p):
             bed_distance = 0
             if beds_target is not None:
-                bed_distance = abs(p.beds - beds_target) if p.beds is not None else 999
+                bed_distance = _beds_distance(p.beds, beds_target)
+                bed_distance = abs(p_beds_num - beds_target) if p_beds_num is not None else 999
             price_distance = 0
             if price_target is not None:
                 price_distance = abs(float(p.get_price_numeric()) - price_target)
@@ -1354,6 +1366,8 @@ def add_property(request):
             errors.append("Location is required")
         if not data['price'].strip():
             errors.append("Price is required")
+        elif data['price'].strip() == "Price on Request":
+            data['price'] = "Price on Request"
         else:
             try:
                 float(data['price'])
@@ -1402,12 +1416,12 @@ def add_property(request):
                 files[field] = uploaded
 
         # Parse numeric fields
+        beds_val = sanitize_input(data['beds']).strip() or None
         try:
-            beds_val = int(data['beds']) if data['beds'] else None
             baths_val = float(data['baths']) if data['baths'] else 0.0
             sqft_val = int(data['sqft']) if data['sqft'] else 0
         except ValueError:
-            messages.error(request, "Invalid numeric values for beds, baths, or sqft")
+            messages.error(request, "Invalid numeric values for baths or sqft")
             return redirect("add_property")
 
         # Parse map coordinates (used by the public Property Map page)
@@ -2356,9 +2370,11 @@ def _update_property(request, property):
         value = sanitize_input(request.POST.get(post_key, getattr(property, field)))
         setattr(property, field, value)
 
+    # Beds ab free text hai (e.g. "4/5"), isliye seedha save karo
+    property.beds = sanitize_input(request.POST.get('beds')).strip() or None
+
     # Numeric fields
     try:
-        property.beds = int(sanitize_input(request.POST.get('beds'))) or None
         property.baths = float(sanitize_input(request.POST.get('baths'))) or None
         property.sqft = int(sanitize_input(request.POST.get('sqft'))) or None
     except (ValueError, TypeError):

@@ -92,10 +92,14 @@ class="w-full border p-2 rounded text-sm">
 <input type="text" name="project_name" value="{{ property.project_name|default:'' }}" placeholder="Project Name"
 class="border p-2 rounded w-full text-sm">
 
+<label class="flex items-center gap-2 text-xs text-gray-600 mb-1">
+    <input type="checkbox" id="editPriceOnRequest" onchange="togglePriceOnRequest('edit')" {% if property.price == "Price on Request" %}checked{% endif %}>
+    Price on Request (site par exact price nahi dikhega)
+</label>
 <div class="flex gap-2">
-    <input name="price" id="editPriceInput" value="{{ property.price }}" placeholder="Price (e.g. 78.5 or 90.1)" type="text" inputmode="decimal" autocomplete="off"
+    <input name="price" id="editPriceInput" value="{{ property.price }}" placeholder="Price (e.g. 78.5 or 90.1)" type="text" inputmode="decimal" autocomplete="off" {% if property.price == "Price on Request" %}readonly{% endif %}
     class="flex-1 border p-2 rounded text-sm">
-    <select name="price_unit" class="border p-2 rounded text-sm">
+    <select name="price_unit" id="editPriceUnit" class="border p-2 rounded text-sm" {% if property.price == "Price on Request" %}disabled{% endif %}>
         <option value="L" {% if property.price_unit == "L" %}selected{% endif %}>Lakh (L)</option>
         <option value="Cr" {% if property.price_unit == "Cr" %}selected{% endif %}>Crore (Cr)</option>
     </select>
@@ -128,7 +132,7 @@ onchange="toggleBHK()">
 <!-- BHK SECTION -->
 <div id="bhkSection" class="grid grid-cols-1 sm:grid-cols-3 gap-2"
 style="{% if property.has_bhk %}display: grid;{% else %}display: none;{% endif %}">
-<input name="beds" value="{{ property.beds|default:'' }}" placeholder="Beds" class="border p-2 rounded text-sm">
+<input name="beds" value="{{ property.beds|default:'' }}" placeholder="Beds (e.g. 3 or 4/5)" class="border p-2 rounded text-sm">
 <input name="baths" value="{{ property.baths|default:'' }}" placeholder="Baths" class="border p-2 rounded text-sm">
 <input name="sqft" value="{{ property.sqft|default:'' }}" placeholder="Sqft" class="border p-2 rounded text-sm">
 </div>
@@ -188,10 +192,18 @@ class="w-full border p-2 rounded text-sm">
 <input name="builder_name" value="{{ property.builder_name|default:'' }}" placeholder="Builder Name"
 class="w-full border p-2 rounded text-sm">
 
-<input name="starting_price" value="{{ property.starting_price|default:'' }}" placeholder="Starting Price"
+<label class="flex items-center gap-2 text-xs text-gray-600 mb-1">
+    <input type="checkbox" id="editStartingPriceOnRequest" onchange="togglePriceOnRequest('editStarting')" {% if property.starting_price == "Price on Request" %}checked{% endif %}>
+    Starting Price on Request
+</label>
+<input name="starting_price" id="editStartingPriceInput" value="{{ property.starting_price|default:'' }}" placeholder="Starting Price" {% if property.starting_price == "Price on Request" %}readonly{% endif %}
 class="w-full border p-2 rounded text-sm">
 
-<input name="max_price" value="{{ property.max_price|default:'' }}" placeholder="Maximum Price"
+<label class="flex items-center gap-2 text-xs text-gray-600 mb-1">
+    <input type="checkbox" id="editMaxPriceOnRequest" onchange="togglePriceOnRequest('editMax')" {% if property.max_price == "Price on Request" %}checked{% endif %}>
+    Maximum Price on Request
+</label>
+<input name="max_price" id="editMaxPriceInput" value="{{ property.max_price|default:'' }}" placeholder="Maximum Price" {% if property.max_price == "Price on Request" %}readonly{% endif %}
 class="w-full border p-2 rounded text-sm">
 
 <!-- PROJECT STATUS -->
@@ -692,7 +704,24 @@ div.innerHTML = `
 `;
 container.appendChild(div);
 }
+/* 💰 PRICE ON REQUEST TOGGLE */
+function togglePriceOnRequest(prefix) {
+    const checkbox = document.getElementById(prefix + "PriceOnRequest");
+    const input = document.getElementById(prefix + "PriceInput");
+    const unit = document.getElementById(prefix + "PriceUnit");
+    if (!checkbox || !input) return;
 
+    if (checkbox.checked) {
+        input.dataset.prevValue = input.value;
+        input.value = "Price on Request";
+        input.readOnly = true;
+        if (unit) unit.disabled = true;
+    } else {
+        input.value = input.dataset.prevValue || "";
+        input.readOnly = false;
+        if (unit) unit.disabled = false;
+    }
+}
 /* BHK SHOW/HIDE */
 function toggleBHK() {
 let type = document.getElementById("propertyType").value;

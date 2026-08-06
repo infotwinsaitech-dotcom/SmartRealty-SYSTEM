@@ -130,7 +130,7 @@
                             {{ property.location }}
                         </div>
  
-                        <div class="showcase-price">₹{{ property.price }} {{ property.price_unit|default:"L" }}</div>
+                        <div class="showcase-price">{% if property.price == "Price on Request" %}Price on Request{% else %}₹{{ property.price }} {{ property.price_unit|default:"L" }}{% endif %}</div>
                         {% if property.beds %}
                         <div class="showcase-bhk">{{ property.beds }} BHK Apartments</div>
                         {% endif %}

@@ -1,9 +1,9 @@
 {% extends "public/base.html" %}
 {% load static cloudinary custom_filters %}
 {% block title %}{{ property.project_name|default:property.title }} | RealShree{% endblock %}
-{% block meta_description %}{{ property.beds|default:"" }}{% if property.beds %} BHK{% endif %} {{ property.property_type }} for sale in {{ property.location }}, Ahmedabad{% if property.price %} at ₹{{ property.price }} {{ property.get_price_unit_display }}{% endif %}. RERA-verified, zero brokerage on RealShree.{% endblock %}
+{% block meta_description %}{{ property.beds|default:"" }}{% if property.beds %} BHK{% endif %} {{ property.property_type }} for sale in {{ property.location }}, Ahmedabad{% if property.price and property.price != "Price on Request" %} at ₹{{ property.price }} {{ property.get_price_unit_display }}{% elif property.price == "Price on Request" %}, price on request{% endif %}. RERA-verified, zero brokerage on RealShree.{% endblock %}
 {% block og_title %}{{ property.project_name|default:property.title }} – {{ property.location }}, Ahmedabad{% endblock %}
-{% block og_description %}{{ property.beds|default:"" }}{% if property.beds %} BHK{% endif %} {{ property.property_type }} in {{ property.location }}{% if property.price %}, ₹{{ property.price }} {{ property.get_price_unit_display }}{% endif %}. RERA-verified listing, zero brokerage.{% endblock %}
+{% block og_description %}{{ property.beds|default:"" }}{% if property.beds %} BHK{% endif %} {{ property.property_type }} in {{ property.location }}{% if property.price and property.price != "Price on Request" %}, ₹{{ property.price }} {{ property.get_price_unit_display }}{% elif property.price == "Price on Request" %}, price on request{% endif %}. RERA-verified listing, zero brokerage.{% endblock %}
 {% block og_image %}{% if property.thumbnail %}{% cloudinary_url property.thumbnail width=1200 height=630 crop='fill' %}{% elif property.images.first %}{% cloudinary_url property.images.first.image width=1200 height=630 crop='fill' %}{% else %}https://www.realshree.com{% static 'images/logo.png' %}{% endif %}{% endblock %}
 {% block canonical_url %}https://RealShree.com{{ property.get_absolute_url }}{% endblock %}
 
@@ -27,8 +27,8 @@
   },
   "offers": {
     "@type": "Offer",
-    "price": "{{ property.price|default:'' }}",
-    "priceCurrency": "INR",
+    {% if property.price and property.price != "Price on Request" %}"price": "{{ property.price }}",
+    "priceCurrency": "INR",{% endif %}
     "availability": "{% if property.status == 'Sold Out' %}https://schema.org/SoldOut{% elif property.status == 'Coming Soon' %}https://schema.org/PreOrder{% else %}https://schema.org/InStock{% endif %}"
   }
 }
@@ -56,7 +56,7 @@
     {
       "@type": "Question",
       "name": "What is the price of {{ property.project_name|default:property.title|escapejs }}?",
-      "acceptedAnswer": {"@type": "Answer", "text": "{{ property.project_name|default:property.title|escapejs }} is priced at ₹{{ property.price|escapejs }} {{ property.price_unit|default:'L'|escapejs }} in {{ property.location|escapejs }}, Ahmedabad."}
+      "acceptedAnswer": {"@type": "Answer", "text": "{% if property.price == 'Price on Request' %}{{ property.project_name|default:property.title|escapejs }} price is available on request in {{ property.location|escapejs }}, Ahmedabad. Please contact us for the latest price.{% else %}{{ property.project_name|default:property.title|escapejs }} is priced at ₹{{ property.price|escapejs }} {{ property.price_unit|default:'L'|escapejs }} in {{ property.location|escapejs }}, Ahmedabad.{% endif %}"}
     },
     {
       "@type": "Question",
@@ -115,7 +115,7 @@
             
             <div class="flex items-center gap-4">
                 <span class="text-2xl md:text-3xl font-bold text-[#d4af37]">
-                    ₹{{ property.price }} {{ property.price_unit|default:"L" }}
+                    {% if property.price == "Price on Request" %}Price on Request{% else %}₹{{ property.price }} {{ property.price_unit|default:"L" }}{% endif %}
                 </span>
                 {% if property.configuration %}
                 <span class="px-3 py-1 bg-white/20 backdrop-blur-sm text-white rounded-full text-sm font-medium">
@@ -536,7 +536,7 @@
                     <div class="space-y-3">
                         <details class="p-3 bg-[var(--color-bg-soft)] rounded-xl">
                             <summary class="text-sm font-semibold text-[var(--color-navy)] cursor-pointer">What is the price of {{ property.project_name|default:property.title }}?</summary>
-                            <p class="text-sm text-[var(--color-text-muted)] mt-2">{{ property.project_name|default:property.title }} is priced at ₹{{ property.price }} {{ property.price_unit|default:"L" }}{% if property.configuration %} for a {{ property.configuration }} unit{% endif %} in {{ property.location }}, Ahmedabad.</p>
+                            <p class="text-sm text-[var(--color-text-muted)] mt-2">{% if property.price == "Price on Request" %}{{ property.project_name|default:property.title }} ki price "Price on Request" par rakhi gayi hai — exact price ke liye humse contact karein{% if property.configuration %} ({{ property.configuration }} unit){% endif %} in {{ property.location }}, Ahmedabad.{% else %}{{ property.project_name|default:property.title }} is priced at ₹{{ property.price }} {{ property.price_unit|default:"L" }}{% if property.configuration %} for a {{ property.configuration }} unit{% endif %} in {{ property.location }}, Ahmedabad.{% endif %}</p>
                         </details>
                         <details class="p-3 bg-[var(--color-bg-soft)] rounded-xl">
                             <summary class="text-sm font-semibold text-[var(--color-navy)] cursor-pointer">Is {{ property.project_name|default:property.title }} RERA registered?</summary>
@@ -573,7 +573,7 @@
                                 {% endif %}
                             </div>
                             <div class="card-content">
-                                <div class="price">₹{{ p.price }} {{ p.price_unit|default:"L" }}</div>
+                                <div class="price">{% if p.price == "Price on Request" %}Price on Request{% else %}₹{{ p.price }} {{ p.price_unit|default:"L" }}{% endif %}</div>
                                 <h3 class="title">{{ p.title }}</h3>
                                 <div class="location">
                                     <span class="material-icons-round" style="font-size:14px">location_on</span>
@@ -596,10 +596,10 @@
                     <div class="card p-6 reveal" style="background: linear-gradient(135deg, var(--color-navy) 0%, #1e3a5f 100%); border: none;">
                         <p class="text-xs text-white/60 uppercase tracking-wider font-medium mb-1">Starting Price</p>
                         <h3 class="text-3xl font-bold text-[#d4af37] mb-1">
-                            ₹{{ property.starting_price|default:property.price }} {{ property.price_unit|default:"L" }}
+                            {% if property.starting_price %}{% if property.starting_price == "Price on Request" %}Price on Request{% else %}₹{{ property.starting_price }} {{ property.price_unit|default:"L" }}{% endif %}{% else %}{% if property.price == "Price on Request" %}Price on Request{% else %}₹{{ property.price }} {{ property.price_unit|default:"L" }}{% endif %}{% endif %}
                         </h3>
                         {% if property.max_price %}
-                        <p class="text-sm text-white/70">Upto ₹{{ property.max_price }} {{ property.price_unit|default:"L" }}</p>
+                        <p class="text-sm text-white/70">{% if property.max_price == "Price on Request" %}Max price on request{% else %}Upto ₹{{ property.max_price }} {{ property.price_unit|default:"L" }}{% endif %}</p>
                         {% endif %}
                         
                         <div class="mt-4 pt-4 border-t border-white/10 space-y-2">
