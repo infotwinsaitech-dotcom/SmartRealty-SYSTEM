@@ -378,6 +378,20 @@ def properties_view(request):
     })
 
 
+def property_detail_legacy_redirect(request, id, slug=None):
+    """
+    BUG FIX: purane /property/<slug>-<id>/ (singular) links ke liye — ye URL
+    pehle duplicate 'property_detail' naam se seedha view par point tha,
+    jisse reverse() ambiguous ho raha tha aur purane crawled/shared links
+    404 de rahe the agar id match nahi hui. Ab ye sirf canonical
+    /properties/<slug>-<id>/ par 301 redirect karta hai — naam clash bhi
+    khatam aur purane backlinks/SEO bhi safe.
+    """
+    if slug:
+        return redirect('property_detail', slug=slug, id=id, permanent=True)
+    return redirect('property_detail', id=id, permanent=True)
+
+
 def property_detail(request, id, slug=None):
     """Property detail with inquiry form"""
     property = get_object_or_404(
