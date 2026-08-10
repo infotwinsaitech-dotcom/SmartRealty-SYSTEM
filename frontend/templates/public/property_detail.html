@@ -391,14 +391,14 @@
         <span class="material-icons-round text-[var(--color-gold)]" style="font-size:20px">architecture</span>
         <h2 class="text-xl font-bold text-[var(--color-navy)]">Floor Plans</h2>
     </div>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div class="grid grid-cols-1 gap-4">
         {% for fp in floor_plans %}
         <div class="border border-[var(--color-border)] rounded-xl overflow-hidden">
             {% if fp.image %}
-            <img src="{% cloudinary_url fp.image width=500 height=400 crop='fit' %}"
+            <img src="{% cloudinary_url fp.image width=800 height=1000 crop='fit' %}"
                  alt="{{ fp.unit_type }} floor plan"
                  class="w-full object-contain bg-[var(--color-bg-soft)] cursor-pointer"
-                 style="max-height:280px"
+                 style="max-height:600px"
                  onclick="window.open(this.src, '_blank')"
                  loading="lazy">
             {% endif %}
