@@ -6,7 +6,84 @@
 {% block og_description %}{{ property.beds|default:"" }}{% if property.beds %} BHK{% endif %} {{ property.property_type }} in {{ property.location }}{% if property.price and property.price != "Price on Request" %}, ₹{{ property.price }} {{ property.get_price_unit_display }}{% elif property.price == "Price on Request" %}, price on request{% endif %}. RERA-verified listing, zero brokerage.{% endblock %}
 {% block og_image %}{% if property.thumbnail %}{% cloudinary_url property.thumbnail width=1200 height=630 crop='fill' %}{% elif property.images.first %}{% cloudinary_url property.images.first.image width=1200 height=630 crop='fill' %}{% else %}https://www.realshree.com{% static 'images/logo.png' %}{% endif %}{% endblock %}
 {% block canonical_url %}https://RealShree.com{{ property.get_absolute_url }}{% endblock %}
-
+{% block extra_head %}
+<style>
+/* Floor Plan Carousel */
+.fp-carousel-wrap{ position: relative; }
+.fp-carousel{
+    display: flex;
+    gap: 16px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    padding: 4px 2px 8px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+}
+.fp-carousel::-webkit-scrollbar{ display: none; }
+.fp-card{
+    flex: 0 0 auto;
+    width: 240px;
+    scroll-snap-align: start;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    background: var(--color-surface);
+    transition: box-shadow var(--transition-base), border-color var(--transition-base);
+}
+.fp-card:hover{ border-color: var(--color-border-strong); box-shadow: var(--shadow-lg); }
+.fp-card-img{
+    width: 100%;
+    height: 180px;
+    object-fit: contain;
+    background: var(--color-bg-soft);
+    cursor: pointer;
+}
+.fp-nav-btn{
+    position: absolute;
+    top: 40%;
+    transform: translateY(-50%);
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    box-shadow: var(--shadow-md, 0 4px 10px rgba(0,0,0,0.12));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-navy);
+    cursor: pointer;
+    z-index: 5;
+    transition: background var(--transition-base);
+}
+.fp-nav-btn:hover{ background: var(--color-bg-soft); }
+.fp-nav-left{ left: -6px; }
+.fp-nav-right{ right: -6px; }
+@media (max-width: 640px){
+    .fp-nav-btn{ display: none; }
+    .fp-card{ width: 200px; }
+    .fp-card-img{ height: 150px; }
+}
+.fp-pill{
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+    color: var(--color-text-muted);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all var(--transition-base);
+}
+.fp-pill.active{
+    background: var(--color-navy);
+    border-color: var(--color-navy);
+    color: #fff;
+}
+</style>
+{% endblock %}
 {% block content %}
 
 <!-- Structured data: this specific listing (helps rich results + AI answer engines) -->
@@ -106,7 +183,9 @@
                 {% endif %}
             </div>
             
-            <h1 class="text-2xl md:text-4xl font-bold text-white mb-2">{{ property.title }}</h1>
+            <h1 class="text-2xl md:text-4xl font-bold text-white mb-2">
+    {{ property.project_name|default:property.title }} – {% if property.beds %}{{ property.beds }} BHK {% endif %}{{ property.property_type }} for Sale in {{ property.location }}, Ahmedabad
+</h1>
             
             <div class="flex items-center gap-2 text-white/80 text-sm md:text-base mb-3">
                 <span class="material-icons-round" style="font-size:18px">location_on</span>
@@ -385,37 +464,52 @@
                     {% endif %}
                 </div>
 <!-- Floor Plans -->
+<!-- Floor Plans -->
 {% if floor_plans %}
-<div class="card p-6 reveal">
-    <div class="flex items-center gap-2 mb-4">
-        <span class="material-icons-round text-[var(--color-gold)]" style="font-size:20px">architecture</span>
-        <h2 class="text-xl font-bold text-[var(--color-navy)]">Floor Plans</h2>
+<div class="card p-6 reveal" id="floorPlanSection">
+    <div class="flex items-center justify-between flex-wrap gap-3 mb-4">
+        <div class="flex items-center gap-2">
+            <span class="material-icons-round text-[var(--color-gold)]" style="font-size:20px">architecture</span>
+            <h2 class="text-xl font-bold text-[var(--color-navy)]">Floor Plans</h2>
+        </div>
+        <div id="fpFilterPills" class="flex items-center gap-2 flex-wrap"></div>
     </div>
-    <div class="grid grid-cols-1 gap-4">
-        {% for fp in floor_plans %}
-        <div class="border border-[var(--color-border)] rounded-xl overflow-hidden">
-            {% if fp.image %}
-            <img src="{% cloudinary_url fp.image width=800 height=1000 crop='fit' %}"
-                 alt="{{ fp.unit_type }} floor plan"
-                 class="w-full object-contain bg-[var(--color-bg-soft)] cursor-pointer"
-                 style="max-height:600px"
-                 onclick="window.open(this.src, '_blank')"
-                 loading="lazy">
-            {% endif %}
-            <div class="p-3">
-                <p class="font-semibold text-sm text-[var(--color-navy)]">{{ fp.unit_type }}</p>
-                <div class="flex flex-wrap gap-x-4 gap-y-1 mt-1 text-xs text-[var(--color-text-muted)]">
-                    {% if fp.carpet_area %}<span>Carpet: {{ fp.carpet_area }} sq.ft</span>{% endif %}
-                    {% if fp.super_area %}<span>Super: {{ fp.super_area }} sq.ft</span>{% endif %}
-                    {% if fp.price %}<span>₹{{ fp.price }}</span>{% endif %}
+
+    <div class="fp-carousel-wrap">
+        <button type="button" id="fpScrollLeft" class="fp-nav-btn fp-nav-left" aria-label="Previous floor plan">
+            <span class="material-icons-round" style="font-size:22px">chevron_left</span>
+        </button>
+
+        <div id="fpCarousel" class="fp-carousel">
+            {% for fp in floor_plans %}
+            <div class="fp-card" data-fp-type="{{ fp.unit_type }}">
+                {% if fp.image %}
+                <img src="{% cloudinary_url fp.image width=420 height=320 crop='fit' %}"
+                     alt="{{ fp.unit_type }} floor plan"
+                     class="fp-card-img"
+                     onclick="window.open(this.src, '_blank')"
+                     loading="lazy">
+                {% endif %}
+                <div class="p-3">
+                    <div class="flex items-center justify-between gap-2 mb-1">
+                        <p class="font-semibold text-sm text-[var(--color-navy)]">{{ fp.unit_type }}</p>
+                        {% if fp.price %}<span class="text-sm font-bold text-[var(--color-gold)] whitespace-nowrap">₹{{ fp.price|format_price }}</span>{% endif %}
+                    </div>
+                    <div class="flex flex-wrap gap-x-3 gap-y-1 text-xs text-[var(--color-text-muted)]">
+                        {% if fp.super_area %}<span>{{ fp.super_area }} sq.ft Super Builtup</span>
+                        {% elif fp.carpet_area %}<span>{{ fp.carpet_area }} sq.ft Carpet Area</span>{% endif %}
+                    </div>
                 </div>
             </div>
+            {% endfor %}
         </div>
-        {% endfor %}
+
+        <button type="button" id="fpScrollRight" class="fp-nav-btn fp-nav-right" aria-label="Next floor plan">
+            <span class="material-icons-round" style="font-size:22px">chevron_right</span>
+        </button>
     </div>
 </div>
-{% endif %}
-                <!-- Gallery -->
+{% endif %}                <!-- Gallery -->
                 {% if property.images.all %}
                 <div class="card p-6 reveal">
                     <div class="flex items-center gap-2 mb-4">
@@ -846,5 +940,63 @@ document.addEventListener('keydown', e => {
     }
 })();
 </script>
+<!-- Floor Plan Carousel: arrows + type filter pills -->
+<script>
+(function(){
+    var track = document.getElementById('fpCarousel');
+    var pillsWrap = document.getElementById('fpFilterPills');
+    if (!track) return;
 
+    var cards = Array.prototype.slice.call(track.querySelectorAll('.fp-card'));
+
+    var types = [];
+    cards.forEach(function(c){
+        var t = c.getAttribute('data-fp-type');
+        if (t && types.indexOf(t) === -1) types.push(t);
+    });
+
+    if (types.length > 1 && pillsWrap) {
+        var allPill = document.createElement('button');
+        allPill.type = 'button';
+        allPill.className = 'fp-pill active';
+        allPill.textContent = 'All';
+        allPill.onclick = function(){ filterCards(null, allPill); };
+        pillsWrap.appendChild(allPill);
+
+        types.forEach(function(t){
+            var pill = document.createElement('button');
+            pill.type = 'button';
+            pill.className = 'fp-pill';
+            pill.textContent = t;
+            pill.onclick = function(){ filterCards(t, pill); };
+            pillsWrap.appendChild(pill);
+        });
+    }
+
+    function filterCards(type, activePill){
+        pillsWrap.querySelectorAll('.fp-pill').forEach(function(p){ p.classList.remove('active'); });
+        activePill.classList.add('active');
+        cards.forEach(function(c){
+            c.style.display = (!type || c.getAttribute('data-fp-type') === type) ? '' : 'none';
+        });
+        track.scrollTo({ left: 0, behavior: 'smooth' });
+    }
+
+    var leftBtn = document.getElementById('fpScrollLeft');
+    var rightBtn = document.getElementById('fpScrollRight');
+    function scrollAmount(){
+        var first = track.querySelector('.fp-card');
+        if (!first) return 260;
+        var style = window.getComputedStyle(track);
+        var gap = parseInt(style.columnGap || style.gap || 16, 10);
+        return first.offsetWidth + gap;
+    }
+    if (leftBtn) leftBtn.addEventListener('click', function(){
+        track.scrollBy({ left: -scrollAmount(), behavior: 'smooth' });
+    });
+    if (rightBtn) rightBtn.addEventListener('click', function(){
+        track.scrollBy({ left: scrollAmount(), behavior: 'smooth' });
+    });
+})();
+</script>
 {% endblock %}
