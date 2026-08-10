@@ -348,7 +348,7 @@
                     <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
                         {% for item in property.amenities %}
                         <div class="flex items-center gap-2 p-3 bg-[var(--color-bg-soft)] rounded-xl">
-                            <span class="material-icons-round text-[var(--color-gold)]" style="font-size:18px">check_circle</span>
+                            <span class="material-icons-round text-[var(--color-gold)]" style="font-size:18px">{{ item|amenity_icon }}</span>
                             <span class="text-sm font-medium text-[var(--color-text)]">{{ item }}</span>
                         </div>
                         {% endfor %}
@@ -584,18 +584,7 @@
                         <div class="flex items-center justify-between p-3 bg-[var(--color-bg-soft)] rounded-xl">
                             <div class="flex items-center gap-3">
                                 <span class="w-8 h-8 rounded-lg bg-[var(--color-gold)]/10 flex items-center justify-center text-lg">
-                                    {% if place.icon == "school" %}🏫
-                                    {% elif place.icon == "local_hospital" %}🏥
-                                    {% elif place.icon == "train" %}🚇
-                                    {% elif place.icon == "shopping_bag" %}🛍️
-                                    {% elif place.icon == "flight" %}✈️
-                                    {% elif place.icon == "directions_railway" %}🚉
-                                    {% elif place.icon == "directions_bus" %}🚌
-                                    {% elif place.icon == "park" %}🌳
-                                    {% elif place.icon == "account_balance" %}🏦
-                                    {% elif place.icon == "restaurant" %}🍽️
-                                    {% elif place.icon == "atm" %}🏧
-                                    {% else %}📍{% endif %}
+                                    {{ place|nearby_icon }}
                                 </span>
                                 <span class="text-sm font-medium text-[var(--color-text)]">{{ place.name }}</span>
                             </div>

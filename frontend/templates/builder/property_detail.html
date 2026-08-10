@@ -175,15 +175,26 @@ class="mt-2 bg-green-600 text-white px-3 py-2 rounded text-sm">
 </button>
 
 <!-- AMENITIES -->
-<label class="text-sm font-semibold mt-4 block">Amenities</label>
-<div class="grid grid-cols-2 gap-2 text-sm">
-<label><input type="checkbox" name="amenities" value="Parking" {% if "Parking" in property.amenities %}checked{% endif %}> Parking</label>
-<label><input type="checkbox" name="amenities" value="Lift" {% if "Lift" in property.amenities %}checked{% endif %}> Lift</label>
-<label><input type="checkbox" name="amenities" value="Gym" {% if "Gym" in property.amenities %}checked{% endif %}> Gym</label>
-<label><input type="checkbox" name="amenities" value="Pool" {% if "Pool" in property.amenities %}checked{% endif %}> Pool</label>
-<label><input type="checkbox" name="amenities" value="Security" {% if "Security" in property.amenities %}checked{% endif %}> Security</label>
-<label><input type="checkbox" name="amenities" value="Garden" {% if "Garden" in property.amenities %}checked{% endif %}> Garden</label>
+<label class="text-sm font-semibold mt-4 block">Amenities <span class="text-gray-400 font-normal">(Type & Enter for custom)</span></label>
+<div class="flex flex-wrap gap-2 mb-2" id="editAmenityTags">
+  <button type="button" onclick="toggleEditAmenityTag(this, 'Parking')" class="edit-amenity-tag px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs border hover:bg-blue-100 hover:border-blue-300 transition">Parking</button>
+  <button type="button" onclick="toggleEditAmenityTag(this, 'Lift')" class="edit-amenity-tag px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs border hover:bg-blue-100 hover:border-blue-300 transition">Lift</button>
+  <button type="button" onclick="toggleEditAmenityTag(this, 'Gym')" class="edit-amenity-tag px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs border hover:bg-blue-100 hover:border-blue-300 transition">Gym</button>
+  <button type="button" onclick="toggleEditAmenityTag(this, 'Pool')" class="edit-amenity-tag px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs border hover:bg-blue-100 hover:border-blue-300 transition">Pool</button>
+  <button type="button" onclick="toggleEditAmenityTag(this, 'Security')" class="edit-amenity-tag px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs border hover:bg-blue-100 hover:border-blue-300 transition">Security</button>
+  <button type="button" onclick="toggleEditAmenityTag(this, 'Garden')" class="edit-amenity-tag px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs border hover:bg-blue-100 hover:border-blue-300 transition">Garden</button>
+  <button type="button" onclick="toggleEditAmenityTag(this, 'Club House')" class="edit-amenity-tag px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs border hover:bg-blue-100 hover:border-blue-300 transition">Club House</button>
+  <button type="button" onclick="toggleEditAmenityTag(this, 'Power Backup')" class="edit-amenity-tag px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs border hover:bg-blue-100 hover:border-blue-300 transition">Power Backup</button>
 </div>
+<div class="flex gap-2 mb-3">
+  <input type="text" id="editCustomAmenityInput" placeholder="Type custom amenity & press Enter..."
+    class="flex-1 border p-2 rounded text-sm" onkeypress="handleEditAmenityKeypress(event)">
+  <button type="button" onclick="addEditCustomAmenity()"
+    class="px-4 py-2 bg-blue-600 text-white rounded text-sm font-medium hover:bg-blue-700 transition">+ Add</button>
+</div>
+<div id="editSelectedAmenities" class="flex flex-wrap gap-2 mb-3 min-h-[30px]"></div>
+<div id="editAmenityHiddenInputs"></div>
+{{ property.amenities|json_script:"existingAmenitiesData" }}
 
 <!-- EXTRA FIELDS -->
 <input name="configuration" value="{{ property.configuration|default:'' }}" placeholder="2BHK, 3BHK"
@@ -692,6 +703,99 @@ container.appendChild(div);
 function removeField(btn) {
 btn.parentElement.remove();
 }
+// ===================== EDIT AMENITIES SYSTEM =====================
+let editSelectedAmenities = [];
+
+function getAmenityIcon(name) {
+  const n = (name || '').toLowerCase();
+  const map = [
+    [['parking'], 'local_parking'], [['lift','elevator'], 'elevator'],
+    [['gym','fitness'], 'fitness_center'], [['pool','swim'], 'pool'],
+    [['security','guard','cctv'], 'security'], [['garden'], 'park'],
+    [['club'], 'groups'], [['power','backup','generator'], 'bolt'],
+    [['water'], 'water_drop'], [['play','kids'], 'toys'],
+    [['jog','track'], 'directions_walk'], [['wifi'], 'wifi'],
+    [['temple','mandir'], 'temple_hindu'], [['school'], 'school'],
+    [['hospital','clinic'], 'local_hospital']
+  ];
+  for (const [keys, icon] of map) {
+    if (keys.some(k => n.includes(k))) return icon;
+  }
+  return 'check_circle';
+}
+
+function toggleEditAmenityTag(btn, amenity) {
+  if (editSelectedAmenities.includes(amenity)) {
+    editSelectedAmenities = editSelectedAmenities.filter(a => a !== amenity);
+    btn.classList.remove('bg-blue-100','border-blue-300');
+  } else {
+    editSelectedAmenities.push(amenity);
+    btn.classList.add('bg-blue-100','border-blue-300');
+  }
+  updateEditAmenityDisplay();
+}
+
+function handleEditAmenityKeypress(e) {
+  if (e.key === 'Enter') { e.preventDefault(); addEditCustomAmenity(); }
+}
+
+function addEditCustomAmenity() {
+  const input = document.getElementById('editCustomAmenityInput');
+  const value = input.value.trim();
+  if (!value || editSelectedAmenities.includes(value)) { input.value = ''; return; }
+  editSelectedAmenities.push(value);
+  input.value = '';
+  updateEditAmenityDisplay();
+}
+
+function removeEditAmenity(amenity) {
+  editSelectedAmenities = editSelectedAmenities.filter(a => a !== amenity);
+  document.querySelectorAll('.edit-amenity-tag').forEach(tag => {
+    if (tag.textContent.trim() === amenity) tag.classList.remove('bg-blue-100','border-blue-300');
+  });
+  updateEditAmenityDisplay();
+}
+
+function updateEditAmenityDisplay() {
+  const container = document.getElementById('editSelectedAmenities');
+  const hiddenContainer = document.getElementById('editAmenityHiddenInputs');
+  container.innerHTML = '';
+  hiddenContainer.innerHTML = '';
+
+  editSelectedAmenities.forEach(amenity => {
+    const icon = getAmenityIcon(amenity);
+    const pill = document.createElement('div');
+    pill.className = 'flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs border border-blue-300';
+    pill.innerHTML = `
+      <span class="material-symbols-outlined" style="font-size:14px">${icon}</span>
+      <span>${amenity}</span>
+      <button type="button" onclick="removeEditAmenity('${amenity}')" class="hover:text-red-500 font-bold ml-1">×</button>
+    `;
+    container.appendChild(pill);
+
+    const hidden = document.createElement('input');
+    hidden.type = 'hidden';
+    hidden.name = 'amenities';
+    hidden.value = amenity;
+    hiddenContainer.appendChild(hidden);
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+  const dataEl = document.getElementById('existingAmenitiesData');
+  if (dataEl) {
+    try {
+      const existing = JSON.parse(dataEl.textContent);
+      existing.forEach(amenity => {
+        editSelectedAmenities.push(amenity);
+        document.querySelectorAll('.edit-amenity-tag').forEach(tag => {
+          if (tag.textContent.trim() === amenity) tag.classList.add('bg-blue-100','border-blue-300');
+        });
+      });
+      updateEditAmenityDisplay();
+    } catch (e) { console.error('Amenity prefill error', e); }
+  }
+});
 
 function addNearbyField() {
 const container = document.getElementById("nearby-container");

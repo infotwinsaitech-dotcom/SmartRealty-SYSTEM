@@ -892,6 +892,40 @@ function removeAmenity(amenity) {
   updateAmenityDisplay();
 }
 
+function getAmenityIcon(name) {
+  const n = (name || '').toLowerCase();
+  const map = [
+    [['parking'], 'local_parking'], [['lift','elevator'], 'elevator'],
+    [['gym','fitness'], 'fitness_center'], [['pool','swim'], 'pool'],
+    [['security','guard','cctv'], 'security'], [['garden'], 'park'],
+    [['club'], 'groups'], [['power','backup','generator'], 'bolt'],
+    [['water'], 'water_drop'], [['play','kids'], 'toys'],
+    [['jog','track'], 'directions_walk'], [['wifi'], 'wifi'],
+    [['temple','mandir'], 'temple_hindu'], [['school'], 'school'],
+    [['hospital','clinic'], 'local_hospital'], [['spa','sauna'], 'spa'],
+    [['solar'], 'solar_power']
+  ];
+  for (const [keys, icon] of map) {
+    if (keys.some(k => n.includes(k))) return icon;
+  }
+  return 'check_circle';
+}
+function getNearbyIcon(name) {
+  const n = (name || '').toLowerCase();
+  const map = [
+    [['school','college'], 'school'], [['hospital','clinic','medical'], 'local_hospital'],
+    [['metro','train','railway'], 'train'], [['mall','shop','market','store'], 'shopping_bag'],
+    [['airport','flight'], 'flight'], [['bus'], 'directions_bus'],
+    [['park','garden'], 'park'], [['bank','atm'], 'account_balance'],
+    [['restaurant','cafe','food'], 'restaurant'], [['highway','road'], 'add_road'],
+    [['temple','mandir'], 'temple_hindu'], [['police'], 'local_police'],
+    [['petrol','fuel','gas'], 'local_gas_station']
+  ];
+  for (const [keys, icon] of map) {
+    if (keys.some(k => n.includes(k))) return icon;
+  }
+  return 'place';
+}
 function updateAmenityDisplay() {
   const container = document.getElementById('selectedAmenities');
   const hiddenContainer = document.getElementById('amenityHiddenInputs');
@@ -901,9 +935,11 @@ function updateAmenityDisplay() {
 
   selectedAmenities.forEach(amenity => {
     // Show pill
+    const icon = getAmenityIcon(amenity);
     const pill = document.createElement('div');
     pill.className = 'flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs border border-blue-300';
     pill.innerHTML = `
+      <span class="material-symbols-outlined" style="font-size:14px">${icon}</span>
       <span>${amenity}</span>
       <button type="button" onclick="removeAmenity('${amenity}')" class="hover:text-red-500 font-bold ml-1">×</button>
     `;
@@ -933,7 +969,7 @@ function addCustomNearby() {
 
   const name = nameInput.value.trim();
   const distance = distanceInput.value.trim();
-  const icon = iconInput.value.trim() || 'place';
+  const icon = iconInput.value.trim() || getNearbyIcon(name);
 
   if (!name || !distance) {
     alert('Please enter both place name and distance');
@@ -972,7 +1008,7 @@ function updateNearbyDisplay() {
     card.className = 'flex items-center justify-between p-2 bg-green-50 border border-green-200 rounded-lg';
     card.innerHTML = `
       <div class="flex items-center gap-2">
-        <span class="material-icons text-green-600 text-sm">${place.icon}</span>
+        <span class="material-symbols-outlined text-green-600 text-sm">${place.icon}</span>
         <span class="text-sm font-medium text-gray-800">${place.name}</span>
         <span class="text-xs text-gray-500">— ${place.distance}</span>
       </div>
