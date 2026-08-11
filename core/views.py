@@ -552,7 +552,7 @@ def property_search_suggestions(request):
 
     AHMEDABAD_AREAS = [
         "Satellite", "Vastrapur", "Bodakdev", "Thaltej", "SG Highway", "Prahlad Nagar",
-        "Navrangpura", "Ellisbridge", "Paldi", "Vasna", "Maninagar", "Isanpur",
+        "Navrangpura", "Ellisbridge", "Paldi", "Vasna", "Maninagar", "Isanpur","Bhadaj",
         "Ghatlodia", "Naranpura", "Ranip", "Chandkheda", "Motera", "Sabarmati",
         "Gota","Vaishnodevi,", "Chandlodia", "Vejalpur", "Jodhpur", "Ambawadi", "Shahibaug",
         "Naroda", "Nikol", "Vastral", "Bapunagar", "Odhav", "Kubernagar",
@@ -626,7 +626,7 @@ def property_list(request):
     # taaki dono jagah options match karein.
     AHMEDABAD_AREAS = [
         "Satellite", "Vastrapur", "Bodakdev", "Thaltej", "SG Highway", "Prahlad Nagar",
-        "Navrangpura", "Ellisbridge", "Paldi", "Vasna", "Maninagar", "Isanpur",
+        "Navrangpura", "Ellisbridge", "Paldi", "Vasna", "Maninagar", "Isanpur","Bhadaj",
         "Ghatlodia", "Naranpura", "Ranip", "Chandkheda", "Motera", "Sabarmati",
         "Gota","Vaishnodevi", "Chandlodia", "Vejalpur", "Jodhpur", "Ambawadi", "Shahibaug",
         "Naroda", "Nikol", "Vastral", "Bapunagar", "Odhav", "Kubernagar",
