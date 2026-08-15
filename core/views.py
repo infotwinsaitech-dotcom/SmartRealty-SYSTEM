@@ -39,7 +39,7 @@ from django.utils.timezone import now
 from django.core.cache import cache
 from subscriptions.utils import check_property_limit, check_agent_limit, LimitExceeded
 from django.views.decorators.cache import cache_page
-
+from django.http import Http404
 # BUG FIX: Hard import band karo — agar package nahi to server crash hoga
 try:
     from sendgrid import SendGridAPIClient
@@ -5031,13 +5031,10 @@ def robots_txt(request):
     ]
     return HttpResponse("\n".join(lines), content_type="text/plain")
 
-
 def sitemap_xml(request):
     """
     /sitemap.xml — static pages + har available property ki detail
-    page ko list karta hai, taaki Google sab listings dhoondh sake.
-    Django admin/sites framework use nahi kiya (extra setup se bachne
-    ke liye) — seedha XML banate hain, safe aur dependency-free.
+    page + saare blog posts ko list karta hai.
     """
     static_pages = [
         {"loc": reverse("home"), "priority": "1.0", "changefreq": "daily"},
@@ -5063,6 +5060,7 @@ def sitemap_xml(request):
             f"<priority>{page['priority']}</priority></url>"
         )
 
+    # FIX: ye loop ab properties ke loop ke BAHAR hai — sirf ek baar chalega
     for prop in properties:
         loc = prop.get_absolute_url()
         lastmod = prop.updated_at.strftime("%Y-%m-%d")
@@ -5071,15 +5069,87 @@ def sitemap_xml(request):
             f"<lastmod>{lastmod}</lastmod>"
             f"<changefreq>weekly</changefreq><priority>0.8</priority></url>"
         )
-        for post in blog_posts:
-            loc = reverse("blog_detail", args=[post.slug])
-            lastmod = post.updated_at.strftime("%Y-%m-%d")
+
+    for post in blog_posts:
+        loc = reverse("blog_detail", args=[post.slug])
+        lastmod = post.updated_at.strftime("%Y-%m-%d")
+        xml_parts.append(
+            f"<url><loc>{SITE_DOMAIN}{loc}</loc>"
+            f"<lastmod>{lastmod}</lastmod>"
+            f"<changefreq>weekly</changefreq><priority>0.6</priority></url>"
+        )
+
+    # NEW: Step 4 mein banaye jaane wale location + BHK landing pages bhi sitemap mein add honge
+    from core.seo_data import AHMEDABAD_AREAS, BHK_OPTIONS
+    from django.utils.text import slugify
+
+    for area in AHMEDABAD_AREAS:
+        area_slug = slugify(area)
+        area_count = Property.objects.filter(location__icontains=area, status='Available').count()
+        if area_count == 0:
+            continue
+        xml_parts.append(
+            f"<url><loc>{SITE_DOMAIN}/properties/in/{area_slug}/</loc>"
+            f"<changefreq>weekly</changefreq><priority>0.7</priority></url>"
+        )
+        for bhk in BHK_OPTIONS:
+            bhk_count = Property.objects.filter(
+                location__icontains=area, status='Available', beds__icontains=bhk
+            ).count()
+            if bhk_count == 0:
+                continue
             xml_parts.append(
-                f"<url><loc>{SITE_DOMAIN}{loc}</loc>"
-                f"<lastmod>{lastmod}</lastmod>"
+                f"<url><loc>{SITE_DOMAIN}/properties/in/{area_slug}/{bhk}-bhk/</loc>"
                 f"<changefreq>weekly</changefreq><priority>0.6</priority></url>"
             )
+
     xml_parts.append('</urlset>')
     return HttpResponse("\n".join(xml_parts), content_type="application/xml")
+from core.seo_data import AHMEDABAD_AREAS, BHK_OPTIONS, get_area_by_slug
+
+
+def location_landing(request, location_slug, bhk=None):
+    """
+    SEO landing page: /properties/in/satellite/  ya  /properties/in/satellite/3-bhk/
+    Google pe "3 BHK flats in Satellite Ahmedabad" jaisi searches ke liye.
+    """
+    area = get_area_by_slug(location_slug)
+    if not area:
+        raise Http404("Location not found")
+
+    qs = Property.objects.filter(
+        location__icontains=area, status='Available'
+    ).select_related('builder').order_by('-created_at')
+
+    if bhk:
+        qs = qs.filter(beds__icontains=bhk)
+
+    properties = qs[:60]
+    total_count = qs.count()
+
+    avg_price = None
+    prices = [p.price_in_rupees() for p in qs if hasattr(p, 'price_in_rupees') and p.price_in_rupees()]
+    if prices:
+        avg_price = sum(prices) / len(prices)
+
+    other_bhk_links = [
+        {"bhk": b, "url": f"/properties/in/{location_slug}/{b}-bhk/", "count":
+            Property.objects.filter(location__icontains=area, status='Available', beds__icontains=b).count()}
+        for b in BHK_OPTIONS
+    ]
+    other_bhk_links = [x for x in other_bhk_links if x["count"] > 0]
+
+    nearby_areas = [a for a in AHMEDABAD_AREAS if a != area][:8]
+
+    return render(request, "public/location_landing.html", {
+        "area": area,
+        "location_slug": location_slug,
+        "bhk": bhk,
+        "properties": properties,
+        "total_count": total_count,
+        "avg_price": avg_price,
+        "other_bhk_links": other_bhk_links,
+        "nearby_areas": nearby_areas,
+    })
 def custom_404(request, exception=None):
     return render(request, "public/404.html", status=404)

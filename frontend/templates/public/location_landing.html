@@ -1,0 +1,106 @@
+{% extends "public/base.html" %}
+{% load static cloudinary %}
+
+{% block title %}{% if bhk %}{{ bhk }} BHK Flats for Sale in {{ area }}{% else %}Properties in {{ area }}{% endif %}, Ahmedabad{% endblock %}
+
+{% block meta_description %}{% if bhk %}{{ bhk }} BHK flats & apartments for sale in {{ area }}, Ahmedabad. {% else %}Browse residential & commercial properties in {{ area }}, Ahmedabad. {% endif %}{{ total_count }}+ RERA-verified listings, zero brokerage, verified builders on RealShree.{% endblock %}
+
+{% block canonical_url %}https://realshree.com/properties/in/{{ location_slug }}/{% if bhk %}{{ bhk }}-bhk/{% endif %}{% endblock %}
+
+{% block extra_head %}
+<meta name="robots" content="index, follow, max-image-preview:large">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://realshree.com{% url 'home' %}"},
+    {"@type": "ListItem", "position": 2, "name": "Properties", "item": "https://realshree.com{% url 'property_list' %}"},
+    {"@type": "ListItem", "position": 3, "name": "{{ area }}", "item": "https://realshree.com/properties/in/{{ location_slug }}/"}
+    {% if bhk %},{"@type": "ListItem", "position": 4, "name": "{{ bhk }} BHK", "item": "https://realshree.com/properties/in/{{ location_slug }}/{{ bhk }}-bhk/"}{% endif %}
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "itemListElement": [
+    {% for property in properties %}
+    {
+      "@type": "ListItem",
+      "position": {{ forloop.counter }},
+      "url": "https://realshree.com{{ property.get_absolute_url }}"
+    }{% if not forloop.last %},{% endif %}
+    {% endfor %}
+  ]
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 py-10">
+
+  <nav class="text-sm text-[var(--color-text-muted)] mb-4">
+    <a href="{% url 'home' %}" class="hover:underline">Home</a> /
+    <a href="{% url 'property_list' %}" class="hover:underline">Properties</a> /
+    <a href="/properties/in/{{ location_slug }}/" class="hover:underline">{{ area }}</a>
+    {% if bhk %} / <span>{{ bhk }} BHK</span>{% endif %}
+  </nav>
+
+  <h1 class="text-2xl md:text-3xl font-bold text-[var(--color-navy)] mb-3">
+    {% if bhk %}{{ bhk }} BHK Flats for Sale in {{ area }}, Ahmedabad{% else %}Properties in {{ area }}, Ahmedabad{% endif %}
+  </h1>
+
+  <p class="text-[var(--color-text-muted)] mb-6 max-w-3xl">
+    {% if bhk %}
+      Explore {{ total_count }} verified {{ bhk }} BHK flats and apartments for sale in {{ area }}, Ahmedabad.
+    {% else %}
+      Explore {{ total_count }} verified residential and commercial properties in {{ area }}, Ahmedabad.
+    {% endif %}
+    All listings are RERA-checked with zero brokerage on RealShree.
+    {% if avg_price %}Average price in this area is around ₹{{ avg_price|floatformat:0 }}.{% endif %}
+  </p>
+
+  {% if other_bhk_links %}
+  <div class="flex flex-wrap gap-2 mb-8">
+    <a href="/properties/in/{{ location_slug }}/" class="px-4 py-2 rounded-full border text-sm {% if not bhk %}bg-[var(--color-navy)] text-white{% endif %}">All</a>
+    {% for link in other_bhk_links %}
+    <a href="{{ link.url }}" class="px-4 py-2 rounded-full border text-sm {% if bhk == link.bhk %}bg-[var(--color-navy)] text-white{% endif %}">{{ link.bhk }} BHK ({{ link.count }})</a>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% if properties %}
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    {% for property in properties %}
+    <a href="{{ property.get_absolute_url }}" class="block border rounded-xl overflow-hidden hover:shadow-lg transition">
+      {% if property.thumbnail %}
+      {% cloudinary_url property.thumbnail width=500 height=340 crop='fill' as img_url %}
+      <img src="{{ img_url }}" alt="{{ property.beds }} BHK {{ property.property_type }} in {{ property.location }} - {{ property.project_name|default:property.title }}" loading="lazy" class="w-full h-48 object-cover">
+      {% endif %}
+      <div class="p-4">
+        <div class="font-semibold text-[var(--color-navy)]">{{ property.price|default:"Price on Request" }} {{ property.price_unit }}</div>
+        <div class="text-lg font-bold">{{ property.project_name|default:property.title }}</div>
+        <div class="text-sm text-[var(--color-text-muted)]">{{ property.location }} {% if property.beds %}· {{ property.beds }} BHK{% endif %}</div>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p>Filhal is area mein koi listing available nahi hai. <a href="{% url 'property_list' %}" class="underline">Saari properties dekho</a>.</p>
+  {% endif %}
+
+  {% if nearby_areas %}
+  <div class="mt-12">
+    <h2 class="text-lg font-semibold mb-3">Nearby Areas</h2>
+    <div class="flex flex-wrap gap-2">
+      {% for a in nearby_areas %}
+      <a href="/properties/in/{{ a|slugify }}/" class="px-3 py-1.5 border rounded-full text-sm hover:bg-[var(--color-bg-soft)]">{{ a }}</a>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

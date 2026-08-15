@@ -148,26 +148,15 @@ urlpatterns = [
     path("auth/redirect/", views.google_login_redirect, name="google_redirect"),
     path("api/check-username/", views.check_username, name="check_username"),
     path("get-messages-ajax/", views.get_messages_ajax, name="get_messages_ajax"),
-    # urls.py
-path("agent/toggle-scheduler/", views.toggle_scheduler, name="toggle_scheduler"),
-path('pipeline/', views.builder_pipeline, name='builder_pipeline'),
-path('accounts/', include('allauth.urls')),
-    path("update-lead-status/", views.update_lead_status, name="update_lead_status"),
-    path("add-note/", views.add_note, name="add_note"),
+    path("agent/toggle-scheduler/", views.toggle_scheduler, name="toggle_scheduler"),
     path("update-priority/", views.update_priority, name="update_priority"),
-    path("builder/property-map/", views.property_map, name="property_map"),
-    # urls.py
+    path("add-note/", views.add_note, name="add_note"),
     path("property-map/", views.property_map_public, name="property_map_public"),
-    path('', views.home, name='home'),
-    path('properties/', views.property_list, name='property_list'),
-    re_path(r'^property/(?:(?P<slug>[\w-]+)-)?(?P<id>\d+)/$', views.property_detail, name='property_detail'),
-    path('login/', views.login_view, name='login'),
-    path('register/', views.register_view, name='register'),
-    path('contact/', views.contact, name='contact'),
-    path('wishlist/', views.wishlist, name='wishlist'),
-    path('profile/', views.profile, name='profile'),
-    path("privacy/", views.privacy, name="privacy"),
     path("terms/", views.terms, name="terms"),
+
+    # ================= SEO: LOCATION + BHK LANDING PAGES =================
+    path("properties/in/<slug:location_slug>/", views.location_landing, name="location_landing"),
+    path("properties/in/<slug:location_slug>/<str:bhk>-bhk/", views.location_landing, name="location_bhk_landing"),
 ]
 
 if settings.DEBUG:
