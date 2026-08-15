@@ -242,9 +242,9 @@
                         </div>
                         
                         <!-- Title -->
-                        <h3 class="title">{{ property.project_name|default:property.title }}</h3>
-                        <p class="text-xs text-[var(--color-text-light)] uppercase tracking-wider font-medium mb-2">{{ property.title }}</p>
-                        
+                       <!-- Title -->
+<h2 class="title">{{ property.project_name|default:property.title }}</h2>
+<h3 class="text-xs text-[var(--color-text-light)] uppercase tracking-wider font-medium mb-2">{{ property.builder_name|default:"" }}</h3>
                         <!-- Location -->
                         <div class="location">
                             <span class="material-icons-round" style="font-size:14px">location_on</span>

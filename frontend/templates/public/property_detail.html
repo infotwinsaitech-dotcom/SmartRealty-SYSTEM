@@ -1,12 +1,19 @@
 {% extends "public/base.html" %}
 {% load static cloudinary custom_filters %}
-{% block title %}{{ property.project_name|default:property.title }} | RealShree{% endblock %}
-{% block meta_description %}{{ property.beds|default:"" }}{% if property.beds %} BHK{% endif %} {{ property.property_type }} for sale in {{ property.location }}, Ahmedabad{% if property.price and property.price != "Price on Request" %} at ₹{{ property.price }} {{ property.get_price_unit_display }}{% elif property.price == "Price on Request" %}, price on request{% endif %}. RERA-verified, zero brokerage on RealShree.{% endblock %}
-{% block og_title %}{{ property.project_name|default:property.title }} – {{ property.location }}, Ahmedabad{% endblock %}
-{% block og_description %}{{ property.beds|default:"" }}{% if property.beds %} BHK{% endif %} {{ property.property_type }} in {{ property.location }}{% if property.price and property.price != "Price on Request" %}, ₹{{ property.price }} {{ property.get_price_unit_display }}{% elif property.price == "Price on Request" %}, price on request{% endif %}. RERA-verified listing, zero brokerage.{% endblock %}
+{% block title %}{% if property.beds %}{{ property.beds }} BHK {% endif %}{{ property.property_type }} for Sale in {{ property.location }} | {{ property.project_name|default:property.title }}{% if property.builder_name %} by {{ property.builder_name }}{% endif %}{% endblock %}
+{% block meta_description %}{{ property.project_name|default:property.title }}{% if property.builder_name %} by {{ property.builder_name }}{% endif %} – {{ property.beds|default:"" }}{% if property.beds %} BHK{% endif %} {{ property.property_type }} in {{ property.location }}, Ahmedabad{% if property.price and property.price != "Price on Request" %}, starting ₹{{ property.price }} {{ property.get_price_unit_display }}{% elif property.price == "Price on Request" %}, price on request{% endif %}{% if property.rera_number %}. RERA registered, {% else %}. {% endif %}zero brokerage — view floor plans, photos & book a site visit on RealShree.{% endblock %}
+{% block og_title %}{% if property.beds %}{{ property.beds }} BHK {% endif %}{{ property.property_type }} in {{ property.location }} – {{ property.project_name|default:property.title }}{% endblock %}
+{% block og_description %}{{ property.beds|default:"" }}{% if property.beds %} BHK{% endif %} {{ property.property_type }}{% if property.builder_name %} by {{ property.builder_name }}{% endif %} in {{ property.location }}, Ahmedabad{% if property.price and property.price != "Price on Request" %}, ₹{{ property.price }} {{ property.get_price_unit_display }}{% elif property.price == "Price on Request" %}, price on request{% endif %}. RERA-verified listing, zero brokerage.{% endblock %}
 {% block og_image %}{% if property.thumbnail %}{% cloudinary_url property.thumbnail width=1200 height=630 crop='fill' %}{% elif property.images.first %}{% cloudinary_url property.images.first.image width=1200 height=630 crop='fill' %}{% else %}https://www.realshree.com{% static 'images/logo.png' %}{% endif %}{% endblock %}
 {% block canonical_url %}https://RealShree.com{{ property.get_absolute_url }}{% endblock %}
 {% block extra_head %}
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{% if property.beds %}{{ property.beds }} BHK {% endif %}{{ property.property_type }} in {{ property.location }} – {{ property.project_name|default:property.title }}">
+<meta name="twitter:description" content="{% if property.beds %}{{ property.beds }} BHK {% endif %}{{ property.property_type }}{% if property.builder_name %} by {{ property.builder_name }}{% endif %} in {{ property.location }}, Ahmedabad. RERA-verified, zero brokerage.">
+{% if property.thumbnail %}<meta name="twitter:image" content="{% cloudinary_url property.thumbnail width=1200 height=630 crop='fill' %}">{% endif %}
+<link rel="preconnect" href="https://res.cloudinary.com">
+<link rel="dns-prefetch" href="https://res.cloudinary.com">
 <style>
 /* Floor Plan Carousel */
 .fp-carousel-wrap{ position: relative; }
@@ -91,23 +98,52 @@
 {
   "@context": "https://schema.org",
   "@type": "RealEstateListing",
-  "name": "{{ property.project_name|default:property.title|escapejs }}",
+  "name": "{% if property.beds %}{{ property.beds }} BHK {% endif %}{{ property.property_type }} for Sale in {{ property.location|escapejs }} - {{ property.project_name|default:property.title|escapejs }}",
   "description": "{{ property.description|striptags|truncatewords:40|escapejs }}",
   "url": "https://RealShree.com{{ property.get_absolute_url }}",
   {% if property.thumbnail %}"image": "{{ og_img_url }}",{% endif %}
   "datePosted": "{{ property.created_at|date:'Y-m-d' }}",
+  {% if property.beds %}"numberOfRooms": "{{ property.beds }}",{% endif %}
+  {% if property.baths %}"numberOfBathroomsTotal": "{{ property.baths }}",{% endif %}
+  {% if property.sqft %}"floorSize": {
+    "@type": "QuantitativeValue",
+    "value": "{{ property.sqft|escapejs }}",
+    "unitCode": "FTK"
+  },{% endif %}
+  {% if property.builder_name %}"broker": {
+    "@type": "Organization",
+    "name": "{{ property.builder_name|escapejs }}"
+  },{% endif %}
   "address": {
     "@type": "PostalAddress",
+    "streetAddress": "{{ property.location|escapejs }}",
     "addressLocality": "{{ property.location|escapejs }}",
     "addressRegion": "Gujarat",
     "addressCountry": "IN"
   },
+  {% if property.latitude and property.longitude %}"geo": {
+    "@type": "GeoCoordinates",
+    "latitude": "{{ property.latitude }}",
+    "longitude": "{{ property.longitude }}"
+  },{% endif %}
   "offers": {
     "@type": "Offer",
     {% if property.price and property.price != "Price on Request" %}"price": "{{ property.price }}",
     "priceCurrency": "INR",{% endif %}
+    "businessFunction": "https://schema.org/Sell",
+    "seller": {
+      "@type": "Organization",
+      "name": "{% if property.builder_name %}{{ property.builder_name|escapejs }}{% else %}RealShree{% endif %}"
+    },
     "availability": "{% if property.status == 'Sold Out' %}https://schema.org/SoldOut{% elif property.status == 'Coming Soon' %}https://schema.org/PreOrder{% else %}https://schema.org/InStock{% endif %}"
-  }
+  }{% if rating_summary %},
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "{{ rating_summary.overall }}",
+    "reviewCount": "{{ rating_summary.count }}",
+    "bestRating": "5",
+    "worstRating": "1"
+  }{% endif %}
 }
 </script>
 
@@ -154,13 +190,26 @@
 }
 </script>
 
+<!-- Visible breadcrumb (matches the BreadcrumbList schema above) -->
+<nav aria-label="Breadcrumb" class="container-app pt-3 pb-1">
+    <ol class="flex flex-wrap items-center gap-1 text-xs text-[var(--color-text-muted)]">
+        <li><a href="{% url 'home' %}" class="hover:text-[var(--color-gold)] transition">Home</a></li>
+        <li aria-hidden="true">/</li>
+        <li><a href="{% url 'property_list' %}" class="hover:text-[var(--color-gold)] transition">Properties</a></li>
+        <li aria-hidden="true">/</li>
+        <li><a href="{% url 'property_list' %}?location={{ property.location|urlencode }}" class="hover:text-[var(--color-gold)] transition">{{ property.location }}</a></li>
+        <li aria-hidden="true">/</li>
+        <li class="text-[var(--color-navy)] font-medium truncate max-w-[180px]" aria-current="page">{{ property.project_name|default:property.title }}</li>
+    </ol>
+</nav>
+
 <!-- ============================================
    PROPERTY HERO - Full Width Image
    ============================================ -->
 <section class="relative w-full" style="height: 45vh; min-height: 300px; max-height: 500px;">
     {% if property.thumbnail %}
     {% cloudinary_url property.thumbnail width=1920 height=800 crop='fill' as hero_img %}
-    <img src="{{ hero_img }}" alt="{{ property.property_type }} for sale in {{ property.location }}, Ahmedabad - {{ property.project_name|default:property.title }}" class="w-full h-full object-cover">
+    <img src="{{ hero_img }}" alt="{% if property.beds %}{{ property.beds }} BHK {% endif %}{{ property.property_type }} for sale in {{ property.location }}, Ahmedabad - {{ property.project_name|default:property.title }}{% if property.builder_name %} by {{ property.builder_name }}{% endif %}" class="w-full h-full object-cover">
     {% else %}
     <div class="w-full h-full bg-[var(--color-navy)] flex items-center justify-center">
         <span class="material-icons-round text-white/30" style="font-size:80px">apartment</span>
@@ -291,6 +340,26 @@
                     <p class="text-sm text-[var(--color-text-muted)] leading-relaxed">
                         {{ property.description|default:"" }}
                     </p>
+
+                    <!-- Internal links: helps Google connect BHK + location + builder searches back to this listing -->
+                    <div class="flex flex-wrap gap-2 mt-4">
+                        {% if property.configuration %}
+                        <a href="{% url 'property_list' %}?location={{ property.location|urlencode }}&config={{ property.configuration|urlencode }}"
+                           class="px-3 py-1.5 rounded-full text-xs font-medium bg-[var(--color-bg-soft)] text-[var(--color-navy)] hover:bg-[var(--color-gold)]/10 transition">
+                            More {{ property.configuration }} in {{ property.location }}
+                        </a>
+                        {% endif %}
+                        {% if property.builder_name %}
+                        <a href="{% url 'property_list' %}?builder={{ property.builder_name|urlencode }}"
+                           class="px-3 py-1.5 rounded-full text-xs font-medium bg-[var(--color-bg-soft)] text-[var(--color-navy)] hover:bg-[var(--color-gold)]/10 transition">
+                            More projects by {{ property.builder_name }}
+                        </a>
+                        {% endif %}
+                        <a href="{% url 'property_list' %}?location={{ property.location|urlencode }}"
+                           class="px-3 py-1.5 rounded-full text-xs font-medium bg-[var(--color-bg-soft)] text-[var(--color-navy)] hover:bg-[var(--color-gold)]/10 transition">
+                            All properties in {{ property.location }}
+                        </a>
+                    </div>
                     
                     <!-- Project Details Grid -->
                     <div class="grid grid-cols-2 md:grid-cols-3 gap-3 mt-6">
@@ -520,7 +589,7 @@
                         {% for img in property.images.all %}
                         <div class="relative group cursor-pointer rounded-xl overflow-hidden" onclick="openGallery({{ forloop.counter0 }})" style="aspect-ratio: 4/3;">
                             <img src="{% cloudinary_url img.image width=400 height=300 crop='fill' %}" 
-                                 alt="{{ property.title }}" 
+                                 alt="{% if property.beds %}{{ property.beds }} BHK {% endif %}{{ property.property_type }} in {{ property.location }} - {{ property.project_name|default:property.title }} photo {{ forloop.counter }}" 
                                  class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                                  loading="lazy">
                             <div class="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all flex items-center justify-center">
