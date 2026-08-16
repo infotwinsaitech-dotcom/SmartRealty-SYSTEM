@@ -58,7 +58,7 @@ from .models import (
     Property, PropertyImage, User, Profile, Lead, Deal, Task, 
     Activity, Agent, Document, Conversation, Message, 
     Notification, Campaign, SiteVisit, FollowUp, Wishlist,
-    Inquiry, LeadNote, LeadActivity, SavedProperty , Advertisement,PropertyReview, FloorPlan,
+    Inquiry, LeadNote, LeadActivity, SavedProperty , Advertisement,PropertyReview, FloorPlan,PropertyInquiry,
 )
 from subscriptions.models import BlogPost
 logger = logging.getLogger('core')
@@ -377,6 +377,103 @@ def properties_view(request):
         "page_obj": page_obj
     })
 
+@require_POST
+def capture_media_lead(request, id):
+    """
+    Property detail page par Floor Plan / Brochure / Video jaisa gated
+    content dekhne se pehle visitor ka naam + mobile number capture karta
+    hai aur us property ke builder ko lead bhejta hai.
+    """
+    property = get_object_or_404(Property.objects.select_related('builder'), id=id)
+
+    name = sanitize_input(request.POST.get("name", "")).strip()
+    phone = sanitize_input(request.POST.get("phone", "")).strip()
+
+    if not name:
+        name = sanitize_input(request.COOKIES.get("viewer_name", "")).strip()
+    if not phone:
+        phone = sanitize_input(request.COOKIES.get("viewer_phone", "")).strip()
+
+    phone_digits = re.sub(r"\D", "", phone)
+
+    if not name or len(phone_digits) < 10:
+        return JsonResponse(
+            {"success": False, "error": "Sahi naam aur 10-digit mobile number dalna zaroori hai."},
+            status=400
+        )
+
+    phone_clean = phone_digits[-10:]
+
+    try:
+        with transaction.atomic():
+            lead = Lead.objects.filter(
+                phone__endswith=phone_clean,
+                builder=property.builder
+            ).order_by('-created_at').first()
+
+            if lead:
+                if not lead.name and name:
+                    lead.name = name
+                    lead.save(update_fields=["name"])
+            else:
+                agents = list(Agent.objects.filter(
+                    builders=property.builder,
+                    is_active=True
+                ).order_by("id"))
+
+                last_lead = Lead.objects.filter(
+                    builder=property.builder
+                ).select_related('assigned_to').order_by('-id').first()
+
+                if last_lead and last_lead.assigned_to in agents:
+                    last_index = agents.index(last_lead.assigned_to)
+                    agent = agents[(last_index + 1) % len(agents)]
+                else:
+                    agent = agents[0] if agents else None
+
+                lead = Lead.objects.create(
+                    name=name,
+                    phone=phone_clean,
+                    status='NEW',
+                    priority='WARM',
+                    source='Website - Floorplan/Brochure/Video View',
+                    interest=property.title,
+                    builder=property.builder,
+                    assigned_to=agent,
+                )
+
+            lead.properties.add(property)
+
+            _, created = PropertyInquiry.objects.get_or_create(
+                property=property,
+                lead=lead,
+                defaults={
+                    'status': 'INTERESTED',
+                    'notes': 'Website par floor plan / brochure / video dekha'
+                }
+            )
+
+            if created:
+                LeadActivity.objects.create(
+                    lead=lead,
+                    message=f"Viewed floor plan / brochure / video of {property.title}"
+                )
+                logger.info(
+                    f"Media-view lead: {name} ({phone_clean}) -> "
+                    f"{property.title} (builder: {property.builder_id})"
+                )
+
+    except Exception as e:
+        logger.error(f"Error capturing media-view lead: {str(e)}")
+        return JsonResponse(
+            {"success": False, "error": "Kuch galat ho gaya, dobara try karein."},
+            status=500
+        )
+
+    response = JsonResponse({"success": True, "name": name, "phone": phone_clean})
+    response.set_cookie("viewer_name", name, max_age=365 * 24 * 3600, samesite='Lax')
+    response.set_cookie("viewer_phone", phone_clean, max_age=365 * 24 * 3600, samesite='Lax')
+    return response
 
 def property_detail(request, id, slug=None):
     """Property detail with inquiry form"""

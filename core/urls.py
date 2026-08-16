@@ -18,6 +18,7 @@ urlpatterns = [
     path("properties/", views.property_list, name="property_list"),
     path("properties/search-suggestions/", views.property_search_suggestions, name="property_search_suggestions"),
     re_path(r'^properties/(?:(?P<slug>[\w-]+)-)?(?P<id>\d+)/$', views.property_detail, name="property_detail"),
+    path("properties/<int:id>/capture-media-lead/", views.capture_media_lead, name="capture_media_lead"),
 
     path("contact/", views.contact, name="contact"),
     path("about/", views.about, name="about"),

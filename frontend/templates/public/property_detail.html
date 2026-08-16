@@ -92,7 +92,43 @@
 </style>
 {% endblock %}
 {% block content %}
+<!-- Lead-gate modal: Floor Plan / Brochure / Video dekhne se pehle naam + mobile number -->
+<div id="leadGateOverlay" class="lead-gate-overlay" onclick="if(event.target===this) closeLeadGateModal()">
+    <div class="lead-gate-modal">
+        <button type="button" class="lead-gate-close" onclick="closeLeadGateModal()" aria-label="Close">
+            <span class="material-icons-round" style="font-size:20px">close</span>
+        </button>
+        <div class="lead-gate-icon">
+            <span class="material-icons-round" style="font-size:26px">lock</span>
+        </div>
+        <h3 class="lead-gate-title">Floor Plan, Brochure &amp; Video Dekhne Ke Liye</h3>
+        <p class="lead-gate-sub">Apna naam aur mobile number bharein — sirf ek baar. Uske baad kabhi bhi bina form ke dekh sakte hain.</p>
+        <form id="leadGateForm" onsubmit="submitLeadGateForm(event)">
+            {% csrf_token %}
+            <input type="text" id="leadGateName" name="name" placeholder="Aapka naam" required class="lead-gate-input">
+            <input type="tel" id="leadGatePhone" name="phone" placeholder="Mobile number" required
+                   pattern="[0-9+ ]{10,15}" maxlength="15" class="lead-gate-input">
+            <p id="leadGateError" class="lead-gate-error" style="display:none;"></p>
+            <button type="submit" id="leadGateSubmitBtn" class="btn btn-navy" style="width:100%; justify-content:center;">
+                View Karein
+            </button>
+        </form>
+    </div>
+</div>
 
+<style>
+.lead-gate-overlay{ display:none; position:fixed; inset:0; background:rgba(15,23,42,0.6); z-index:9999; align-items:center; justify-content:center; padding:16px; }
+.lead-gate-overlay.active{ display:flex; }
+.lead-gate-modal{ position:relative; width:100%; max-width:380px; background:var(--color-surface, #fff); border-radius:var(--radius-lg, 16px); padding:28px 24px 24px; box-shadow:0 20px 60px rgba(0,0,0,0.3); text-align:center; }
+.lead-gate-close{ position:absolute; top:12px; right:12px; width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:var(--color-bg-soft, #f3f4f6); border:none; cursor:pointer; color:var(--color-text-muted, #6b7280); }
+.lead-gate-icon{ width:52px; height:52px; border-radius:50%; background:var(--color-gold, #d4af37); color:#fff; display:flex; align-items:center; justify-content:center; margin:0 auto 14px; }
+.lead-gate-title{ font-size:18px; font-weight:700; color:var(--color-navy, #0f1e3d); margin-bottom:6px; }
+.lead-gate-sub{ font-size:13px; color:var(--color-text-muted, #6b7280); margin-bottom:18px; line-height:1.4; }
+.lead-gate-input{ width:100%; padding:12px 14px; margin-bottom:12px; border:1px solid var(--color-border, #e5e7eb); border-radius:10px; font-size:14px; outline:none; }
+.lead-gate-input:focus{ border-color:var(--color-gold, #d4af37); }
+.lead-gate-error{ color:#dc2626; font-size:12px; margin:-6px 0 12px; text-align:left; }
+.gated-video-box:hover{ opacity:0.92; }
+</style>
 <!-- Structured data: this specific listing (helps rich results + AI answer engines) -->
 <script type="application/ld+json">
 {
@@ -553,12 +589,12 @@
             {% for fp in floor_plans %}
             <div class="fp-card" data-fp-type="{{ fp.unit_type }}">
                 {% if fp.image %}
-                <img src="{% cloudinary_url fp.image width=420 height=320 crop='fit' %}"
-                     alt="{{ fp.unit_type }} floor plan"
-                     class="fp-card-img"
-                     onclick="window.open(this.src, '_blank')"
-                     loading="lazy">
-                {% endif %}
+<img src="{% cloudinary_url fp.image width=420 height=320 crop='fit' %}"
+     alt="{{ fp.unit_type }} floor plan"
+     class="fp-card-img"
+     onclick="handleGatedMediaClick(event, function(){ window.open('{% cloudinary_url fp.image width=420 height=320 crop='fit' %}', '_blank'); })"
+     loading="lazy">
+{% endif %}
                 <div class="p-3">
                     <div class="flex items-center justify-between gap-2 mb-1">
                         <p class="font-semibold text-sm text-[var(--color-navy)]">{{ fp.unit_type }}</p>
@@ -602,44 +638,46 @@
                 {% endif %}
                 
                 <!-- Video -->
-                {% if property.project_video_url %}
-                <div class="card p-6 reveal">
-                    <div class="flex items-center gap-2 mb-4">
-                        <span class="material-icons-round text-[var(--color-gold)]" style="font-size:20px">videocam</span>
-                        <h2 class="text-xl font-bold text-[var(--color-navy)]">Project Video</h2>
-                    </div>
-                    <div class="rounded-xl overflow-hidden" style="position:relative; padding-top:56.25%;">
-                        <iframe src="{{ property.get_video_embed_url }}"
-                            style="position:absolute; top:0; left:0; width:100%; height:100%;"
-                            frameborder="0" 
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                            allowfullscreen>
-                        </iframe>
-                    </div>
-                </div>
-                {% endif %}
+                <!-- Video -->
+{% if property.project_video_url %}
+<div class="card p-6 reveal">
+    <div class="flex items-center gap-2 mb-4">
+        <span class="material-icons-round text-[var(--color-gold)]" style="font-size:20px">videocam</span>
+        <h2 class="text-xl font-bold text-[var(--color-navy)]">Project Video</h2>
+    </div>
+    <div class="rounded-xl overflow-hidden gated-video-box" id="gatedVideoBox"
+         data-video-src="{{ property.get_video_embed_url }}"
+         onclick="handleGatedVideoClick(event)"
+         style="position:relative; padding-top:56.25%; cursor:pointer; background:linear-gradient(135deg, var(--color-navy), #1a2a4a);">
+        <div style="position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; color:#fff; gap:8px;">
+            <span class="material-icons-round" style="font-size:48px; opacity:0.9;">play_circle</span>
+            <span style="font-size:13px; font-weight:600; opacity:0.9;">Video dekhne ke liye tap karein</span>
+        </div>
+    </div>
+</div>
+{% endif %}
                 
                 <!-- Floor Plan / Brochure -->
-                {% if property.brochure %}
-                <div class="card p-6 reveal">
-                    <div class="flex items-center gap-2 mb-4">
-                        <span class="material-icons-round text-[var(--color-gold)]" style="font-size:20px">description</span>
-                        <h2 class="text-xl font-bold text-[var(--color-navy)]">Floor Plan & Brochure</h2>
-                    </div>
-                    <div class="flex flex-wrap gap-3">
-                        <a href="{{ brochure_pdf_url|default:property.brochure.url }}" target="_blank"
-                           class="btn btn-navy">
-                            <span class="material-icons-round" style="font-size:18px">visibility</span>
-                            View Brochure
-                        </a>
-                        <a href="{{ property.brochure.url }}" download
-                           class="btn btn-outline">
-                            <span class="material-icons-round" style="font-size:18px">download</span>
-                            Download
-                        </a>
-                    </div>
-                </div>
-                {% endif %}
+{% if property.brochure %}
+<div class="card p-6 reveal">
+    <div class="flex items-center gap-2 mb-4">
+        <span class="material-icons-round text-[var(--color-gold)]" style="font-size:20px">description</span>
+        <h2 class="text-xl font-bold text-[var(--color-navy)]">Floor Plan & Brochure</h2>
+    </div>
+    <div class="flex flex-wrap gap-3">
+        <button type="button" class="btn btn-navy"
+                onclick="handleGatedMediaClick(event, function(){ window.open('{{ brochure_pdf_url|default:property.brochure.url }}', '_blank'); })">
+            <span class="material-icons-round" style="font-size:18px">visibility</span>
+            View Brochure
+        </button>
+        <button type="button" class="btn btn-outline"
+                onclick="handleGatedMediaClick(event, function(){ const a=document.createElement('a'); a.href='{{ property.brochure.url }}'; a.download=''; document.body.appendChild(a); a.click(); a.remove(); })">
+            <span class="material-icons-round" style="font-size:18px">download</span>
+            Download
+        </button>
+    </div>
+</div>
+{% endif %}
                 
                 <!-- Nearby Places -->
                 {% if property.nearby_places %}
@@ -1057,4 +1095,128 @@ document.addEventListener('keydown', e => {
     });
 })();
 </script>
+<!-- Lead-gate logic: Floor Plan / Brochure / Video ke liye name+mobile capture -->
+<script>
+(function(){
+    var PROPERTY_ID = {{ property.id }};
+    var CAPTURE_URL = "{% url 'capture_media_lead' id=property.id %}";
+    var pendingAction = null;
+    var mediaViewReported = false;
+
+    function isUnlocked(){
+        return !!(getCookie('viewer_name') && getCookie('viewer_phone'));
+    }
+
+    function openLeadGateModal(){
+        document.getElementById('leadGateOverlay').classList.add('active');
+        document.getElementById('leadGateError').style.display = 'none';
+        setTimeout(function(){
+            var nameInput = document.getElementById('leadGateName');
+            if (nameInput) nameInput.focus();
+        }, 50);
+    }
+
+    window.closeLeadGateModal = function(){
+        document.getElementById('leadGateOverlay').classList.remove('active');
+        pendingAction = null;
+    };
+
+    function reportMediaView(nameOverride, phoneOverride){
+        if (mediaViewReported) return;
+        mediaViewReported = true;
+        var body = new URLSearchParams();
+        if (nameOverride) body.append('name', nameOverride);
+        if (phoneOverride) body.append('phone', phoneOverride);
+        fetch(CAPTURE_URL, {
+            method: 'POST',
+            headers: { 'X-CSRFToken': getCookie('csrftoken'), 'X-Requested-With': 'XMLHttpRequest' },
+            body: body
+        }).catch(function(){});
+    }
+
+    window.handleGatedMediaClick = function(evt, action){
+        if (evt) evt.preventDefault();
+        if (isUnlocked()){
+            reportMediaView();
+            if (action) action();
+            return;
+        }
+        pendingAction = action;
+        openLeadGateModal();
+    };
+
+    window.handleGatedVideoClick = function(evt){
+        if (evt) evt.preventDefault();
+        var playVideo = function(){
+            var box = document.getElementById('gatedVideoBox');
+            if (!box) return;
+            var videoSrc = box.getAttribute('data-video-src');
+            if (!videoSrc) return;
+            box.outerHTML =
+                '<div class="rounded-xl overflow-hidden" style="position:relative; padding-top:56.25%;">' +
+                '<iframe src="' + videoSrc + '" style="position:absolute; top:0; left:0; width:100%; height:100%;" ' +
+                'frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>' +
+                '</div>';
+        };
+        handleGatedMediaClick(evt, playVideo);
+    };
+
+    window.submitLeadGateForm = function(evt){
+        evt.preventDefault();
+        var nameVal = document.getElementById('leadGateName').value.trim();
+        var phoneVal = document.getElementById('leadGatePhone').value.trim();
+        var errorEl = document.getElementById('leadGateError');
+        var submitBtn = document.getElementById('leadGateSubmitBtn');
+        var digitsOnly = phoneVal.replace(/\D/g, '');
+
+        if (!nameVal || digitsOnly.length < 10){
+            errorEl.textContent = 'Sahi naam aur 10-digit mobile number dalein.';
+            errorEl.style.display = 'block';
+            return;
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Please wait...';
+
+        var body = new URLSearchParams();
+        body.append('name', nameVal);
+        body.append('phone', phoneVal);
+
+        fetch(CAPTURE_URL, {
+            method: 'POST',
+            headers: { 'X-CSRFToken': getCookie('csrftoken'), 'X-Requested-With': 'XMLHttpRequest' },
+            body: body
+        })
+        .then(function(r){ return r.json(); })
+        .then(function(data){
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'View Karein';
+            if (data.success){
+                mediaViewReported = true;
+                closeLeadGateModal();
+                if (typeof showToast === 'function'){
+                    showToast('Dhanyavaad! Ab aap poori detail dekh sakte hain.', 'success');
+                }
+                if (pendingAction) { pendingAction(); pendingAction = null; }
+            } else {
+                errorEl.textContent = data.error || 'Kuch galat ho gaya, dobara try karein.';
+                errorEl.style.display = 'block';
+            }
+        })
+        .catch(function(){
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'View Karein';
+            errorEl.textContent = 'Network error, dobara try karein.';
+            errorEl.style.display = 'block';
+        });
+    };
+
+    document.addEventListener('DOMContentLoaded', function(){
+        if (isUnlocked()){
+            reportMediaView();
+        }
+    });
+})();
+</script>
+
 {% endblock %}
