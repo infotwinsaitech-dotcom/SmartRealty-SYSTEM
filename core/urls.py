@@ -10,6 +10,7 @@ from . import views_automation
 from core.views_health import health_check, cache_status
 
 urlpatterns = [
+    path('', views.home, name='home'),
 
     # ================= PUBLIC =================
 
