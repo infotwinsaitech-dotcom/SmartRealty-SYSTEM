@@ -1,0 +1,10 @@
+.env
+*.sqlite3
+backup.json
+media/
+venv/
+tailwindcss.exe
+*.exe
+staticfiles/
+__pycache__/
+*.pyc

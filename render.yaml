@@ -1,0 +1,72 @@
+services:
+  - type: web
+    name: smartrealty-crm
+    runtime: python
+    buildCommand: |
+      pip install -r requirements.txt
+      curl -sL https://github.com/tailwindlabs/tailwindcss/releases/download/v3.4.17/tailwindcss-linux-x64 -o tailwindcss
+      chmod +x tailwindcss
+      ./tailwindcss -i ./static/src/input.css -o ./static/css/tailwind.css --minify
+      python manage.py collectstatic --noinput
+      python manage.py migrate
+      python manage.py createcachetable
+    startCommand: gunicorn realestate_crm.wsgi:application -c gunicorn.conf.py
+    healthCheckPath: /health/
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.11.0"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: "False"
+      - key: DJANGO_ENV
+        value: "production"
+      - key: ALLOWED_HOSTS
+        value: "smartrealty-system.onrender.com"
+      - key: CSRF_TRUSTED_ORIGINS
+        value: "https://smartrealty-system.onrender.com"
+
+      # --- Ye sab Render Dashboard pe manually set karo ---
+      # CLOUDINARY_CLOUD_NAME
+      # CLOUDINARY_API_KEY
+      # CLOUDINARY_API_SECRET
+      # SENDGRID_API_KEY
+      # DEFAULT_FROM_EMAIL
+      # REDIS_URL          (Upstash free Redis ya Render Redis)
+      # SENTRY_DSN         (optional but recommended)
+      # GOOGLE_CLIENT_ID   (agar Google login chahiye)
+      # GOOGLE_SECRET      (agar Google login chahiye)
+
+      - key: SENTRY_DSN
+        sync: false
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
+      - key: SENDGRID_API_KEY
+        sync: false
+      - key: REDIS_URL
+        sync: false
+    plan: free
+
+  - type: cron
+    name: smartrealty-backup
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    schedule: "0 2 * * *"
+    startCommand: python manage.py backup_db
+    envVars:
+      - key: SECRET_KEY
+        fromService:
+          type: web
+          name: smartrealty-crm
+          envVarKey: SECRET_KEY
+      - key: DATABASE_URL
+        fromService:
+          type: web
+          name: smartrealty-crm
+          envVarKey: DATABASE_URL
+      - key: DJANGO_ENV
+        value: "production"
