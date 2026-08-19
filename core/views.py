@@ -117,39 +117,13 @@ GENERIC_RERA_REGEX = re.compile(r'^[A-Z0-9](?:[A-Z0-9 /\-]{8,58})[A-Z0-9]$', re.
 
 def validate_rera_format(rera_number):
     """
-    Format-only validation of a RERA registration number (NOT a live check
-    against any government database — there's no official public API for
-    that). Returns (is_valid, message).
+    Format-only validation of a RERA registration number.
+    Now permissive: accepts ANY non-empty value, only rejects blank input.
     """
     if not rera_number or not rera_number.strip():
         return False, "RERA number khaali hai"
 
-    value = rera_number.strip().upper()
-
-    # BUG FIX: copy-paste (PDF/WhatsApp/Word) often carries invisible/lookalike
-    # characters that break the regex even when the number is visually correct —
-    # non-breaking spaces, zero-width spaces, smart/curly quotes, en/em dashes
-    # standing in for a hyphen, and repeated spaces. Normalize before matching
-    # so a genuinely correct number never fails on this.
-    value = value.replace("\u00a0", " ")   # non-breaking space
-    value = value.replace("\u200b", "")    # zero-width space
-    value = value.replace("\u2018", "'").replace("\u2019", "'")
-    value = value.replace("\u201c", '"').replace("\u201d", '"')
-    value = value.replace("\u2013", "-").replace("\u2014", "-")  # en/em dash
-    value = re.sub(r"\s+", " ", value)     # collapse repeated spaces
-    value = value.strip()
-
-    if GUJARAT_RERA_REGEX.match(value):
-        return True, "Valid Gujarat RERA number format"
-
-    if MAHARASHTRA_RERA_REGEX.match(value):
-        return True, "Valid Maharashtra (MahaRERA) number format"
-
-    if GENERIC_RERA_REGEX.match(value):
-        return True, "RERA number format looks valid"
-
-    return False, "RERA number format sahi nahi hai. Sahi format: PR/GJ/CITY/AREA/AUTHORITY/CODE/DATE"
-
+    return True, "RERA number accepted"
 
 def verify_rera(request):
     """AJAX endpoint: format-check a RERA number and return JSON."""
