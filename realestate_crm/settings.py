@@ -374,7 +374,7 @@ else:
 # BUG FIX: cached_db + False — DB hammer band
 # =============================================================================
 
-SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
+SESSION_ENGINE = "django.contrib.sessions.backends.db"
 SESSION_COOKIE_AGE = 1209600
 SESSION_SAVE_EVERY_REQUEST = False
 
