@@ -1396,6 +1396,7 @@ def add_property(request):
         try:
             check_property_limit(request.user)
         except LimitExceeded as e:
+            logger.warning(f"Add property blocked (plan limit) for {request.user.username}: {e}")
             messages.error(request, str(e))
             return redirect('add_property')
         # Collect data
@@ -1456,6 +1457,7 @@ def add_property(request):
                 errors.append(f"RERA Number: {rera_msg}")
 
         if errors:
+            logger.warning(f"Add property validation failed for {request.user.username}: {errors}")
             for error in errors:
                 messages.error(request, error)
             return redirect("add_property")
@@ -1482,6 +1484,7 @@ def add_property(request):
             if uploaded:
                 valid, msg = validate_file_upload(uploaded, exts, max_size)
                 if not valid:
+                    logger.warning(f"Add property file validation failed for {request.user.username} ({field}): {msg}")
                     messages.error(request, f"{field.title()}: {msg}")
                     return redirect("add_property")
                 files[field] = uploaded
@@ -1492,6 +1495,7 @@ def add_property(request):
             baths_val = float(data['baths']) if data['baths'] else 0.0
             sqft_val = int(data['sqft']) if data['sqft'] else 0
         except ValueError:
+            logger.warning(f"Add property numeric parse failed for {request.user.username}: baths={data['baths']!r}, sqft={data['sqft']!r}")
             messages.error(request, "Invalid numeric values for baths or sqft")
             return redirect("add_property")
 
