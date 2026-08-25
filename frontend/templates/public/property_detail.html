@@ -955,7 +955,7 @@
 // Gallery
 let images = [
 {% for img in property.images.all %}
-"{% cloudinary_url img.image width=1400 height=900 crop='fill' %}",
+"{% cloudinary_url img.image width=1600 crop='limit' quality='auto:best' %}",
 {% endfor %}
 ];
 let currentIndex = 0;
