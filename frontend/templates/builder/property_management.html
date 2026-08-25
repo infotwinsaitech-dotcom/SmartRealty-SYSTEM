@@ -1173,7 +1173,7 @@ function compressImageFile(file, maxBytes = 9.5 * 1024 * 1024, maxDimension = 25
       function tryCompress() {
         canvas.toBlob(blob => {
           if (!blob) { reject(new Error('Compression failed')); return; }
-          if (blob.size <= maxBytes || quality <= 0.4) {
+          if (blob.size <= maxBytes || quality <= 0.75) {
             resolve(new File([blob], file.name, { type: 'image/jpeg' }));
           } else {
             quality -= 0.1;

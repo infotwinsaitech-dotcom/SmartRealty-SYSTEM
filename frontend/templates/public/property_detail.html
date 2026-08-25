@@ -589,10 +589,10 @@
             {% for fp in floor_plans %}
             <div class="fp-card" data-fp-type="{{ fp.unit_type }}">
                 {% if fp.image %}
-<img src="{% cloudinary_url fp.image width=420 height=320 crop='fit' %}"
+<img src="{% cloudinary_url fp.image width=420 height=320 crop='fit' quality='auto:best' fetch_format='auto' %}"
      alt="{{ fp.unit_type }} floor plan"
      class="fp-card-img"
-     onclick="handleGatedMediaClick(event, function(){ window.open('{% cloudinary_url fp.image width=420 height=320 crop='fit' %}', '_blank'); })"
+     onclick="handleGatedMediaClick(event, function(){ window.open('{% cloudinary_url fp.image crop='limit' quality='100' %}', '_blank'); })"
      loading="lazy">
 {% endif %}
                 <div class="p-3">
@@ -624,7 +624,7 @@
                     <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
                         {% for img in property.images.all %}
                         <div class="relative group cursor-pointer rounded-xl overflow-hidden" onclick="openGallery({{ forloop.counter0 }})" style="aspect-ratio: 4/3;">
-                            <img src="{% cloudinary_url img.image width=400 height=300 crop='fill' %}" 
+                            <img src="{% cloudinary_url img.image width=400 height=300 crop='fill' gravity='auto' quality='auto:good' %}" 
                                  alt="{% if property.beds %}{{ property.beds }} BHK {% endif %}{{ property.property_type }} in {{ property.location }} - {{ property.project_name|default:property.title }} photo {{ forloop.counter }}" 
                                  class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                                  loading="lazy">

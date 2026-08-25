@@ -148,7 +148,7 @@ class="w-full border p-2 rounded text-sm">{{ property.description|default:'' }}<
 <!-- THUMBNAIL -->
 <label class="text-sm font-semibold">Thumbnail</label>
 {% if property.thumbnail %}
-<img src="{% cloudinary_url property.thumbnail width=400 height=250 crop='fill' %}"
+<img src="{% cloudinary_url property.thumbnail width=400 height=250 gravity='auto' quality='auto:good' %}"
 class="mb-2 rounded w-full h-40 object-cover">
 {% endif %}
 <input type="file" name="thumbnail" id="editThumbnailInput" onchange="editUpload(this,'image','editThumbnailPublicId','editThumbnailStatus')"
@@ -161,7 +161,7 @@ class="w-full border p-2 rounded text-sm">
 <div id="image-container" class="space-y-2">
 {% for img in property.images.all %}
 <div class="flex gap-2 items-center">
-<img src="{% cloudinary_url img.image width=100 height=80 crop='fill' %}" class="rounded h-16 w-20 object-cover">
+<img src="{% cloudinary_url img.image width=100 height=80 gravity='auto' quality='auto:good' %}" class="rounded h-16 w-20 object-cover">
 <span class="text-xs text-gray-500">Current Image {{ forloop.counter }}</span>
 </div>
 {% endfor %}
@@ -244,7 +244,7 @@ class="w-full border p-2 rounded text-sm">
 <!-- PROJECT LOGO -->
 <label class="text-sm font-semibold">Project Logo</label>
 {% if property.project_logo %}
-<img src="{% cloudinary_url property.project_logo width=100 height=80 crop='fill' %}"
+<img src="{% cloudinary_url property.project_logo width=100 height=80 gravity='auto' quality='auto:good' %}"
 class="mb-2 rounded h-16 w-20 object-cover">
 {% endif %}
 <input type="file" name="project_logo" id="editLogoInput" onchange="editUpload(this,'image','editLogoPublicId','editLogoStatus')"
