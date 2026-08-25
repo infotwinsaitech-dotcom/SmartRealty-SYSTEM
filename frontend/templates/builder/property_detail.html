@@ -180,7 +180,7 @@ class="mt-2 bg-green-600 text-white px-3 py-2 rounded text-sm">
   <button type="button" onclick="toggleEditAmenityTag(this, 'Parking')" class="edit-amenity-tag px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs border hover:bg-blue-100 hover:border-blue-300 transition">Parking</button>
   <button type="button" onclick="toggleEditAmenityTag(this, 'Lift')" class="edit-amenity-tag px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs border hover:bg-blue-100 hover:border-blue-300 transition">Lift</button>
   <button type="button" onclick="toggleEditAmenityTag(this, 'Gym')" class="edit-amenity-tag px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs border hover:bg-blue-100 hover:border-blue-300 transition">Gym</button>
-  <button type="button" onclick="toggleEditAmenityTag(this, 'Pool')" class="edit-amenity-tag px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs border hover:bg-blue-100 hover:border-blue-300 transition">Pool</button>
+  <button type="button" onclick="toggleEditAmenityTag(this, 'Swimming Pool')" class="edit-amenity-tag px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs border hover:bg-blue-100 hover:border-blue-300 transition">Swimming Pool</button>
   <button type="button" onclick="toggleEditAmenityTag(this, 'Security')" class="edit-amenity-tag px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs border hover:bg-blue-100 hover:border-blue-300 transition">Security</button>
   <button type="button" onclick="toggleEditAmenityTag(this, 'Garden')" class="edit-amenity-tag px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs border hover:bg-blue-100 hover:border-blue-300 transition">Garden</button>
   <button type="button" onclick="toggleEditAmenityTag(this, 'Club House')" class="edit-amenity-tag px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs border hover:bg-blue-100 hover:border-blue-300 transition">Club House</button>
@@ -710,7 +710,7 @@ function getAmenityIcon(name) {
   const n = (name || '').toLowerCase();
   const map = [
     [['parking'], 'local_parking'], [['lift','elevator'], 'elevator'],
-    [['gym','fitness'], 'fitness_center'], [['pool','swim'], 'pool'],
+    [['gym','fitness'], 'fitness_center'], [['Swimming Pool','swim'], 'Swimming Pool'],
     [['security','guard','cctv'], 'security'], [['garden'], 'park'],
     [['club'], 'groups'], [['power','backup','generator'], 'bolt'],
     [['water'], 'water_drop'], [['play','kids'], 'toys'],
