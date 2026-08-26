@@ -461,7 +461,17 @@ def property_detail(request, id, slug=None):
 
     highlights_list = []
     if property.highlights:
-        highlights_list = [h.strip() for h in property.highlights.split(",") if h.strip()]
+        # Builder textarea me highlights alag-alag line (Enter) se likhe jaate hain.
+        # Kabhi kabhi comma ya bullet (-, *, •) se bhi separate kiya jaata hai.
+        # Isliye newline, comma, aur bullet-prefix teeno ko handle karo,
+        # taaki text ek dusre se jumbled hoke na chipke.
+        raw_text = property.highlights.replace("\r\n", "\n")
+        parts = re.split(r"[\n,]+", raw_text)
+        highlights_list = []
+        for part in parts:
+            cleaned = re.sub(r"^[\s\-\*•]+", "", part).strip()
+            if cleaned:
+                highlights_list.append(cleaned)
     
     similar_properties = Property.objects.filter(
         location=property.location

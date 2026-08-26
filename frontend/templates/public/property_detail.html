@@ -433,13 +433,14 @@
                         <span class="material-icons-round text-[var(--color-gold)]" style="font-size:20px">auto_awesome</span>
                         <h2 class="text-xl font-bold text-[var(--color-navy)]">Highlights</h2>
                     </div>
-                    <div class="flex flex-wrap gap-2">
+                    <ul class="space-y-2.5">
                         {% for h in highlights_list %}
-                        <span class="px-4 py-2 bg-[var(--color-gold)]/10 text-[var(--color-gold)] rounded-full text-sm font-semibold">
-                            {{ h }}
-                        </span>
+                        <li class="flex items-start gap-2.5">
+                            <span class="material-icons-round text-[var(--color-gold)] mt-0.5" style="font-size:16px">check_circle</span>
+                            <span class="text-sm text-[var(--color-text)] leading-relaxed">{{ h }}</span>
+                        </li>
                         {% endfor %}
-                    </div>
+                    </ul>
                 </div>
                 {% endif %}
                 

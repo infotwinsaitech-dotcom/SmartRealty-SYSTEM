@@ -282,7 +282,7 @@ class="w-full border p-2 rounded text-sm">
 <option value="2+ Years" {% if property.possession == "2+ Years" %}selected{% endif %}>2+ Years</option>
 </select>
 
-<textarea name="highlights" placeholder="Highlights"
+<textarea name="highlights" placeholder="Highlights (har point ek naye line me likhein, Enter daba kar)" rows="5"
 class="w-full border p-2 rounded text-sm">{{ property.highlights|default:'' }}</textarea>
 
 <input name="map_link" value="{{ property.map_link|default:'' }}" placeholder="Google Map Link"
