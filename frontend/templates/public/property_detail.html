@@ -425,7 +425,70 @@
                         </div>
                     </div>
                 </div>
+                            <!-- Gallery -->
+                {% if property.images.all %}
+                <div class="card p-6 reveal">
+                    <div class="flex items-center gap-2 mb-4">
+                        <span class="material-icons-round text-[var(--color-gold)]" style="font-size:20px">photo_library</span>
+                        <h2 class="text-xl font-bold text-[var(--color-navy)]">Gallery</h2>
+                    </div>
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                        {% for img in property.images.all %}
+                        <div class="relative group cursor-pointer rounded-xl overflow-hidden" onclick="openGallery({{ forloop.counter0 }})" style="aspect-ratio: 4/3;">
+                            <img src="{% cloudinary_url img.image width=400 height=300 crop='fill' gravity='auto' quality='auto:good' %}" 
+                                 alt="{% if property.beds %}{{ property.beds }} BHK {% endif %}{{ property.property_type }} in {{ property.location }} - {{ property.project_name|default:property.title }} photo {{ forloop.counter }}" 
+                                 class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                 loading="lazy">
+                            <div class="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all flex items-center justify-center">
+                                <span class="material-icons-round text-white opacity-0 group-hover:opacity-100 transition-opacity" style="font-size:32px">zoom_in</span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
                 
+                <!-- Video -->
+                <!-- Video -->
+{% if property.project_video_url %}
+<div class="card p-6 reveal">
+    <div class="flex items-center gap-2 mb-4">
+        <span class="material-icons-round text-[var(--color-gold)]" style="font-size:20px">videocam</span>
+        <h2 class="text-xl font-bold text-[var(--color-navy)]">Project Video</h2>
+    </div>
+    <div class="rounded-xl overflow-hidden gated-video-box" id="gatedVideoBox"
+         data-video-src="{{ property.get_video_embed_url }}"
+         onclick="handleGatedVideoClick(event)"
+         style="position:relative; padding-top:56.25%; cursor:pointer; background:linear-gradient(135deg, var(--color-navy), #1a2a4a);">
+        <div style="position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; color:#fff; gap:8px;">
+            <span class="material-icons-round" style="font-size:48px; opacity:0.9;">play_circle</span>
+            <span style="font-size:13px; font-weight:600; opacity:0.9;">Video dekhne ke liye tap karein</span>
+        </div>
+    </div>
+</div>
+{% endif %}
+                
+                <!-- Floor Plan / Brochure -->
+{% if property.brochure %}
+<div class="card p-6 reveal">
+    <div class="flex items-center gap-2 mb-4">
+        <span class="material-icons-round text-[var(--color-gold)]" style="font-size:20px">description</span>
+        <h2 class="text-xl font-bold text-[var(--color-navy)]">Floor Plan & Brochure</h2>
+    </div>
+    <div class="flex flex-wrap gap-3">
+        <button type="button" class="btn btn-navy"
+                onclick="handleGatedMediaClick(event, function(){ window.open('{{ brochure_pdf_url|default:property.brochure.url }}', '_blank'); })">
+            <span class="material-icons-round" style="font-size:18px">visibility</span>
+            View Brochure
+        </button>
+        <button type="button" class="btn btn-outline"
+                onclick="handleGatedMediaClick(event, function(){ const a=document.createElement('a'); a.href='{{ property.brochure.url }}'; a.download=''; document.body.appendChild(a); a.click(); a.remove(); })">
+            <span class="material-icons-round" style="font-size:18px">download</span>
+            Download
+        </button>
+    </div>
+</div>
+{% endif %}
                 <!-- Highlights -->
                 {% if highlights_list %}
                 <div class="card p-6 reveal">
@@ -615,70 +678,7 @@
         </button>
     </div>
 </div>
-{% endif %}                <!-- Gallery -->
-                {% if property.images.all %}
-                <div class="card p-6 reveal">
-                    <div class="flex items-center gap-2 mb-4">
-                        <span class="material-icons-round text-[var(--color-gold)]" style="font-size:20px">photo_library</span>
-                        <h2 class="text-xl font-bold text-[var(--color-navy)]">Gallery</h2>
-                    </div>
-                    <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
-                        {% for img in property.images.all %}
-                        <div class="relative group cursor-pointer rounded-xl overflow-hidden" onclick="openGallery({{ forloop.counter0 }})" style="aspect-ratio: 4/3;">
-                            <img src="{% cloudinary_url img.image width=400 height=300 crop='fill' gravity='auto' quality='auto:good' %}" 
-                                 alt="{% if property.beds %}{{ property.beds }} BHK {% endif %}{{ property.property_type }} in {{ property.location }} - {{ property.project_name|default:property.title }} photo {{ forloop.counter }}" 
-                                 class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                                 loading="lazy">
-                            <div class="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all flex items-center justify-center">
-                                <span class="material-icons-round text-white opacity-0 group-hover:opacity-100 transition-opacity" style="font-size:32px">zoom_in</span>
-                            </div>
-                        </div>
-                        {% endfor %}
-                    </div>
-                </div>
-                {% endif %}
-                
-                <!-- Video -->
-                <!-- Video -->
-{% if property.project_video_url %}
-<div class="card p-6 reveal">
-    <div class="flex items-center gap-2 mb-4">
-        <span class="material-icons-round text-[var(--color-gold)]" style="font-size:20px">videocam</span>
-        <h2 class="text-xl font-bold text-[var(--color-navy)]">Project Video</h2>
-    </div>
-    <div class="rounded-xl overflow-hidden gated-video-box" id="gatedVideoBox"
-         data-video-src="{{ property.get_video_embed_url }}"
-         onclick="handleGatedVideoClick(event)"
-         style="position:relative; padding-top:56.25%; cursor:pointer; background:linear-gradient(135deg, var(--color-navy), #1a2a4a);">
-        <div style="position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; color:#fff; gap:8px;">
-            <span class="material-icons-round" style="font-size:48px; opacity:0.9;">play_circle</span>
-            <span style="font-size:13px; font-weight:600; opacity:0.9;">Video dekhne ke liye tap karein</span>
-        </div>
-    </div>
-</div>
-{% endif %}
-                
-                <!-- Floor Plan / Brochure -->
-{% if property.brochure %}
-<div class="card p-6 reveal">
-    <div class="flex items-center gap-2 mb-4">
-        <span class="material-icons-round text-[var(--color-gold)]" style="font-size:20px">description</span>
-        <h2 class="text-xl font-bold text-[var(--color-navy)]">Floor Plan & Brochure</h2>
-    </div>
-    <div class="flex flex-wrap gap-3">
-        <button type="button" class="btn btn-navy"
-                onclick="handleGatedMediaClick(event, function(){ window.open('{{ brochure_pdf_url|default:property.brochure.url }}', '_blank'); })">
-            <span class="material-icons-round" style="font-size:18px">visibility</span>
-            View Brochure
-        </button>
-        <button type="button" class="btn btn-outline"
-                onclick="handleGatedMediaClick(event, function(){ const a=document.createElement('a'); a.href='{{ property.brochure.url }}'; a.download=''; document.body.appendChild(a); a.click(); a.remove(); })">
-            <span class="material-icons-round" style="font-size:18px">download</span>
-            Download
-        </button>
-    </div>
-</div>
-{% endif %}
+{% endif %}    
                 
                 <!-- Nearby Places -->
                 {% if property.nearby_places %}
