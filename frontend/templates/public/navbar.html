@@ -130,7 +130,14 @@
                     </div>
                 </div>
                 {% else %}
-                <!-- BUILDER/AGENT: Show Logout only -->
+                <!-- BUILDER: Dashboard button (CRM tak jaane ke liye) -->
+                {% if user.role == 'builder' %}
+                <a href="{% url 'builder_dashboard' %}" class="hidden sm:flex items-center gap-1.5 font-semibold transition px-3 py-2 rounded-lg text-sm" style="color: var(--color-navy); background: var(--color-gold)/10;" onmouseover="this.style.background='var(--color-bg-soft)'" onmouseout="this.style.background=''">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
+                    Dashboard
+                </a>
+                {% endif %}
+                <!-- BUILDER/AGENT: Show Logout -->
                 <a href="{% url 'logout' %}" class="hidden sm:flex items-center gap-1.5 font-medium transition px-3 py-2 rounded-lg text-sm hover:bg-red-50" style="color: #ef4444;">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
                     Logout
@@ -258,7 +265,14 @@
                 Logout
             </a>
             {% else %}
-            <!-- BUILDER/AGENT: Show Logout only -->
+            <!-- BUILDER: Dashboard link (CRM tak jaane ke liye) -->
+            {% if user.role == 'builder' %}
+            <a href="{% url 'builder_dashboard' %}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition font-semibold" style="color: var(--color-navy); background: var(--color-bg-soft);">
+                <svg class="w-5 h-5" style="color: var(--color-gold-dark);" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
+                Dashboard
+            </a>
+            {% endif %}
+            <!-- BUILDER/AGENT: Show Logout -->
             <a href="{% url 'logout' %}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition font-medium hover:bg-red-50" style="color: #ef4444;">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
                 Logout
