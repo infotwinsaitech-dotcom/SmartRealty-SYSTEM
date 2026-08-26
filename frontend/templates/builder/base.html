@@ -143,16 +143,8 @@
                 {% include 'components/builder_navbar.html' %}
             </div>
 
-            <!-- राइट साइड: साइट बटन + नोटिफिकेशन बेल -->
-            <div class="flex items-center gap-2 md:gap-4">
-                <!-- SITE BUTTON: builder ko wapas public website par le jaata hai -->
-                <a href="{% url 'home' %}" target="_blank" rel="noopener"
-                   class="flex items-center gap-1.5 px-2.5 md:px-3 py-2 rounded-lg text-sm font-semibold bg-primary text-on-primary hover:opacity-90 transition"
-                   title="Public site par jaane ke liye">
-                    <span class="material-symbols-outlined" style="font-size:18px;">language</span>
-                    <span class="hidden md:inline">Site</span>
-                </a>
-
+            <!-- राइट साइड: नोटिफिकेशन बेल -->
+            <div class="flex items-center gap-4">
                 <a href="{% url 'notifications' %}" class="relative p-2 hover:bg-surface-variant rounded-full inline-block">
                     <span class="text-xl">🔔</span>
                     {% if notifications_unread_count > 0 %}
