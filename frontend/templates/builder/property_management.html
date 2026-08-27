@@ -227,34 +227,36 @@ class="border p-2 rounded w-full mb-2 text-sm">
     </select>
 </div>
 
-<!-- PROPERTY TYPE -->
-<select name="property_type" id="propertyType"
-class="bg-gray-900 text-white p-2 md:p-3 rounded-xl w-full mb-3"
-onchange="toggleBHK()">
+<!-- PROPERTY TYPE (MULTI-SELECT): ek se zyada type select kar sakte ho -->
+<div class="bg-gray-900 text-white p-3 rounded-xl w-full mb-3">
+    <p class="text-xs text-gray-400 mb-2 font-semibold">Property Type (ek ya zyada select karo)</p>
 
-<option value="">Select Type</option>
+    <p class="text-[11px] text-gray-500 mt-2 mb-1">Residential</p>
+    <div class="grid grid-cols-2 sm:grid-cols-3 gap-1.5">
+        <label class="flex items-center gap-1.5 text-sm bg-gray-800 rounded-lg px-2 py-1.5 cursor-pointer"><input type="checkbox" name="property_type" value="Flat" class="property-type-checkbox" onchange="toggleBHK()"> Flat</label>
+        <label class="flex items-center gap-1.5 text-sm bg-gray-800 rounded-lg px-2 py-1.5 cursor-pointer"><input type="checkbox" name="property_type" value="Villa" class="property-type-checkbox" onchange="toggleBHK()"> Villa</label>
+        <label class="flex items-center gap-1.5 text-sm bg-gray-800 rounded-lg px-2 py-1.5 cursor-pointer"><input type="checkbox" name="property_type" value="Bungalow" class="property-type-checkbox" onchange="toggleBHK()"> Bungalow</label>
+        <label class="flex items-center gap-1.5 text-sm bg-gray-800 rounded-lg px-2 py-1.5 cursor-pointer"><input type="checkbox" name="property_type" value="Duplex" class="property-type-checkbox" onchange="toggleBHK()"> Duplex</label>
+        <label class="flex items-center gap-1.5 text-sm bg-gray-800 rounded-lg px-2 py-1.5 cursor-pointer"><input type="checkbox" name="property_type" value="Penthouse" class="property-type-checkbox" onchange="toggleBHK()"> Penthouse</label>
+    </div>
 
-<!-- Residential -->
-<option value="Flat">Flat</option>
-<option value="Villa">Villa</option>
-<option value="Bungalow">Bungalow</option>
-<option value="Duplex">Duplex</option>
-<option value="Penthouse">Penthouse</option>
+    <p class="text-[11px] text-gray-500 mt-3 mb-1">Commercial</p>
+    <div class="grid grid-cols-2 sm:grid-cols-3 gap-1.5">
+        <label class="flex items-center gap-1.5 text-sm bg-gray-800 rounded-lg px-2 py-1.5 cursor-pointer"><input type="checkbox" name="property_type" value="Office" class="property-type-checkbox" onchange="toggleBHK()"> Office</label>
+        <label class="flex items-center gap-1.5 text-sm bg-gray-800 rounded-lg px-2 py-1.5 cursor-pointer"><input type="checkbox" name="property_type" value="Shop" class="property-type-checkbox" onchange="toggleBHK()"> Shop</label>
+        <label class="flex items-center gap-1.5 text-sm bg-gray-800 rounded-lg px-2 py-1.5 cursor-pointer"><input type="checkbox" name="property_type" value="Showroom" class="property-type-checkbox" onchange="toggleBHK()"> Showroom</label>
+        <label class="flex items-center gap-1.5 text-sm bg-gray-800 rounded-lg px-2 py-1.5 cursor-pointer"><input type="checkbox" name="property_type" value="Warehouse" class="property-type-checkbox" onchange="toggleBHK()"> Warehouse</label>
+        <label class="flex items-center gap-1.5 text-sm bg-gray-800 rounded-lg px-2 py-1.5 cursor-pointer"><input type="checkbox" name="property_type" value="Industrial" class="property-type-checkbox" onchange="toggleBHK()"> Industrial</label>
+    </div>
 
-<!-- Commercial -->
-<option value="Office">Office</option>
-<option value="Shop">Shop</option>
-<option value="Showroom">Showroom</option>
-<option value="Warehouse">Warehouse</option>
-<option value="Industrial">Industrial</option>
-
-<!-- Land -->
-<option value="Land">Land</option>
-<option value="Plot">Plot</option>
-<option value="Plots">Plots</option>
-<option value="Farmhouse">Farmhouse</option>
-
-</select>
+    <p class="text-[11px] text-gray-500 mt-3 mb-1">Land</p>
+    <div class="grid grid-cols-2 sm:grid-cols-3 gap-1.5">
+        <label class="flex items-center gap-1.5 text-sm bg-gray-800 rounded-lg px-2 py-1.5 cursor-pointer"><input type="checkbox" name="property_type" value="Land" class="property-type-checkbox" onchange="toggleBHK()"> Land</label>
+        <label class="flex items-center gap-1.5 text-sm bg-gray-800 rounded-lg px-2 py-1.5 cursor-pointer"><input type="checkbox" name="property_type" value="Plot" class="property-type-checkbox" onchange="toggleBHK()"> Plot</label>
+        <label class="flex items-center gap-1.5 text-sm bg-gray-800 rounded-lg px-2 py-1.5 cursor-pointer"><input type="checkbox" name="property_type" value="Plots" class="property-type-checkbox" onchange="toggleBHK()"> Plots</label>
+        <label class="flex items-center gap-1.5 text-sm bg-gray-800 rounded-lg px-2 py-1.5 cursor-pointer"><input type="checkbox" name="property_type" value="Farmhouse" class="property-type-checkbox" onchange="toggleBHK()"> Farmhouse</label>
+    </div>
+</div>
 
 <!-- GRID FIX (BHK SECTION) -->
 <div id="bhkSection" class="grid grid-cols-1 sm:grid-cols-3 gap-2">
