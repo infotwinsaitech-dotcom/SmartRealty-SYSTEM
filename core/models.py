@@ -101,10 +101,10 @@ class Property(models.Model):
     )
 
     property_type = models.CharField(
-        max_length=50,
-        choices=PROPERTY_TYPE_CHOICES,
+        max_length=255,
         default="Flat",
-        db_index=True
+        db_index=True,
+        help_text="Multiple types ko comma (,) se separate karke store kiya jaata hai, e.g. 'Flat,Penthouse'"
     )
 
     thumbnail = CloudinaryField('image', blank=True, null=True)
@@ -167,7 +167,17 @@ class Property(models.Model):
         verbose_name_plural = 'Properties'
 
     def has_bhk(self):
-        return self.property_type in ["Flat", "Villa", "Bungalow", "Duplex", "Penthouse"]
+        return any(t in ["Flat", "Villa", "Bungalow", "Duplex", "Penthouse"] for t in self.get_property_types_list())
+
+    def get_property_types_list(self):
+        """property_type field ko comma se split karke clean list return karta hai (multi-select support)."""
+        if not self.property_type:
+            return []
+        return [t.strip() for t in self.property_type.split(",") if t.strip()]
+
+    def get_property_types_display(self):
+        """Property types ko readable string me joda hua deta hai, e.g. 'Flat, Penthouse'."""
+        return ", ".join(self.get_property_types_list())
 
     def get_video_embed_url(self):
         """

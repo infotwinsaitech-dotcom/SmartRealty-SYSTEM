@@ -1415,7 +1415,7 @@ def add_property(request):
             'location': sanitize_input(request.POST.get("location", "")),
             'project_name': sanitize_input(request.POST.get("project_name", "")),
             'status': sanitize_input(request.POST.get("status", "Available")),
-            'property_type': sanitize_input(request.POST.get("property_type", "")),
+            'property_type': ",".join([sanitize_input(t) for t in request.POST.getlist("property_type") if sanitize_input(t).strip()]),
             'builder_name': sanitize_input(request.POST.get("builder_name", "")),
             'price': request.POST.get("price", ""),
             'price_unit': sanitize_input(request.POST.get("price_unit", "L")),
@@ -2431,7 +2431,6 @@ def _update_property(request, property):
         'location': 'location',
         'project_name': 'project_name',
         'price': 'price',
-        'property_type': 'property_type',
         'description': 'description',
         'status': 'status',
         'configuration': 'configuration',
@@ -2454,6 +2453,11 @@ def _update_property(request, property):
     for field, post_key in fields.items():
         value = sanitize_input(request.POST.get(post_key, getattr(property, field)))
         setattr(property, field, value)
+
+    # PROPERTY TYPE: multiple checkboxes ho sakti hain (Flat, Penthouse, Duplex, etc.)
+    selected_types = request.POST.getlist("property_type")
+    if selected_types:
+        property.property_type = ",".join([sanitize_input(t) for t in selected_types if sanitize_input(t).strip()])
 
     # Beds ab free text hai (e.g. "4/5"), isliye seedha save karo
     property.beds = sanitize_input(request.POST.get('beds')).strip() or None

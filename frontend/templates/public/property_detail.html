@@ -366,7 +366,7 @@
                         <h2 class="text-xl font-bold text-[var(--color-navy)]">About Project</h2>
                     </div>
                     <p class="text-sm text-[var(--color-text-muted)] leading-relaxed mb-3">
-                        {{ property.project_name|default:property.title }} is a {{ property.property_type|default:"residential" }} property
+                        {{ property.project_name|default:property.title }} is a {{ property.get_property_types_display|default:"residential" }} property
                         {% if property.configuration %}offering a {{ property.configuration }} configuration{% endif %}
                         located in {{ property.location }}, Ahmedabad{% if property.sqft %}, spread across {{ property.sqft }} sq.ft{% endif %}.
                         {% if property.status == "Available" %}This property is currently available for sale{% elif property.status == "Coming Soon" %}This is an upcoming project{% elif property.status %}This property's current status is {{ property.status }}{% endif %}

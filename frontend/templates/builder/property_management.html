@@ -1132,12 +1132,14 @@ function togglePriceOnRequest(prefix) {
 }
 /* 🔥 BHK SHOW/HIDE */
 function toggleBHK() {
-let type = document.getElementById("propertyType").value;
+let checkboxes = document.querySelectorAll(".property-type-checkbox:checked");
+let selectedTypes = Array.from(checkboxes).map(cb => cb.value);
 let bhk = document.getElementById("bhkSection");
 
 let residential = ["Flat","Villa","Bungalow","Duplex","Penthouse"];
+let hasResidential = selectedTypes.some(type => residential.includes(type));
 
-if (residential.includes(type)) {
+if (hasResidential) {
 bhk.style.display = "grid";
 } else {
 bhk.style.display = "none";

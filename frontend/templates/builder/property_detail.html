@@ -105,29 +105,36 @@ class="border p-2 rounded w-full text-sm">
     </select>
 </div>
 
-<!-- PROPERTY TYPE -->
-<select name="property_type" id="propertyType"
-class="bg-gray-900 text-white p-2 md:p-3 rounded-xl w-full"
-onchange="toggleBHK()">
-<option value="">Select Type</option>
-<!-- Residential -->
-<option value="Flat" {% if property.property_type == "Flat" %}selected{% endif %}>Flat</option>
-<option value="Villa" {% if property.property_type == "Villa" %}selected{% endif %}>Villa</option>
-<option value="Bungalow" {% if property.property_type == "Bungalow" %}selected{% endif %}>Bungalow</option>
-<option value="Duplex" {% if property.property_type == "Duplex" %}selected{% endif %}>Duplex</option>
-<option value="Penthouse" {% if property.property_type == "Penthouse" %}selected{% endif %}>Penthouse</option>
-<!-- Commercial -->
-<option value="Office" {% if property.property_type == "Office" %}selected{% endif %}>Office</option>
-<option value="Shop" {% if property.property_type == "Shop" %}selected{% endif %}>Shop</option>
-<option value="Showroom" {% if property.property_type == "Showroom" %}selected{% endif %}>Showroom</option>
-<option value="Warehouse" {% if property.property_type == "Warehouse" %}selected{% endif %}>Warehouse</option>
-<option value="Industrial" {% if property.property_type == "Industrial" %}selected{% endif %}>Industrial</option>
-<!-- Land -->
-<option value="Land" {% if property.property_type == "Land" %}selected{% endif %}>Land</option>
-<option value="Plot" {% if property.property_type == "Plot" %}selected{% endif %}>Plot</option>
-<option value="Plots" {% if property.property_type == "Plots" %}selected{% endif %}>Plots</option>
-<option value="Farmhouse" {% if property.property_type == "Farmhouse" %}selected{% endif %}>Farmhouse</option>
-</select>
+<!-- PROPERTY TYPE (MULTI-SELECT): ek se zyada type select kar sakte ho -->
+<div class="bg-gray-900 text-white p-3 rounded-xl w-full">
+    <p class="text-xs text-gray-400 mb-2 font-semibold">Property Type (ek ya zyada select karo)</p>
+
+    <p class="text-[11px] text-gray-500 mt-2 mb-1">Residential</p>
+    <div class="grid grid-cols-2 sm:grid-cols-3 gap-1.5">
+        <label class="flex items-center gap-1.5 text-sm bg-gray-800 rounded-lg px-2 py-1.5 cursor-pointer"><input type="checkbox" name="property_type" value="Flat" class="property-type-checkbox" onchange="toggleBHK()" {% if "Flat" in property.get_property_types_list %}checked{% endif %}> Flat</label>
+        <label class="flex items-center gap-1.5 text-sm bg-gray-800 rounded-lg px-2 py-1.5 cursor-pointer"><input type="checkbox" name="property_type" value="Villa" class="property-type-checkbox" onchange="toggleBHK()" {% if "Villa" in property.get_property_types_list %}checked{% endif %}> Villa</label>
+        <label class="flex items-center gap-1.5 text-sm bg-gray-800 rounded-lg px-2 py-1.5 cursor-pointer"><input type="checkbox" name="property_type" value="Bungalow" class="property-type-checkbox" onchange="toggleBHK()" {% if "Bungalow" in property.get_property_types_list %}checked{% endif %}> Bungalow</label>
+        <label class="flex items-center gap-1.5 text-sm bg-gray-800 rounded-lg px-2 py-1.5 cursor-pointer"><input type="checkbox" name="property_type" value="Duplex" class="property-type-checkbox" onchange="toggleBHK()" {% if "Duplex" in property.get_property_types_list %}checked{% endif %}> Duplex</label>
+        <label class="flex items-center gap-1.5 text-sm bg-gray-800 rounded-lg px-2 py-1.5 cursor-pointer"><input type="checkbox" name="property_type" value="Penthouse" class="property-type-checkbox" onchange="toggleBHK()" {% if "Penthouse" in property.get_property_types_list %}checked{% endif %}> Penthouse</label>
+    </div>
+
+    <p class="text-[11px] text-gray-500 mt-3 mb-1">Commercial</p>
+    <div class="grid grid-cols-2 sm:grid-cols-3 gap-1.5">
+        <label class="flex items-center gap-1.5 text-sm bg-gray-800 rounded-lg px-2 py-1.5 cursor-pointer"><input type="checkbox" name="property_type" value="Office" class="property-type-checkbox" onchange="toggleBHK()" {% if "Office" in property.get_property_types_list %}checked{% endif %}> Office</label>
+        <label class="flex items-center gap-1.5 text-sm bg-gray-800 rounded-lg px-2 py-1.5 cursor-pointer"><input type="checkbox" name="property_type" value="Shop" class="property-type-checkbox" onchange="toggleBHK()" {% if "Shop" in property.get_property_types_list %}checked{% endif %}> Shop</label>
+        <label class="flex items-center gap-1.5 text-sm bg-gray-800 rounded-lg px-2 py-1.5 cursor-pointer"><input type="checkbox" name="property_type" value="Showroom" class="property-type-checkbox" onchange="toggleBHK()" {% if "Showroom" in property.get_property_types_list %}checked{% endif %}> Showroom</label>
+        <label class="flex items-center gap-1.5 text-sm bg-gray-800 rounded-lg px-2 py-1.5 cursor-pointer"><input type="checkbox" name="property_type" value="Warehouse" class="property-type-checkbox" onchange="toggleBHK()" {% if "Warehouse" in property.get_property_types_list %}checked{% endif %}> Warehouse</label>
+        <label class="flex items-center gap-1.5 text-sm bg-gray-800 rounded-lg px-2 py-1.5 cursor-pointer"><input type="checkbox" name="property_type" value="Industrial" class="property-type-checkbox" onchange="toggleBHK()" {% if "Industrial" in property.get_property_types_list %}checked{% endif %}> Industrial</label>
+    </div>
+
+    <p class="text-[11px] text-gray-500 mt-3 mb-1">Land</p>
+    <div class="grid grid-cols-2 sm:grid-cols-3 gap-1.5">
+        <label class="flex items-center gap-1.5 text-sm bg-gray-800 rounded-lg px-2 py-1.5 cursor-pointer"><input type="checkbox" name="property_type" value="Land" class="property-type-checkbox" onchange="toggleBHK()" {% if "Land" in property.get_property_types_list %}checked{% endif %}> Land</label>
+        <label class="flex items-center gap-1.5 text-sm bg-gray-800 rounded-lg px-2 py-1.5 cursor-pointer"><input type="checkbox" name="property_type" value="Plot" class="property-type-checkbox" onchange="toggleBHK()" {% if "Plot" in property.get_property_types_list %}checked{% endif %}> Plot</label>
+        <label class="flex items-center gap-1.5 text-sm bg-gray-800 rounded-lg px-2 py-1.5 cursor-pointer"><input type="checkbox" name="property_type" value="Plots" class="property-type-checkbox" onchange="toggleBHK()" {% if "Plots" in property.get_property_types_list %}checked{% endif %}> Plots</label>
+        <label class="flex items-center gap-1.5 text-sm bg-gray-800 rounded-lg px-2 py-1.5 cursor-pointer"><input type="checkbox" name="property_type" value="Farmhouse" class="property-type-checkbox" onchange="toggleBHK()" {% if "Farmhouse" in property.get_property_types_list %}checked{% endif %}> Farmhouse</label>
+    </div>
+</div>
 
 <!-- BHK SECTION -->
 <div id="bhkSection" class="grid grid-cols-1 sm:grid-cols-3 gap-2"
@@ -828,10 +835,12 @@ function togglePriceOnRequest(prefix) {
 }
 /* BHK SHOW/HIDE */
 function toggleBHK() {
-let type = document.getElementById("propertyType").value;
+let checkboxes = document.querySelectorAll(".property-type-checkbox:checked");
+let selectedTypes = Array.from(checkboxes).map(cb => cb.value);
 let bhk = document.getElementById("bhkSection");
 let residential = ["Flat","Villa","Bungalow","Duplex","Penthouse"];
-if (residential.includes(type)) {
+let hasResidential = selectedTypes.some(type => residential.includes(type));
+if (hasResidential) {
 bhk.style.display = "grid";
 } else {
 bhk.style.display = "none";
