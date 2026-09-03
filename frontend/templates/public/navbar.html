@@ -1,8 +1,4 @@
 {% load static %}
-<style>
-/* Menu+Actions area me scrollbar chhupao (Chrome/Edge/Safari) */
-.nav-scroll-area::-webkit-scrollbar { display: none; }
-</style>
 <!-- ============================================
      TOP NAVBAR - RealShri
      Navy + Gold + White, matches base.html design system
@@ -20,8 +16,8 @@
             <span style="display:none; font-weight:800; font-size:1.1rem; color: var(--color-navy);">{{ site.company_name|default:'RealShree' }}</span>
         </div>
 
-        <!-- MENU + ACTIONS: agar space kam pade to yeh horizontally scroll ho jayega, taaki koi bhi item screen se bahar "cut" na ho -->
-        <div class="flex items-center gap-3 flex-1 min-w-0 justify-start lg:justify-end nav-scroll-area" style="overflow-x: auto; scrollbar-width: none;">
+        <!-- MENU + ACTIONS -->
+        <div class="flex items-center gap-3 flex-1 min-w-0 justify-start lg:justify-end nav-scroll-area">
 
         <!-- DESKTOP MENU -->
         <div class="hidden lg:flex items-center gap-0.5 font-medium flex-shrink-0" style="color: var(--color-text);">
