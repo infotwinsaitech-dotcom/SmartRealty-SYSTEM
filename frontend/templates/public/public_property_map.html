@@ -254,7 +254,6 @@ const statusBgColors = {
 // Property data
 const properties = [
     {% for property in properties %}
-    {% if property.latitude and property.longitude %}
     {
         id: {{ property.id }},
         title: "{{ property.title|escapejs }}",
@@ -262,17 +261,29 @@ const properties = [
         price: "₹{{ property.price }} {{ property.price_unit|default:'L' }}",
         status: "{{ property.status|escapejs }}",
         type: "{{ property.property_type|escapejs }}",
-        lat: {{ property.latitude }},
-        lng: {{ property.longitude }},
+        lat: {{ property.latitude|default:'null' }},
+        lng: {{ property.longitude|default:'null' }},
+        mapLink: "{{ property.map_link|default:''|escapejs }}",
         thumbnail: "{% if property.thumbnail %}{% cloudinary_url property.thumbnail width=300 height=200 crop='fill' %}{% else %}https://via.placeholder.com/300x200?text=No+Image{% endif %}",
         url: "{{ property.get_absolute_url }}",
         beds: {{ property.beds|default:'null' }},
         sqft: {{ property.sqft|default:'null' }},
         builder: "{{ property.builder.get_full_name|default:property.builder.username|escapejs }}"
     },
-    {% endif %}
     {% endfor %}
 ];
+
+// Lat/lng agar direct nahi hai to map_link se nikalne ki koshish karo
+// (property_detail.html jaisa hi fallback)
+function resolveCoords(prop) {
+    if (prop.lat && prop.lng) return { lat: prop.lat, lng: prop.lng };
+    if (prop.mapLink) {
+        const match = prop.mapLink.match(/(-?\d+\.?\d*)[,\s]+(-?\d+\.?\d*)/);
+        if (match) return { lat: parseFloat(match[1]), lng: parseFloat(match[2]) };
+    }
+    return null;
+}
+
 
 let markers = [];
 let activeFilter = 'all';
@@ -286,6 +297,9 @@ function createMarkers() {
         : properties.filter(p => p.status === activeFilter);
 
     filtered.forEach(prop => {
+        const coords = resolveCoords(prop);
+        if (!coords) return; // ye property map par nahi dikhayi ja sakti (na lat/lng, na map_link)
+
         const color = statusColors[prop.status] || '#6b7280';
         
         const customIcon = L.divIcon({
@@ -296,7 +310,7 @@ function createMarkers() {
             popupAnchor: [0, -18]
         });
 
-        const marker = L.marker([prop.lat, prop.lng], { icon: customIcon }).addTo(map);
+        const marker = L.marker([coords.lat, coords.lng], { icon: customIcon }).addTo(map);
 
         const popupContent = `
             <div style="min-width:260px;font-family:'Inter',system-ui,sans-serif;">
@@ -323,7 +337,7 @@ function createMarkers() {
             className: 'custom-popup'
         });
 
-        markers.push({ marker, lat: prop.lat, lng: prop.lng, status: prop.status });
+        markers.push({ marker, lat: coords.lat, lng: coords.lng, status: prop.status });
     });
 
     if (markers.length > 0) {
