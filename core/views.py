@@ -885,7 +885,6 @@ def property_list(request):
             bed_distance = 0
             if beds_target is not None:
                 bed_distance = _beds_distance(p.beds, beds_target)
-                bed_distance = abs(p_beds_num - beds_target) if p_beds_num is not None else 999
             price_distance = 0
             if price_target is not None:
                 price_distance = abs(float(p.get_price_numeric()) - price_target)
