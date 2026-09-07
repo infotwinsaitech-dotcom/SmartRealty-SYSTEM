@@ -775,7 +775,10 @@ def property_list(request):
     # HARD FILTER: Category (Residential / Commercial / Land tab).
     # This never falls back to other categories — Commercial tab must never show Residential, and vice versa.
     if category in CATEGORY_TYPES:
-        filters &= Q(property_type__in=CATEGORY_TYPES[category])
+        cat_query = Q()
+        for t in CATEGORY_TYPES[category]:
+            cat_query |= Q(property_type__icontains=t)
+        filters &= cat_query
 
     # HARD FILTER: specific type checkboxes (Flat, Office, Plot, etc.)
     if property_type:
@@ -816,7 +819,10 @@ def property_list(request):
     if not properties and (location or query):
         base_qs = Property.objects.select_related('builder').all()
         if category in CATEGORY_TYPES:
-            base_qs = base_qs.filter(property_type__in=CATEGORY_TYPES[category])
+            cat_query = Q()
+            for t in CATEGORY_TYPES[category]:
+                cat_query |= Q(property_type__icontains=t)
+            base_qs = base_qs.filter(cat_query)
         if property_type:
             types = [t.strip() for t in property_type.split(',') if t.strip()]
             if types:
