@@ -266,7 +266,7 @@ const properties = [
         mapLink: "{{ property.map_link|default:''|escapejs }}",
         thumbnail: "{% if property.thumbnail %}{% cloudinary_url property.thumbnail width=300 height=200 crop='fill' %}{% else %}https://via.placeholder.com/300x200?text=No+Image{% endif %}",
         url: "{{ property.get_absolute_url }}",
-        beds: {{ property.beds|default:'null' }},
+        beds: "{{ property.beds|default:''|escapejs }}",
         sqft: {{ property.sqft|default:'null' }},
         builder: "{{ property.builder.get_full_name|default:property.builder.username|escapejs }}"
     },
