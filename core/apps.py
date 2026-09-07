@@ -71,7 +71,7 @@ class CoreConfig(AppConfig):
             import os
 
             # 1. Ensure Site exists
-            site, _ = Site.objects.get_or_create(
+            site, _ = Site.objects.update_or_create(
                 id=1,
                 defaults={
                     'domain': 'realshree.com',

@@ -122,6 +122,7 @@ AUTHENTICATION_BACKENDS = [
 # =============================================================================
 
 ACCOUNT_EMAIL_VERIFICATION = "mandatory" if IS_PRODUCTION else "none"
+SOCIALACCOUNT_EMAIL_VERIFICATION = "none"  # Google pehle se email verify kar chuka hota hai, dobara confirm mat maango
 ACCOUNT_LOGIN_METHODS = {"email"}
 ACCOUNT_SIGNUP_FIELDS = ["email*", "username*", "password1*", "password2*"]
 ACCOUNT_USER_MODEL_USERNAME_FIELD = "username"
