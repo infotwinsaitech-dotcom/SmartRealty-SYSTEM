@@ -19,6 +19,30 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
     3. Prevents duplicate email conflicts
     """
 
+    def pre_social_login(self, request, sociallogin):
+        """
+        Google se aane wala email agar kisi EXISTING account (email/password wale)
+        se match kare, to naya account banane ki koshish mat karo — usi purane
+        account se Google ko jod (link) do, taaki user seedha login ho jaye
+        instead of 'Account Already Exists' loop mein fasne ke.
+        """
+        if sociallogin.is_existing:
+            return  # already linked, kuch karne ki zaroorat nahi
+
+        email = user_email(sociallogin.user)
+        if not email:
+            return
+
+        try:
+            existing_user = User.objects.get(email__iexact=email)
+        except User.DoesNotExist:
+            return
+        except User.MultipleObjectsReturned:
+            existing_user = User.objects.filter(email__iexact=email).order_by('id').first()
+
+        # Existing account mil gaya -> Google login ko usi se connect karo
+        sociallogin.connect(request, existing_user)
+
     def populate_user(self, request, sociallogin, data):
         """
         Populate user fields from social account data.
