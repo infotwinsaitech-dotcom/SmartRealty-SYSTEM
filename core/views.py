@@ -4273,7 +4273,7 @@ def export_leads_csv(request):
         writer.writerow([
             lead.name,
             lead.email,
-            lead.phone,
+            f'="{lead.phone}"',
             lead.source,
             lead.status,
             lead.priority,
