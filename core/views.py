@@ -515,8 +515,8 @@ def property_detail(request, id, slug=None):
         phone = sanitize_input(request.POST.get("phone"))
         message = sanitize_input(request.POST.get("message"))
 
-        if not all([name, email, phone]):
-            messages.error(request, "Name, email and phone are required")
+        if not all([name, phone]):
+            messages.error(request, "Name and phone are required")
             return redirect('property_detail', id=property.id)
 
         # Round-robin agent assignment
