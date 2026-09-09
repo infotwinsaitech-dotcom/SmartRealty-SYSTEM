@@ -4278,8 +4278,22 @@ def create_agent_for_user(sender, instance, created, **kwargs):
 @builder_required
 def export_leads_csv(request):
     """Export leads to CSV with all details"""
+    site_settings = SiteSettings.get_settings()
+
+    builder_projects = list(
+        Property.objects.filter(builder=request.user)
+        .exclude(project_name__isnull=True)
+        .exclude(project_name__exact='')
+        .values_list('project_name', flat=True)
+        .distinct()
+    )
+    project_part = " - ".join(builder_projects) if builder_projects else "Leads"
+
+    filename = f"{project_part} {site_settings.company_name.upper()} LEAD {timezone.localdate().strftime('%d %B %Y')}.csv"
+    filename = filename.replace('"', '')
+
     response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="leads_report.csv"'
+    response['Content-Disposition'] = f'attachment; filename="{filename}"'
     writer = csv.writer(response)
     writer.writerow([
         'Lead Name', 'Email', 'Phone', 'Source', 'Status',
