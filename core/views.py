@@ -58,7 +58,7 @@ from .models import (
     Property, PropertyImage, User, Profile, Lead, Deal, Task, 
     Activity, Agent, Document, Conversation, Message, 
     Notification, Campaign, SiteVisit, FollowUp, Wishlist,
-    Inquiry, LeadNote, LeadActivity, SavedProperty , Advertisement,PropertyReview, FloorPlan,PropertyInquiry,
+    Inquiry, LeadNote, LeadActivity, SavedProperty , Advertisement,PropertyReview, FloorPlan,PropertyInquiry,SiteSettings,
 )
 from subscriptions.models import BlogPost
 logger = logging.getLogger('core')
