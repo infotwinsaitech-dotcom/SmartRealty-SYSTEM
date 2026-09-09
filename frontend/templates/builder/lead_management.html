@@ -28,20 +28,56 @@
 
     <div class="bg-white rounded-2xl shadow-lg border overflow-hidden">
 
-        <div class="p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b">
-            <h3 class="text-xl font-bold">Lead Inventory</h3>
+        <div class="p-6 flex flex-col gap-4 border-b">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <h3 class="text-xl font-bold">Lead Inventory</h3>
 
-            <div class="flex items-center gap-2 w-full sm:w-auto justify-between">
-                <a href="{% url 'export_leads_csv' %}{% if request.GET.q %}?q={{ request.GET.q }}{% endif %}"
-                   class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 shadow transition-all">
-                    <span class="material-symbols-outlined text-sm">download</span>
-                    Export CSV
+                <div class="flex items-center gap-2 w-full sm:w-auto justify-between">
+                    <a href="{% url 'export_leads_csv' %}?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}{% if current_date_filter %}date_filter={{ current_date_filter }}&{% endif %}{% if from_date %}from_date={{ from_date }}&{% endif %}{% if to_date %}to_date={{ to_date }}{% endif %}"
+                       class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 shadow transition-all">
+                        <span class="material-symbols-outlined text-sm">download</span>
+                        Export CSV
+                    </a>
+
+                    <button onclick="openModal()"
+                            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow transition-all">
+                        + Add Lead
+                    </button>
+                </div>
+            </div>
+
+            <!-- Date filter -->
+            <div class="flex flex-wrap items-center gap-2">
+                <a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}"
+                   class="px-3 py-1.5 rounded-full text-xs font-semibold border transition-all {% if not current_date_filter %}bg-blue-600 text-white border-blue-600{% else %}bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100{% endif %}">
+                    All
+                </a>
+                <a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}date_filter=today"
+                   class="px-3 py-1.5 rounded-full text-xs font-semibold border transition-all {% if current_date_filter == 'today' %}bg-blue-600 text-white border-blue-600{% else %}bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100{% endif %}">
+                    Today
+                </a>
+                <a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}date_filter=week"
+                   class="px-3 py-1.5 rounded-full text-xs font-semibold border transition-all {% if current_date_filter == 'week' %}bg-blue-600 text-white border-blue-600{% else %}bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100{% endif %}">
+                    This Week
+                </a>
+                <a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}date_filter=month"
+                   class="px-3 py-1.5 rounded-full text-xs font-semibold border transition-all {% if current_date_filter == 'month' %}bg-blue-600 text-white border-blue-600{% else %}bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100{% endif %}">
+                    This Month
                 </a>
 
-                <button onclick="openModal()"
-                        class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow transition-all">
-                    + Add Lead
-                </button>
+                <form method="GET" class="flex items-center gap-2 ml-1">
+                    {% if request.GET.q %}<input type="hidden" name="q" value="{{ request.GET.q }}">{% endif %}
+                    <input type="hidden" name="date_filter" value="custom">
+                    <input type="date" name="from_date" value="{{ from_date }}"
+                           class="px-2 py-1.5 rounded-lg border border-gray-200 text-xs">
+                    <span class="text-xs text-gray-400">to</span>
+                    <input type="date" name="to_date" value="{{ to_date }}"
+                           class="px-2 py-1.5 rounded-lg border border-gray-200 text-xs">
+                    <button type="submit"
+                            class="px-3 py-1.5 rounded-full text-xs font-semibold border transition-all {% if current_date_filter == 'custom' %}bg-blue-600 text-white border-blue-600{% else %}bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100{% endif %}">
+                        Custom
+                    </button>
+                </form>
             </div>
         </div>
 

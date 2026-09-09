@@ -1728,6 +1728,31 @@ def property_wishlist_list(request):
         "selected_property": property_id,
     })
 
+def apply_lead_date_filter(queryset, request):
+    """Filter a Lead queryset by the date_filter GET param.
+    Supported values: today, week, month, custom (needs from_date & to_date, YYYY-MM-DD)."""
+    date_filter = request.GET.get('date_filter', '')
+    today = timezone.localdate()
+
+    if date_filter == 'today':
+        queryset = queryset.filter(created_at__date=today)
+    elif date_filter == 'week':
+        start_of_week = today - timedelta(days=today.weekday())
+        queryset = queryset.filter(created_at__date__gte=start_of_week, created_at__date__lte=today)
+    elif date_filter == 'month':
+        start_of_month = today.replace(day=1)
+        queryset = queryset.filter(created_at__date__gte=start_of_month, created_at__date__lte=today)
+    elif date_filter == 'custom':
+        from_date = request.GET.get('from_date', '')
+        to_date = request.GET.get('to_date', '')
+        if from_date:
+            queryset = queryset.filter(created_at__date__gte=from_date)
+        if to_date:
+            queryset = queryset.filter(created_at__date__lte=to_date)
+
+    return queryset
+
+
 @builder_required
 def lead_management(request):
     """Builder lead management with search, filter, pagination"""
@@ -1756,6 +1781,9 @@ def lead_management(request):
     status = sanitize_input(request.GET.get('status', ''))
     if status:
         leads = leads.filter(status=status)
+
+    # Date filter (today / week / month / custom)
+    leads = apply_lead_date_filter(leads, request)
 
     # Sort
     sort = sanitize_input(request.GET.get('sort', ''))
@@ -1797,6 +1825,9 @@ def lead_management(request):
         "hot_leads": hot_leads,
         "agents": agents,
         "properties": properties,
+        "current_date_filter": request.GET.get('date_filter', ''),
+        "from_date": request.GET.get('from_date', ''),
+        "to_date": request.GET.get('to_date', ''),
     })
 
 
@@ -4265,6 +4296,9 @@ def export_leads_csv(request):
             Q(name__icontains=search_query) |
             Q(email__icontains=search_query)
         )
+
+    # Date filter (today / week / month / custom) - same as lead list page
+    leads = apply_lead_date_filter(leads, request)
 
     for lead in leads:
         agent_name = lead.assigned_to.name if lead.assigned_to else "Not Assigned"
