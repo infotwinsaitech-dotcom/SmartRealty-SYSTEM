@@ -776,7 +776,42 @@
                     </div>
                 </div>
                 {% endif %}
-                
+
+                <!-- Project & Builder Info (SEO) -->
+                <div class="reveal" style="margin-top: 24px;">
+                    <h2 class="text-xl font-bold text-[var(--color-navy)] mb-3">Project &amp; Builder Information</h2>
+                    <div class="space-y-2">
+                        {% if property.project_name %}
+                        <details class="seo-info-box">
+                            <summary>Project Name</summary>
+                            <div class="seo-info-content">
+                                <h3>{{ property.project_name }}</h3>
+                                <p>{{ property.project_name }} {{ property.property_type }} for sale in {{ property.location }}, Ahmedabad{% if property.builder %}, developed by {{ property.builder.get_full_name|default:property.builder.username }}{% endif %}.</p>
+                            </div>
+                        </details>
+                        {% endif %}
+                        {% if property.builder %}
+                        <details class="seo-info-box">
+                            <summary>Builder / Developer</summary>
+                            <div class="seo-info-content">
+                                <h3>{{ property.builder.get_full_name|default:property.builder.username }}</h3>
+                                <p>This property is developed by {{ property.builder.get_full_name|default:property.builder.username }}{% if property.project_name %}, the developer behind {{ property.project_name }}{% endif %} in {{ property.location }}, Ahmedabad.</p>
+                            </div>
+                        </details>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <style>
+                .seo-info-box { border: 1px solid var(--color-border, #e5e7eb); border-radius: 10px; overflow: hidden; margin-bottom: 8px; }
+                .seo-info-box summary { cursor: pointer; padding: 12px 16px; font-weight: 600; color: var(--color-navy, #0f1e3d); list-style: none; display:flex; align-items:center; justify-content:space-between; }
+                .seo-info-box summary::-webkit-details-marker { display: none; }
+                .seo-info-box summary::after { content: '+'; font-size: 18px; color: var(--color-gold, #d4af37); }
+                .seo-info-box[open] summary::after { content: '\2212'; }
+                .seo-info-content { padding: 0 16px 14px; color: var(--color-text-muted, #6b7280); font-size: 14px; line-height: 1.6; }
+                .seo-info-content h3 { font-size: 15px; font-weight: 700; color: var(--color-navy, #0f1e3d); margin-bottom: 4px; }
+                </style>
+
             </div>
             
             <!-- RIGHT SIDEBAR (1 col) - Sticky Enquiry Form -->
