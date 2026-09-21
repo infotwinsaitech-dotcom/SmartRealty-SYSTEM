@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>{{ viewer.heading }}</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --line: #334155;
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      --accent: #38bdf8;
+      --accent2: #818cf8;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: radial-gradient(1200px 600px at 10% -10%, #1e3a8a55, transparent),
+                  radial-gradient(900px 500px at 100% 0%, #6d28d955, transparent),
+                  var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+    .wrap { max-width: 980px; margin: 0 auto; padding: 24px 16px 48px; }
+    header {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 12px; margin-bottom: 28px;
+    }
+    .hello { color: var(--muted); font-size: 14px; }
+    h1 { font-size: 24px; font-weight: 700; margin-top: 2px; }
+    .logout {
+      color: var(--text); text-decoration: none; font-size: 14px;
+      border: 1px solid var(--line); padding: 8px 16px; border-radius: 999px;
+      transition: background .2s;
+    }
+    .logout:hover { background: var(--card); }
+
+    .total {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-radius: 20px; padding: 32px 24px; text-align: center;
+      box-shadow: 0 20px 50px -20px #38bdf866;
+      margin-bottom: 20px;
+    }
+    .total .label { font-size: 14px; letter-spacing: .12em; text-transform: uppercase; color: #0f172acc; font-weight: 600; }
+    .total .value { font-size: clamp(56px, 16vw, 96px); font-weight: 800; color: #0f172a; line-height: 1.05; margin-top: 6px; }
+
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 14px; }
+    .card {
+      background: var(--card); border: 1px solid var(--line);
+      border-radius: 16px; padding: 20px 16px; text-align: center;
+    }
+    .card .label { color: var(--muted); font-size: 13px; text-transform: uppercase; letter-spacing: .08em; }
+    .card .value { font-size: 36px; font-weight: 700; margin-top: 8px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div>
+        {% if viewer.display_name %}<div class="hello">Welcome, {{ viewer.display_name }}</div>{% endif %}
+        <h1>{{ viewer.heading }}</h1>
+      </div>
+      <a class="logout" href="{% url 'logout' %}">Logout</a>
+    </header>
+
+    <section class="total">
+      <div class="label">Total Leads</div>
+      <div class="value" data-count="{{ viewer.total_leads }}">{{ viewer.total_leads }}</div>
+    </section>
+
+    {% if viewer.breakdown %}
+    <section class="grid">
+      {% for label, value in viewer.breakdown %}
+      <div class="card">
+        <div class="label">{{ label }}</div>
+        <div class="value" data-count="{{ value }}">{{ value }}</div>
+      </div>
+      {% endfor %}
+    </section>
+    {% endif %}
+  </div>
+
+  <script>
+    // Halka sa count-up animation (JS band ho to bhi number dikhega)
+    document.querySelectorAll('[data-count]').forEach(function (el) {
+      var target = parseInt(el.getAttribute('data-count'), 10);
+      if (!target || target < 0) return;
+      var start = null, duration = 800;
+      function step(ts) {
+        if (start === null) start = ts;
+        var p = Math.min((ts - start) / duration, 1);
+        el.textContent = Math.round(target * (1 - Math.pow(1 - p, 3)));
+        if (p < 1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    });
+  </script>
+</body>
+</html>
