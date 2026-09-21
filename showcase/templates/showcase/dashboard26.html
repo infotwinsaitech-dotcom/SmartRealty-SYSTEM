@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>CRM — Project Wise Leads Report</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+
+  --bg:#f4f6fb;
+  --panel:#ffffff;
+  --panel-2:#fafbfe;
+  --line:#e3e8f2;
+  --line-strong:#cfd7e8;
+  --text:#121a2b;
+  --muted:#697389;
+  --brand:#2f56d3;
+  --brand-soft:#e8edfd;
+  --accent:#0f9f6e;
+  --total-bg:#eef2fe;
+  --heat:47,86,211;
+  --shadow:0 1px 2px rgba(16,24,40,.05), 0 8px 24px rgba(16,24,40,.06);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0c1018;
+    --panel:#131a26;
+    --panel-2:#171f2d;
+    --line:#242e40;
+    --line-strong:#33405a;
+    --text:#e8edf7;
+    --muted:#98a3ba;
+    --brand:#7d9bff;
+    --brand-soft:#1c2740;
+    --accent:#3ddc9a;
+    --total-bg:#1a2338;
+    --heat:125,155,255;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px rgba(0,0,0,.35);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0c1018;
+  --panel:#131a26;
+  --panel-2:#171f2d;
+  --line:#242e40;
+  --line-strong:#33405a;
+  --text:#e8edf7;
+  --muted:#98a3ba;
+  --brand:#7d9bff;
+  --brand-soft:#1c2740;
+  --accent:#3ddc9a;
+  --total-bg:#1a2338;
+  --heat:125,155,255;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px rgba(0,0,0,.35);
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px);-webkit-text-size-adjust:100%}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+  font-size:14px;
+  line-height:1.5;
+}
+.wrap{max-width:1280px;margin:0 auto;padding:20px 16px 56px}
+
+/* ---------- Header ---------- */
+.topbar{
+  display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+  margin-bottom:18px;
+}
+.logo{
+  width:40px;height:40px;border-radius:11px;flex:0 0 auto;
+  background:linear-gradient(135deg,var(--brand),#7a4ddb);
+  display:grid;place-items:center;color:#fff;font-weight:700;letter-spacing:.5px;
+  box-shadow:var(--shadow);
+}
+.ttl h1{margin:0;font-size:18px;font-weight:700;letter-spacing:-.2px}
+.ttl p{margin:2px 0 0;font-size:12.5px;color:var(--muted)}
+.spacer{flex:1 1 auto}
+.btn{
+  border:1px solid var(--line-strong);background:var(--panel);color:var(--text);
+  padding:8px 13px;border-radius:9px;font:inherit;font-size:13px;font-weight:500;
+  cursor:pointer;transition:.15s;
+}
+.btn:hover{background:var(--brand-soft);border-color:var(--brand)}
+
+/* ---------- KPI cards ---------- */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:18px}
+.kpi{
+  background:var(--panel);border:1px solid var(--line);border-radius:13px;
+  padding:13px 15px;box-shadow:var(--shadow);
+}
+.kpi .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);font-weight:600}
+.kpi .val{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:24px;font-weight:700;margin-top:5px;letter-spacing:-.5px}
+.kpi.hl .val{color:var(--brand)}
+
+/* ---------- Toolbar ---------- */
+.toolbar{
+  display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px;
+}
+.search{
+  flex:1 1 240px;min-width:200px;
+  display:flex;align-items:center;gap:8px;
+  background:var(--panel);border:1px solid var(--line-strong);border-radius:10px;padding:0 11px;
+}
+.search input{
+  flex:1;border:0;outline:0;background:transparent;color:var(--text);
+  font:inherit;padding:10px 0;
+}
+.search svg{flex:0 0 auto;opacity:.55}
+.hint{font-size:12px;color:var(--muted)}
+
+/* ---------- Table ---------- */
+.card{
+  background:var(--panel);border:1px solid var(--line);border-radius:14px;
+  box-shadow:var(--shadow);overflow:hidden;
+}
+.scroller{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{border-collapse:separate;border-spacing:0;width:100%;min-width:900px}
+thead th{
+  position:sticky;top:0;z-index:3;
+  background:var(--panel-2);
+  border-bottom:1px solid var(--line-strong);
+  font-size:11px;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);
+  font-weight:700;padding:12px 10px;text-align:center;white-space:nowrap;cursor:pointer;user-select:none;
+}
+thead th:first-child{text-align:left;left:0;z-index:5;min-width:250px;padding-left:16px}
+thead th .arw{opacity:.35;font-size:9px;margin-left:3px}
+thead th.sorted{color:var(--brand)}
+thead th.sorted .arw{opacity:1}
+thead th.tot{background:var(--total-bg);color:var(--brand)}
+
+tbody td{
+  border-bottom:1px solid var(--line);
+  padding:0;text-align:center;
+  font-family:"JetBrains Mono",ui-monospace,monospace;
+  font-size:13.5px;font-weight:600;
+  white-space:nowrap;
+}
+tbody td .cell{padding:11px 10px;display:block}
+tbody td.name{
+  position:sticky;left:0;z-index:2;background:var(--panel);
+  text-align:left;font-family:"Inter",sans-serif;font-weight:500;font-size:13.5px;
+  border-right:1px solid var(--line);
+}
+tbody td.name .cell{padding:11px 14px 11px 16px;display:flex;align-items:center;gap:9px}
+.idx{
+  flex:0 0 auto;width:22px;height:22px;border-radius:6px;background:var(--brand-soft);
+  color:var(--brand);font-size:10.5px;font-weight:700;display:grid;place-items:center;
+  font-family:"JetBrains Mono",monospace;
+}
+tbody tr:hover td{background:var(--panel-2)}
+tbody tr:hover td.name{background:var(--panel-2)}
+td.tot{background:var(--total-bg);color:var(--brand);font-weight:700}
+td.zero{color:var(--muted);opacity:.5;font-weight:500}
+
+tfoot td{
+  position:sticky;bottom:0;z-index:3;
+  background:var(--panel-2);border-top:2px solid var(--line-strong);
+  padding:13px 10px;text-align:center;
+  font-family:"JetBrains Mono",monospace;font-weight:700;font-size:14px;
+}
+tfoot td:first-child{
+  left:0;z-index:5;text-align:left;padding-left:16px;
+  font-family:"Inter",sans-serif;font-size:12px;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);
+}
+tfoot td.tot{background:var(--brand);color:#fff}
+
+.empty{padding:36px;text-align:center;color:var(--muted)}
+.foot{margin-top:14px;font-size:11.5px;color:var(--muted);text-align:center}
+@media (max-width:640px){
+  .wrap{padding:14px 10px 40px}
+  .kpi .val{font-size:20px}
+  thead th:first-child{min-width:190px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <div class="logo">CRM</div>
+    <div class="ttl">
+      <h1>Project Wise Leads Report</h1>
+      <p>Lead counts only · no contact details shown</p>
+    </div>
+    <div class="spacer"></div>
+    <button class="btn" id="themeBtn" type="button">Theme</button>
+  </div>
+
+  <div class="kpis" id="kpis"></div>
+
+  <div class="toolbar">
+    <label class="search">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+      <input type="search" id="q" placeholder="Search project…" autocomplete="off">
+    </label>
+    <span class="hint" id="count"></span>
+    <span class="hint">Tip: column header pe click karke sort karein</span>
+  </div>
+
+  <div class="card">
+    <div class="scroller">
+      <table>
+        <thead><tr id="thead"></tr></thead>
+        <tbody id="tbody"></tbody>
+        <tfoot><tr id="tfoot"></tr></tfoot>
+      </table>
+    </div>
+    <div class="empty" id="empty" style="display:none">Koi project match nahi hua.</div>
+  </div>
+
+  <p class="foot">Sample data · Report generated for internal CRM use</p>
+</div>
+
+<script>
+const COLS = [
+  {key:"today", label:"Today"},
+  {key:"week",  label:"This Week"},
+  {key:"month", label:"This Month"},
+  {key:"m3",    label:"3 Months"},
+  {key:"m6",    label:"6 Months"},
+  {key:"year",  label:"This Year"},
+  {key:"total", label:"Total", tot:true}
+];
+
+const RAW = [
+  ["Rhythm Gladeview",                         4,21, 78,214,402, 731],
+  ["Harmony Harikesh",                         2,13, 52,168,331, 604],
+  ["Shashwat Evana",                           6,28, 94,271,520, 944],
+  ["The Regal – Exclusive 4 BHK Apartments",   3,17, 61,190,358, 656],
+  ["Sheetal Dharohar",                         1, 9, 38,122,247, 451],
+  ["Aristo The Opus & Aatmantan",              5,24, 86,245,470, 858],
+  ["Aristo Amaya",                             3,15, 57,176,342, 621],
+  ["ONE FIFTY ONE",                            7,31,108,298,566,1024],
+  ["OXYVIEW – 4 BHK Exclusive Residence",      2,12, 47,154,302, 559],
+  ["Aashray Anantam",                          4,19, 69,203,389, 712],
+  ["Sandalwood 26 – 4 BHK Luxury Apartments",  1, 8, 34,111,226, 418],
+  ["Sweven by Signature",                      5,26, 91,259,494, 902],
+  ["SHRIMLEELA SAFFRON",                       3,16, 59,182,351, 638],
+  ["SHRIMLEELA BLISS",                         2,11, 44,147,289, 533],
+  ["Trinova Nest",                             6,27, 96,274,525, 951],
+  ["Serenity Trion",                           1,10, 41,133,264, 487],
+  ["Smart Walls Business Space",               4,22, 81,236,452, 826],
+  ["Akshar Evara",                             3,14, 55,171,333, 609],
+  ["Akshar Evoq",                              2,13, 50,161,315, 578],
+  ["Vedant Zade",                              5,23, 84,241,462, 841],
+  ["Sahajanand Marigold",                      1, 7, 31,104,213, 396],
+  ["Hiradhan Heaven",                          4,20, 73,211,405, 740],
+  ["Hiradhan Sanket",                          2,12, 46,151,296, 545],
+  ["Rajshree Regalia",                         6,29,101,285,543, 987],
+  ["Tremont Adleap",                           3,18, 64,195,374, 683],
+  ["Anali Heights",                            5,25, 88,251,481, 877]
+];
+
+const DATA = RAW.map(r => ({
+  name:r[0], today:r[1], week:r[2], month:r[3], m3:r[4], m6:r[5], year:r[6], total:r[6]
+}));
+
+const maxOf = {};
+COLS.forEach(c => maxOf[c.key] = Math.max(...DATA.map(d => d[c.key])));
+
+let sortKey = "total", sortDir = -1, query = "";
+const nf = n => n.toLocaleString("en-IN");
+
+/* ---- KPI cards ---- */
+function renderKpis(){
+  const sum = k => DATA.reduce((a,d)=>a+d[k],0);
+  const cards = [
+    ["Today",       sum("today")],
+    ["This Week",   sum("week")],
+    ["This Month",  sum("month")],
+    ["This Year",   sum("year")],
+    ["Total Leads", sum("total"), true],
+    ["Projects",    DATA.length]
+  ];
+  document.getElementById("kpis").innerHTML = cards.map(c =>
+    `<div class="kpi${c[2]?" hl":""}"><div class="lbl">${c[0]}</div><div class="val">${nf(c[1])}</div></div>`
+  ).join("");
+}
+
+/* ---- Head ---- */
+function renderHead(){
+  document.getElementById("thead").innerHTML =
+    `<th data-k="name">Project Title<span class="arw">▲</span></th>` +
+    COLS.map(c => `<th data-k="${c.key}" class="${c.tot?"tot":""}">${c.label}<span class="arw">▼</span></th>`).join("");
+  document.querySelectorAll("#thead th").forEach(th => {
+    th.classList.toggle("sorted", th.dataset.k === sortKey);
+    const a = th.querySelector(".arw");
+    if (th.dataset.k === sortKey) a.textContent = sortDir === 1 ? "▲" : "▼";
+    th.onclick = () => {
+      if (sortKey === th.dataset.k) sortDir = -sortDir;
+      else { sortKey = th.dataset.k; sortDir = (sortKey === "name") ? 1 : -1; }
+      render();
+    };
+  });
+}
+
+/* ---- Body ---- */
+function heat(v, k){
+  const m = maxOf[k] || 1;
+  const t = Math.min(v / m, 1);
+  return t < 0.04 ? "transparent" : `rgba(var(--heat), ${(0.06 + t*0.26).toFixed(3)})`;
+}
+
+function render(){
+  renderHead();
+  let rows = DATA.filter(d => d.name.toLowerCase().includes(query));
+  rows.sort((a,b) => sortKey === "name"
+    ? a.name.localeCompare(b.name) * sortDir
+    : (a[sortKey] - b[sortKey]) * sortDir);
+
+  document.getElementById("tbody").innerHTML = rows.map((d,i) =>
+    `<tr><td class="name"><span class="cell"><span class="idx">${i+1}</span>${d.name}</span></td>` +
+    COLS.map(c => {
+      const v = d[c.key];
+      const bg = c.tot ? "" : `style="background:${heat(v,c.key)}"`;
+      return `<td class="${c.tot?"tot":""}${v===0?" zero":""}" ${bg}><span class="cell">${nf(v)}</span></td>`;
+    }).join("") + `</tr>`
+  ).join("");
+
+  document.getElementById("tfoot").innerHTML =
+    `<td>Grand Total</td>` +
+    COLS.map(c => `<td class="${c.tot?"tot":""}">${nf(rows.reduce((a,d)=>a+d[c.key],0))}</td>`).join("");
+
+  document.getElementById("empty").style.display = rows.length ? "none" : "block";
+  document.getElementById("count").textContent = rows.length + " / " + DATA.length + " projects";
+}
+
+document.getElementById("q").addEventListener("input", e => {
+  query = e.target.value.trim().toLowerCase();
+  render();
+});
+
+document.getElementById("themeBtn").addEventListener("click", () => {
+  const cur = document.documentElement.getAttribute("data-theme");
+  const dark = cur ? cur === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+  document.documentElement.setAttribute("data-theme", dark ? "light" : "dark");
+});
+
+renderKpis();
+render();
+</script>
+</body>
+</html>
