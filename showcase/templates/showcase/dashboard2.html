@@ -227,40 +227,42 @@ const COLS = [
   {key:"week",  label:"This Week"},
   {key:"month", label:"This Month"},
   {key:"m3",    label:"3 Months"},
+  {key:"m6",    label:"6 Months"},
+  {key:"year",  label:"This Year"},
   {key:"total", label:"Total", tot:true}
 ];
 
 const RAW = [
-  ["Rhythm Gladeview",                         4,21, 78,214, 731],
-  ["Harmony Harikesh",                         2,13, 52,168, 604],
-  ["Shashwat Evana",                           6,28, 94,271, 944],
-  ["The Regal – Exclusive 4 BHK Apartments",   3,17, 61,190, 656],
-  ["Sheetal Dharohar",                         1, 9, 38,122, 451],
-  ["Aristo The Opus & Aatmantan",              5,24, 86,245, 858],
-  ["Aristo Amaya",                             3,15, 57,176, 621],
-  ["ONE FIFTY ONE",                            7,31,108,298,1024],
-  ["OXYVIEW – 4 BHK Exclusive Residence",      2,12, 47,154, 559],
-  ["Aashray Anantam",                          4,19, 69,203, 712],
-  ["Sandalwood 26 – 4 BHK Luxury Apartments",  1, 8, 34,111, 418],
-  ["Sweven by Signature",                      5,26, 91,259, 902],
-  ["SHRIMLEELA SAFFRON",                       3,16, 59,182, 638],
-  ["SHRIMLEELA BLISS",                         2,11, 44,147, 533],
-  ["Trinova Nest",                             6,27, 96,274, 951],
-  ["Serenity Trion",                           1,10, 41,133, 487],
-  ["Smart Walls Business Space",               4,22, 81,236, 826],
-  ["Akshar Evara",                             3,14, 55,171, 609],
-  ["Akshar Evoq",                              2,13, 50,161, 578],
-  ["Vedant Zade",                              5,23, 84,241, 841],
-  ["Sahajanand Marigold",                      1, 7, 31,104, 396],
-  ["Hiradhan Heaven",                          4,20, 73,211, 740],
-  ["Hiradhan Sanket",                          2,12, 46,151, 545],
-  ["Rajshree Regalia",                         6,29,101,285, 987],
-  ["Tremont Adleap",                           3,18, 64,195, 683],
-  ["Anali Heights",                            5,25, 88,251, 877]
+  ["Rhythm Gladeview",                         4,21, 78,214,-, 731],
+  ["Harmony Harikesh",                         2,13, 52,168,-, 604],
+  ["Shashwat Evana",                           6,28, 94,271,-, 944],
+  ["The Regal – Exclusive 4 BHK Apartments",   3,17, 61,190,-, 656],
+  ["Sheetal Dharohar",                         1, 9, 38,122,-, 451],
+  ["Aristo The Opus & Aatmantan",              5,24, 86,245,-, 858],
+  ["Aristo Amaya",                             3,15, 57,176,-, 621],
+  ["ONE FIFTY ONE",                            7,31,108,298,-,1024],
+  ["OXYVIEW – 4 BHK Exclusive Residence",      2,12, 47,154,-, 559],
+  ["Aashray Anantam",                          4,19, 69,203,-, 712],
+  ["Sandalwood 26 – 4 BHK Luxury Apartments",  1, 8, 34,111,-, 418],
+  ["Sweven by Signature",                      5,26, 91,259,-, 902],
+  ["SHRIMLEELA SAFFRON",                       3,16, 59,182,-, 638],
+  ["SHRIMLEELA BLISS",                         2,11, 44,147,"-", 533],
+  ["Trinova Nest",                             6,27, 96,274,-, 951],
+  ["Serenity Trion",                           1,10, 41,133,-, 487],
+  ["Smart Walls Business Space",               4,22, 81,236,-, 826],
+  ["Akshar Evara",                             3,14, 55,171,-, 609],
+  ["Akshar Evoq",                              2,13, 50,161,-, 578],
+  ["Vedant Zade",                              5,23, 84,241,-, 841],
+  ["Sahajanand Marigold",                      1, 7, 31,104,-, 396],
+  ["Hiradhan Heaven",                          4,20, 73,211,-, 740],
+  ["Hiradhan Sanket",                          2,12, 46,151,-, 545],
+  ["Rajshree Regalia",                         6,29,101,285,-, 987],
+  ["Tremont Adleap",                           3,18, 64,195,-, 683],
+  ["Anali Heights",                            5,25, 88,251,-, 877]
 ];
 
 const DATA = RAW.map(r => ({
-  name:r[0], today:r[1], week:r[2], month:r[3], m3:r[4], total:r[5]
+  name:r[0], today:r[1], week:r[2], month:r[3], m3:r[4], m6:r[5], year:r[6], total:r[6]
 }));
 
 const maxOf = {};
@@ -276,7 +278,7 @@ function renderKpis(){
     ["Today",       sum("today")],
     ["This Week",   sum("week")],
     ["This Month",  sum("month")],
-    ["3 Months",    sum("m3")],
+    ["This Year",   sum("year")],
     ["Total Leads", sum("total"), true],
     ["Projects",    DATA.length]
   ];
