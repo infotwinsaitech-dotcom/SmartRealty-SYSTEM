@@ -991,6 +991,9 @@ def blog_detail(request, slug):
 
 def redirect_by_role(user):
     """Redirect user based on role"""
+    # Private lead-numbers viewer (showcase app) -> sirf numbers wala page
+    if hasattr(user, "showcase_viewer"):
+        return redirect("showcase:dashboard")
     if user.role == "builder":
         return redirect("builder_dashboard")
     elif user.role == "agent":

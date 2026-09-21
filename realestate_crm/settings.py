@@ -97,6 +97,7 @@ INSTALLED_APPS = [
     "cloudinary_storage",
     "core",
     "subscriptions",
+    "showcase",
 ]
 
 if not IS_TEST:

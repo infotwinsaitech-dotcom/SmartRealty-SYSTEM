@@ -7,6 +7,11 @@ from core import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+        # Private lead-numbers viewer (sirf numbers)
+    path('lead-summary/', include('showcase.urls')),
+
+    # Core App URLs
+    path('', include('core.urls')),
 
     # Core App URLs
     path('', include('core.urls')),
