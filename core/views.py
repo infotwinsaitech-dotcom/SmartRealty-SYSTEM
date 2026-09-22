@@ -304,10 +304,18 @@ def home(request):
     
     advertisements = Advertisement.objects.filter(is_active=True).select_related('property')
 
-    return render(request, "public/index.html", {
+    from core.seo_data import get_seo_explore_context
+    seo_context = get_seo_explore_context(
+        Property.objects.filter(status='Available')
+    )
+
+    context = {
         "properties": properties,
-        "advertisements": advertisements
-    })
+        "advertisements": advertisements,
+    }
+    context.update(seo_context)
+
+    return render(request, "public/index.html", context)
 
 
 def convert_price(price):
@@ -906,7 +914,12 @@ def property_list(request):
             .values_list('property_id', flat=True)
         )
 
-    return render(request, "public/property.html", {
+    from core.seo_data import get_seo_explore_context
+    seo_context = get_seo_explore_context(
+        Property.objects.filter(status='Available')
+    )
+
+    context = {
         "properties": page_obj,
         "page_obj": page_obj,
         "search_query": query,
@@ -923,7 +936,10 @@ def property_list(request):
         "max_price_unit": max_price_unit,
         "beds_filter": beds,
         'user_wishlist_ids': user_wishlist_ids,
-    })
+    }
+    context.update(seo_context)
+
+    return render(request, "public/property.html", context)
 
 
 def contact(request):

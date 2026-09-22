@@ -211,6 +211,7 @@ TEMPLATES = [
                 "django.contrib.messages.context_processors.messages",
                 "core.context_processors.site_settings",
                 "core.context_processors.notification_count",
+                "core.context_processors.footer_locality_links",
             ],
         },
     },
@@ -547,7 +548,7 @@ if DEBUG and not IS_TEST:
     print(f"  DATABASE: {'PostgreSQL' if DATABASE_URL else 'SQLite'}")
     print(f"  REDIS: {'Connected' if _redis_url else 'Not set - using DB cache'}")
     print(f"  CLOUDINARY: {'Enabled' if CLOUDINARY_CLOUD_NAME else 'Disabled - local storage'}")
-    print(f"  EMAIL: {'SendGrid' if SENDGRID_API_KEY else 'Console only'}")
+    print(f"  EMAIL: {'SendGrid' if os.environ.get('SENDGRID_API_KEY') else 'Console only'}")
     print(f"  SENTRY: {'Enabled' if SENTRY_DSN else 'Disabled'}")
     print("=" * 60)
     # =============================================================================

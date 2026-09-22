@@ -69,6 +69,18 @@
                 </ul>
             </div>
 
+            <!-- Top Localities (SEO internal links) -->
+            {% if footer_top_localities %}
+            <div>
+                <h4 class="footer-heading">Top Localities in Ahmedabad</h4>
+                <ul class="footer-links">
+                    {% for loc in footer_top_localities %}
+                    <li><a href="/properties/in/{{ loc.slug }}/">Flats in {{ loc.name }}</a></li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+
             <!-- Contact -->
             <div>
                 <h4 class="footer-heading">Get in Touch</h4>
