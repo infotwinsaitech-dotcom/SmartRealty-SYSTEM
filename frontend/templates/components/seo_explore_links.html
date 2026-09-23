@@ -35,34 +35,65 @@
         {% endif %}
 
         {% if seo_trending_localities %}
-        <div style="margin-bottom: var(--space-xl);">
-            <h2 style="font-size:1.15rem; font-weight:700; color: var(--color-navy); margin-bottom: var(--space-md); border-left: 3px solid var(--color-gold); padding-left: 10px;">
-                Trending Localities
-            </h2>
-            <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px 24px;">
-                {% for loc in seo_trending_localities %}
-                <a href="/properties/in/{{ loc.slug }}/" style="font-size:0.9rem; color: var(--color-text-muted); text-decoration:none; display:flex; align-items:center; gap:4px;" onmouseover="this.style.color='var(--color-gold-dark)'" onmouseout="this.style.color='var(--color-text-muted)'">
-                    <span class="material-icons-round" style="font-size:14px;">place</span>{{ loc.name }}
-                </a>
-                {% endfor %}
-            </div>
-        </div>
-        {% endif %}
+<div class="seo-toggle-group" style="margin-bottom: var(--space-xl);">
+    <h2 style="font-size:1.15rem; font-weight:700; color: var(--color-navy); margin-bottom: var(--space-md); border-left: 3px solid var(--color-gold); padding-left: 10px;">
+        Trending Localities in Ahmedabad
+    </h2>
+    <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px 24px;">
+        {% for loc in seo_trending_localities %}
+        <a href="/properties/in/{{ loc.slug }}/" {% if forloop.counter > 14 %}class="seo-more-item" style="display:none; font-size:0.9rem; color: var(--color-text-muted); text-decoration:none; align-items:center; gap:4px;"{% else %}style="font-size:0.9rem; color: var(--color-text-muted); text-decoration:none; display:flex; align-items:center; gap:4px;"{% endif %} onmouseover="this.style.color='var(--color-gold-dark)'" onmouseout="this.style.color='var(--color-text-muted)'">
+            <span class="material-icons-round" style="font-size:14px;">place</span>{{ loc.name }}
+        </a>
+        {% endfor %}
+    </div>
+    {% if seo_trending_localities|length > 14 %}
+    <button type="button" class="seo-toggle-btn" onclick="seoToggleGroup(this)"
+        data-more-text="+ {{ seo_trending_localities|length|add:"-14" }} more localities"
+        data-less-text="Show less"
+        style="margin-top:14px; background:none; border:1px solid var(--color-gold); color: var(--color-gold-dark); font-size:0.85rem; font-weight:600; padding:6px 16px; border-radius:20px; cursor:pointer;">
+        + {{ seo_trending_localities|length|add:"-14" }} more localities
+    </button>
+    {% endif %}
+</div>
+{% endif %}
 
         {% if seo_popular_projects %}
-        <div>
-            <h2 style="font-size:1.15rem; font-weight:700; color: var(--color-navy); margin-bottom: var(--space-md); border-left: 3px solid var(--color-gold); padding-left: 10px;">
-                Most Searched Projects
-            </h2>
-            <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px 24px;">
-                {% for project in seo_popular_projects %}
-                <a href="{% url 'property_list' %}?q={{ project|urlencode }}" style="font-size:0.9rem; color: var(--color-text-muted); text-decoration:none; display:flex; align-items:center; gap:4px;" onmouseover="this.style.color='var(--color-gold-dark)'" onmouseout="this.style.color='var(--color-text-muted)'">
-                    <span class="material-icons-round" style="font-size:14px;">search</span>{{ project }}
-                </a>
-                {% endfor %}
-            </div>
-        </div>
-        {% endif %}
-
+<div class="seo-toggle-group">
+    <h2 style="font-size:1.15rem; font-weight:700; color: var(--color-navy); margin-bottom: var(--space-md); border-left: 3px solid var(--color-gold); padding-left: 10px;">
+        Most Searched Projects in Ahmedabad
+    </h2>
+    <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px 24px;">
+        {% for project in seo_popular_projects %}
+        <a href="{% url 'property_list' %}?q={{ project|urlencode }}" {% if forloop.counter > 14 %}class="seo-more-item" style="display:none; font-size:0.9rem; color: var(--color-text-muted); text-decoration:none; align-items:center; gap:4px;"{% else %}style="font-size:0.9rem; color: var(--color-text-muted); text-decoration:none; display:flex; align-items:center; gap:4px;"{% endif %} onmouseover="this.style.color='var(--color-gold-dark)'" onmouseout="this.style.color='var(--color-text-muted)'">
+            <span class="material-icons-round" style="font-size:14px;">search</span>{{ project }}
+        </a>
+        {% endfor %}
     </div>
+    {% if seo_popular_projects|length > 14 %}
+    <button type="button" class="seo-toggle-btn" onclick="seoToggleGroup(this)"
+        data-more-text="+ {{ seo_popular_projects|length|add:"-14" }} more projects"
+        data-less-text="Show less"
+        style="margin-top:14px; background:none; border:1px solid var(--color-gold); color: var(--color-gold-dark); font-size:0.85rem; font-weight:600; padding:6px 16px; border-radius:20px; cursor:pointer;">
+        + {{ seo_popular_projects|length|add:"-14" }} more projects
+    </button>
+    {% endif %}
+</div>
+{% endif %}
+
+</div>
 </section>
+
+<script>
+// "Show more / Show less" toggle for the Trending Localities and
+// Most Searched Projects blocks above. Works for both sections the same way.
+function seoToggleGroup(btn) {
+    var group = btn.closest('.seo-toggle-group');
+    var items = group.querySelectorAll('.seo-more-item');
+    var expanded = btn.getAttribute('data-expanded') === 'true';
+    items.forEach(function (item) {
+        item.style.display = expanded ? 'none' : 'flex';
+    });
+    btn.setAttribute('data-expanded', expanded ? 'false' : 'true');
+    btn.textContent = expanded ? btn.getAttribute('data-more-text') : btn.getAttribute('data-less-text');
+}
+</script>
