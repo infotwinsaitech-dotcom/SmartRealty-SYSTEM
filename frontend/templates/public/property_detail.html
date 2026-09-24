@@ -5,7 +5,7 @@
 {% block og_title %}{% if property.beds %}{{ property.beds }} BHK {% endif %}{{ property.property_type }} in {{ property.location }} – {{ property.project_name|default:property.title }}{% endblock %}
 {% block og_description %}{{ property.beds|default:"" }}{% if property.beds %} BHK{% endif %} {{ property.property_type }}{% if property.builder_name %} by {{ property.builder_name }}{% endif %} in {{ property.location }}, Ahmedabad{% if property.price and property.price != "Price on Request" %}, ₹{{ property.price }} {{ property.get_price_unit_display }}{% elif property.price == "Price on Request" %}, price on request{% endif %}. RERA-verified listing, zero brokerage.{% endblock %}
 {% block og_image %}{% if property.thumbnail %}{% cloudinary_url property.thumbnail width=1200 height=630 crop='fill' %}{% elif property.images.first %}{% cloudinary_url property.images.first.image width=1200 height=630 crop='fill' %}{% else %}https://www.realshree.com{% static 'images/logo.png' %}{% endif %}{% endblock %}
-{% block canonical_url %}https://RealShree.com{{ property.get_absolute_url }}{% endblock %}
+{% block canonical_url %}https://realshree.com{{ property.get_absolute_url }}{% endblock %}
 {% block extra_head %}
 <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
 <meta name="twitter:card" content="summary_large_image">
@@ -136,7 +136,7 @@
   "@type": "RealEstateListing",
   "name": "{% if property.beds %}{{ property.beds }} BHK {% endif %}{{ property.property_type }} for Sale in {{ property.location|escapejs }} - {{ property.project_name|default:property.title|escapejs }}",
   "description": "{{ property.description|striptags|truncatewords:40|escapejs }}",
-  "url": "https://RealShree.com{{ property.get_absolute_url }}",
+  "url": "https://realshree.com{{ property.get_absolute_url }}",
   {% if property.thumbnail %}"image": "{{ og_img_url }}",{% endif %}
   "datePosted": "{{ property.created_at|date:'Y-m-d' }}",
   {% if property.beds %}"numberOfRooms": "{{ property.beds }}",{% endif %}
@@ -189,9 +189,9 @@
   "@context": "https://schema.org",
   "@type": "BreadcrumbList",
   "itemListElement": [
-    {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://RealShree.com{% url 'home' %}"},
-    {"@type": "ListItem", "position": 2, "name": "Properties", "item": "https://RealShree.com{% url 'property_list' %}"},
-    {"@type": "ListItem", "position": 3, "name": "{{ property.project_name|default:property.title|escapejs }}", "item": "https://RealShree.com{{ property.get_absolute_url }}"}
+    {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://realshree.com{% url 'home' %}"},
+    {"@type": "ListItem", "position": 2, "name": "Properties", "item": "https://realshree.com{% url 'property_list' %}"},
+    {"@type": "ListItem", "position": 3, "name": "{{ property.project_name|default:property.title|escapejs }}", "item": "https://realshree.com{{ property.get_absolute_url }}"}
   ]
 }
 </script>
@@ -363,7 +363,7 @@
                 <div class="card p-6 reveal">
                     <div class="flex items-center gap-2 mb-4">
                         <span class="material-icons-round text-[var(--color-gold)]" style="font-size:20px">info</span>
-                        <h2 class="text-xl font-bold text-[var(--color-navy)]">About Project</h2>
+                        <h2 class="text-xl font-bold text-[var(--color-navy)]">About {{ property.project_name|default:property.title }}</h2>
                     </div>
                     <p class="text-sm text-[var(--color-text-muted)] leading-relaxed mb-3">
                         {{ property.project_name|default:property.title }} is a {{ property.get_property_types_display|default:"residential" }} property
@@ -512,7 +512,7 @@
                 <div class="card p-6 reveal">
                     <div class="flex items-center gap-2 mb-4">
                         <span class="material-icons-round text-[var(--color-gold)]" style="font-size:20px">stars</span>
-                        <h2 class="text-xl font-bold text-[var(--color-navy)]">Amenities</h2>
+                        <h2 class="text-xl font-bold text-[var(--color-navy)]">Amenities in {{ property.project_name|default:property.title }}</h2>
                     </div>
                     <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
                         {% for item in property.amenities %}
@@ -639,7 +639,7 @@
     <div class="flex items-center justify-between flex-wrap gap-3 mb-4">
         <div class="flex items-center gap-2">
             <span class="material-icons-round text-[var(--color-gold)]" style="font-size:20px">architecture</span>
-            <h2 class="text-xl font-bold text-[var(--color-navy)]">Floor Plans</h2>
+            <h2 class="text-xl font-bold text-[var(--color-navy)]">Floor Plans of {{ property.project_name|default:property.title }}</h2>
         </div>
         <div id="fpFilterPills" class="flex items-center gap-2 flex-wrap"></div>
     </div>
@@ -685,7 +685,7 @@
                 <div class="card p-6 reveal">
                     <div class="flex items-center gap-2 mb-4">
                         <span class="material-icons-round text-[var(--color-gold)]" style="font-size:20px">place</span>
-                        <h2 class="text-xl font-bold text-[var(--color-navy)]">What's Nearby</h2>
+                        <h2 class="text-xl font-bold text-[var(--color-navy)]">What's Nearby {{ property.project_name|default:property.title }}</h2>
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         {% for place in property.nearby_places %}
@@ -707,7 +707,7 @@
                 <div class="card p-6 reveal">
                     <div class="flex items-center gap-2 mb-4">
                         <span class="material-icons-round text-[var(--color-gold)]" style="font-size:20px">map</span>
-                        <h2 class="text-xl font-bold text-[var(--color-navy)]">Location</h2>
+                        <h2 class="text-xl font-bold text-[var(--color-navy)]">Location of {{ property.project_name|default:property.title }}</h2>
                     </div>
                     <div class="rounded-xl overflow-hidden" style="height: 300px;">
                         <div id="propertyDetailMap" style="width:100%; height:100%;"></div>
@@ -722,7 +722,7 @@
                 <div class="card p-6 reveal">
                     <div class="flex items-center gap-2 mb-4">
                         <span class="material-icons-round text-[var(--color-gold)]" style="font-size:20px">help_outline</span>
-                        <h2 class="text-xl font-bold text-[var(--color-navy)]">Frequently Asked Questions</h2>
+                        <h2 class="text-xl font-bold text-[var(--color-navy)]">Frequently Asked Questions about {{ property.project_name|default:property.title }}</h2>
                     </div>
                     <div class="space-y-3">
                         <details class="p-3 bg-[var(--color-bg-soft)] rounded-xl">

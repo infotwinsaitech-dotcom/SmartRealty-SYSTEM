@@ -136,17 +136,23 @@ def get_seo_explore_context(properties_qs=None, limit_projects=None, limit_local
         try:
             from django.db.models import Count
 
-            ahmedabad_qs = _ahmedabad_only(properties_qs)
+            from django.db.models import Value, CharField
+            from django.db.models.functions import Coalesce
+
+            ahmedabad_qs = _ahmedabad_only(properties_qs).annotate(
+                display_name=Coalesce(
+                    "project_name", "title", Value(""), output_field=CharField()
+                )
+            )
             popular_projects_qs = (
-                ahmedabad_qs.exclude(project_name__isnull=True)
-                .exclude(project_name__exact="")
-                .values("project_name")
+                ahmedabad_qs.exclude(display_name__exact="")
+                .values("display_name")
                 .annotate(total=Count("id"))
                 .order_by("-total")
             )
             if limit_projects:
                 popular_projects_qs = popular_projects_qs[:limit_projects]
-            popular_projects = [p["project_name"] for p in popular_projects_qs]
+            popular_projects = [p["display_name"] for p in popular_projects_qs]
         except Exception:
             popular_projects = []
 
