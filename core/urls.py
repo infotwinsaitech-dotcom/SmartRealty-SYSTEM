@@ -5,12 +5,14 @@ from django.shortcuts import render
 from django.http import JsonResponse
 from . import views
 from . import views_automation
-
+from core.backup_views import backup_download, backup_restore
 # BUG FIX: views_health se import karo — duplicate local def hataya
 from core.views_health import health_check, cache_status
 
 urlpatterns = [
     path('', views.home, name='home'),
+    path("system/backup/", backup_download, name="backup_download"),
+    path("system/restore/", backup_restore, name="backup_restore"),
 
     # ================= PUBLIC =================
 
