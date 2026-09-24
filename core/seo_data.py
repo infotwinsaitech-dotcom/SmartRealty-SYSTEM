@@ -25,7 +25,11 @@ AHMEDABAD_AREAS = [
 # Gandhinagar side ki localities — inhe kabhi bhi "...in Ahmedabad" wale
 # section (Trending Localities, Most Searched Projects) me nahi dikhana.
 
-
+GANDHINAGAR_AREAS = [
+    "Sargasan", "Kudasan", "Randesan", "Raysan", "Adalaj", "Koba", "Sughad",
+    "Gandhinagar Road", "New CG Road", "Bhat", "Khoraj", "GIFT City",
+    "PDPU Road", "Kolvada", "Pethapur", "Vavol", "Chiloda",
+]
 BHK_OPTIONS = ["1", "2", "3", "4", "5"]
 
 
