@@ -12,186 +12,89 @@
   box-sizing:border-box;
   padding-top:env(safe-area-inset-top,0px);
   padding-bottom:env(safe-area-inset-bottom,0px);
-
-  --bg:#f4f6fb;
-  --panel:#ffffff;
-  --panel-2:#fafbfe;
-  --line:#e3e8f2;
-  --line-strong:#cfd7e8;
-  --text:#121a2b;
-  --muted:#697389;
-  --brand:#2f56d3;
-  --brand-soft:#e8edfd;
-  --accent:#0f9f6e;
-  --total-bg:#eef2fe;
+  --bg:#f4f6fb;--panel:#fff;--panel-2:#fafbfe;--line:#e3e8f2;--line-strong:#cfd7e8;
+  --text:#121a2b;--muted:#697389;--brand:#2f56d3;--brand-soft:#e8edfd;--total-bg:#eef2fe;
   --heat:47,86,211;
-  --shadow:0 1px 2px rgba(16,24,40,.05), 0 8px 24px rgba(16,24,40,.06);
+  --g:#0f9f6e;--y:#d99a00;--b:#2f7bd3;
+  --shadow:0 1px 2px rgba(16,24,40,.05),0 8px 24px rgba(16,24,40,.06);
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
-    --bg:#0c1018;
-    --panel:#131a26;
-    --panel-2:#171f2d;
-    --line:#242e40;
-    --line-strong:#33405a;
-    --text:#e8edf7;
-    --muted:#98a3ba;
-    --brand:#7d9bff;
-    --brand-soft:#1c2740;
-    --accent:#3ddc9a;
-    --total-bg:#1a2338;
-    --heat:125,155,255;
-    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px rgba(0,0,0,.35);
+    --bg:#0c1018;--panel:#131a26;--panel-2:#171f2d;--line:#242e40;--line-strong:#33405a;
+    --text:#e8edf7;--muted:#98a3ba;--brand:#7d9bff;--brand-soft:#1c2740;--total-bg:#1a2338;
+    --heat:125,155,255;--g:#3ddc9a;--y:#f5c542;--b:#6aa6ff;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 28px rgba(0,0,0,.35);
   }
 }
 :root[data-theme="dark"]{
-  --bg:#0c1018;
-  --panel:#131a26;
-  --panel-2:#171f2d;
-  --line:#242e40;
-  --line-strong:#33405a;
-  --text:#e8edf7;
-  --muted:#98a3ba;
-  --brand:#7d9bff;
-  --brand-soft:#1c2740;
-  --accent:#3ddc9a;
-  --total-bg:#1a2338;
-  --heat:125,155,255;
-  --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px rgba(0,0,0,.35);
+  --bg:#0c1018;--panel:#131a26;--panel-2:#171f2d;--line:#242e40;--line-strong:#33405a;
+  --text:#e8edf7;--muted:#98a3ba;--brand:#7d9bff;--brand-soft:#1c2740;--total-bg:#1a2338;
+  --heat:125,155,255;--g:#3ddc9a;--y:#f5c542;--b:#6aa6ff;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 28px rgba(0,0,0,.35);
 }
 *,*::before,*::after{box-sizing:inherit}
 html{scroll-padding-top:env(safe-area-inset-top,0px);-webkit-text-size-adjust:100%}
-body{
-  margin:0;
-  background:var(--bg);
-  color:var(--text);
-  font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
-  font-size:14px;
-  line-height:1.5;
-}
+body{margin:0;background:var(--bg);color:var(--text);font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;font-size:14px;line-height:1.5}
 .wrap{max-width:1280px;margin:0 auto;padding:20px 16px 56px}
-
-/* ---------- Header ---------- */
-.topbar{
-  display:flex;align-items:center;gap:14px;flex-wrap:wrap;
-  margin-bottom:18px;
-}
-.logo{
-  width:40px;height:40px;border-radius:11px;flex:0 0 auto;
-  background:linear-gradient(135deg,var(--brand),#7a4ddb);
-  display:grid;place-items:center;color:#fff;font-weight:700;letter-spacing:.5px;
-  box-shadow:var(--shadow);
-}
-.ttl h1{margin:0;font-size:18px;font-weight:700;letter-spacing:-.2px}
+.topbar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:18px}
+.logo{width:40px;height:40px;border-radius:11px;flex:0 0 auto;background:linear-gradient(135deg,var(--brand),#7a4ddb);display:grid;place-items:center;color:#fff;font-weight:700;box-shadow:var(--shadow)}
+.ttl h1{margin:0;font-size:18px;font-weight:700}
 .ttl p{margin:2px 0 0;font-size:12.5px;color:var(--muted)}
 .spacer{flex:1 1 auto}
-.btn{
-  border:1px solid var(--line-strong);background:var(--panel);color:var(--text);
-  padding:8px 13px;border-radius:9px;font:inherit;font-size:13px;font-weight:500;
-  cursor:pointer;transition:.15s;
-}
+.btn{border:1px solid var(--line-strong);background:var(--panel);color:var(--text);padding:8px 13px;border-radius:9px;font:inherit;font-size:13px;font-weight:500;cursor:pointer}
 .btn:hover{background:var(--brand-soft);border-color:var(--brand)}
-
-/* ---------- KPI cards ---------- */
 .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:18px}
-.kpi{
-  background:var(--panel);border:1px solid var(--line);border-radius:13px;
-  padding:13px 15px;box-shadow:var(--shadow);
-}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:13px 15px;box-shadow:var(--shadow)}
 .kpi .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);font-weight:600}
-.kpi .val{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:24px;font-weight:700;margin-top:5px;letter-spacing:-.5px}
+.kpi .val{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:24px;font-weight:700;margin-top:5px}
 .kpi.hl .val{color:var(--brand)}
-
-/* ---------- Toolbar ---------- */
-.toolbar{
-  display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px;
-}
-.search{
-  flex:1 1 240px;min-width:200px;
-  display:flex;align-items:center;gap:8px;
-  background:var(--panel);border:1px solid var(--line-strong);border-radius:10px;padding:0 11px;
-}
-.search input{
-  flex:1;border:0;outline:0;background:transparent;color:var(--text);
-  font:inherit;padding:10px 0;
-}
-.search svg{flex:0 0 auto;opacity:.55}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+.search{flex:1 1 240px;min-width:200px;display:flex;align-items:center;gap:8px;background:var(--panel);border:1px solid var(--line-strong);border-radius:10px;padding:0 11px}
+.search input{flex:1;border:0;outline:0;background:transparent;color:var(--text);font:inherit;padding:10px 0}
 .hint{font-size:12px;color:var(--muted)}
-
-/* ---------- Table ---------- */
-.card{
-  background:var(--panel);border:1px solid var(--line);border-radius:14px;
-  box-shadow:var(--shadow);overflow:hidden;
-}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-bottom:12px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:10px;height:10px;border-radius:50%;display:inline-block}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);overflow:hidden}
 .scroller{overflow-x:auto;-webkit-overflow-scrolling:touch}
 table{border-collapse:separate;border-spacing:0;width:100%;min-width:900px}
-thead th{
-  position:sticky;top:0;z-index:3;
-  background:var(--panel-2);
-  border-bottom:1px solid var(--line-strong);
-  font-size:11px;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);
-  font-weight:700;padding:12px 10px;text-align:center;white-space:nowrap;cursor:pointer;user-select:none;
-}
-thead th:first-child{text-align:left;left:0;z-index:5;min-width:250px;padding-left:16px}
+thead th{position:sticky;top:0;z-index:3;background:var(--panel-2);border-bottom:1px solid var(--line-strong);font-size:11px;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);font-weight:700;padding:12px 10px;text-align:center;white-space:nowrap;cursor:pointer;user-select:none}
+thead th:first-child{text-align:left;left:0;z-index:5;min-width:300px;padding-left:16px}
 thead th .arw{opacity:.35;font-size:9px;margin-left:3px}
 thead th.sorted{color:var(--brand)}
 thead th.sorted .arw{opacity:1}
 thead th.tot{background:var(--total-bg);color:var(--brand)}
-
-tbody td{
-  border-bottom:1px solid var(--line);
-  padding:0;text-align:center;
-  font-family:"JetBrains Mono",ui-monospace,monospace;
-  font-size:13.5px;font-weight:600;
-  white-space:nowrap;
-}
+tbody td{border-bottom:1px solid var(--line);padding:0;text-align:center;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:13.5px;font-weight:600;white-space:nowrap}
 tbody td .cell{padding:11px 10px;display:block}
-tbody td.name{
-  position:sticky;left:0;z-index:2;background:var(--panel);
-  text-align:left;font-family:"Inter",sans-serif;font-weight:500;font-size:13.5px;
-  border-right:1px solid var(--line);
-}
-tbody td.name .cell{padding:11px 14px 11px 16px;display:flex;align-items:center;gap:9px}
-.idx{
-  flex:0 0 auto;width:22px;height:22px;border-radius:6px;background:var(--brand-soft);
-  color:var(--brand);font-size:10.5px;font-weight:700;display:grid;place-items:center;
-  font-family:"JetBrains Mono",monospace;
-}
+tbody td.name{position:sticky;left:0;z-index:2;background:var(--panel);text-align:left;font-family:"Inter",sans-serif;font-weight:500;font-size:13.5px;border-right:1px solid var(--line);border-left:4px solid transparent}
+tbody td.name .cell{padding:11px 14px 11px 12px;display:flex;align-items:center;gap:9px}
+.idx{flex:0 0 auto;width:22px;height:22px;border-radius:6px;background:var(--brand-soft);color:var(--brand);font-size:10.5px;font-weight:700;display:grid;place-items:center;font-family:"JetBrains Mono",monospace}
+.nm{flex:1 1 auto}
+.area{display:block;font-size:10.5px;font-weight:600;color:var(--muted);letter-spacing:.3px}
+.badge{flex:0 0 auto;font-size:10.5px;font-weight:700;padding:3px 8px;border-radius:99px;color:#fff;font-family:"Inter",sans-serif}
 tbody tr:hover td{background:var(--panel-2)}
-tbody tr:hover td.name{background:var(--panel-2)}
+/* tier backgrounds on project name */
+tbody tr td.name.t-g{background:linear-gradient(90deg,color-mix(in srgb,var(--g) 26%,var(--panel)),color-mix(in srgb,var(--g) 8%,var(--panel)));border-left-color:var(--g)}
+tbody tr td.name.t-y{background:linear-gradient(90deg,color-mix(in srgb,var(--y) 26%,var(--panel)),color-mix(in srgb,var(--y) 8%,var(--panel)));border-left-color:var(--y)}
+tbody tr td.name.t-b{background:linear-gradient(90deg,color-mix(in srgb,var(--b) 24%,var(--panel)),color-mix(in srgb,var(--b) 7%,var(--panel)));border-left-color:var(--b)}
+.t-g .badge{background:var(--g)}.t-y .badge{background:var(--y)}.t-b .badge{background:var(--b)}
+.t-g .badge{animation:pulse 1.8s ease-in-out infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 color-mix(in srgb,var(--g) 55%,transparent)}50%{box-shadow:0 0 0 6px transparent}}
+@media (prefers-reduced-motion:reduce){.t-g .badge{animation:none}}
 td.tot{background:var(--total-bg);color:var(--brand);font-weight:700}
-td.zero{color:var(--muted);opacity:.5;font-weight:500}
-
-tfoot td{
-  position:sticky;bottom:0;z-index:3;
-  background:var(--panel-2);border-top:2px solid var(--line-strong);
-  padding:13px 10px;text-align:center;
-  font-family:"JetBrains Mono",monospace;font-weight:700;font-size:14px;
-}
-tfoot td:first-child{
-  left:0;z-index:5;text-align:left;padding-left:16px;
-  font-family:"Inter",sans-serif;font-size:12px;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);
-}
+tfoot td{position:sticky;bottom:0;z-index:3;background:var(--panel-2);border-top:2px solid var(--line-strong);padding:13px 10px;text-align:center;font-family:"JetBrains Mono",monospace;font-weight:700;font-size:14px}
+tfoot td:first-child{left:0;z-index:5;text-align:left;padding-left:16px;font-family:"Inter",sans-serif;font-size:12px;text-transform:uppercase;letter-spacing:.7px;color:var(--muted)}
 tfoot td.tot{background:var(--brand);color:#fff}
-
 .empty{padding:36px;text-align:center;color:var(--muted)}
 .foot{margin-top:14px;font-size:11.5px;color:var(--muted);text-align:center}
-@media (max-width:640px){
-  .wrap{padding:14px 10px 40px}
-  .kpi .val{font-size:20px}
-  thead th:first-child{min-width:190px}
-}
+@media (max-width:640px){.wrap{padding:14px 10px 40px}.kpi .val{font-size:20px}thead th:first-child{min-width:230px}}
 </style>
 </head>
 <body>
 <div class="wrap">
-
   <div class="topbar">
     <div class="logo">CRM</div>
-    <div class="ttl">
-      <h1>Project Wise Leads Report</h1>
-      <p>Lead counts only · no contact details shown</p>
-    </div>
+    <div class="ttl"><h1>Project Wise Leads Report</h1><p>Lead counts only · no contact details shown</p></div>
     <div class="spacer"></div>
     <button class="btn" id="themeBtn" type="button">Theme</button>
   </div>
@@ -200,11 +103,17 @@ tfoot td.tot{background:var(--brand);color:#fff}
 
   <div class="toolbar">
     <label class="search">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" style="opacity:.55"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
       <input type="search" id="q" placeholder="Search project…" autocomplete="off">
     </label>
     <span class="hint" id="count"></span>
     <span class="hint">Tip: column header pe click karke sort karein</span>
+  </div>
+
+  <div class="legend">
+    <span><i style="background:var(--g)"></i>Trending (10+ daily)</span>
+    <span><i style="background:var(--y)"></i>Rising (9+ daily)</span>
+    <span><i style="background:var(--b)"></i>Steady (8+ daily)</span>
   </div>
 
   <div class="card">
@@ -217,7 +126,6 @@ tfoot td.tot{background:var(--brand);color:#fff}
     </div>
     <div class="empty" id="empty" style="display:none">Koi project match nahi hua.</div>
   </div>
-
   <p class="foot">Sample data · Report generated for internal CRM use</p>
 </div>
 
@@ -230,38 +138,50 @@ const COLS = [
   {key:"total", label:"Total", tot:true}
 ];
 
+/* [project name, daily average leads, area (RealShree listing ke hisaab se)]
+   HOT areas (Vaishnodevi, Chharodi, Gota, Science City, Science Park) = 10+ daily. Baaki 8-10 daily. */
+const HOT = ["Vaishnodevi","Chharodi","Gota","Science City","Science Park"];
 const RAW = [
-  ["Rhythm Gladeview",                         4,21, 78,214, 731],
-  ["Harmony Harikesh",                         2,13, 52,168, 604],
-  ["Shashwat Evana",                           6,28, 94,271, 944],
-  ["The Regal – Exclusive 4 BHK Apartments",   3,17, 61,190, 656],
-  ["Sheetal Dharohar",                         1, 9, 38,122, 451],
-  ["Aristo The Opus & Aatmantan",              5,24, 86,245, 858],
-  ["Aristo Amaya",                             3,15, 57,176, 621],
-  ["ONE FIFTY ONE",                            7,31,108,298,1024],
-  ["OXYVIEW – 4 BHK Exclusive Residence",      2,12, 47,154, 559],
-  ["Aashray Anantam",                          4,19, 69,203, 712],
-  ["Sandalwood 26 – 4 BHK Luxury Apartments",  1, 8, 34,111, 418],
-  ["Sweven by Signature",                      5,26, 91,259, 902],
-  ["SHRIMLEELA SAFFRON",                       3,16, 59,182, 638],
-  ["SHRIMLEELA BLISS",                         2,11, 44,147, 533],
-  ["Trinova Nest",                             6,27, 96,274, 951],
-  ["Serenity Trion",                           1,10, 41,133, 487],
-  ["Smart Walls Business Space",               4,22, 81,236, 826],
-  ["Akshar Evara",                             3,14, 55,171, 609],
-  ["Akshar Evoq",                              2,13, 50,161, 578],
-  ["Vedant Zade",                              5,23, 84,241, 841],
-  ["Sahajanand Marigold",                      1, 7, 31,104, 396],
-  ["Hiradhan Heaven",                          4,20, 73,211, 740],
-  ["Hiradhan Sanket",                          2,12, 46,151, 545],
-  ["Rajshree Regalia",                         6,29,101,285, 987],
-  ["Tremont Adleap",                           3,18, 64,195, 683],
-  ["Anali Heights",                            5,25, 88,251, 877]
+  ["Rhythm Gladeview",                        10.6, "Science Park"],
+  ["Harmony Harikesh",                        11.2, "Science City"],
+  ["Shashwat Evana",                          12.4, "Vaishnodevi"],
+  ["The Regal – Exclusive 4 BHK Apartments",  11.9, "Vaishnodevi"],
+  ["Sheetal Dharohar",                         8.0, "SG Highway"],
+  ["Aristo The Opus & Aatmantan",             11.6, "Gota"],
+  ["Aristo Amaya",                            10.9, "Gota"],
+  ["ONE FIFTY ONE",                            9.8, "Bhadaj"],
+  ["OXYVIEW – 4 BHK Exclusive Residence",     10.3, "Science Park"],
+  ["Aashray Anantam",                          9.7, "Shilaj"],
+  ["Sandalwood 26 – 4 BHK Luxury Apartments", 10.1, "Chharodi"],
+  ["Sweven by Signature",                     11.4, "Chharodi"],
+  ["SHRIMLEELA SAFFRON",                      10.7, "Science Park"],
+  ["SHRIMLEELA BLISS",                         8.4, "Ghatlodia"],
+  ["Trinova Nest",                             9.4, "Ognaj"],
+  ["Serenity Trion",                           8.0, "Shilaj"],
+  ["Smart Walls Business Space",               9.3, "Ghatlodia"],
+  ["Akshar Evara",                             8.7, "Ognaj"],
+  ["Akshar Evoq",                              8.5, "Tragad"],
+  ["Vedant Zade",                              9.6, "Chandkheda"],
+  ["Sahajanand Marigold",                      8.1, "Chandkheda"],
+  ["Hiradhan Heaven",                          9.2, "Sabarmati"],
+  ["Hiradhan Sanket",                          8.4, "Naranpura"],
+  ["Rajshree Regalia",                         9.9, "Jagatpur"],
+  ["Tremont Adleap",                          12.1, "Chharodi"],
+  ["Anali Heights",                            9.5, "Naranpura"]
 ];
 
-const DATA = RAW.map(r => ({
-  name:r[0], today:r[1], week:r[2], month:r[3], m3:r[4], total:r[5]
-}));
+const DATA = RAW.map((r,i) => {
+  const avg = r[1], hot = HOT.includes(r[2]);
+  const noise = ((i*7)%5 - 2) * 0.4;
+  let today = Math.round(avg + noise);
+  today = hot ? Math.max(today,10) : Math.min(Math.max(today,8),10);
+  return {
+    name:r[0], area:r[2], avg,
+    today, week:Math.round(avg*7), month:Math.round(avg*30),
+    m3:Math.round(avg*90), total:Math.round(avg*165)
+  };
+});
+const tier = a => a >= 10 ? ["t-g","🔥 Trending"] : a >= 9 ? ["t-y","Rising"] : ["t-b","Steady"];
 
 const maxOf = {};
 COLS.forEach(c => maxOf[c.key] = Math.max(...DATA.map(d => d[c.key])));
@@ -269,61 +189,54 @@ COLS.forEach(c => maxOf[c.key] = Math.max(...DATA.map(d => d[c.key])));
 let sortKey = "total", sortDir = -1, query = "";
 const nf = n => n.toLocaleString("en-IN");
 
-/* ---- KPI cards ---- */
 function renderKpis(){
   const sum = k => DATA.reduce((a,d)=>a+d[k],0);
   const cards = [
-    ["Today",       sum("today")],
-    ["This Week",   sum("week")],
-    ["This Month",  sum("month")],
-    ["3 Months",    sum("m3")],
-    ["Total Leads", sum("total"), true],
-    ["Projects",    DATA.length]
+    ["Today",sum("today")],["This Week",sum("week")],["This Month",sum("month")],
+    ["3 Months",sum("m3")],["Total Leads",sum("total"),true],
+    ["Trending",DATA.filter(d=>d.avg>=10).length],["Projects",DATA.length]
   ];
   document.getElementById("kpis").innerHTML = cards.map(c =>
-    `<div class="kpi${c[2]?" hl":""}"><div class="lbl">${c[0]}</div><div class="val">${nf(c[1])}</div></div>`
-  ).join("");
+    `<div class="kpi${c[2]?" hl":""}"><div class="lbl">${c[0]}</div><div class="val">${nf(c[1])}</div></div>`).join("");
 }
 
-/* ---- Head ---- */
 function renderHead(){
   document.getElementById("thead").innerHTML =
     `<th data-k="name">Project Title<span class="arw">▲</span></th>` +
     COLS.map(c => `<th data-k="${c.key}" class="${c.tot?"tot":""}">${c.label}<span class="arw">▼</span></th>`).join("");
   document.querySelectorAll("#thead th").forEach(th => {
     th.classList.toggle("sorted", th.dataset.k === sortKey);
-    const a = th.querySelector(".arw");
-    if (th.dataset.k === sortKey) a.textContent = sortDir === 1 ? "▲" : "▼";
+    if (th.dataset.k === sortKey) th.querySelector(".arw").textContent = sortDir === 1 ? "▲" : "▼";
     th.onclick = () => {
       if (sortKey === th.dataset.k) sortDir = -sortDir;
-      else { sortKey = th.dataset.k; sortDir = (sortKey === "name") ? 1 : -1; }
+      else { sortKey = th.dataset.k; sortDir = sortKey === "name" ? 1 : -1; }
       render();
     };
   });
 }
 
-/* ---- Body ---- */
-function heat(v, k){
-  const m = maxOf[k] || 1;
-  const t = Math.min(v / m, 1);
-  return t < 0.04 ? "transparent" : `rgba(var(--heat), ${(0.06 + t*0.26).toFixed(3)})`;
+function heat(v,k){
+  const t = Math.min(v/(maxOf[k]||1),1);
+  return t < 0.04 ? "transparent" : `rgba(var(--heat), ${(0.06+t*0.26).toFixed(3)})`;
 }
 
 function render(){
   renderHead();
-  let rows = DATA.filter(d => d.name.toLowerCase().includes(query));
+  const rows = DATA.filter(d => d.name.toLowerCase().includes(query) || d.area.toLowerCase().includes(query));
   rows.sort((a,b) => sortKey === "name"
-    ? a.name.localeCompare(b.name) * sortDir
-    : (a[sortKey] - b[sortKey]) * sortDir);
+    ? a.name.localeCompare(b.name)*sortDir
+    : (a[sortKey]-b[sortKey])*sortDir);
 
-  document.getElementById("tbody").innerHTML = rows.map((d,i) =>
-    `<tr><td class="name"><span class="cell"><span class="idx">${i+1}</span>${d.name}</span></td>` +
-    COLS.map(c => {
-      const v = d[c.key];
-      const bg = c.tot ? "" : `style="background:${heat(v,c.key)}"`;
-      return `<td class="${c.tot?"tot":""}${v===0?" zero":""}" ${bg}><span class="cell">${nf(v)}</span></td>`;
-    }).join("") + `</tr>`
-  ).join("");
+  document.getElementById("tbody").innerHTML = rows.map((d,i) => {
+    const [cls,label] = tier(d.avg);
+    return `<tr><td class="name ${cls}"><span class="cell"><span class="idx">${i+1}</span>` +
+      `<span class="nm">${d.name}${d.area?`<span class="area">📍 ${d.area}</span>`:""}</span>` +
+      `<span class="badge">${label}</span></span></td>` +
+      COLS.map(c => {
+        const bg = c.tot ? "" : `style="background:${heat(d[c.key],c.key)}"`;
+        return `<td class="${c.tot?"tot":""}" ${bg}><span class="cell">${nf(d[c.key])}</span></td>`;
+      }).join("") + `</tr>`;
+  }).join("");
 
   document.getElementById("tfoot").innerHTML =
     `<td>Grand Total</td>` +
@@ -333,11 +246,7 @@ function render(){
   document.getElementById("count").textContent = rows.length + " / " + DATA.length + " projects";
 }
 
-document.getElementById("q").addEventListener("input", e => {
-  query = e.target.value.trim().toLowerCase();
-  render();
-});
-
+document.getElementById("q").addEventListener("input", e => { query = e.target.value.trim().toLowerCase(); render(); });
 document.getElementById("themeBtn").addEventListener("click", () => {
   const cur = document.documentElement.getAttribute("data-theme");
   const dark = cur ? cur === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
