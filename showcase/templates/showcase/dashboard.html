@@ -111,9 +111,9 @@ tfoot td.tot{background:var(--brand);color:#fff}
   </div>
 
   <div class="legend">
-    <span><i style="background:var(--g)"></i>Trending (10+ daily)</span>
-    <span><i style="background:var(--y)"></i>Rising (9+ daily)</span>
-    <span><i style="background:var(--b)"></i>Steady (8+ daily)</span>
+    <span><i style="background:var(--g)"></i>Trending (~5–7 daily)</span>
+    <span><i style="background:var(--y)"></i>Rising (~4–5 daily)</span>
+    <span><i style="background:var(--b)"></i>Steady (~2–3 daily)</span>
   </div>
 
   <div class="card">
@@ -139,49 +139,49 @@ const COLS = [
 ];
 
 /* [project name, daily average leads, area (RealShree listing ke hisaab se)]
-   HOT areas (Vaishnodevi, Chharodi, Gota, Science City, Science Park) = 10+ daily. Baaki 8-10 daily. */
+   HOT areas (Vaishnodevi, Chharodi, Gota, Science City, Science Park) = ~5-7 daily. Baaki 2-5 daily. */
 const HOT = ["Vaishnodevi","Chharodi","Gota","Science City","Science Park"];
 const RAW = [
-  ["Rhythm Gladeview",                        10.6, "Science Park"],
-  ["Harmony Harikesh",                        11.2, "Science City"],
-  ["Shashwat Evana",                          12.4, "Vaishnodevi"],
-  ["The Regal – Exclusive 4 BHK Apartments",  11.9, "Vaishnodevi"],
-  ["Sheetal Dharohar",                         8.0, "SG Highway"],
-  ["Aristo The Opus & Aatmantan",             11.6, "Gota"],
-  ["Aristo Amaya",                            10.9, "Gota"],
-  ["ONE FIFTY ONE",                            9.8, "Bhadaj"],
-  ["OXYVIEW – 4 BHK Exclusive Residence",     10.3, "Science Park"],
-  ["Aashray Anantam",                          9.7, "Shilaj"],
-  ["Sandalwood 26 – 4 BHK Luxury Apartments", 10.1, "Chharodi"],
-  ["Sweven by Signature",                     11.4, "Chharodi"],
-  ["SHRIMLEELA SAFFRON",                      10.7, "Science Park"],
-  ["SHRIMLEELA BLISS",                         8.4, "Ghatlodia"],
-  ["Trinova Nest",                             9.4, "Ognaj"],
-  ["Serenity Trion",                           8.0, "Shilaj"],
-  ["Smart Walls Business Space",               9.3, "Ghatlodia"],
-  ["Akshar Evara",                             8.7, "Ognaj"],
-  ["Akshar Evoq",                              8.5, "Tragad"],
-  ["Vedant Zade",                              9.6, "Chandkheda"],
-  ["Sahajanand Marigold",                      8.1, "Chandkheda"],
-  ["Hiradhan Heaven",                          9.2, "Sabarmati"],
-  ["Hiradhan Sanket",                          8.4, "Naranpura"],
-  ["Rajshree Regalia",                         9.9, "Jagatpur"],
-  ["Tremont Adleap",                          12.1, "Chharodi"],
-  ["Anali Heights",                            9.5, "Naranpura"]
+  ["Rhythm Gladeview",                            6.4, "Science Park"],
+  ["Harmony Harikesh",                            6.4, "Science City"],
+  ["Shashwat Evana",                              6.4, "Vaishnodevi"],
+  ["The Regal – Exclusive 4 BHK Apartments",      7.1, "Vaishnodevi"],
+  ["Sheetal Dharohar",                            2.5, "SG Highway"],
+  ["Aristo The Opus & Aatmantan",                 6.0, "Gota"],
+  ["Aristo Amaya",                                6.6, "Gota"],
+  ["ONE FIFTY ONE",                               4.7, "Bhadaj"],
+  ["OXYVIEW – 4 BHK Exclusive Residence",         5.2, "Science Park"],
+  ["Aashray Anantam",                             5.0, "Shilaj"],
+  ["Sandalwood 26 – 4 BHK Luxury Apartments",     5.5, "Chharodi"],
+  ["Sweven by Signature",                         5.8, "Chharodi"],
+  ["SHRIMLEELA SAFFRON",                          6.3, "Science Park"],
+  ["SHRIMLEELA BLISS",                            3.1, "Ghatlodia"],
+  ["Trinova Nest",                                3.6, "Ognaj"],
+  ["Serenity Trion",                              3.2, "Shilaj"],
+  ["Smart Walls Business Space",                  4.3, "Ghatlodia"],
+  ["Akshar Evara",                                2.8, "Ognaj"],
+  ["Akshar Evoq",                                 3.5, "Tragad"],
+  ["Vedant Zade",                                 4.4, "Chandkheda"],
+  ["Sahajanand Marigold",                         2.8, "Chandkheda"],
+  ["Hiradhan Heaven",                             4.7, "Sabarmati"],
+  ["Hiradhan Sanket",                             3.1, "Naranpura"],
+  ["Rajshree Regalia",                            4.3, "Jagatpur"],
+  ["Tremont Adleap",                              7.2, "Chharodi"],
+  ["Anali Heights",                               4.6, "Naranpura"]
 ];
 
 const DATA = RAW.map((r,i) => {
   const avg = r[1], hot = HOT.includes(r[2]);
   const noise = ((i*7)%5 - 2) * 0.4;
   let today = Math.round(avg + noise);
-  today = hot ? Math.max(today,10) : Math.min(Math.max(today,8),10);
+  today = hot ? Math.min(Math.max(today,5),8) : Math.min(Math.max(today,2),5);
   return {
-    name:r[0], area:r[2], avg,
+    name:r[0], area:r[2], avg, hot,
     today, week:Math.round(avg*7), month:Math.round(avg*30),
     m3:Math.round(avg*90), total:Math.round(avg*165)
   };
 });
-const tier = a => a >= 10 ? ["t-g","🔥 Trending"] : a >= 9 ? ["t-y","Rising"] : ["t-b","Steady"];
+const tier = d => d.hot ? ["t-g","🔥 Trending"] : d.avg >= 4 ? ["t-y","Rising"] : ["t-b","Steady"];
 
 const maxOf = {};
 COLS.forEach(c => maxOf[c.key] = Math.max(...DATA.map(d => d[c.key])));
@@ -194,7 +194,7 @@ function renderKpis(){
   const cards = [
     ["Today",sum("today")],["This Week",sum("week")],["This Month",sum("month")],
     ["3 Months",sum("m3")],["Total Leads",sum("total"),true],
-    ["Trending",DATA.filter(d=>d.avg>=10).length],["Projects",DATA.length]
+    ["Trending",DATA.filter(d=>d.hot).length],["Projects",DATA.length]
   ];
   document.getElementById("kpis").innerHTML = cards.map(c =>
     `<div class="kpi${c[2]?" hl":""}"><div class="lbl">${c[0]}</div><div class="val">${nf(c[1])}</div></div>`).join("");
@@ -228,7 +228,7 @@ function render(){
     : (a[sortKey]-b[sortKey])*sortDir);
 
   document.getElementById("tbody").innerHTML = rows.map((d,i) => {
-    const [cls,label] = tier(d.avg);
+    const [cls,label] = tier(d);
     return `<tr><td class="name ${cls}"><span class="cell"><span class="idx">${i+1}</span>` +
       `<span class="nm">${d.name}${d.area?`<span class="area">📍 ${d.area}</span>`:""}</span>` +
       `<span class="badge">${label}</span></span></td>` +
