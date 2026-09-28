@@ -113,7 +113,7 @@ tfoot td.tot{background:var(--brand);color:#fff}
   <div class="legend">
     <span><i style="background:var(--g)"></i>Trending (~5–7 daily)</span>
     <span><i style="background:var(--y)"></i>Rising (~4–5 daily)</span>
-    <span><i style="background:var(--b)"></i>Steady (~2–3 daily)</span>
+    <span><i style="background:var(--b)"></i>Steady (~3–4 daily)</span>
   </div>
 
   <div class="card">
@@ -139,14 +139,14 @@ const COLS = [
 ];
 
 /* [project name, daily average leads, area (RealShree listing ke hisaab se)]
-   HOT areas (Vaishnodevi, Chharodi, Gota, Science City, Science Park) = ~5-7 daily. Baaki 2-5 daily. */
+   HOT areas (Vaishnodevi, Chharodi, Gota, Science City, Science Park) = ~5-7 daily. Baaki 3-5 daily. */
 const HOT = ["Vaishnodevi","Chharodi","Gota","Science City","Science Park"];
 const RAW = [
   ["Rhythm Gladeview",                            6.4, "Science Park"],
   ["Harmony Harikesh",                            6.4, "Science City"],
   ["Shashwat Evana",                              6.4, "Vaishnodevi"],
   ["The Regal – Exclusive 4 BHK Apartments",      7.1, "Vaishnodevi"],
-  ["Sheetal Dharohar",                            2.5, "SG Highway"],
+  ["Sheetal Dharohar",                             3.4, "SG Highway"],
   ["Aristo The Opus & Aatmantan",                 6.0, "Gota"],
   ["Aristo Amaya",                                6.6, "Gota"],
   ["ONE FIFTY ONE",                               4.7, "Bhadaj"],
@@ -155,16 +155,16 @@ const RAW = [
   ["Sandalwood 26 – 4 BHK Luxury Apartments",     5.5, "Chharodi"],
   ["Sweven by Signature",                         5.8, "Chharodi"],
   ["SHRIMLEELA SAFFRON",                          6.3, "Science Park"],
-  ["SHRIMLEELA BLISS",                            3.1, "Ghatlodia"],
-  ["Trinova Nest",                                3.6, "Ognaj"],
-  ["Serenity Trion",                              3.2, "Shilaj"],
+  ["SHRIMLEELA BLISS",                             3.7, "Ghatlodia"],
+  ["Trinova Nest",                                 3.9, "Ognaj"],
+  ["Serenity Trion",                               3.8, "Shilaj"],
   ["Smart Walls Business Space",                  4.3, "Ghatlodia"],
-  ["Akshar Evara",                                2.8, "Ognaj"],
-  ["Akshar Evoq",                                 3.5, "Tragad"],
+  ["Akshar Evara",                                 3.6, "Ognaj"],
+  ["Akshar Evoq",                                  3.6, "Tragad"],
   ["Vedant Zade",                                 4.4, "Chandkheda"],
-  ["Sahajanand Marigold",                         2.8, "Chandkheda"],
+  ["Sahajanand Marigold",                          3.3, "Chandkheda"],
   ["Hiradhan Heaven",                             4.7, "Sabarmati"],
-  ["Hiradhan Sanket",                             3.1, "Naranpura"],
+  ["Hiradhan Sanket",                              3.5, "Naranpura"],
   ["Rajshree Regalia",                            4.3, "Jagatpur"],
   ["Tremont Adleap",                              7.2, "Chharodi"],
   ["Anali Heights",                               4.6, "Naranpura"]
@@ -174,7 +174,7 @@ const DATA = RAW.map((r,i) => {
   const avg = r[1], hot = HOT.includes(r[2]);
   const noise = ((i*7)%5 - 2) * 0.4;
   let today = Math.round(avg + noise);
-  today = hot ? Math.min(Math.max(today,5),8) : Math.min(Math.max(today,2),5);
+  today = hot ? Math.min(Math.max(today,5),8) : Math.min(Math.max(today,3),5);
   return {
     name:r[0], area:r[2], avg, hot,
     today, week:Math.round(avg*7), month:Math.round(avg*30),
