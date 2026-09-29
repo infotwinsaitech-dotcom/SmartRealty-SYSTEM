@@ -88,7 +88,7 @@
     {% endfor %}
   </div>
   {% else %}
-  <p>Filhal is area mein koi listing available nahi hai. <a href="{% url 'property_list' %}" class="underline">Saari properties dekho</a>.</p>
+  <p>There are no listings in this area right now. <a href="{% url 'property_list' %}" class="underline">View all properties</a>.</p>
   {% endif %}
 
   {% if nearby_areas %}

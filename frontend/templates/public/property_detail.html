@@ -101,17 +101,23 @@
         <div class="lead-gate-icon">
             <span class="material-icons-round" style="font-size:26px">lock</span>
         </div>
-        <h3 class="lead-gate-title">Floor Plan, Brochure &amp; Video Dekhne Ke Liye</h3>
-        <p class="lead-gate-sub">Apna naam aur mobile number bharein — sirf ek baar. Uske baad kabhi bhi bina form ke dekh sakte hain.</p>
+               <h3 class="lead-gate-title">Enter Your Details to View the Floor Plan, Brochure &amp; Video</h3>
+        <p class="lead-gate-sub">Enter your name and mobile number just once. After that, you can view everything anytime without filling this form again.</p>
         <form id="leadGateForm" onsubmit="submitLeadGateForm(event)">
             {% csrf_token %}
-            <input type="text" id="leadGateName" name="name" placeholder="Aapka naam" required class="lead-gate-input">
+            <input type="text" id="leadGateName" name="name" placeholder="Your name" required class="lead-gate-input">
             <input type="tel" id="leadGatePhone" name="phone" placeholder="Mobile number" required
                    pattern="[0-9+ ]{10,15}" maxlength="15" class="lead-gate-input">
             <p id="leadGateError" class="lead-gate-error" style="display:none;"></p>
             <button type="submit" id="leadGateSubmitBtn" class="btn btn-navy" style="width:100%; justify-content:center;">
-                View Karein
+                View Now
             </button>
+
+            <!-- ADD THIS -->
+            <p style="display:flex; align-items:center; justify-content:center; gap:6px; margin-top:12px; font-size:0.78rem; color:var(--color-text-muted); text-align:center;">
+                <span class="material-icons-round" style="font-size:16px; color:var(--color-success);">lock</span>
+                Your information is 100% secure.
+            </p>
         </form>
     </div>
 </div>
@@ -462,7 +468,7 @@
          style="position:relative; padding-top:56.25%; cursor:pointer; background:linear-gradient(135deg, var(--color-navy), #1a2a4a);">
         <div style="position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; color:#fff; gap:8px;">
             <span class="material-icons-round" style="font-size:48px; opacity:0.9;">play_circle</span>
-            <span style="font-size:13px; font-weight:600; opacity:0.9;">Video dekhne ke liye tap karein</span>
+            <span style="font-size:13px; font-weight:600; opacity:0.9;">Tap to watch the video</span>
         </div>
     </div>
 </div>
@@ -564,7 +570,7 @@
                         </div>
                     </div>
                     {% else %}
-                    <p class="text-sm text-[var(--color-text-muted)] mb-4">Is property ke liye abhi tak koi review nahi hai. Sabse pehle review dene wale bano!</p>
+                    <p class="text-sm text-[var(--color-text-muted)] mb-4">There are no reviews for this property yet. Be the first to write one!</p>
                     {% endif %}
 
                     <!-- Write a Review form (hidden by default) -->
@@ -885,6 +891,11 @@
                                 <span class="material-icons-round" style="font-size:18px">send</span>
                                 Submit Enquiry
                             </button>
+                            <!-- ADD THIS -->
+                            <p class="flex items-center justify-center gap-1.5 text-xs text-[var(--color-text-muted)] text-center">
+                                <span class="material-icons-round text-[var(--color-success)]" style="font-size:16px">lock</span>
+                                Your information is 100% secure.
+                            </p>
                         </form>
                         
                         <!-- Direct Contact -->
@@ -1206,7 +1217,7 @@ document.addEventListener('keydown', e => {
         var digitsOnly = phoneVal.replace(/\D/g, '');
 
         if (!nameVal || digitsOnly.length < 10){
-            errorEl.textContent = 'Sahi naam aur 10-digit mobile number dalein.';
+            errorEl.textContent = 'Please enter a valid name and a 10-digit mobile number..';
             errorEl.style.display = 'block';
             return;
         }
@@ -1226,23 +1237,23 @@ document.addEventListener('keydown', e => {
         .then(function(r){ return r.json(); })
         .then(function(data){
             submitBtn.disabled = false;
-            submitBtn.textContent = 'View Karein';
+            submitBtn.textContent = 'View Now';
             if (data.success){
                 mediaViewReported = true;
                 closeLeadGateModal();
                 if (typeof showToast === 'function'){
-                    showToast('Dhanyavaad! Ab aap poori detail dekh sakte hain.', 'success');
+                    showToast('Thank you! You can now view the full details.', 'success');
                 }
                 if (pendingAction) { pendingAction(); pendingAction = null; }
             } else {
-                errorEl.textContent = data.error || 'Kuch galat ho gaya, dobara try karein.';
+                errorEl.textContent = data.error || 'Something went wrong. Please try again.';
                 errorEl.style.display = 'block';
             }
         })
         .catch(function(){
             submitBtn.disabled = false;
-            submitBtn.textContent = 'View Karein';
-            errorEl.textContent = 'Network error, dobara try karein.';
+            submitBtn.textContent = 'View Now';
+            errorEl.textContent = 'Network error. Please try again.';
             errorEl.style.display = 'block';
         });
     };

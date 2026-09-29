@@ -47,7 +47,7 @@ def backup_restore(request):
                 f.write(chunk)
         try:
             management.call_command("loaddata", tmp_path)
-            messages.success(request, "Data successfully restore ho gaya!")
+            messages.success(request, "Data restored successfully!")
         except Exception as e:
             messages.error(request, f"Restore fail hua: {e}")
         finally:

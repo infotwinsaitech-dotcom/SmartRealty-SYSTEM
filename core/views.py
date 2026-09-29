@@ -121,7 +121,7 @@ def validate_rera_format(rera_number):
     Now permissive: accepts ANY non-empty value, only rejects blank input.
     """
     if not rera_number or not rera_number.strip():
-        return False, "RERA number khaali hai"
+        return False, "RERA number is empty"
 
     return True, "RERA number accepted"
 
@@ -262,7 +262,7 @@ def builder_required(view_func):
 
         from subscriptions.utils import get_active_subscription
         if get_active_subscription(request.user) is None:
-            messages.warning(request, "Panel dekhne ke liye pehle ek subscription plan choose karo.")
+            messages.warning(request, "Please choose a subscription plan to access your panel.")
             return redirect("subscriptions:pricing")
 
         return view_func(request, *args, **kwargs)
@@ -281,7 +281,7 @@ def agent_required(view_func):
 
         from subscriptions.utils import get_active_subscription
         if get_active_subscription(request.user) is None:
-            messages.warning(request, "Panel dekhne ke liye pehle ek subscription plan choose karo.")
+            messages.warning(request, "Please choose a subscription plan to access your panel.")
             return redirect("subscriptions:pricing")
 
         return view_func(request, *args, **kwargs)
@@ -380,7 +380,7 @@ def capture_media_lead(request, id):
 
     if not name or len(phone_digits) < 10:
         return JsonResponse(
-            {"success": False, "error": "Sahi naam aur 10-digit mobile number dalna zaroori hai."},
+            {"success": False, "error": "Please enter a valid name and a 10-digit mobile number."},
             status=400
         )
 
@@ -448,7 +448,7 @@ def capture_media_lead(request, id):
     except Exception as e:
         logger.error(f"Error capturing media-view lead: {str(e)}")
         return JsonResponse(
-            {"success": False, "error": "Kuch galat ho gaya, dobara try karein."},
+            {"success": False, "error": "Something went wrong. Please try again."},
             status=500
         )
 
@@ -498,7 +498,7 @@ def property_detail(request, id, slug=None):
                 return 5
 
         if not reviewer_name.strip():
-            messages.error(request, "Naam daalna zaroori hai review ke liye")
+            messages.error(request, "Please enter your name to submit a review.")
             return redirect(property.get_absolute_url())
 
         PropertyReview.objects.create(
@@ -514,7 +514,7 @@ def property_detail(request, id, slug=None):
             needs_improvement=needs_improvement,
             is_approved=False,
         )
-        messages.success(request, "Review submit ho gayi! Admin approval ke baad ye public page par dikhegi.")
+        messages.success(request, "Your review has been submitted! It will appear on the page after admin approval.")
         return redirect(property.get_absolute_url())
 
     if request.method == "POST":
@@ -1569,7 +1569,7 @@ def add_property(request):
         used_tokens = request.session.get('used_property_tokens', [])
 
         if form_token and form_token in used_tokens:
-            messages.info(request, "Ye submission already process ho chuki hai (duplicate click rok diya gaya).")
+            messages.info(request, "This submission has already been processed (duplicate click prevented).")
             return redirect("my_property")
 
         if form_token:
@@ -4640,8 +4640,8 @@ def wishlist_add(request, property_id):
     if created and property_obj.builder:
         Notification.objects.create(
             recipient=property_obj.builder,
-            title="❤️ Property Wishlist mein Add Hui",
-            message=f"{request.user.get_full_name() or request.user.username} ne aapki property '{property_obj.project_name or property_obj.title}' apni wishlist mein add ki hai.",
+            title="❤️ Property Added to Wishlist",
+            message=f"{request.user.get_full_name() or request.user.username} added your property '{property_obj.project_name or property_obj.title}' to their wishlist.",
             type="lead"
         )
         logger.info(f"Wishlist notification sent to builder {property_obj.builder.username} for property {property_obj.title}")
