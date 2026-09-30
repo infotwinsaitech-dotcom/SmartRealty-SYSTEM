@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manager Panel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 min-h-screen text-gray-800">
+
+<nav class="bg-blue-700 text-white px-4 md:px-8 py-3 flex items-center justify-between shadow">
+    <div class="font-extrabold text-lg">Manager Panel</div>
+    <div class="flex items-center gap-4 text-sm">
+        <span class="hidden sm:inline">{{ request.user.get_full_name|default:request.user.username }}</span>
+        <a href="{% url 'logout' %}" class="bg-white/20 hover:bg-white/30 px-3 py-1.5 rounded-lg font-semibold">Logout</a>
+    </div>
+</nav>
+
+<main class="p-4 md:p-8 max-w-7xl mx-auto">
+
+    <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+        <div>
+            <h1 class="text-3xl font-extrabold">All Properties &amp; Leads</h1>
+            <p class="text-gray-500 text-sm mt-1">Date filter lagao, phir jis property ki leads chahiye uska CSV download karo</p>
+        </div>
+        <a href="{% url 'manager_export_all' %}{% if qs %}?{{ qs }}{% endif %}"
+           class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow">
+            ⬇ Download All Leads
+        </a>
+    </header>
+
+    {% with base=request.path %}
+    <div class="bg-white rounded-2xl shadow border p-4 mb-6 flex flex-col gap-3">
+        <div class="flex flex-wrap items-center gap-2">
+            <a href="{{ base }}{% if q %}?q={{ q|urlencode }}{% endif %}"
+               class="px-3 py-1.5 rounded-full text-xs font-semibold border {% if not current_date_filter %}bg-blue-600 text-white border-blue-600{% else %}bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100{% endif %}">All</a>
+            <a href="{{ base }}?date_filter=today{% if q %}&q={{ q|urlencode }}{% endif %}"
+               class="px-3 py-1.5 rounded-full text-xs font-semibold border {% if current_date_filter == 'today' %}bg-blue-600 text-white border-blue-600{% else %}bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100{% endif %}">Today</a>
+            <a href="{{ base }}?date_filter=week{% if q %}&q={{ q|urlencode }}{% endif %}"
+               class="px-3 py-1.5 rounded-full text-xs font-semibold border {% if current_date_filter == 'week' %}bg-blue-600 text-white border-blue-600{% else %}bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100{% endif %}">This Week</a>
+            <a href="{{ base }}?date_filter=month{% if q %}&q={{ q|urlencode }}{% endif %}"
+               class="px-3 py-1.5 rounded-full text-xs font-semibold border {% if current_date_filter == 'month' %}bg-blue-600 text-white border-blue-600{% else %}bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100{% endif %}">This Month</a>
+            <a href="{{ base }}?date_filter=year{% if q %}&q={{ q|urlencode }}{% endif %}"
+               class="px-3 py-1.5 rounded-full text-xs font-semibold border {% if current_date_filter == 'year' %}bg-blue-600 text-white border-blue-600{% else %}bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100{% endif %}">This Year</a>
+
+            <form method="GET" class="flex flex-wrap items-center gap-2 sm:ml-2">
+                <input type="hidden" name="date_filter" value="custom">
+                {% if q %}<input type="hidden" name="q" value="{{ q }}">{% endif %}
+                <input type="date" name="from_date" value="{{ from_date }}" class="border rounded-lg px-2 py-1 text-xs">
+                <span class="text-xs text-gray-400">to</span>
+                <input type="date" name="to_date" value="{{ to_date }}" class="border rounded-lg px-2 py-1 text-xs">
+                <button type="submit"
+                        class="px-3 py-1.5 rounded-full text-xs font-semibold border {% if current_date_filter == 'custom' %}bg-blue-600 text-white border-blue-600{% else %}bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100{% endif %}">Custom</button>
+            </form>
+        </div>
+
+        <form method="GET" class="flex gap-2">
+            {% if current_date_filter %}<input type="hidden" name="date_filter" value="{{ current_date_filter }}">{% endif %}
+            {% if from_date %}<input type="hidden" name="from_date" value="{{ from_date }}">{% endif %}
+            {% if to_date %}<input type="hidden" name="to_date" value="{{ to_date }}">{% endif %}
+            <input name="q" value="{{ q }}" placeholder="Property / project / location / builder search..."
+                   class="flex-1 sm:max-w-md border rounded-xl px-4 py-2 text-sm">
+            <button class="bg-gray-800 text-white px-4 py-2 rounded-xl text-sm font-semibold">Search</button>
+        </form>
+    </div>
+    {% endwith %}
+
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+        <div class="bg-white rounded-2xl shadow border p-5">
+            <p class="text-xs uppercase font-bold text-gray-500">Total Leads (selected period)</p>
+            <p class="text-3xl font-extrabold mt-1">{{ total_leads }}</p>
+        </div>
+        <div class="bg-white rounded-2xl shadow border p-5">
+            <p class="text-xs uppercase font-bold text-gray-500">Properties</p>
+            <p class="text-3xl font-extrabold mt-1">{{ properties|length }}</p>
+        </div>
+        <div class="bg-white rounded-2xl shadow border p-5">
+            <p class="text-xs uppercase font-bold text-gray-500">Leads without property</p>
+            <p class="text-3xl font-extrabold mt-1">{{ no_property_leads }}</p>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-2xl shadow-lg border overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm">
+                <thead class="bg-gray-50 text-xs uppercase text-gray-500">
+                    <tr>
+                        <th class="px-4 py-4">Property</th>
+                        <th class="px-4 py-4">Location</th>
+                        <th class="px-4 py-4">Builder</th>
+                        <th class="px-4 py-4 text-center">Leads</th>
+                        <th class="px-4 py-4 text-right">Download</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y">
+                {% for p in properties %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-4 py-4 font-semibold">
+                            {{ p.title }}
+                            {% if p.project_name %}<div class="text-xs text-gray-400 font-normal">{{ p.project_name }}</div>{% endif %}
+                        </td>
+                        <td class="px-4 py-4 text-gray-600">{{ p.location }}</td>
+                        <td class="px-4 py-4 text-gray-600">{% if p.builder %}{{ p.builder.username }}{% else %}-{% endif %}</td>
+                        <td class="px-4 py-4 text-center">
+                            <span class="inline-block min-w-[2.5rem] px-3 py-1 rounded-full text-xs font-bold {% if p.period_leads %}bg-blue-100 text-blue-700{% else %}bg-gray-100 text-gray-400{% endif %}">{{ p.period_leads }}</span>
+                        </td>
+                        <td class="px-4 py-4 text-right">
+                            {% if p.period_leads %}
+                            <a href="{% url 'manager_export_property' p.id %}{% if qs %}?{{ qs }}{% endif %}"
+                               class="inline-block bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg text-xs font-semibold shadow">⬇ CSV</a>
+                            {% else %}
+                            <span class="text-xs text-gray-300">No leads</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="5" class="px-4 py-10 text-center text-gray-400">Koi property nahi mili.</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+</body>
+</html>

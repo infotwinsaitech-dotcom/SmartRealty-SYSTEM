@@ -491,6 +491,7 @@ class User(AbstractUser):
         ('agent', 'Agent'),
         ('user', 'User'),
         ('admin', 'Admin'),
+        ('manager', 'Manager'),
     )
 
     role = models.CharField(

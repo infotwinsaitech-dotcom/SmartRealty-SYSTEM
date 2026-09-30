@@ -1010,6 +1010,8 @@ def redirect_by_role(user):
     # Private lead-numbers viewer (showcase app) -> sirf numbers wala page
     if hasattr(user, "showcase_viewer"):
         return redirect("showcase:dashboard")
+    if user.role == "manager":
+        return redirect("manager_panel")
     if user.role == "builder":
         return redirect("builder_dashboard")
     elif user.role == "agent":
@@ -1761,6 +1763,11 @@ def apply_lead_date_filter(queryset, request):
     elif date_filter == 'month':
         start_of_month = today.replace(day=1)
         queryset = queryset.filter(created_at__date__gte=start_of_month, created_at__date__lte=today)
+    elif date_filter == 'year':
+        queryset = queryset.filter(
+            created_at__date__gte=today.replace(month=1, day=1),
+            created_at__date__lte=today
+        )
     elif date_filter == 'custom':
         from_date = request.GET.get('from_date', '')
         to_date = request.GET.get('to_date', '')
@@ -4289,7 +4296,115 @@ def create_agent_for_user(sender, instance, created, **kwargs):
             }
         )
 
+# =============================================================================
+# MANAGER PANEL (separate manager login - sees ALL properties & leads)
+# =============================================================================
 
+def manager_required(view_func):
+    """Only logged-in users with role='manager' (or superuser) can open."""
+    from functools import wraps
+
+    @wraps(view_func)
+    def wrapper(request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return redirect("login")
+        if request.user.role != "manager" and not request.user.is_superuser:
+            messages.error(request, "Manager access required")
+            return redirect("login")
+        return view_func(request, *args, **kwargs)
+    return wrapper
+
+
+def _manager_qs_string(request):
+    """Keep the chosen date filter in links / download URLs."""
+    from urllib.parse import urlencode
+    params = {}
+    df = request.GET.get('date_filter', '')
+    if df in ('today', 'week', 'month', 'year', 'custom'):
+        params['date_filter'] = df
+        if df == 'custom':
+            if request.GET.get('from_date'):
+                params['from_date'] = request.GET['from_date']
+            if request.GET.get('to_date'):
+                params['to_date'] = request.GET['to_date']
+    return urlencode(params)
+
+
+@manager_required
+def manager_panel(request):
+    """All properties (all builders) with lead counts for the chosen period."""
+    leads_qs = apply_lead_date_filter(Lead.objects.all(), request)
+
+    properties = Property.objects.select_related('builder').annotate(
+        period_leads=Count(
+            'interested_leads',
+            filter=Q(interested_leads__in=leads_qs.values('id')),
+            distinct=True,
+        )
+    )
+
+    q = sanitize_input(request.GET.get('q', ''))
+    if q:
+        properties = properties.filter(
+            Q(title__icontains=q) | Q(project_name__icontains=q) |
+            Q(location__icontains=q) | Q(builder__username__icontains=q)
+        )
+    properties = properties.order_by('-period_leads', 'title')
+
+    return render(request, "manager/panel.html", {
+        "properties": properties,
+        "total_leads": leads_qs.count(),
+        "no_property_leads": leads_qs.filter(properties__isnull=True).count(),
+        "current_date_filter": request.GET.get('date_filter', ''),
+        "from_date": request.GET.get('from_date', ''),
+        "to_date": request.GET.get('to_date', ''),
+        "q": q,
+        "qs": _manager_qs_string(request),
+    })
+
+
+@manager_required
+def manager_export_leads(request, property_id=None):
+    """CSV of leads for ONE property (or all), with the same date filter."""
+    leads = apply_lead_date_filter(
+        Lead.objects.all(), request
+    ).select_related('assigned_to', 'builder').prefetch_related('properties')
+
+    if property_id is not None:
+        prop = get_object_or_404(Property, id=property_id)
+        leads = leads.filter(properties=prop).distinct()
+        name_part = slugify(prop.title) or f"property-{prop.id}"
+    else:
+        leads = leads.distinct()
+        name_part = "all-properties"
+
+    df = request.GET.get('date_filter', '') or 'all'
+    if df == 'custom':
+        df = f"{request.GET.get('from_date', '') or 'start'}_to_{request.GET.get('to_date', '') or 'today'}"
+    filename = f"leads-{name_part}-{df}-{timezone.localdate().strftime('%Y-%m-%d')}.csv"
+
+    response = HttpResponse(content_type='text/csv; charset=utf-8')
+    response['Content-Disposition'] = f'attachment; filename="{filename}"'
+    response.write('\ufeff')  # BOM: Excel shows Hindi/Gujarati text properly
+    writer = csv.writer(response)
+    writer.writerow([
+        'Lead Name', 'Email', 'Phone', 'Source', 'Status', 'Priority',
+        'Assigned Agent', 'Builder', 'Properties', 'Created Date'
+    ])
+    for lead in leads.order_by('-created_at'):
+        writer.writerow([
+            lead.name,
+            lead.email,
+            f'="{lead.phone}"',
+            lead.source,
+            lead.status,
+            lead.priority,
+            lead.assigned_to.name if lead.assigned_to else "Not Assigned",
+            lead.builder.username if lead.builder else "-",
+            ", ".join(p.title for p in lead.properties.all()) or "-",
+            timezone.localtime(lead.created_at).strftime('%Y-%m-%d %H:%M'),
+        ])
+    return response
 # =============================================================================
 # EXPORT FUNCTIONS
 # =============================================================================

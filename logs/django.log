@@ -601,3 +601,14 @@ INFO 2026-09-21 23:54:15,443 basehttp code 400, message Bad request version ('::
 ERROR 2026-09-21 23:54:15,443 basehttp You're accessing the development server over HTTPS, but it only supports HTTP.
 INFO 2026-09-21 23:54:15,446 basehttp code 400, message Bad request version ('\x9fÍÍ\x04Ä¤¢Å\x96\x1aaa\x9b\x00')
 ERROR 2026-09-21 23:54:15,446 basehttp You're accessing the development server over HTTPS, but it only supports HTTP.
+INFO 2026-09-30 09:41:40,282 apps  PostgreSQL optimized
+INFO 2026-09-30 09:41:40,283 apps  Core app initialized
+INFO 2026-09-30 09:41:40,646 views views.py loaded successfully
+INFO 2026-09-30 09:41:57,979 apps  PostgreSQL optimized
+INFO 2026-09-30 09:41:57,979 apps  Core app initialized
+INFO 2026-09-30 09:41:58,158 views views.py loaded successfully
+INFO 2026-09-30 09:43:29,498 apps  Cache table auto-created
+INFO 2026-09-30 09:43:30,519 apps  PostgreSQL optimized
+WARNING 2026-09-30 09:43:32,069 apps [AUTO-SETUP] Google credentials not set!
+INFO 2026-09-30 09:43:32,069 apps  Core app initialized
+INFO 2026-09-30 09:43:32,138 views views.py loaded successfully
