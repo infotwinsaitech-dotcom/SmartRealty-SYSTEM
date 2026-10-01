@@ -5,8 +5,21 @@
 {% block og_title %}Properties in Ahmedabad – RealShree{% endblock %}
 {% block og_description %}Search RERA-verified residential, commercial &amp; land properties across Ahmedabad. Zero brokerage.{% endblock %}
 
-{% block content %}
+{% block extra_head %}
+<!-- Smart navbar: scroll down = hide, thoda sa scroll up = show -->
+<script>window.SMART_NAV_PAGE = true;</script>
+<style>
+    nav.sticky.top-0 { transition: transform .3s ease; will-change: transform; }
+    nav.sticky.top-0.nav-hidden { transform: translateY(-100%); }
+    /* filter bar (desktop pe sticky): nav chhupne par upar chipak jaye */
+    #listFilterBar { transition: top .3s ease; }
+    @media (min-width: 768px) {
+        body.nav-is-hidden #listFilterBar { top: 0 !important; }
+    }
+</style>
+{% endblock %}
 
+{% block content %}
 <!-- ============================================
    PROPERTY LIST HERO - Simple, Clean
    ============================================ -->
@@ -28,7 +41,7 @@
 <!-- ============================================
    FILTER SECTION - Mobile Optimized
    ============================================ -->
-<section class="bg-[var(--color-surface)] border-b border-[var(--color-border)] md:sticky md:top-14 md:z-30">
+<section id="listFilterBar" class="bg-[var(--color-surface)] border-b border-[var(--color-border)] md:sticky md:top-14 md:z-30">
     <div class="container-app py-3">
         
         <!-- Category Tabs -->
@@ -786,5 +799,52 @@ function shareProperty(title, location, price, relativeUrl) {
     }
 }
 </script>
+<script>
+/* ===== Smart navbar (property list page) =====
+   - neeche scroll  -> navbar chhup jata hai
+   - thoda sa upar scroll -> navbar wapas aa jata hai
+   - page top par hamesha dikhta hai */
+(function () {
+    var nav = document.querySelector('nav.sticky.top-0') || document.querySelector('nav');
+    if (!nav) return;
 
+    var HIDE_AFTER   = 80;  // itna scroll hone ke baad hi hide hoga (px)
+    var SHOW_ON_UP   = 30;  // itna sa upar scroll karte hi show (px)
+    var HIDE_ON_DOWN = 10;  // chhoti jitter ignore karne ke liye (px)
+
+    var lastY = window.pageYOffset, upDist = 0, downDist = 0, ticking = false;
+
+    function setHidden(h) {
+        nav.classList.toggle('nav-hidden', h);
+        document.body.classList.toggle('nav-is-hidden', h);
+    }
+
+    function update() {
+        ticking = false;
+        var y = Math.max(0, window.pageYOffset);
+        var delta = y - lastY;
+        lastY = y;
+
+        // mobile menu khula ho to navbar mat chhupao
+        var menu = document.getElementById('mobileMenu');
+        if (menu && !menu.classList.contains('hidden')) { setHidden(false); return; }
+
+        if (y <= 10) { upDist = downDist = 0; setHidden(false); return; }
+
+        if (delta > 0) {            // neeche scroll
+            upDist = 0;
+            downDist += delta;
+            if (y > HIDE_AFTER && downDist > HIDE_ON_DOWN) setHidden(true);
+        } else if (delta < 0) {     // upar scroll
+            downDist = 0;
+            upDist += -delta;
+            if (upDist > SHOW_ON_UP) setHidden(false);
+        }
+    }
+
+    window.addEventListener('scroll', function () {
+        if (!ticking) { ticking = true; requestAnimationFrame(update); }
+    }, { passive: true });
+})();
+</script>
 {% endblock %}
