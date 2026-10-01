@@ -1708,7 +1708,7 @@ document.addEventListener('scroll', () => {}, { passive: true });
 // Hide/show navbar on scroll (mobile)
 let lastScroll = 0;
 const navbar = document.querySelector('nav');
-if (navbar && window.innerWidth < 768 && !window.SMART_NAV_PAGE) {
+if (navbar && window.innerWidth < 768) {
     window.addEventListener('scroll', () => {
         const currentScroll = window.pageYOffset;
         if (currentScroll > lastScroll && currentScroll > 100) {
