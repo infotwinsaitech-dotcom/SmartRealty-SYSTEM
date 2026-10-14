@@ -1,7 +1,7 @@
 from .models import SiteSettings
 
 def site_settings(request):
-    settings = SiteSettings.objects.first()
+    settings = SiteSettings.get_settings()
     return {
         'site': settings
     }

@@ -67,6 +67,11 @@ class SiteSettingsAdmin(admin.ModelAdmin):
             'classes': ('collapse',),
         }),
     )
+    def has_add_permission(self, request):
+        return not SiteSettings.objects.exists()
+
+    def has_delete_permission(self, request, obj=None):
+        return SiteSettings.objects.count() > 1
 
 
 # ========== USER & PROFILE ==========

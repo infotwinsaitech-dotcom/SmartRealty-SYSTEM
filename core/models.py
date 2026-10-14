@@ -468,16 +468,15 @@ class SiteSettings(models.Model):
 
     @classmethod
     def get_settings(cls):
-        """Get or create default settings"""
-        settings_obj, created = cls.objects.get_or_create(
-            id=1,
-            defaults={
-                'company_name': 'RealShree',
-                'phone': '+91-9876543210',
-                'email': 'info@smartrealty.com',
-                'location': 'India'
-            }
-        )
+        """Always return the same (oldest) row. Create defaults ONLY if the table is empty."""
+        settings_obj = cls.objects.order_by('id').first()
+        if settings_obj is None:
+            settings_obj = cls.objects.create(
+                company_name='RealShree',
+                phone='+91 9726314471',
+                email='sales@realshree.com',
+                location='India',
+            )
         return settings_obj
 
 
