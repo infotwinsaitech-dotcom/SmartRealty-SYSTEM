@@ -1533,7 +1533,7 @@ p {
 }
 </style>
 
-<title>{% block title %}{% endblock %} | RealShree Ahmedabad</title>
+<title>{% block full_title %}{% block title %}{% endblock %} | RealShree Ahmedabad{% endblock %}</title>
 <meta name="description" content="{% block meta_description %}RealShree – Ahmedabad's trusted RERA-verified real estate platform. Buy, sell &amp; rent residential, commercial &amp; land properties with zero brokerage.{% endblock %}">
 <link rel="canonical" href="{% block canonical_url %}https://realshree.com{{ request.path }}{% endblock %}">
 

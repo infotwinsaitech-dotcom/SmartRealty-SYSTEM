@@ -1,0 +1,1269 @@
+{% extends "public/base.html" %}
+{% load static cloudinary custom_filters %}
+{% block title %}{% if property.beds %}{{ property.beds }} BHK {% endif %}{{ property.property_type }} for Sale in {{ property.location }} | {{ property.project_name|default:property.title }}{% if property.builder_name %} by {{ property.builder_name }}{% endif %}{% endblock %}
+{% block meta_description %}{{ property.project_name|default:property.title }}{% if property.builder_name %} by {{ property.builder_name }}{% endif %} – {{ property.beds|default:"" }}{% if property.beds %} BHK{% endif %} {{ property.property_type }} in {{ property.location }}, Ahmedabad{% if property.price and property.price != "Price on Request" %}, starting ₹{{ property.price }} {{ property.get_price_unit_display }}{% elif property.price == "Price on Request" %}, price on request{% endif %}{% if property.rera_number %}. RERA registered, {% else %}. {% endif %}zero brokerage — view floor plans, photos & book a site visit on RealShree.{% endblock %}
+{% block og_title %}{% if property.beds %}{{ property.beds }} BHK {% endif %}{{ property.property_type }} in {{ property.location }} – {{ property.project_name|default:property.title }}{% endblock %}
+{% block og_description %}{{ property.beds|default:"" }}{% if property.beds %} BHK{% endif %} {{ property.property_type }}{% if property.builder_name %} by {{ property.builder_name }}{% endif %} in {{ property.location }}, Ahmedabad{% if property.price and property.price != "Price on Request" %}, ₹{{ property.price }} {{ property.get_price_unit_display }}{% elif property.price == "Price on Request" %}, price on request{% endif %}. RERA-verified listing, zero brokerage.{% endblock %}
+{% block og_image %}{% if property.thumbnail %}{% cloudinary_url property.thumbnail width=1200 height=630 crop='fill' %}{% elif property.images.first %}{% cloudinary_url property.images.first.image width=1200 height=630 crop='fill' %}{% else %}https://www.realshree.com{% static 'images/logo.png' %}{% endif %}{% endblock %}
+{% block canonical_url %}https://realshree.com{{ property.get_absolute_url }}{% endblock %}
+{% block extra_head %}
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{% if property.beds %}{{ property.beds }} BHK {% endif %}{{ property.property_type }} in {{ property.location }} – {{ property.project_name|default:property.title }}">
+<meta name="twitter:description" content="{% if property.beds %}{{ property.beds }} BHK {% endif %}{{ property.property_type }}{% if property.builder_name %} by {{ property.builder_name }}{% endif %} in {{ property.location }}, Ahmedabad. RERA-verified, zero brokerage.">
+{% if property.thumbnail %}<meta name="twitter:image" content="{% cloudinary_url property.thumbnail width=1200 height=630 crop='fill' %}">{% endif %}
+<link rel="preconnect" href="https://res.cloudinary.com">
+<link rel="dns-prefetch" href="https://res.cloudinary.com">
+<style>
+/* Floor Plan Carousel */
+.fp-carousel-wrap{ position: relative; }
+.fp-carousel{
+    display: flex;
+    gap: 16px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    padding: 4px 2px 8px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+}
+.fp-carousel::-webkit-scrollbar{ display: none; }
+.fp-card{
+    flex: 0 0 auto;
+    width: 240px;
+    scroll-snap-align: start;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    background: var(--color-surface);
+    transition: box-shadow var(--transition-base), border-color var(--transition-base);
+}
+.fp-card:hover{ border-color: var(--color-border-strong); box-shadow: var(--shadow-lg); }
+.fp-card-img{
+    width: 100%;
+    height: 180px;
+    object-fit: contain;
+    background: var(--color-bg-soft);
+    cursor: pointer;
+}
+.fp-nav-btn{
+    position: absolute;
+    top: 40%;
+    transform: translateY(-50%);
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    box-shadow: var(--shadow-md, 0 4px 10px rgba(0,0,0,0.12));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-navy);
+    cursor: pointer;
+    z-index: 5;
+    transition: background var(--transition-base);
+}
+.fp-nav-btn:hover{ background: var(--color-bg-soft); }
+.fp-nav-left{ left: -6px; }
+.fp-nav-right{ right: -6px; }
+@media (max-width: 640px){
+    .fp-nav-btn{ display: none; }
+    .fp-card{ width: 200px; }
+    .fp-card-img{ height: 150px; }
+}
+.fp-pill{
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+    color: var(--color-text-muted);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all var(--transition-base);
+}
+.fp-pill.active{
+    background: var(--color-navy);
+    border-color: var(--color-navy);
+    color: #fff;
+}
+</style>
+{% endblock %}
+{% block content %}
+<!-- Lead-gate modal: Floor Plan / Brochure / Video dekhne se pehle naam + mobile number -->
+<div id="leadGateOverlay" class="lead-gate-overlay" onclick="if(event.target===this) closeLeadGateModal()">
+    <div class="lead-gate-modal">
+        <button type="button" class="lead-gate-close" onclick="closeLeadGateModal()" aria-label="Close">
+            <span class="material-icons-round" style="font-size:20px">close</span>
+        </button>
+        <div class="lead-gate-icon">
+            <span class="material-icons-round" style="font-size:26px">lock</span>
+        </div>
+               <h3 class="lead-gate-title">Enter Your Details to View the Floor Plan, Brochure &amp; Video</h3>
+        <p class="lead-gate-sub">Enter your name and mobile number just once. After that, you can view everything anytime without filling this form again.</p>
+        <form id="leadGateForm" onsubmit="submitLeadGateForm(event)">
+            {% csrf_token %}
+            <input type="text" id="leadGateName" name="name" placeholder="Your name" required class="lead-gate-input">
+            <input type="tel" id="leadGatePhone" name="phone" placeholder="Mobile number" required
+                   pattern="[0-9+ ]{10,15}" maxlength="15" class="lead-gate-input">
+            <p id="leadGateError" class="lead-gate-error" style="display:none;"></p>
+            <button type="submit" id="leadGateSubmitBtn" class="btn btn-navy" style="width:100%; justify-content:center;">
+                View Now
+            </button>
+
+            <!-- ADD THIS -->
+            <p style="display:flex; align-items:center; justify-content:center; gap:6px; margin-top:12px; font-size:0.78rem; color:var(--color-text-muted); text-align:center;">
+                <span class="material-icons-round" style="font-size:16px; color:var(--color-success);">lock</span>
+                Your information is 100% secure.
+            </p>
+        </form>
+    </div>
+</div>
+
+<style>
+.lead-gate-overlay{ display:none; position:fixed; inset:0; background:rgba(15,23,42,0.6); z-index:9999; align-items:center; justify-content:center; padding:16px; }
+.lead-gate-overlay.active{ display:flex; }
+.lead-gate-modal{ position:relative; width:100%; max-width:380px; background:var(--color-surface, #fff); border-radius:var(--radius-lg, 16px); padding:28px 24px 24px; box-shadow:0 20px 60px rgba(0,0,0,0.3); text-align:center; }
+.lead-gate-close{ position:absolute; top:12px; right:12px; width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:var(--color-bg-soft, #f3f4f6); border:none; cursor:pointer; color:var(--color-text-muted, #6b7280); }
+.lead-gate-icon{ width:52px; height:52px; border-radius:50%; background:var(--color-gold, #d4af37); color:#fff; display:flex; align-items:center; justify-content:center; margin:0 auto 14px; }
+.lead-gate-title{ font-size:18px; font-weight:700; color:var(--color-navy, #0f1e3d); margin-bottom:6px; }
+.lead-gate-sub{ font-size:13px; color:var(--color-text-muted, #6b7280); margin-bottom:18px; line-height:1.4; }
+.lead-gate-input{ width:100%; padding:12px 14px; margin-bottom:12px; border:1px solid var(--color-border, #e5e7eb); border-radius:10px; font-size:14px; outline:none; }
+.lead-gate-input:focus{ border-color:var(--color-gold, #d4af37); }
+.lead-gate-error{ color:#dc2626; font-size:12px; margin:-6px 0 12px; text-align:left; }
+.gated-video-box:hover{ opacity:0.92; }
+</style>
+<!-- Structured data: this specific listing (helps rich results + AI answer engines) -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "RealEstateListing",
+  "name": "{% if property.beds %}{{ property.beds }} BHK {% endif %}{{ property.property_type }} for Sale in {{ property.location|escapejs }} - {{ property.project_name|default:property.title|escapejs }}",
+  "description": "{{ property.description|striptags|truncatewords:40|escapejs }}",
+  "url": "https://realshree.com{{ property.get_absolute_url }}",
+  {% if property.thumbnail %}"image": "{{ og_img_url }}",{% endif %}
+  "datePosted": "{{ property.created_at|date:'Y-m-d' }}",
+  {% if property.beds %}"numberOfRooms": "{{ property.beds }}",{% endif %}
+  {% if property.baths %}"numberOfBathroomsTotal": "{{ property.baths }}",{% endif %}
+  {% if property.sqft %}"floorSize": {
+    "@type": "QuantitativeValue",
+    "value": "{{ property.sqft|escapejs }}",
+    "unitCode": "FTK"
+  },{% endif %}
+  {% if property.builder_name %}"broker": {
+    "@type": "Organization",
+    "name": "{{ property.builder_name|escapejs }}"
+  },{% endif %}
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "{{ property.location|escapejs }}",
+    "addressLocality": "{{ property.location|escapejs }}",
+    "addressRegion": "Gujarat",
+    "addressCountry": "IN"
+  },
+  {% if property.latitude and property.longitude %}"geo": {
+    "@type": "GeoCoordinates",
+    "latitude": "{{ property.latitude }}",
+    "longitude": "{{ property.longitude }}"
+  },{% endif %}
+  "offers": {
+    "@type": "Offer",
+    {% if property.price and property.price != "Price on Request" %}"price": "{{ property.price }}",
+    "priceCurrency": "INR",{% endif %}
+    "businessFunction": "https://schema.org/Sell",
+    "seller": {
+      "@type": "Organization",
+      "name": "{% if property.builder_name %}{{ property.builder_name|escapejs }}{% else %}RealShree{% endif %}"
+    },
+    "availability": "{% if property.status == 'Sold Out' %}https://schema.org/SoldOut{% elif property.status == 'Coming Soon' %}https://schema.org/PreOrder{% else %}https://schema.org/InStock{% endif %}"
+  }{% if rating_summary %},
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "{{ rating_summary.overall }}",
+    "reviewCount": "{{ rating_summary.count }}",
+    "bestRating": "5",
+    "worstRating": "1"
+  }{% endif %}
+}
+</script>
+
+<!-- Structured data: breadcrumb trail (shows as a path in Google results) -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://realshree.com{% url 'home' %}"},
+    {"@type": "ListItem", "position": 2, "name": "Properties", "item": "https://realshree.com{% url 'property_list' %}"},
+    {"@type": "ListItem", "position": 3, "name": "{{ property.project_name|default:property.title|escapejs }}", "item": "https://realshree.com{{ property.get_absolute_url }}"}
+  ]
+}
+</script>
+
+<!-- Structured data: FAQ shown on this page -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is the price of {{ property.project_name|default:property.title|escapejs }}?",
+      "acceptedAnswer": {"@type": "Answer", "text": "{% if property.price == 'Price on Request' %}{{ property.project_name|default:property.title|escapejs }} price is available on request in {{ property.location|escapejs }}, Ahmedabad. Please contact us for the latest price.{% else %}{{ property.project_name|default:property.title|escapejs }} is priced at ₹{{ property.price|escapejs }} {{ property.price_unit|default:'L'|escapejs }} in {{ property.location|escapejs }}, Ahmedabad.{% endif %}"}
+    },
+    {
+      "@type": "Question",
+      "name": "Is {{ property.project_name|default:property.title|escapejs }} RERA registered?",
+      "acceptedAnswer": {"@type": "Answer", "text": "{% if property.rera_number %}Yes, this project is RERA-registered with number {{ property.rera_number|escapejs }}.{% else %}RERA status is confirmed at the time of listing verification.{% endif %}"}
+    },
+    {
+      "@type": "Question",
+      "name": "Do I have to pay brokerage to buy this property?",
+      "acceptedAnswer": {"@type": "Answer", "text": "No, RealShree lists this property with zero brokerage — buyers deal directly with the owner or builder."}
+    },
+    {
+      "@type": "Question",
+      "name": "When is possession available for this property?",
+      "acceptedAnswer": {"@type": "Answer", "text": "{% if property.possession_date %}Possession is expected {{ property.possession_date|escapejs }}.{% else %}Contact RealShree for the latest possession timeline on this property.{% endif %}"}
+    }
+  ]
+}
+</script>
+
+<!-- Visible breadcrumb (matches the BreadcrumbList schema above) -->
+<nav aria-label="Breadcrumb" class="container-app pt-3 pb-1">
+    <ol class="flex flex-wrap items-center gap-1 text-xs text-[var(--color-text-muted)]">
+        <li><a href="{% url 'home' %}" class="hover:text-[var(--color-gold)] transition">Home</a></li>
+        <li aria-hidden="true">/</li>
+        <li><a href="{% url 'property_list' %}" class="hover:text-[var(--color-gold)] transition">Properties</a></li>
+        <li aria-hidden="true">/</li>
+        <li><a href="{% url 'property_list' %}?location={{ property.location|urlencode }}" class="hover:text-[var(--color-gold)] transition">{{ property.location }}</a></li>
+        <li aria-hidden="true">/</li>
+        <li class="text-[var(--color-navy)] font-medium truncate max-w-[180px]" aria-current="page">{{ property.project_name|default:property.title }}</li>
+    </ol>
+</nav>
+
+<!-- ============================================
+   PROPERTY HERO - Full Width Image
+   ============================================ -->
+<section class="relative w-full" style="height: 45vh; min-height: 300px; max-height: 500px;">
+    {% if property.thumbnail %}
+    {% cloudinary_url property.thumbnail width=1920 height=800 crop='fill' as hero_img %}
+    <img src="{{ hero_img }}" alt="{% if property.beds %}{{ property.beds }} BHK {% endif %}{{ property.property_type }} for sale in {{ property.location }}, Ahmedabad - {{ property.project_name|default:property.title }}{% if property.builder_name %} by {{ property.builder_name }}{% endif %}" class="w-full h-full object-cover">
+    {% else %}
+    <div class="w-full h-full bg-[var(--color-navy)] flex items-center justify-center">
+        <span class="material-icons-round text-white/30" style="font-size:80px">apartment</span>
+    </div>
+    {% endif %}
+    
+    <!-- Overlay -->
+    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"></div>
+    
+    <!-- Content -->
+    <div class="absolute bottom-0 left-0 right-0 p-4 md:p-8">
+        <div class="container-app">
+            <div class="flex items-center gap-2 mb-2">
+                <span class="badge">{{ property.status }}</span>
+                {% if property.rera_number %}
+                <a href="{{ rera_verify_url }}" target="_blank" rel="noopener" class="rera-badge" title="Verify on Gujarat RERA site">
+                    <span class="material-icons-round" style="font-size:10px">verified</span>
+                    RERA
+                </a>
+                {% endif %}
+            </div>
+            
+            <h1 class="text-2xl md:text-4xl font-bold text-white mb-2">
+    {{ property.project_name|default:property.title }} – {% if property.beds %}{{ property.beds }} BHK {% endif %}{{ property.property_type }} for Sale in {{ property.location }}, Ahmedabad
+</h1>
+            
+            <div class="flex items-center gap-2 text-white/80 text-sm md:text-base mb-3">
+                <span class="material-icons-round" style="font-size:18px">location_on</span>
+                {{ property.location }}
+            </div>
+            
+            <div class="flex items-center gap-4">
+                <span class="text-2xl md:text-3xl font-bold text-[#d4af37]">
+                    {% if property.price == "Price on Request" %}Price on Request{% else %}₹{{ property.price }} {{ property.price_unit|default:"L" }}{% endif %}
+                </span>
+                {% if property.configuration %}
+                <span class="px-3 py-1 bg-white/20 backdrop-blur-sm text-white rounded-full text-sm font-medium">
+                    {{ property.configuration }}
+                </span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Wishlist Button -->
+    <button class="absolute top-4 right-4 md:top-6 md:right-6 w-12 h-12 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center shadow-lg hover:bg-white transition"
+            onclick="toggleWishlist({{ property.id }}, this)"
+            aria-label="Add to wishlist">
+        <span class="material-icons-round {% if property.id in user_wishlist_ids %}text-red-500{% else %}text-[var(--color-text-muted)]{% endif %}" style="font-size:24px">
+            {% if property.id in user_wishlist_ids %}favorite{% else %}favorite_border{% endif %}
+        </span>
+    </button>
+</section>
+
+<!-- ============================================
+   QUICK INFO BAR
+   ============================================ -->
+<section class="bg-[var(--color-surface)] border-b border-[var(--color-border)]">
+    <div class="container-app py-4">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="flex items-center gap-3 p-3 rounded-xl bg-[var(--color-bg-soft)]">
+                <div class="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center shrink-0">
+                    <span class="material-icons-round text-blue-600" style="font-size:20px">bed</span>
+                </div>
+                <div>
+                    <p class="text-lg font-bold text-[var(--color-navy)]">{{ property.beds|default:"-" }}</p>
+                    <p class="text-xs text-[var(--color-text-muted)]">BHK</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-3 p-3 rounded-xl bg-[var(--color-bg-soft)]">
+                <div class="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center shrink-0">
+                    <span class="material-icons-round text-purple-600" style="font-size:20px">bathtub</span>
+                </div>
+                <div>
+                    <p class="text-lg font-bold text-[var(--color-navy)]">{{ property.baths|default:"-" }}</p>
+                    <p class="text-xs text-[var(--color-text-muted)]">Bathrooms</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-3 p-3 rounded-xl bg-[var(--color-bg-soft)]">
+                <div class="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center shrink-0">
+                    <span class="material-icons-round text-green-600" style="font-size:20px">square_foot</span>
+                </div>
+                <div>
+                    <p class="text-lg font-bold text-[var(--color-navy)]">{{ property.sqft|default:"-" }}</p>
+                    <p class="text-xs text-[var(--color-text-muted)]">Sq.ft</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-3 p-3 rounded-xl bg-[var(--color-bg-soft)]">
+                <div class="w-10 h-10 rounded-lg bg-amber-100 flex items-center justify-center shrink-0">
+                    <span class="material-icons-round text-amber-600" style="font-size:20px">calendar_today</span>
+                </div>
+                <div>
+                    <p class="text-lg font-bold text-[var(--color-navy)]">{{ property.possession_date|default:"Ready" }}</p>
+                    <p class="text-xs text-[var(--color-text-muted)]">Possession</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================
+   MAIN CONTENT + SIDEBAR
+   ============================================ -->
+<section class="section-pad bg-[var(--color-bg)]">
+    <div class="container-app">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <!-- LEFT CONTENT (2 cols) -->
+            <div class="lg:col-span-2 space-y-8">
+                
+                <!-- About Project -->
+                <div class="card p-6 reveal">
+                    <div class="flex items-center gap-2 mb-4">
+                        <span class="material-icons-round text-[var(--color-gold)]" style="font-size:20px">info</span>
+                        <h2 class="text-xl font-bold text-[var(--color-navy)]">About {{ property.project_name|default:property.title }}</h2>
+                    </div>
+                    <p class="text-sm text-[var(--color-text-muted)] leading-relaxed mb-3">
+                        {{ property.project_name|default:property.title }} is a {{ property.get_property_types_display|default:"residential" }} property
+                        {% if property.configuration %}offering a {{ property.configuration }} configuration{% endif %}
+                        located in {{ property.location }}, Ahmedabad{% if property.sqft %}, spread across {{ property.sqft }} sq.ft{% endif %}.
+                        {% if property.status == "Available" %}This property is currently available for sale{% elif property.status == "Coming Soon" %}This is an upcoming project{% elif property.status %}This property's current status is {{ property.status }}{% endif %}
+                        {% if property.rera_number %}and is RERA-registered (No. {{ property.rera_number }}), so all approvals and paperwork are verified.{% else %}and is listed with zero brokerage — you deal directly with the {% if property.builder_name %}builder{% else %}owner{% endif %}.{% endif %}
+                        {% if property.possession_date %}Possession is expected {{ property.possession_date }}.{% endif %}
+                    </p>
+                    <p class="text-sm text-[var(--color-text-muted)] leading-relaxed">
+                        {{ property.description|default:"" }}
+                    </p>
+
+                    <!-- Internal links: helps Google connect BHK + location + builder searches back to this listing -->
+                    <div class="flex flex-wrap gap-2 mt-4">
+                        {% if property.configuration %}
+                        <a href="{% url 'property_list' %}?location={{ property.location|urlencode }}&config={{ property.configuration|urlencode }}"
+                           class="px-3 py-1.5 rounded-full text-xs font-medium bg-[var(--color-bg-soft)] text-[var(--color-navy)] hover:bg-[var(--color-gold)]/10 transition">
+                            More {{ property.configuration }} in {{ property.location }}
+                        </a>
+                        {% endif %}
+                        {% if property.builder_name %}
+                        <a href="{% url 'property_list' %}?builder={{ property.builder_name|urlencode }}"
+                           class="px-3 py-1.5 rounded-full text-xs font-medium bg-[var(--color-bg-soft)] text-[var(--color-navy)] hover:bg-[var(--color-gold)]/10 transition">
+                            More projects by {{ property.builder_name }}
+                        </a>
+                        {% endif %}
+                        <a href="{% url 'property_list' %}?location={{ property.location|urlencode }}"
+                           class="px-3 py-1.5 rounded-full text-xs font-medium bg-[var(--color-bg-soft)] text-[var(--color-navy)] hover:bg-[var(--color-gold)]/10 transition">
+                            All properties in {{ property.location }}
+                        </a>
+                    </div>
+                    
+                    <!-- Project Details Grid -->
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-3 mt-6">
+                        <div class="p-3 bg-[var(--color-bg-soft)] rounded-xl">
+                            <p class="text-xs text-[var(--color-text-muted)] mb-1">Project Status</p>
+                            <p class="font-semibold text-sm text-[var(--color-navy)]">{{ property.project_status|default:"N/A" }}</p>
+                        </div>
+                        <div class="p-3 bg-[var(--color-bg-soft)] rounded-xl">
+                            <p class="text-xs text-[var(--color-text-muted)] mb-1">Launch Date</p>
+                            <p class="font-semibold text-sm text-[var(--color-navy)]">{{ property.launch_date|default:"N/A" }}</p>
+                        </div>
+                        <div class="p-3 bg-[var(--color-bg-soft)] rounded-xl">
+                            <p class="text-xs text-[var(--color-text-muted)] mb-1">Total Units</p>
+                            <p class="font-semibold text-sm text-[var(--color-navy)]">{{ property.total_units|default:"N/A" }}</p>
+                        </div>
+                        <div class="p-3 bg-[var(--color-bg-soft)] rounded-xl">
+                            <p class="text-xs text-[var(--color-text-muted)] mb-1">Total Towers</p>
+                            <p class="font-semibold text-sm text-[var(--color-navy)]">{{ property.total_towers|default:"N/A" }}</p>
+                        </div>
+                        <div class="p-3 bg-[var(--color-bg-soft)] rounded-xl">
+                            <p class="text-xs text-[var(--color-text-muted)] mb-1">Land Parcel</p>
+                            <p class="font-semibold text-sm text-[var(--color-navy)]">{{ property.land_parcel|default:"N/A" }}</p>
+                        </div>
+                        <div class="p-3 bg-[var(--color-bg-soft)] rounded-xl">
+                            <p class="text-xs text-[var(--color-text-muted)] mb-1">Builder</p>
+                            <p class="font-semibold text-sm text-[var(--color-navy)]">{{ property.builder_name|default:"N/A" }}</p>
+                        </div>
+                    </div>
+                </div>
+                            <!-- Gallery -->
+                {% if property.images.all %}
+                <div class="card p-6 reveal">
+                    <div class="flex items-center gap-2 mb-4">
+                        <span class="material-icons-round text-[var(--color-gold)]" style="font-size:20px">photo_library</span>
+                        <h2 class="text-xl font-bold text-[var(--color-navy)]">Gallery</h2>
+                    </div>
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                        {% for img in property.images.all %}
+                        <div class="relative group cursor-pointer rounded-xl overflow-hidden" onclick="openGallery({{ forloop.counter0 }})" style="aspect-ratio: 4/3;">
+                            <img src="{% cloudinary_url img.image width=400 height=300 crop='fill' gravity='auto' quality='auto:good' %}" 
+                                 alt="{% if property.beds %}{{ property.beds }} BHK {% endif %}{{ property.property_type }} in {{ property.location }} - {{ property.project_name|default:property.title }} photo {{ forloop.counter }}" 
+                                 class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                 loading="lazy">
+                            <div class="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all flex items-center justify-center">
+                                <span class="material-icons-round text-white opacity-0 group-hover:opacity-100 transition-opacity" style="font-size:32px">zoom_in</span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- Video -->
+                <!-- Video -->
+{% if property.project_video_url %}
+<div class="card p-6 reveal">
+    <div class="flex items-center gap-2 mb-4">
+        <span class="material-icons-round text-[var(--color-gold)]" style="font-size:20px">videocam</span>
+        <h2 class="text-xl font-bold text-[var(--color-navy)]">Project Video</h2>
+    </div>
+    <div class="rounded-xl overflow-hidden gated-video-box" id="gatedVideoBox"
+         data-video-src="{{ property.get_video_embed_url }}"
+         onclick="handleGatedVideoClick(event)"
+         style="position:relative; padding-top:56.25%; cursor:pointer; background:linear-gradient(135deg, var(--color-navy), #1a2a4a);">
+        <div style="position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; color:#fff; gap:8px;">
+            <span class="material-icons-round" style="font-size:48px; opacity:0.9;">play_circle</span>
+            <span style="font-size:13px; font-weight:600; opacity:0.9;">Tap to watch the video</span>
+        </div>
+    </div>
+</div>
+{% endif %}
+                
+                <!-- Floor Plan / Brochure -->
+{% if property.brochure %}
+<div class="card p-6 reveal">
+    <div class="flex items-center gap-2 mb-4">
+        <span class="material-icons-round text-[var(--color-gold)]" style="font-size:20px">description</span>
+        <h2 class="text-xl font-bold text-[var(--color-navy)]">Floor Plan & Brochure</h2>
+    </div>
+    <div class="flex flex-wrap gap-3">
+        <button type="button" class="btn btn-navy"
+                onclick="handleGatedMediaClick(event, function(){ window.open('{{ brochure_pdf_url|default:property.brochure.url }}', '_blank'); })">
+            <span class="material-icons-round" style="font-size:18px">visibility</span>
+            View Brochure
+        </button>
+        <button type="button" class="btn btn-outline"
+                onclick="handleGatedMediaClick(event, function(){ const a=document.createElement('a'); a.href='{{ property.brochure.url }}'; a.download=''; document.body.appendChild(a); a.click(); a.remove(); })">
+            <span class="material-icons-round" style="font-size:18px">download</span>
+            Download
+        </button>
+    </div>
+</div>
+{% endif %}
+                <!-- Highlights -->
+                {% if highlights_list %}
+                <div class="card p-6 reveal">
+                    <div class="flex items-center gap-2 mb-4">
+                        <span class="material-icons-round text-[var(--color-gold)]" style="font-size:20px">auto_awesome</span>
+                        <h2 class="text-xl font-bold text-[var(--color-navy)]">Highlights</h2>
+                    </div>
+                    <ul class="space-y-2.5">
+                        {% for h in highlights_list %}
+                        <li class="flex items-start gap-2.5">
+                            <span class="material-icons-round text-[var(--color-gold)] mt-0.5" style="font-size:16px">check_circle</span>
+                            <span class="text-sm text-[var(--color-text)] leading-relaxed">{{ h }}</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+                
+                <!-- Amenities -->
+                {% if property.amenities %}
+                <div class="card p-6 reveal">
+                    <div class="flex items-center gap-2 mb-4">
+                        <span class="material-icons-round text-[var(--color-gold)]" style="font-size:20px">stars</span>
+                        <h2 class="text-xl font-bold text-[var(--color-navy)]">Amenities in {{ property.project_name|default:property.title }}</h2>
+                    </div>
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                        {% for item in property.amenities %}
+                        <div class="flex items-center gap-2 p-3 bg-[var(--color-bg-soft)] rounded-xl">
+                            <span class="material-icons-round text-[var(--color-gold)]" style="font-size:18px">{{ item|amenity_icon }}</span>
+                            <span class="text-sm font-medium text-[var(--color-text)]">{{ item }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Ratings & Reviews -->
+                <div class="card p-6 reveal">
+                    <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
+                        <div class="flex items-center gap-2">
+                            <span class="material-icons-round text-[var(--color-gold)]" style="font-size:20px">star_rate</span>
+                            <h2 class="text-xl font-bold text-[var(--color-navy)]">Ratings &amp; Reviews</h2>
+                        </div>
+                        <button type="button" onclick="document.getElementById('write-review-box').classList.toggle('hidden')"
+                            class="text-sm font-semibold text-[var(--color-gold)] hover:underline">
+                            + Write a Review
+                        </button>
+                    </div>
+
+                    {% if rating_summary %}
+                    <div class="mb-5">
+                        <div class="flex items-baseline gap-2 mb-3">
+                            <span class="text-3xl font-extrabold text-[var(--color-navy)]">{{ rating_summary.overall }}</span>
+                            <span class="text-sm text-[var(--color-text-muted)]">/5 &middot; based on {{ rating_summary.count }} review{{ rating_summary.count|pluralize }}</span>
+                        </div>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
+                            <div class="bg-[var(--color-bg-soft)] rounded-xl p-3">
+                                <p class="text-lg font-bold text-[var(--color-navy)]">{{ rating_summary.connectivity }}/5</p>
+                                <p class="text-xs text-[var(--color-text-muted)]">Connectivity</p>
+                            </div>
+                            <div class="bg-[var(--color-bg-soft)] rounded-xl p-3">
+                                <p class="text-lg font-bold text-[var(--color-navy)]">{{ rating_summary.neighbourhood }}/5</p>
+                                <p class="text-xs text-[var(--color-text-muted)]">Neighbourhood</p>
+                            </div>
+                            <div class="bg-[var(--color-bg-soft)] rounded-xl p-3">
+                                <p class="text-lg font-bold text-[var(--color-navy)]">{{ rating_summary.safety }}/5</p>
+                                <p class="text-xs text-[var(--color-text-muted)]">Safety</p>
+                            </div>
+                            <div class="bg-[var(--color-bg-soft)] rounded-xl p-3">
+                                <p class="text-lg font-bold text-[var(--color-navy)]">{{ rating_summary.livability }}/5</p>
+                                <p class="text-xs text-[var(--color-text-muted)]">Livability</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <p class="text-sm text-[var(--color-text-muted)] mb-4">There are no reviews for this property yet. Be the first to write one!</p>
+                    {% endif %}
+
+                    <!-- Write a Review form (hidden by default) -->
+                    <div id="write-review-box" class="hidden border-t border-[var(--color-border)] pt-5 mt-2">
+                        <form method="POST" class="space-y-4">
+                            {% csrf_token %}
+                            <input type="hidden" name="form_type" value="review">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <input type="text" name="reviewer_name" placeholder="Your Name *" required
+                                    class="w-full px-4 py-3 rounded-xl bg-[var(--color-bg)] border border-[var(--color-border)] text-sm focus:outline-none focus:border-[var(--color-gold)] transition">
+                                <select name="reviewer_type"
+                                    class="w-full px-4 py-3 rounded-xl bg-[var(--color-bg)] border border-[var(--color-border)] text-sm focus:outline-none focus:border-[var(--color-gold)] transition">
+                                    <option value="Owner">Owner</option>
+                                    <option value="Tenant">Tenant</option>
+                                    <option value="Visitor">Visitor</option>
+                                    <option value="Others">Others</option>
+                                </select>
+                            </div>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                {% for field, label in review_rating_fields %}
+                                <div>
+                                    <label class="text-xs text-[var(--color-text-muted)]">{{ label }}</label>
+                                    <select name="{{ field }}"
+                                        class="w-full px-3 py-2 rounded-xl bg-[var(--color-bg)] border border-[var(--color-border)] text-sm">
+                                        <option value="5">5 - Excellent</option>
+                                        <option value="4">4 - Good</option>
+                                        <option value="3">3 - Average</option>
+                                        <option value="2">2 - Below Average</option>
+                                        <option value="1">1 - Poor</option>
+                                    </select>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            <textarea name="good_things" placeholder="Good things here..." rows="2"
+                                class="w-full px-4 py-3 rounded-xl bg-[var(--color-bg)] border border-[var(--color-border)] text-sm focus:outline-none focus:border-[var(--color-gold)] transition resize-none"></textarea>
+                            <textarea name="needs_improvement" placeholder="Things need improvement..." rows="2"
+                                class="w-full px-4 py-3 rounded-xl bg-[var(--color-bg)] border border-[var(--color-border)] text-sm focus:outline-none focus:border-[var(--color-gold)] transition resize-none"></textarea>
+                            <button type="submit" class="btn btn-gold" style="min-height:44px;">
+                                <span class="material-icons-round" style="font-size:18px">send</span>
+                                Submit Review
+                            </button>
+                            <p class="text-xs text-[var(--color-text-muted)]">Aapki review admin approval ke baad publicly dikhegi.</p>
+                        </form>
+                    </div>
+
+                    <!-- Approved reviews list -->
+                    {% if approved_reviews %}
+                    <div class="space-y-4 mt-5">
+                        {% for review in approved_reviews %}
+                        <div class="border-t border-[var(--color-border)] pt-4">
+                            <div class="flex items-center justify-between mb-1">
+                                <p class="font-semibold text-sm text-[var(--color-navy)]">{{ review.reviewer_name }} <span class="text-xs font-normal text-[var(--color-text-muted)]">&middot; {{ review.reviewer_type }}</span></p>
+                                <span class="text-sm font-bold text-[var(--color-gold)]">{{ review.overall_rating }}/5</span>
+                            </div>
+                            {% if review.good_things %}
+                            <p class="text-xs font-semibold text-green-700 mt-2">Good things here</p>
+                            <p class="text-sm text-[var(--color-text)]">{{ review.good_things }}</p>
+                            {% endif %}
+                            {% if review.needs_improvement %}
+                            <p class="text-xs font-semibold text-amber-700 mt-2">Things need improvement</p>
+                            <p class="text-sm text-[var(--color-text)]">{{ review.needs_improvement }}</p>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+<!-- Floor Plans -->
+<!-- Floor Plans -->
+{% if floor_plans %}
+<div class="card p-6 reveal" id="floorPlanSection">
+    <div class="flex items-center justify-between flex-wrap gap-3 mb-4">
+        <div class="flex items-center gap-2">
+            <span class="material-icons-round text-[var(--color-gold)]" style="font-size:20px">architecture</span>
+            <h2 class="text-xl font-bold text-[var(--color-navy)]">Floor Plans of {{ property.project_name|default:property.title }}</h2>
+        </div>
+        <div id="fpFilterPills" class="flex items-center gap-2 flex-wrap"></div>
+    </div>
+
+    <div class="fp-carousel-wrap">
+        <button type="button" id="fpScrollLeft" class="fp-nav-btn fp-nav-left" aria-label="Previous floor plan">
+            <span class="material-icons-round" style="font-size:22px">chevron_left</span>
+        </button>
+
+        <div id="fpCarousel" class="fp-carousel">
+            {% for fp in floor_plans %}
+            <div class="fp-card" data-fp-type="{{ fp.unit_type }}">
+                {% if fp.image %}
+<img src="{% cloudinary_url fp.image width=420 height=320 crop='fit' quality='auto:best' fetch_format='auto' %}"
+     alt="{{ fp.unit_type }} floor plan"
+     class="fp-card-img"
+     onclick="handleGatedMediaClick(event, function(){ window.open('{% cloudinary_url fp.image crop='limit' quality='100' %}', '_blank'); })"
+     loading="lazy">
+{% endif %}
+                <div class="p-3">
+                    <div class="flex items-center justify-between gap-2 mb-1">
+                        <p class="font-semibold text-sm text-[var(--color-navy)]">{{ fp.unit_type }}</p>
+                        {% if fp.price %}<span class="text-sm font-bold text-[var(--color-gold)] whitespace-nowrap">₹{{ fp.price|format_price }}</span>{% endif %}
+                    </div>
+                    <div class="flex flex-wrap gap-x-3 gap-y-1 text-xs text-[var(--color-text-muted)]">
+                        {% if fp.super_area %}<span>{{ fp.super_area }} sq.ft Super Builtup</span>
+                        {% elif fp.carpet_area %}<span>{{ fp.carpet_area }} sq.ft Carpet Area</span>{% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <button type="button" id="fpScrollRight" class="fp-nav-btn fp-nav-right" aria-label="Next floor plan">
+            <span class="material-icons-round" style="font-size:22px">chevron_right</span>
+        </button>
+    </div>
+</div>
+{% endif %}    
+                
+                <!-- Nearby Places -->
+                {% if property.nearby_places %}
+                <div class="card p-6 reveal">
+                    <div class="flex items-center gap-2 mb-4">
+                        <span class="material-icons-round text-[var(--color-gold)]" style="font-size:20px">place</span>
+                        <h2 class="text-xl font-bold text-[var(--color-navy)]">What's Nearby {{ property.project_name|default:property.title }}</h2>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {% for place in property.nearby_places %}
+                        <div class="flex items-center justify-between p-3 bg-[var(--color-bg-soft)] rounded-xl">
+                            <div class="flex items-center gap-3">
+                                <span class="w-8 h-8 rounded-lg bg-[var(--color-gold)]/10 flex items-center justify-center text-lg">
+                                    {{ place|nearby_icon }}
+                                </span>
+                                <span class="text-sm font-medium text-[var(--color-text)]">{{ place.name }}</span>
+                            </div>
+                            <span class="text-xs text-[var(--color-text-muted)] bg-white px-2 py-1 rounded-lg">{{ place.distance }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- Location Map -->
+                <div class="card p-6 reveal">
+                    <div class="flex items-center gap-2 mb-4">
+                        <span class="material-icons-round text-[var(--color-gold)]" style="font-size:20px">map</span>
+                        <h2 class="text-xl font-bold text-[var(--color-navy)]">Location of {{ property.project_name|default:property.title }}</h2>
+                    </div>
+                    <div class="rounded-xl overflow-hidden" style="height: 300px;">
+                        <div id="propertyDetailMap" style="width:100%; height:100%;"></div>
+                    </div>
+                    <p class="text-sm text-[var(--color-text-muted)] mt-3 flex items-center gap-1">
+                        <span class="material-icons-round" style="font-size:16px">location_on</span>
+                        {{ property.location }}
+                    </p>
+                </div>
+                
+                <!-- FAQs -->
+                <div class="card p-6 reveal">
+                    <div class="flex items-center gap-2 mb-4">
+                        <span class="material-icons-round text-[var(--color-gold)]" style="font-size:20px">help_outline</span>
+                        <h2 class="text-xl font-bold text-[var(--color-navy)]">Frequently Asked Questions about {{ property.project_name|default:property.title }}</h2>
+                    </div>
+                    <div class="space-y-3">
+                        <details class="p-3 bg-[var(--color-bg-soft)] rounded-xl">
+                            <summary class="text-sm font-semibold text-[var(--color-navy)] cursor-pointer">What is the price of {{ property.project_name|default:property.title }}?</summary>
+                            <p class="text-sm text-[var(--color-text-muted)] mt-2">{% if property.price == "Price on Request" %}{{ property.project_name|default:property.title }} ki price "Price on Request" par rakhi gayi hai — exact price ke liye humse contact karein{% if property.configuration %} ({{ property.configuration }} unit){% endif %} in {{ property.location }}, Ahmedabad.{% else %}{{ property.project_name|default:property.title }} is priced at ₹{{ property.price }} {{ property.price_unit|default:"L" }}{% if property.configuration %} for a {{ property.configuration }} unit{% endif %} in {{ property.location }}, Ahmedabad.{% endif %}</p>
+                        </details>
+                        <details class="p-3 bg-[var(--color-bg-soft)] rounded-xl">
+                            <summary class="text-sm font-semibold text-[var(--color-navy)] cursor-pointer">Is {{ property.project_name|default:property.title }} RERA registered?</summary>
+                            <p class="text-sm text-[var(--color-text-muted)] mt-2">{% if property.rera_number %}Yes, this project is RERA-registered with number {{ property.rera_number }}, so the approvals and paperwork are verified.{% else %}RERA status is confirmed at the time of listing verification — contact us for the latest documentation on this property.{% endif %}</p>
+                        </details>
+                        <details class="p-3 bg-[var(--color-bg-soft)] rounded-xl">
+                            <summary class="text-sm font-semibold text-[var(--color-navy)] cursor-pointer">Do I have to pay brokerage to buy this property?</summary>
+                            <p class="text-sm text-[var(--color-text-muted)] mt-2">No — RealShree lists this property with zero brokerage, so you deal directly with the {% if property.builder_name %}builder ({{ property.builder_name }}){% else %}owner{% endif %}.</p>
+                        </details>
+                        <details class="p-3 bg-[var(--color-bg-soft)] rounded-xl">
+                            <summary class="text-sm font-semibold text-[var(--color-navy)] cursor-pointer">When is possession available?</summary>
+                            <p class="text-sm text-[var(--color-text-muted)] mt-2">{% if property.possession_date %}Possession for this property is expected {{ property.possession_date }}.{% else %}This property's status is currently marked as {{ property.status|default:"available" }} — contact our team for the latest possession timeline.{% endif %}</p>
+                        </details>
+                    </div>
+                </div>
+
+                <!-- Similar Properties -->
+                {% if similar_properties %}
+                <div class="reveal">
+                    <div class="flex items-center gap-2 mb-4">
+                        <span class="material-icons-round text-[var(--color-gold)]" style="font-size:20px">apartment</span>
+                        <h2 class="text-xl font-bold text-[var(--color-navy)]">Similar Properties</h2>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        {% for p in similar_properties %}
+                        <a href="{{ p.get_absolute_url }}" class="property-card">
+                            <div class="card-img" style="aspect-ratio: 16/10;">
+                                {% if p.thumbnail %}
+                                <img src="{% cloudinary_url p.thumbnail width=400 height=250 crop='fill' %}" alt="{{ p.title }}" loading="lazy">
+                                {% else %}
+                                <div class="w-full h-full bg-[var(--color-bg-soft)] flex items-center justify-center">
+                                    <span class="material-icons-round text-[var(--color-text-light)]" style="font-size:32px">apartment</span>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="card-content">
+                                <div class="price">{% if p.price == "Price on Request" %}Price on Request{% else %}₹{{ p.price }} {{ p.price_unit|default:"L" }}{% endif %}</div>
+                                <h3 class="title">{{ p.title }}</h3>
+                                <div class="location">
+                                    <span class="material-icons-round" style="font-size:14px">location_on</span>
+                                    {{ p.location }}
+                                </div>
+                            </div>
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Project & Builder Info (SEO) -->
+                <div class="reveal" style="margin-top: 24px;">
+                    <h2 class="text-xl font-bold text-[var(--color-navy)] mb-3">Project &amp; Builder Information</h2>
+                    <div class="space-y-2">
+                        {% if property.project_name %}
+                        <details class="seo-info-box">
+                            <summary>Project Name</summary>
+                            <div class="seo-info-content">
+                                <h3>{{ property.project_name }}</h3>
+                                <p>{{ property.project_name }} {{ property.property_type }} for sale in {{ property.location }}, Ahmedabad{% if property.builder %}, developed by {{ property.builder.get_full_name|default:property.builder.username }}{% endif %}.</p>
+                            </div>
+                        </details>
+                        {% endif %}
+                        {% if property.builder %}
+                        <details class="seo-info-box">
+                            <summary>Builder / Developer</summary>
+                            <div class="seo-info-content">
+                                <h3>{{ property.builder.get_full_name|default:property.builder.username }}</h3>
+                                <p>This property is developed by {{ property.builder.get_full_name|default:property.builder.username }}{% if property.project_name %}, the developer behind {{ property.project_name }}{% endif %} in {{ property.location }}, Ahmedabad.</p>
+                            </div>
+                        </details>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <style>
+                .seo-info-box { border: 1px solid var(--color-border, #e5e7eb); border-radius: 10px; overflow: hidden; margin-bottom: 8px; }
+                .seo-info-box summary { cursor: pointer; padding: 12px 16px; font-weight: 600; color: var(--color-navy, #0f1e3d); list-style: none; display:flex; align-items:center; justify-content:space-between; }
+                .seo-info-box summary::-webkit-details-marker { display: none; }
+                .seo-info-box summary::after { content: '+'; font-size: 18px; color: var(--color-gold, #d4af37); }
+                .seo-info-box[open] summary::after { content: '\2212'; }
+                .seo-info-content { padding: 0 16px 14px; color: var(--color-text-muted, #6b7280); font-size: 14px; line-height: 1.6; }
+                .seo-info-content h3 { font-size: 15px; font-weight: 700; color: var(--color-navy, #0f1e3d); margin-bottom: 4px; }
+                </style>
+
+            </div>
+            
+            <!-- RIGHT SIDEBAR (1 col) - Sticky Enquiry Form -->
+            <div class="lg:col-span-1">
+                <div class="lg:sticky lg:top-20 space-y-4">
+                    
+                    <!-- Price Card -->
+                    <div class="card p-6 reveal" style="background: linear-gradient(135deg, var(--color-navy) 0%, #1e3a5f 100%); border: none;">
+                        <p class="text-xs text-white/60 uppercase tracking-wider font-medium mb-1">Starting Price</p>
+                        <h3 class="text-3xl font-bold text-[#d4af37] mb-1">
+                            {% if property.starting_price %}{% if property.starting_price == "Price on Request" %}Price on Request{% else %}₹{{ property.starting_price }} {{ property.price_unit|default:"L" }}{% endif %}{% else %}{% if property.price == "Price on Request" %}Price on Request{% else %}₹{{ property.price }} {{ property.price_unit|default:"L" }}{% endif %}{% endif %}
+                        </h3>
+                        {% if property.max_price %}
+                        <p class="text-sm text-white/70">{% if property.max_price == "Price on Request" %}Max price on request{% else %}Upto ₹{{ property.max_price }} {{ property.price_unit|default:"L" }}{% endif %}</p>
+                        {% endif %}
+                        
+                        <div class="mt-4 pt-4 border-t border-white/10 space-y-2">
+                            <div class="flex justify-between text-sm">
+                                <span class="text-white/60">Configuration</span>
+                                <span class="text-white font-medium">{{ property.configuration|default:"N/A" }}</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-white/60">Property Type</span>
+                                <span class="text-white font-medium">{{ property.property_type|default:"N/A" }}</span>
+                            </div>
+                            {% if property.rera_number %}
+                            <div class="text-sm pt-2 border-t border-white/10 mt-1">
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="text-white/60">RERA No.</span>
+                                    {% if rera_verify_url %}
+                                    <a href="{{ rera_verify_url }}" target="_blank" rel="noopener" class="text-[var(--color-gold)] text-xs underline">Verify</a>
+                                    {% endif %}
+                                </div>
+                                <p class="text-white font-medium text-xs break-all leading-relaxed">{{ property.rera_number }}</p>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Enquiry Form -->
+                    <div class="card p-6 reveal" id="enquiryForm">
+                        <div class="flex items-center gap-3 mb-5">
+                            <div class="w-10 h-10 rounded-xl bg-[var(--color-gold)]/10 flex items-center justify-center">
+                                <span class="material-icons-round text-[var(--color-gold)]" style="font-size:20px">contact_support</span>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-[var(--color-navy)]">Enquire Now</h3>
+                                <p class="text-xs text-[var(--color-text-muted)]">Get best deals</p>
+                            </div>
+                        </div>
+                        
+                        <form method="POST" class="space-y-4">
+                            {% csrf_token %}
+                            <div>
+                                <input type="text" name="name" placeholder="Full Name *" required
+                                    class="w-full px-4 py-3 rounded-xl bg-[var(--color-bg)] border border-[var(--color-border)] text-sm focus:outline-none focus:border-[var(--color-gold)] transition">
+                            </div>
+                            <div>
+                                <input type="email" name="email" placeholder="Email Address (optional)"
+                                    class="w-full px-4 py-3 rounded-xl bg-[var(--color-bg)] border border-[var(--color-border)] text-sm focus:outline-none focus:border-[var(--color-gold)] transition">
+                            </div>
+                            <div>
+                                <input type="tel" name="phone" placeholder="Phone Number *" required
+                                    class="w-full px-4 py-3 rounded-xl bg-[var(--color-bg)] border border-[var(--color-border)] text-sm focus:outline-none focus:border-[var(--color-gold)] transition">
+                            </div>
+                            <div>
+                                <textarea name="message" placeholder="Your message..." rows="3"
+                                    class="w-full px-4 py-3 rounded-xl bg-[var(--color-bg)] border border-[var(--color-border)] text-sm focus:outline-none focus:border-[var(--color-gold)] transition resize-none"></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-gold w-full" style="min-height:48px;">
+                                <span class="material-icons-round" style="font-size:18px">send</span>
+                                Submit Enquiry
+                            </button>
+                            <!-- ADD THIS -->
+                            <p class="flex items-center justify-center gap-1.5 text-xs text-[var(--color-text-muted)] text-center">
+                                <span class="material-icons-round text-[var(--color-success)]" style="font-size:16px">lock</span>
+                                Your information is 100% secure.
+                            </p>
+                        </form>
+                        
+                        <!-- Direct Contact -->
+                        <div class="mt-5 pt-5 border-t border-[var(--color-border)]">
+                            <p class="text-xs text-[var(--color-text-muted)] text-center mb-3">Or contact directly</p>
+                            <div class="grid grid-cols-2 gap-2">
+                                <a href="tel:{{ property.sales_head_number|default:site.phone|default:'+91XXXXXXXXXX' }}" 
+                                   class="flex items-center justify-center gap-1.5 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-semibold hover:bg-blue-700 transition">
+                                    <span class="material-icons-round" style="font-size:16px">phone</span>
+                                    Call
+                                </a>
+                                <a href="https://wa.me/91{{ property.sales_head_number|default:'XXXXXXXXXX' }}" 
+                                   target="_blank"
+                                   class="flex items-center justify-center gap-1.5 py-2.5 bg-green-500 text-white rounded-xl text-sm font-semibold hover:bg-green-600 transition">
+                                    <span class="material-icons-round" style="font-size:16px">chat</span>
+                                    WhatsApp
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Trust Badge -->
+                    {% if rera_verify_url %}
+                    <a href="{{ rera_verify_url }}" target="_blank" rel="noopener" class="card p-4 reveal flex items-center gap-3 hover:shadow-md transition">
+                        <span class="material-icons-round text-[var(--color-success)]" style="font-size:28px">verified</span>
+                        <div>
+                            <p class="font-semibold text-sm text-[var(--color-navy)]">RERA Verified</p>
+                            <p class="text-xs text-[var(--color-text-muted)]">Tap to verify on Gujarat RERA site</p>
+                        </div>
+                    </a>
+                    {% else %}
+                    <div class="card p-4 reveal flex items-center gap-3">
+                        <span class="material-icons-round text-[var(--color-text-muted)]" style="font-size:28px">info</span>
+                        <div>
+                            <p class="font-semibold text-sm text-[var(--color-navy)]">RERA Pending</p>
+                            <p class="text-xs text-[var(--color-text-muted)]">RERA number not added yet by builder</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</section>
+
+<!-- ============================================
+   STICKY CTA - Mobile Bottom Bar
+   ============================================ -->
+<div class="sticky-cta md:hidden">
+    <div class="flex gap-3">
+        <a href="tel:{{ property.sales_head_number|default:site.phone|default:'+91XXXXXXXXXX' }}" 
+           class="flex-1 btn btn-navy" style="min-height:48px;">
+            <span class="material-icons-round" style="font-size:18px">phone</span>
+            Call Now
+        </a>
+        <button onclick="document.getElementById('enquiryForm').scrollIntoView({behavior: 'smooth'})"
+                class="flex-1 btn btn-gold" style="min-height:48px;">
+            <span class="material-icons-round" style="font-size:18px">edit</span>
+            Enquire
+        </button>
+    </div>
+</div>
+
+<!-- ============================================
+   GALLERY LIGHTBOX
+   ============================================ -->
+<div id="galleryModal" class="fixed inset-0 bg-black/95 hidden items-center justify-center z-50">
+    <button onclick="closeGallery()" class="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition z-50">
+        <span class="material-icons-round">close</span>
+    </button>
+    
+    <div class="absolute top-4 left-1/2 -translate-x-1/2 bg-white/10 px-4 py-2 rounded-full text-white text-sm">
+        <span id="imageCounter">1</span> / <span id="totalImages">{{ property.images.all|length }}</span>
+    </div>
+    
+    <button onclick="prevImage()" class="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition">
+        <span class="material-icons-round" style="font-size:28px">chevron_left</span>
+    </button>
+    
+    <img id="galleryImage" alt="{{ property.project_name|default:property.title }} - photo" class="max-w-[90vw] max-h-[70vh] rounded-xl object-contain transition-opacity duration-300">
+    
+    <button onclick="nextImage()" class="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition">
+        <span class="material-icons-round" style="font-size:28px">chevron_right</span>
+    </button>
+    
+    <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 max-w-[90vw] overflow-x-auto pb-2">
+        {% for img in property.images.all %}
+        <img src="{% cloudinary_url img.image width=120 height=80 crop='fill' %}"
+             alt="{{ property.project_name|default:property.title }} - thumbnail {{ forloop.counter }}"
+             onclick="goToImage({{ forloop.counter0 }})"
+             class="gallery-thumb w-16 h-12 object-cover rounded-lg cursor-pointer border-2 border-transparent transition"
+             data-index="{{ forloop.counter0 }}">
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Leaflet Map -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+
+<script>
+// Gallery
+let images = [
+{% for img in property.images.all %}
+"{% cloudinary_url img.image width=1600 crop='limit' quality='auto:best' %}",
+{% endfor %}
+];
+let currentIndex = 0;
+
+function openGallery(index) {
+    currentIndex = index;
+    updateImage();
+    document.getElementById('galleryModal').classList.remove('hidden');
+    document.getElementById('galleryModal').classList.add('flex');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeGallery() {
+    document.getElementById('galleryModal').classList.add('hidden');
+    document.getElementById('galleryModal').classList.remove('flex');
+    document.body.style.overflow = '';
+}
+
+function updateImage() {
+    const img = document.getElementById('galleryImage');
+    img.style.opacity = '0';
+    setTimeout(() => {
+        img.src = images[currentIndex];
+        img.style.opacity = '1';
+        document.getElementById('imageCounter').textContent = currentIndex + 1;
+        document.querySelectorAll('.gallery-thumb').forEach((t, i) => {
+            t.classList.toggle('border-[var(--color-gold)]', i === currentIndex);
+            t.classList.toggle('border-transparent', i !== currentIndex);
+        });
+    }, 150);
+}
+
+function goToImage(index) { currentIndex = index; updateImage(); }
+function nextImage() { currentIndex = (currentIndex + 1) % images.length; updateImage(); }
+function prevImage() { currentIndex = (currentIndex - 1 + images.length) % images.length; updateImage(); }
+
+document.addEventListener('keydown', e => {
+    if (document.getElementById('galleryModal').classList.contains('hidden')) return;
+    if (e.key === 'Escape') closeGallery();
+    if (e.key === 'ArrowRight') nextImage();
+    if (e.key === 'ArrowLeft') prevImage();
+});
+
+// Map
+(function() {
+    var lat = {{ property.latitude|default:"null" }};
+    var lng = {{ property.longitude|default:"null" }};
+    var mapLink = "{{ property.map_link|default:''|escapejs }}";
+    
+    function initMap(lat, lng) {
+        var map = L.map('propertyDetailMap', { center: [lat, lng], zoom: 15, scrollWheelZoom: false });
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap', maxZoom: 19
+        }).addTo(map);
+        
+        L.marker([lat, lng]).addTo(map)
+            .bindPopup('<b>{{ property.title|escapejs }}</b><br>{{ property.location|escapejs }}')
+            .openPopup();
+        
+        map.on('click', () => map.scrollWheelZoom.enable());
+    }
+    
+    if (lat && lng) {
+        initMap(lat, lng);
+    } else if (mapLink) {
+        var match = mapLink.match(/(-?\d+\.?\d*)[,\s]+(-?\d+\.?\d*)/);
+        if (match) {
+            initMap(parseFloat(match[1]), parseFloat(match[2]));
+        } else {
+            fetch('https://nominatim.openstreetmap.org/search?q=' + encodeURIComponent("{{ property.location|escapejs }}") + '&format=json&limit=1')
+                .then(r => r.json()).then(d => {
+                    if (d.length) initMap(parseFloat(d[0].lat), parseFloat(d[0].lon));
+                    else initMap(20.5937, 78.9629);
+                }).catch(() => initMap(20.5937, 78.9629));
+        }
+    } else {
+        initMap(20.5937, 78.9629);
+    }
+})();
+</script>
+<!-- Floor Plan Carousel: arrows + type filter pills -->
+<script>
+(function(){
+    var track = document.getElementById('fpCarousel');
+    var pillsWrap = document.getElementById('fpFilterPills');
+    if (!track) return;
+
+    var cards = Array.prototype.slice.call(track.querySelectorAll('.fp-card'));
+
+    var types = [];
+    cards.forEach(function(c){
+        var t = c.getAttribute('data-fp-type');
+        if (t && types.indexOf(t) === -1) types.push(t);
+    });
+
+    if (types.length > 1 && pillsWrap) {
+        var allPill = document.createElement('button');
+        allPill.type = 'button';
+        allPill.className = 'fp-pill active';
+        allPill.textContent = 'All';
+        allPill.onclick = function(){ filterCards(null, allPill); };
+        pillsWrap.appendChild(allPill);
+
+        types.forEach(function(t){
+            var pill = document.createElement('button');
+            pill.type = 'button';
+            pill.className = 'fp-pill';
+            pill.textContent = t;
+            pill.onclick = function(){ filterCards(t, pill); };
+            pillsWrap.appendChild(pill);
+        });
+    }
+
+    function filterCards(type, activePill){
+        pillsWrap.querySelectorAll('.fp-pill').forEach(function(p){ p.classList.remove('active'); });
+        activePill.classList.add('active');
+        cards.forEach(function(c){
+            c.style.display = (!type || c.getAttribute('data-fp-type') === type) ? '' : 'none';
+        });
+        track.scrollTo({ left: 0, behavior: 'smooth' });
+    }
+
+    var leftBtn = document.getElementById('fpScrollLeft');
+    var rightBtn = document.getElementById('fpScrollRight');
+    function scrollAmount(){
+        var first = track.querySelector('.fp-card');
+        if (!first) return 260;
+        var style = window.getComputedStyle(track);
+        var gap = parseInt(style.columnGap || style.gap || 16, 10);
+        return first.offsetWidth + gap;
+    }
+    if (leftBtn) leftBtn.addEventListener('click', function(){
+        track.scrollBy({ left: -scrollAmount(), behavior: 'smooth' });
+    });
+    if (rightBtn) rightBtn.addEventListener('click', function(){
+        track.scrollBy({ left: scrollAmount(), behavior: 'smooth' });
+    });
+})();
+</script>
+<!-- Lead-gate logic: Floor Plan / Brochure / Video ke liye name+mobile capture -->
+<script>
+(function(){
+    var PROPERTY_ID = {{ property.id }};
+    var CAPTURE_URL = "{% url 'capture_media_lead' id=property.id %}";
+    var pendingAction = null;
+    var mediaViewReported = false;
+
+    function isUnlocked(){
+        return !!(getCookie('viewer_name') && getCookie('viewer_phone'));
+    }
+
+    function openLeadGateModal(){
+        document.getElementById('leadGateOverlay').classList.add('active');
+        document.getElementById('leadGateError').style.display = 'none';
+        setTimeout(function(){
+            var nameInput = document.getElementById('leadGateName');
+            if (nameInput) nameInput.focus();
+        }, 50);
+    }
+
+    window.closeLeadGateModal = function(){
+        document.getElementById('leadGateOverlay').classList.remove('active');
+        pendingAction = null;
+    };
+
+    function reportMediaView(nameOverride, phoneOverride){
+        if (mediaViewReported) return;
+        mediaViewReported = true;
+        var body = new URLSearchParams();
+        if (nameOverride) body.append('name', nameOverride);
+        if (phoneOverride) body.append('phone', phoneOverride);
+        fetch(CAPTURE_URL, {
+            method: 'POST',
+            headers: { 'X-CSRFToken': getCookie('csrftoken'), 'X-Requested-With': 'XMLHttpRequest' },
+            body: body
+        }).catch(function(){});
+    }
+
+    window.handleGatedMediaClick = function(evt, action){
+        if (evt) evt.preventDefault();
+        if (isUnlocked()){
+            reportMediaView();
+            if (action) action();
+            return;
+        }
+        pendingAction = action;
+        openLeadGateModal();
+    };
+
+    window.handleGatedVideoClick = function(evt){
+        if (evt) evt.preventDefault();
+        var playVideo = function(){
+            var box = document.getElementById('gatedVideoBox');
+            if (!box) return;
+            var videoSrc = box.getAttribute('data-video-src');
+            if (!videoSrc) return;
+            box.outerHTML =
+                '<div class="rounded-xl overflow-hidden" style="position:relative; padding-top:56.25%;">' +
+                '<iframe src="' + videoSrc + '" style="position:absolute; top:0; left:0; width:100%; height:100%;" ' +
+                'frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>' +
+                '</div>';
+        };
+        handleGatedMediaClick(evt, playVideo);
+    };
+
+    window.submitLeadGateForm = function(evt){
+        evt.preventDefault();
+        var nameVal = document.getElementById('leadGateName').value.trim();
+        var phoneVal = document.getElementById('leadGatePhone').value.trim();
+        var errorEl = document.getElementById('leadGateError');
+        var submitBtn = document.getElementById('leadGateSubmitBtn');
+        var digitsOnly = phoneVal.replace(/\D/g, '');
+
+        if (!nameVal || digitsOnly.length < 10){
+            errorEl.textContent = 'Please enter a valid name and a 10-digit mobile number..';
+            errorEl.style.display = 'block';
+            return;
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Please wait...';
+
+        var body = new URLSearchParams();
+        body.append('name', nameVal);
+        body.append('phone', phoneVal);
+
+        fetch(CAPTURE_URL, {
+            method: 'POST',
+            headers: { 'X-CSRFToken': getCookie('csrftoken'), 'X-Requested-With': 'XMLHttpRequest' },
+            body: body
+        })
+        .then(function(r){ return r.json(); })
+        .then(function(data){
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'View Now';
+            if (data.success){
+                mediaViewReported = true;
+                closeLeadGateModal();
+                if (typeof showToast === 'function'){
+                    showToast('Thank you! You can now view the full details.', 'success');
+                }
+                if (pendingAction) { pendingAction(); pendingAction = null; }
+            } else {
+                errorEl.textContent = data.error || 'Something went wrong. Please try again.';
+                errorEl.style.display = 'block';
+            }
+        })
+        .catch(function(){
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'View Now';
+            errorEl.textContent = 'Network error. Please try again.';
+            errorEl.style.display = 'block';
+        });
+    };
+
+    document.addEventListener('DOMContentLoaded', function(){
+        if (isUnlocked()){
+            reportMediaView();
+        }
+    });
+})();
+</script>
+
+{% endblock %}

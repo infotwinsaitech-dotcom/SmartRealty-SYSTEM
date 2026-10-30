@@ -459,6 +459,7 @@ def capture_media_lead(request, id):
 
 def property_detail(request, id, slug=None):
     """Property detail with inquiry form"""
+    from core.seo_property import build_property_seo_safe
     property = get_object_or_404(
         Property.objects.select_related('builder').prefetch_related('images'), 
         id=id
@@ -624,6 +625,7 @@ def property_detail(request, id, slug=None):
         "rera_verify_url": rera_verify_url,
         "review_rating_fields": review_rating_fields,
         "floor_plans": floor_plans,
+        "seo": build_property_seo_safe(property, SITE_DOMAIN, rating_summary),
     })
 
 def property_search_suggestions(request):
